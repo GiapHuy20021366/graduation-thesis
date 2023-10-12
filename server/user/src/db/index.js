@@ -1,9 +1,5 @@
 import mongoose from "mongoose";
 import {
-    userSchema
-} from "./schema"
-import collections from "./collections";
-import {
     MONGODB_LOCAL_URI
 } from "../config"
 
@@ -22,9 +18,3 @@ export const connectDB = async () => {
   });
   conn.on("error", console.error.bind(console, "connection error:"));
 };
-
-export const User = mongoose.model(
-    "User",
-    userSchema,
-    collections.user
-)
