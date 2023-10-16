@@ -1,0 +1,10 @@
+.F4U
+|___ server                   ( services               )
+|______ gateway               (API gateway             )
+|______ user                  (User service            )
+|______ notification          (Notification service    )
+|______ ...services           (Other services          ) 
+|___ web-app                  (vite-react)
+|______ public
+|______ src
+|______ index.html

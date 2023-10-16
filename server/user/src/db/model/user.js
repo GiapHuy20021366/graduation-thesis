@@ -12,7 +12,7 @@ const user = new Schema({
     picture: String
   },
   createAt: { type: Date, default: Date.now },
-  validAt: { type: Date, default: Date.now },
+  validSince: { type: Date, default: Date.now },
 });
 
 user.methods = {

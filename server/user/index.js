@@ -2,6 +2,9 @@ const express = require("express");
 const cors = require("cors");
 import { PORT } from "./src/config";
 import { connectDB } from "./src/db";
+import { RPCObserver } from "./rpc"
+import logger from "./src/config/logger"
+logger.info("huy", "gv");
 
 const app = express();
 
@@ -13,3 +16,5 @@ app.use(express.json());
 app.listen(PORT, () => {
   console.log(`User sevice is Listening to Port ${PORT}`);
 });
+
+RPCObserver();

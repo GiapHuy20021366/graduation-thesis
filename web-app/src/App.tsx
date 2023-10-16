@@ -5,14 +5,11 @@ import {
 } from "./env";
 import { GoogleOAuthResponse } from './types/GoogleOAuthResponse';
 import jwtDecode from 'jwt-decode';
-
-declare global {
-  interface Window {
-    google: any;
-  }
-}
+import "./types/declare";
 
 function App() {
+
+  console.log("asasd".format(true, false, 1, "huy"));
 
   const handleCallbackResponse = (response: GoogleOAuthResponse) => {
     console.log(response);
