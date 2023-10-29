@@ -13,8 +13,6 @@ package-lock.json
 dist
 dist-ssr
 /server/web-app
-*.local
-.env
 
 # Editor directories and files
 .vscode/*
