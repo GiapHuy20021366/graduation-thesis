@@ -1,19 +1,9 @@
-const amqplib = require("amqplib");
-const { v4: uuid4 } = require("uuid");
-import { AMQP_PATH, RPC_QUEUE_NAME } from "./src/config";
+import { ConsumeMessage } from "amqplib";
+import { v4 as uuid4 } from "uuid";
+import { RPC_QUEUE_NAME, RPC_REQUEST_TIME_OUT } from "../config";
+import { getChannel } from "./channel";
 
-let amqplibConnection = null;
-
-const getChannel = async () => {
-  if (amqplibConnection === null) {
-    amqplibConnection = await amqplib.connect(AMQP_PATH);
-  }
-  const channel = await amqplibConnection.createChannel();
-  console.log(channel)
-  return channel;
-};
-
-const RPCObserver = async () => {
+export const RPCObserver = async () => {
   const channel = await getChannel();
   await channel.assertQueue(RPC_QUEUE_NAME, {
     durable: false,
@@ -21,8 +11,8 @@ const RPCObserver = async () => {
   channel.prefetch(1);
   channel.consume(
     RPC_QUEUE_NAME,
-    async (msg) => {
-      if (msg.content) {
+    async (msg: ConsumeMessage | null) => {
+      if (msg != null) {
         const payload = JSON.parse(msg.content.toString());
 
         // Implement response;
@@ -44,7 +34,11 @@ const RPCObserver = async () => {
   );
 };
 
-const requestData = async (RPC_QUEUE_NAME, requestPayload, uuid, timeout = 3000) => {
+const requestData = async (
+  RPC_QUEUE_NAME: string,
+  requestPayload: any,
+  uuid: string
+): Promise<string | null> => {
   try {
     const channel = await getChannel();
 
@@ -64,16 +58,18 @@ const requestData = async (RPC_QUEUE_NAME, requestPayload, uuid, timeout = 3000)
       const timeout = setTimeout(() => {
         channel.close();
         resolve("Request time out!");
-      }, timeout);
+      }, RPC_REQUEST_TIME_OUT);
 
       channel.consume(
         q.queue,
-        (msg) => {
-          if (msg.properties.correlationId == uuid) {
-            resolve(JSON.parse(msg.content.toString()));
-            clearTimeout(timeout);
-          } else {
-            reject("Data not found!");
+        (msg: ConsumeMessage | null) => {
+          if (msg != null) {
+            if (msg.properties.correlationId == uuid) {
+              clearTimeout(timeout);
+              resolve(JSON.parse(msg.content.toString()));
+            } else {
+              reject("Data not found!");
+            }
           }
         },
         {
@@ -82,17 +78,12 @@ const requestData = async (RPC_QUEUE_NAME, requestPayload, uuid, timeout = 3000)
       );
     });
   } catch (error) {
-    return "error";
+    return null;
   }
 };
 
-const RPCRequest = async (RPCQueueName, requestPayload) => {
+export const RPCRequest = async (RPCQueueName: string, requestPayload: any) => {
   const uuid = uuid4();
   return await requestData(RPCQueueName, requestPayload, uuid);
 };
 
-module.exports = {
-  getChannel,
-  RPCObserver,
-  RPCRequest,
-};

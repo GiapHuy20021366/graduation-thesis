@@ -8,7 +8,7 @@ declare global {
     }
 }
 
-String.prototype.format = function(...params: any[]): string {
+String.prototype.format = function (...params: any[]): string {
     const d: string = String(this);
     return d + params.join(",");
 }

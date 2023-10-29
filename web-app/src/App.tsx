@@ -5,7 +5,6 @@ import {
 } from "./env";
 import { GoogleOAuthResponse } from './types/GoogleOAuthResponse';
 import jwtDecode from 'jwt-decode';
-import "./types/declare";
 
 function App() {
 
