@@ -16,7 +16,7 @@ app.use(express.json());
 initUserRouters(app);
 
 app.listen(PORT, () => {
-  console.log(`User sevice is Listening to Port ${PORT}`);
+  console.log(`Message sevice is Listening to Port ${PORT}`);
 });
 
 // RPCObserver();
