@@ -4,13 +4,15 @@ import { connectDB } from "./src/db";
 import { RPCObserver } from "./src/broker/rpc"
 import { initUserRouters } from "./src/route";
 import cors from "cors";
+import bodyParser from "body-parser";
 
 const app: Express = express();
 
 // connectDB();
 
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 app.use(cors());
-app.use(express.json());
 
 // init endpoints
 initUserRouters(app);

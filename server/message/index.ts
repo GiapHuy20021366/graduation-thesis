@@ -11,6 +11,7 @@ const app: Express = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static("public"));
 
 // init endpoints
 initUserRouters(app);
