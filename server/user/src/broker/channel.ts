@@ -1,9 +1,9 @@
 import amqplib, { Connection, Channel } from "amqplib";
-import { AMQP_PATH } from "../config";
+import { AMQP_PATH, consoleLogger } from "../config";
 
 interface RabbitInfo {
   connection?: Connection;
-  channel?: Channel
+  channel?: Channel;
 }
 const rabbit: RabbitInfo = {
     connection: undefined,
@@ -13,9 +13,16 @@ const rabbit: RabbitInfo = {
 export const getChannel = async (): Promise<Channel> => {
   if (rabbit.connection === undefined) {
     rabbit.connection = await amqplib.connect(AMQP_PATH);
+    consoleLogger.info(`[MESSAGE BROKER] Connection established`)
   }
   if (rabbit.channel == undefined) {
     rabbit.channel = await rabbit.connection.createChannel();
+    consoleLogger.info(`[MESSAGE BROKER] Channel created`)
   }
   return rabbit.channel;
 };
+
+export const initChannel = async (): Promise<void> => {
+  await getChannel();
+}
+

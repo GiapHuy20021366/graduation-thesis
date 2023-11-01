@@ -1,32 +1,16 @@
 import { Model, Schema, HydratedDocument, model } from 'mongoose';
 import collections from '../collections';
-
-export interface IGoogleOAuthInfo {
-  aud: string,
-  azp: string,
-  email: string,
-  family_name: string,
-  given_name: string,
-  locale: string,
-  sub: string,
-  picture: string
-}
-
-export interface IUser {
-  googleOAuth?: IGoogleOAuthInfo,
-  createdAt: Date,
-  validSince: Date,
-}
+import { UserInfo } from '../../data';
 
 interface IUserMethods {
   // fullName(): string;
 }
 
-interface IUserModel extends Model<IUser, {}, IUserMethods> {
-  findByEmail(email: string): Promise<HydratedDocument<IUser, IUserMethods>>;
+interface IUserModel extends Model<UserInfo, {}, IUserMethods> {
+  findByEmail(email: string): Promise<HydratedDocument<UserInfo, IUserMethods>>;
 }
 
-const userSchema = new Schema<IUser, IUserModel, IUserMethods>({
+const userSchema = new Schema<UserInfo, IUserModel, IUserMethods>({
   googleOAuth: { 
     aud: String,
     azp: String,
@@ -52,6 +36,6 @@ userSchema.static('findByEmail', function (name: string) {
 //   return this + ' ' + this.lastName;
 // });
 
-export const User = model<IUser, IUserModel>('User', userSchema, collections.user);
+export const User = model<UserInfo, IUserModel>('User', userSchema, collections.user);
 
 export default User;

@@ -14,4 +14,5 @@ export const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1h";
 
 
 // other configs
-export { logger } from "./logger";
+export { logger as winstonLogger } from "./winston";
+export { logger as consoleLogger } from "./logger";

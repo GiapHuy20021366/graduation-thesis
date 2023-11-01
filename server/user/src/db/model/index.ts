@@ -1,1 +1,1 @@
-export { User, IGoogleOAuthInfo, IUser } from "./user";
+export { User } from "./user";
