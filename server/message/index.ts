@@ -1,8 +1,8 @@
 import express, { Express } from "express";
-import { PORT } from "./src/config";
+import { PORT, consoleLogger } from "./src/config";
 import { connectDB } from "./src/db";
-import { RPCObserver } from "./src/broker/rpc"
 import { initUserRouters } from "./src/route";
+import { initChannel } from "./src/broker";
 import cors from "cors";
 
 const app: Express = express();
@@ -17,7 +17,7 @@ app.use(express.static("public"));
 initUserRouters(app);
 
 app.listen(PORT, () => {
-  console.log(`Message sevice is Listening to Port ${PORT}`);
+  consoleLogger.info(`Message sevice is Listening to Port ${PORT}`)
 });
 
-// RPCObserver();
+initChannel();

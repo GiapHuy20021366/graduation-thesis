@@ -22,4 +22,5 @@ export const NODE_MAILER_CONFIG_PORT = +(process.env.NODE_MAILER_CONFIG_PORT || 
 
 
 // other configs
-export { logger } from "./logger";
+export { logger as winstonLogger } from "./winston";
+export { logger as consoleLogger } from "./logger";

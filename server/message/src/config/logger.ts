@@ -1,15 +1,46 @@
-import winston from "winston";
+const Level = {
+  info: "INFO",
+  warn: "WARN",
+  err: "ERR"
+} as const;
 
-export const logger = winston.createLogger({
-  level: "info",
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.prettyPrint(),
-  ),
-});
+const getHeaderLogger = (level: string): string => {
+  let header = "[" + level + "] ";
+  header += "[" + (new Date()).toUTCString() + "]";
+  header += "  ";
+  return header;
+}
 
-logger.add(
-  new winston.transports.Console({
-    format: winston.format.simple(),
-  })
-);
+const getParamsLogger = (...params: any[]): string => {
+  let message = "";
+  for (const param of params) {
+    if (typeof param === "object") {
+      message += "\n";
+    } else {
+      message += " ";
+    }
+    message += param.toString();
+  }
+  return message;
+}
+
+const info = (...params: any[]): void => {
+  let message = getHeaderLogger(Level.info) + getParamsLogger(...params);
+  console.log(message);
+}
+
+const warn = (...params: any[]): void => {
+  let message = getHeaderLogger(Level.warn) + getParamsLogger(...params);
+  console.log(message);
+}
+
+const err = (...params: any[]): void => {
+  let message = getHeaderLogger(Level.err) + getParamsLogger(...params);
+  console.log(message);
+}
+
+export const logger = {
+  info: info,
+  err: err,
+  warn: warn
+}
