@@ -1,13 +1,10 @@
 import mongoose from "mongoose";
 import {
-    MONGODB_LOCAL_URI
+  MONGODB_LOCAL_URI
 } from "../config"
 
 export const connectDB = async () => {
-  mongoose.connect(MONGODB_LOCAL_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  mongoose.connect(MONGODB_LOCAL_URI, {});
 
   const conn = mongoose.connection;
   conn.on("connected", function () {

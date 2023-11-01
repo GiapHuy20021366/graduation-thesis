@@ -21,8 +21,3 @@ export const getChannel = async (): Promise<Channel> => {
   }
   return rabbit.channel;
 };
-
-export const initChannel = async (): Promise<void> => {
-  await getChannel();
-}
-

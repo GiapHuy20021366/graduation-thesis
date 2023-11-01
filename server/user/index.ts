@@ -5,7 +5,7 @@ import { initUserRouters } from "./src/route";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { consoleLogger } from "./src/config";
-import { initChannel } from "./src/broker";
+import { subscribeMessage, publishMessage } from "./src/broker";
 
 const app: Express = express();
 
@@ -22,6 +22,8 @@ app.listen(PORT, () => {
   consoleLogger.info(`User sevice is Listening to Port ${PORT}`)
 });
 
-initChannel();
+subscribeMessage().then(() => {
+  publishMessage("Message service", "Hello from User service");
+});
 
 // RPCObserver();
