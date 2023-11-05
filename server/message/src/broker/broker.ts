@@ -4,7 +4,9 @@ import { getChannel } from "./channel";
 import { MannualAccountInfo, sendActiveMannualAccount } from "../services";
 
 export const operations = {
-  ACTIVE_MANNUAL_ACCOUNT: "ACTIVE_MANNUAL_ACCOUNT"
+  mail: {
+    ACTIVE_MANNUAL_ACCOUNT: "ACTIVE_MANNUAL_ACCOUNT"
+  }
 } as const;
 
 // Message Broker
@@ -48,7 +50,7 @@ export const subscribeMessage = async () => {
             return;
           }
           
-          consoleLogger.info("[MESSAGE BROKER] ", parsed);
+          consoleLogger.info("[MESSAGE BROKER] ", "recieved message from ", parsed.from, parsed);
           
           exeOperation(parsed).then((result: boolean) => {
             if (result === false) {
@@ -71,7 +73,7 @@ export const exeOperation = async (info: {[key: string]: any}): Promise<boolean>
 
   try {
     switch (info.operation) {
-      case operations.ACTIVE_MANNUAL_ACCOUNT: {
+      case operations.mail.ACTIVE_MANNUAL_ACCOUNT: {
         const accountInfo = info as MannualAccountInfo;
         const messageInfo = await sendActiveMannualAccount(accountInfo);
         if (messageInfo === null) {

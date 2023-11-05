@@ -1,10 +1,11 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { JWT_PRIVATE_KEY, JWT_EXPIRES_IN } from "~/config";
+import { JWT_PRIVATE_KEY, JWT_EXPIRES_IN } from "../config";
 
 export const signToken = (payload: string | object | Buffer, expiresIn: string | number = JWT_EXPIRES_IN): string => {
-    return "Bearer "+ jwt.sign(payload, JWT_PRIVATE_KEY, {
+    const token = jwt.sign(payload, JWT_PRIVATE_KEY, {
         expiresIn: expiresIn
     });
+    return token;
 };
 
 export const verifyToken = (token: string | null | undefined): string | JwtPayload | null => {

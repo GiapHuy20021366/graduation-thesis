@@ -1,0 +1,1 @@
+export { registAccountByMannual } from "./mannual-register";

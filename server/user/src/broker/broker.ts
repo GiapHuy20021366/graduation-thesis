@@ -1,6 +1,12 @@
-import { Channel, ConsumeMessage } from "amqplib";
-import { EXCHANGE_NAME, CUSTOMER_SERVICE, consoleLogger } from "../config";
+import { ConsumeMessage } from "amqplib";
+import { EXCHANGE_NAME, USER_SERVICE, consoleLogger } from "../config";
 import { getChannel } from "./channel";
+
+export const operations = {
+  mail: {
+    ACTIVE_MANNUAL_ACCOUNT: "ACTIVE_MANNUAL_ACCOUNT"
+  }
+} as const;
 
 // Message Broker
 export const withQueue = async () => {
@@ -28,8 +34,8 @@ export const subscribeMessage = async () => {
   consoleLogger.info(`[MESSAGE BROKER] [QUEUE] Create queue with name ${q.queue}`);
   consoleLogger.info(`[MESSAGE BROKER] [QUEUE] Waiting for messages in queue ${q.queue}`)
 
-  channel.bindQueue(q.queue, EXCHANGE_NAME, CUSTOMER_SERVICE);
-  consoleLogger.info(`[MESSAGE BROKER] [BINDING] Biding exchange ${EXCHANGE_NAME} and queue ${q.queue} with name ${CUSTOMER_SERVICE}`);
+  channel.bindQueue(q.queue, EXCHANGE_NAME, USER_SERVICE);
+  consoleLogger.info(`[MESSAGE BROKER] [BINDING] Biding exchange ${EXCHANGE_NAME} and queue ${q.queue} with name ${USER_SERVICE}`);
 
   channel.consume(
     q.queue,

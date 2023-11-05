@@ -15,6 +15,7 @@ export const SALT_ROUNDS = +(process.env.SALT_ROUNDS || 10) as number;
 export const JWT_PRIVATE_KEY = (process.env.JWT_PRIVATE_KEY || "json-web-token") as string;
 export const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1h";
 
+export const NODE_MAILER_SERVICE = process.env.NODE_MAILER_SERVICE as string;
 export const NODE_MAILER_ALIAS = process.env.NODE_MAILER_ALIAS as string;
 export const NODE_MAILER_PASSWORD = process.env.NODE_MAILER_PASSWORD as string;
 export const NODE_MAILER_CONFIG_HOST = process.env.NODE_MAILER_CONFIG_HOST as string;

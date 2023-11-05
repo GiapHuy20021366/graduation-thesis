@@ -7,7 +7,6 @@ import { GoogleOAuthResponse } from './types/GoogleOAuthResponse';
 import jwtDecode from 'jwt-decode';
 
 function App() {
-
   console.log("asasd".format(true, false, 1, "huy"));
 
   const handleCallbackResponse = (response: GoogleOAuthResponse) => {
@@ -29,12 +28,12 @@ function App() {
 
   return (
     <>
-      <div className='App'>
-        <div id="google-oauth">
-        </div>
+      <div className="App">
+        <div id="google-oauth"></div>
+        <>"asasd".format(true, false, 1, "huy")</>
       </div>
     </>
-  )
+  );
 }
 
 export default App

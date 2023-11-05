@@ -106,10 +106,11 @@
     "global.d.ts"
   ],
   "include": [
-    "src/**/*.ts",
+    "src/**/*",
     "index.ts",
     "tsconfig.json",
-    "global.d.ts"
+    "global.d.ts",
+    "src/views/*.ejs",
   ],
   "exclude": [
     "node_modules"

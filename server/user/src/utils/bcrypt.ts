@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { SALT_ROUNDS } from "~/config";
+import { SALT_ROUNDS } from "../config";
 
 
 export const hashText = (text: string): string | null => {

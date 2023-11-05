@@ -7,11 +7,11 @@ export const validateAccountRegisterMethod = (method?: TAccountRegisterMethod): 
     if (method == undefined || !methods.includes(method)) {
         throw new InvalidDataError({
             message: `Invalid method "${method}" for Account register.`
-        })
+        });
     }
 } 
 
-export const validateEmail = (email?: string): void => {
+export const validateEmail = async (email?: string): Promise<boolean> => {
     if (email === undefined) {
         throw new InvalidDataError({
             message: "Email can not be undefined"
@@ -23,29 +23,57 @@ export const validateEmail = (email?: string): void => {
             message: "Invalid email format"
         });
     }
+    return true;
 }
 
-export const validatePassword = (password?: string): void => {
+export const validatePassword = async (password?: string): Promise<boolean> => {
     if (password == undefined) {
-        throw new Error("Password can not be undefined");
+        throw new InvalidDataError({
+            message: "Password can not be undefined"
+        });
     }
     if (password.length < 8) {
-        throw new Error("Invalid password format: Length have to larger or equal t0 8");
+        throw new InvalidDataError({
+            message: "Invalid password format: Length have to larger or equal to 8"
+        });
     }
 
     if (!/[A-Z]/.test(password)) {
-        throw new Error("Invalid password format:");
+        throw new InvalidDataError({
+            message: "Invalid password format: At least one upper case character"
+        });
     }
 
     if (!/[a-z]/.test(password)) {
-        throw new Error("Invalid password format:");
+        throw new InvalidDataError({
+            message: "Invalid password format: At least one lower case character"
+        });
     }
 
     if (!/[0-9]/.test(password)) {
-        throw new Error("Invalid password format:");
+        throw new InvalidDataError({
+            message: "Invalid password format: At least one digit character"
+        });
     }
 
     if (!/[!@#$%^&*]/.test(password)) {
-        throw new Error("Invalid password format:");
+        throw new InvalidDataError({
+            message: "Invalid password format: At least one special character"
+        });
     }
+    return true;
+}
+
+export const validateName = async (firstName?: string, lastName?: string): Promise<boolean> => {
+    if (firstName === undefined || firstName === "") {
+        throw new InvalidDataError({
+            message: "First name cannot be empty"
+        });
+    }
+    if (lastName === undefined || lastName === "") {
+        throw new InvalidDataError({
+            message: "Last name cannot be empty"
+        });
+    }
+    return true;
 }

@@ -3,15 +3,16 @@ import collections from '../collections';
 import { UserInfo } from '../../data';
 
 interface IUserMethods {
-  // fullName(): string;
+  isOAuthGoogle(): boolean;
+  isOAuthFacebook(): boolean; // TODO
 }
 
 interface IUserModel extends Model<UserInfo, {}, IUserMethods> {
-  findByEmail(email: string): Promise<HydratedDocument<UserInfo, IUserMethods>>;
+  findOneByEmail(email: string): Promise<HydratedDocument<UserInfo, IUserMethods> | null>;
 }
 
 const userSchema = new Schema<UserInfo, IUserModel, IUserMethods>({
-  googleOAuth: { 
+  googleOAuth: {
     aud: String,
     azp: String,
     email: String,
@@ -19,22 +20,40 @@ const userSchema = new Schema<UserInfo, IUserModel, IUserMethods>({
     given_name: String,
     locale: String,
     sub: String,
-    picture: String
+    picture: String,
+    createdAt: Date
   },
   createdAt: { type: Date, default: Date.now },
-  validSince: { type: Date, default: Date.now }
+  validSince: { type: Date, default: Date.now },
+  firstName: {
+    required: true,
+    type: String
+  },
+  lastName: {
+    required: true,
+    type: String
+  },
+  email: {
+    required: true,
+    type: String,
+    index: true
+  },
+  password: {
+    required: true,
+    type: String,
+  },
+  titles: [String]
 });
 
 // Statics
-userSchema.static('findByEmail', function (name: string) {
-  const [firstName, lastName] = name.split(' ');
-  return this.create({ firstName, lastName });
+userSchema.static('findOneByEmail', function (email: string) {
+  return this.findOne({ email: email });
 });
 
 // Methods
-// schema.method('fullName', function fullName(): string {
-//   return this + ' ' + this.lastName;
-// });
+userSchema.method('isOAuthGoogle', function () {
+  return this.googleOAuth !== undefined;
+});
 
 export const User = model<UserInfo, IUserModel>('User', userSchema, collections.user);
 

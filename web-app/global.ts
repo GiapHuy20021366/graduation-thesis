@@ -13,4 +13,4 @@ String.prototype.format = function (...params: any[]): string {
     return d + params.join(",");
 }
 
-export {};
+export { };

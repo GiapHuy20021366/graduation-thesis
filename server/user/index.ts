@@ -9,7 +9,7 @@ import { subscribeMessage, publishMessage } from "./src/broker";
 
 const app: Express = express();
 
-// connectDB();
+connectDB();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -23,7 +23,7 @@ app.listen(PORT, () => {
 });
 
 subscribeMessage().then(() => {
-  publishMessage("Message service", "Hello from User service");
+  consoleLogger.info("[MESSAGE BROKER] start listening messages");
 });
 
 // RPCObserver();

@@ -4,8 +4,10 @@ export {
     TAccountRegisterMethod,
     validateAccountRegisterMethod,
     validateEmail,
-    validatePassword
+    validatePassword,
+    validateName
 } from "./validation";
 export { InternalErrorInfo, InternalError } from "./internal-error";
 export { InvalidDataErrorInfor, InvalidDataError } from "./invalid-data-error";
+export { ResourceExistedErrorInfor, ResourceExistedError } from "./resource-existed-error";
 export { HttpResponseCode } from "./http-response-code"

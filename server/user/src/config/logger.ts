@@ -5,9 +5,9 @@ const Level = {
 } as const;
 
 const getHeaderLogger = (level: string): string => {
-  let header = "[" + level + "] ";
-  header += "[" + (new Date()).toUTCString() + "]";
-  header += "  ";
+  let header = "";
+  header += "[" + (new Date()).toUTCString() + "] ";
+  header += "[" + level + "]  ";
   return header;
 }
 

@@ -6,7 +6,10 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node dist/index.js",
-    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\""
+    "ts:watch": "npx tsc --watch",
+    "nodemon:watch": "nodemon -q dist/index.js",
+    "dev": "concurrently \"npm run ts:watch\" \"npm run nodemon:watch\" \"npm run copy-views\"",
+    "copy-views": "npx copyfiles -u 1 src/views/*.ejs dist/src"
   },
   "author": "",
   "license": "ISC",

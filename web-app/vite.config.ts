@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
+import dts from 'vite-plugin-dts';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -14,7 +15,7 @@ export default defineConfig({
       "types": "/src/types"
     }
   },
-  plugins: [react()],
+  plugins: [dts(), react()],
   build: {
     outDir: "../server/web-app"
   }
