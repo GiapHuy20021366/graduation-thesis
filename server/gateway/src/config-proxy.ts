@@ -1,6 +1,7 @@
 import { Express } from "express";
 import proxy from "express-http-proxy";
 import endpoints from "../endpoints.json";
+import { logger as consoleLogger } from "./logger";
 
 interface EndPoint {
     path: string;
@@ -12,8 +13,7 @@ export const withProxy = (app: Express): void => {
     endpoints.forEach((endpoint: EndPoint) => {
         const url = `${endpoint.host}:${endpoint.port}`;
         app.use(endpoint.path, proxy(url));
-        console.log(
-            `BINDING: "${endpoint.path}" to "${endpoint.host}:${endpoint.port}"`
-        );
+
+        consoleLogger.info("[PROXY] [BINDING] ", `"${endpoint.path}"`, " to ", `"${endpoint.host}:${endpoint.port}"`)
     });
 }
