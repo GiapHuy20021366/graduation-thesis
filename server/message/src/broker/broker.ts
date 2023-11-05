@@ -1,6 +1,11 @@
 import { Channel, ConsumeMessage } from "amqplib";
 import { EXCHANGE_NAME, MESSAGE_SERVICE, consoleLogger } from "../config";
 import { getChannel } from "./channel";
+import { MannualAccountInfo, sendActiveMannualAccount } from "../services";
+
+export const operations = {
+  ACTIVE_MANNUAL_ACCOUNT: "ACTIVE_MANNUAL_ACCOUNT"
+} as const;
 
 // Message Broker
 export const withQueue = async () => {
@@ -35,12 +40,50 @@ export const subscribeMessage = async () => {
     q.queue,
     (msg: ConsumeMessage | null) => {
       if (msg != null) {
-          console.log("the message is:", msg.content.toString());
+        const message = msg.content.toString();
+        let parsed: { [key: string]: any; } | null = null;
+        try {
+          parsed = JSON.parse(message);
+          if (parsed === null) {
+            return;
+          }
+          
+          consoleLogger.info("[MESSAGE BROKER] ", parsed);
+          
+          exeOperation(parsed).then((result: boolean) => {
+            if (result === false) {
+              consoleLogger.err("Cannot to execute operation with data ", parsed);
+            }
+          });
+
+        } catch (error) {
+          consoleLogger.err("Error when parsed message", error);
+        }
       }
-      console.log("[X] received");
     },
     {
       noAck: true,
     }
   );
 };
+
+export const exeOperation = async (info: {[key: string]: any}): Promise<boolean> => {
+
+  try {
+    switch (info.operation) {
+      case operations.ACTIVE_MANNUAL_ACCOUNT: {
+        const accountInfo = info as MannualAccountInfo;
+        const messageInfo = await sendActiveMannualAccount(accountInfo);
+        if (messageInfo === null) {
+          return false;
+        }
+        break;
+      }
+    }
+  } catch (error) {
+    consoleLogger.err("Error while execute operation", error);
+    return false;
+  }
+
+  return true;
+}

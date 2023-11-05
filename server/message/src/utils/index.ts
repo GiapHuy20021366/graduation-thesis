@@ -1,1 +1,1 @@
-export { sendMail } from "./mailer"
+export { sendMail, renderHtmlFromTemplate } from "./mailer"

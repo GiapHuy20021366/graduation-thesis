@@ -19,6 +19,7 @@ export const NODE_MAILER_ALIAS = process.env.NODE_MAILER_ALIAS as string;
 export const NODE_MAILER_PASSWORD = process.env.NODE_MAILER_PASSWORD as string;
 export const NODE_MAILER_CONFIG_HOST = process.env.NODE_MAILER_CONFIG_HOST as string;
 export const NODE_MAILER_CONFIG_PORT = +(process.env.NODE_MAILER_CONFIG_PORT || 465) as number;
+export const NODE_MAILER_SENDER = process.env.NODE_MAILER_SENDER as string;
 
 
 // other configs

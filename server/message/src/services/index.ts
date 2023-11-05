@@ -1,0 +1,1 @@
+export { MannualAccountInfo, mailTemplates, sendActiveMannualAccount } from "./mailService";
