@@ -1,39 +1,42 @@
-import { useEffect } from 'react'
-import 'styles/App.css'
-import {
-  GOOGLE_CLIENT_ID
-} from "./env";
-import { GoogleOAuthResponse } from './types/GoogleOAuthResponse';
-import jwtDecode from 'jwt-decode';
+
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import LoginPage from "./components/LoginPage";
+import AuthenticationContextProvider from "./contexts/AuthenticationContext";
+import IsNotAuthenticated from "./auths/IsNotAuthenticated";
+import DashBoard from "./components/DashBoard";
+import IsAuthenticated from "./auths/IsAuthenticated";
 
 function App() {
   console.log("asasd".format(true, false, 1, "huy"));
 
-  const handleCallbackResponse = (response: GoogleOAuthResponse) => {
-    console.log(response);
-    console.log(jwtDecode(response.credential));
-  };
 
-  useEffect(() => {
-    window.google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: handleCallbackResponse
-    });
-    window.google.accounts.id.renderButton(
-      document.getElementById("google-oauth"),
-      { theme: "outline", size: "large"}
-    );
-    window.google.accounts.id.prompt();
-  }, []);
 
   return (
     <>
-      <div className="App">
-        <div id="google-oauth"></div>
-        <>"asasd".format(true, false, 1, "huy")</>
-      </div>
+      <AuthenticationContextProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route
+              path="login"
+              element={
+                <IsNotAuthenticated>
+                  <LoginPage />
+                </IsNotAuthenticated>
+              }
+            />
+            <Route
+              path="dashboard"
+              element={
+                <IsAuthenticated>
+                  <DashBoard />
+                </IsAuthenticated>
+              }
+            />
+          </Routes>
+        </BrowserRouter>
+      </AuthenticationContextProvider>
     </>
   );
 }
 
-export default App
+export default App;

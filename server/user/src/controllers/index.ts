@@ -1,7 +1,6 @@
 export { 
     registAccount,
-    IRequestAccountBody,
-    IRequestAccountParams,
-    IRequestAccountQuery,
-    IResponseAccountBody
+    IRegistAccountQuery,
+    IRegistAccountBody,
+    activeMannualAccount
 } from "./account-register";

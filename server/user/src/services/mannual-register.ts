@@ -1,11 +1,10 @@
-import { ResourceExistedError } from "../data";
+import { InvalidDataError, ResourceExistedError } from "../data";
 import { User } from "../db/model";
 import {
-    MESSAGE_SERVICE,
     USER_SERVICE
 } from "../config";
-import { operations, publishMessage } from "../broker";
-import { signToken } from "../utils";
+import { operations, brokerChannel } from "../broker";
+import { hashText, signToken, verifyToken } from "../utils";
 
 
 interface MannualAccountRegisterInfo {
@@ -15,11 +14,7 @@ interface MannualAccountRegisterInfo {
     lastName: string;
 }
 
-interface MannualRegisterResult {
-    isSuccessful: boolean;
-}
-
-export const registAccountByMannual = async (info: MannualAccountRegisterInfo): Promise<MannualRegisterResult> => {
+export const registAccountByMannual = async (info: MannualAccountRegisterInfo): Promise<any> => {
     const account = await User.findOneByEmail(info.email);
     if (account !== null) {
         throw new ResourceExistedError({
@@ -27,7 +22,10 @@ export const registAccountByMannual = async (info: MannualAccountRegisterInfo): 
         });
     }
 
-    const token = signToken(info, "1h");
+    const token = signToken({
+        ...info,
+        password: hashText(info.password)
+    }, "1h");
     const message = JSON.stringify({
         email: info.email,
         operation: operations.mail.ACTIVE_MANNUAL_ACCOUNT,
@@ -36,10 +34,54 @@ export const registAccountByMannual = async (info: MannualAccountRegisterInfo): 
     });
 
     // send email to user
-    await publishMessage(MESSAGE_SERVICE, message);
+    await brokerChannel.toMessageServiceQueue(message);
 
     return {
         isSuccessful: true
     }
 
 };
+
+export const createMannualAccountFromToken = async (token: string): Promise<any> => {
+    const info = verifyToken(token) as MannualAccountRegisterInfo | null;
+    console.log(info);
+    if (info === null) {
+        throw new InvalidDataError({
+            message: "Token invalid"
+        });
+    }
+
+    const { email, firstName, lastName, password } = info;
+
+    const account = await User.findOneByEmail(email);
+    if (account !== null) {
+        throw new ResourceExistedError({
+            message: "Email already existed"
+        });
+    }
+
+    const newAccount = await User.create({
+        firstName,
+        lastName,
+        email,
+        password
+    });
+
+    
+    const dataToSignToken = {
+        firstName: newAccount.firstName,
+        lastName: newAccount.lastName,
+        email: newAccount.email
+    };
+    // use for login
+    const tempToken = signToken(dataToSignToken);
+    
+    const dataToReturn = {
+        firstName: newAccount.firstName,
+        lastName: newAccount.lastName,
+        email: newAccount.email,
+        token: tempToken
+    };
+
+    return dataToReturn;
+}

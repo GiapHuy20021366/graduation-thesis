@@ -1,4 +1,4 @@
-import { Channel, ConsumeMessage } from "amqplib";
+import { ConsumeMessage } from "amqplib";
 import { EXCHANGE_NAME, MESSAGE_SERVICE, consoleLogger } from "../config";
 import { getChannel } from "./channel";
 import { MannualAccountInfo, sendActiveMannualAccount } from "../services";

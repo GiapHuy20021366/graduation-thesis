@@ -22,6 +22,8 @@ export const NODE_MAILER_CONFIG_HOST = process.env.NODE_MAILER_CONFIG_HOST as st
 export const NODE_MAILER_CONFIG_PORT = +(process.env.NODE_MAILER_CONFIG_PORT || 465) as number;
 export const NODE_MAILER_SENDER = process.env.NODE_MAILER_SENDER as string;
 
+export const WEB_APP_HOST = process.env.WEB_APP_HOST as string;
+
 
 // other configs
 export { logger as winstonLogger } from "./winston";

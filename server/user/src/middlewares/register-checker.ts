@@ -1,13 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import {
-    IRequestAccountBody,
-    IRequestAccountParams,
-    IRequestAccountQuery,
-    IResponseAccountBody
+    IRegistAccountBody,
+    IRegistAccountQuery
 } from "../controllers";
 import { TAccountRegisterMethod, validateAccountRegisterMethod, validateEmail, validateName, validatePassword } from "../data";
 
-export const checkRequestBodyAndParams = async (request: Request<IRequestAccountParams, IResponseAccountBody, IRequestAccountBody, IRequestAccountQuery>, _response: Response, next: NextFunction) => {
+export const checkRequestBodyAndParams = async (request: Request<{}, {}, IRegistAccountBody, IRegistAccountQuery>, _response: Response, next: NextFunction) => {
     const method: TAccountRegisterMethod | undefined = request.query.method;
     validateAccountRegisterMethod(method);
     let isAllValid: boolean = false;

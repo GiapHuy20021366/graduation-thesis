@@ -1,0 +1,1 @@
+export { toActiveMannualAccountUrl } from "./to-active-mannual-account-url";

@@ -8,5 +8,6 @@ export interface UserInfo {
     lastName: string,
     email: string,
     password?: string,
-    titles?: string[]
+    titles?: string[],
+    avatar: string,
 }

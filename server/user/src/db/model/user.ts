@@ -4,7 +4,7 @@ import { UserInfo } from '../../data';
 
 interface IUserMethods {
   isOAuthGoogle(): boolean;
-  isOAuthFacebook(): boolean; // TODO
+  isOAuthFacebook(): boolean;
 }
 
 interface IUserModel extends Model<UserInfo, {}, IUserMethods> {
@@ -42,7 +42,11 @@ const userSchema = new Schema<UserInfo, IUserModel, IUserMethods>({
     required: true,
     type: String,
   },
-  titles: [String]
+  avatar: String,
+  titles: {
+    type: [String],
+    default: []
+  }
 });
 
 // Statics
