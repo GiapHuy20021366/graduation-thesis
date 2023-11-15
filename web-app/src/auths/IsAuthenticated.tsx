@@ -1,4 +1,4 @@
-import { useAuthenticationContext } from "../hooks/useAuthenticationContext";
+import { useAuthenticationContext } from "../contexts/useAuthenticationContext";
 import { Navigate } from "react-router";
 
 interface AuthenticatedOptions {
