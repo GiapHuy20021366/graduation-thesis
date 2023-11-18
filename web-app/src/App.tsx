@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import LoginPage from "./components/login/LoginPage";
+import SignUpPage from "./components/signup/SignUpPage";
+import SignInPage from "./components/signin/SignInPage";
 import AuthenticationContextProvider from "./contexts/AuthenticationContext";
 import IsNotAuthenticated from "./auths/IsNotAuthenticated";
 import DashBoard from "./components/DashBoard";
@@ -21,10 +22,19 @@ function App() {
               }
             />
             <Route
-              path="login"
+              path="signin"
               element={
                 <IsNotAuthenticated>
-                  <LoginPage />
+                  <SignInPage />
+                </IsNotAuthenticated>
+              }
+            />
+
+            <Route
+              path="signup"
+              element={
+                <IsNotAuthenticated>
+                  <SignUpPage />
                 </IsNotAuthenticated>
               }
             />

@@ -15,23 +15,28 @@ import {
 import { Link as ReactRouterLink } from "react-router-dom";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useAuthenticationContext } from "../../contexts";
+import { useAuthenticationContext, useLanguageContext } from "../../contexts";
 
 interface FormValues {
   email: string;
   password: string;
 }
 
-const signInSchema = yup.object({
-  email: yup.string().email("Invalid email").required("Email is required"),
-  password: yup
-    .string()
-    .required("Password is required")
-    .min(8, "Password must be at least 8 characters"),
-});
-
 export default function SignInForm() {
   const auth = useAuthenticationContext();
+  const languageContext = useLanguageContext();
+  const lang = languageContext.of(SignInForm);
+
+  const signInSchema = yup.object({
+    email: yup
+      .string()
+      .email(lang("invalid-email"))
+      .required(lang("require-email")),
+    password: yup
+      .string()
+      .required(lang("require-password"))
+      .min(8, lang("invalid-length-password", 8)),
+  });
 
   const form = useForm<FormValues>({
     defaultValues: {
@@ -69,49 +74,43 @@ export default function SignInForm() {
   }, []);
 
   return (
-    <Box>
-      <Container>
-        <div>Back</div>
-        <h1>Login F4U</h1>
-      </Container>
-      <Box
-        component="form"
-        noValidate
-        onSubmit={handleSubmit(onSubmit)}
-        sx={{ mt: 3 }}
-      >
-        <Stack spacing={2}>
-          <TextField
-            label="Email"
-            type="email"
-            {...register("email")}
-            error={!!errors.email}
-            helperText={errors.email?.message}
-          />
-          <TextField
-            label="Password"
-            type="password"
-            {...register("password")}
-            error={!!errors.password}
-            helperText={errors.password?.message}
-          />
-          <Container>
-            <div>Or</div>
-            <Grid>
-              <div id="google-oauth" />
-            </Grid>
-          </Container>
-          <Button type="submit" variant="contained">
-            Login now
-          </Button>
-          <Container>
-            <span>Not have a account yet, </span>
-            <MuiLink to="/login?q=register" component={ReactRouterLink}>
-              Register
-            </MuiLink>
-          </Container>
-        </Stack>
-      </Box>
+    <Box
+      component="form"
+      noValidate
+      onSubmit={handleSubmit(onSubmit)}
+      sx={{ mt: 3 }}
+    >
+      <Stack spacing={2}>
+        <TextField
+          label={lang("l-email")}
+          type="email"
+          {...register("email")}
+          error={!!errors.email}
+          helperText={errors.email?.message}
+        />
+        <TextField
+          label={lang("l-password")}
+          type="password"
+          {...register("password")}
+          error={!!errors.password}
+          helperText={errors.password?.message}
+        />
+        <Container>
+          <div>{lang("or")}</div>
+          <Grid>
+            <div id="google-oauth" />
+          </Grid>
+        </Container>
+        <Button type="submit" variant="contained">
+          {lang("login-now")}
+        </Button>
+        <Container>
+          <span>{lang("not-account-yet")}</span>
+          <MuiLink to="/signup" component={ReactRouterLink}>
+            {lang("signup")}
+          </MuiLink>
+        </Container>
+      </Stack>
     </Box>
   );
 }

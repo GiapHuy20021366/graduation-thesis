@@ -22,7 +22,7 @@ export default function IsAuthenticated({
     if (redirectUrl === undefined && errorElement !== undefined) {
       return errorElement;
     }
-    let url = redirectUrl ?? "/login";
+    let url = redirectUrl ?? "/signin";
     if (withCallback !== false) url += `?redirect=${window.location.pathname}`;
     return <Navigate to={url} replace />;
   }

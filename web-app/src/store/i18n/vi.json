@@ -1,0 +1,44 @@
+{
+    "SignInForm": {
+        "l-email": "Email",
+        "l-password": "Mật khẩu",
+        "login-now": "Đăng nhập",
+        "signup": "Đăng ký",
+        "or": "Hoặc",
+        "not-account-yet": "Chưa có tài khoản? ",
+        "invalid-email": "Email không hợp lệ",
+        "require-email": "Email là bắt buộc",
+        "require-password": "Mật khẩu là bắt buộc",
+        "invalid-length-password": "Mật khẩu phải dài ít nhất {0} ký tự"
+    },
+    "SignInPage": {
+        "signin": "Đăng nhập"
+    },
+    "SignUpForm": {
+        "l-firstname": "Tên",
+        "l-lastname": "Họ",
+        "l-email": "Email",
+        "l-password": "Mật khẩu",
+        "login-now": "Đăng nhập",
+        "signin": "Đăng nhập",
+        "or": "Hoặc",
+        "have-account-yet": "Đã có tài khoản? ",
+        "invalid-email": "Email không hợp lệ",
+        "require-email": "Email là bắt buộc",
+        "require-password": "Mật khẩu là bắt buộc",
+        "invalid-length-password": "Mật khẩu phải dài ít nhất {0} ký tự",
+        "require-firstname": "Tên là bắt buộc",
+        "require-lastname": "Họ là bắt buộc",
+        "l-allow-email": "Tôi muốn được cập nhật các thông tin mới nhất qua email",
+        "join-now": "Tham gia ngay"
+    },
+    "BeforeJoin": {
+        "title": "Trước khi bạn tham gia",
+        "agree-community": "Hãy đồng ý với cam kết cộng đồng của chúng tôi:",
+        "i-agree": "Tôi đồng ý",
+        "cancel-signup": "Dừng đăng ký"
+    },
+    "SignUpPage": {
+        "join": "Tham gia {0}"
+    }
+}

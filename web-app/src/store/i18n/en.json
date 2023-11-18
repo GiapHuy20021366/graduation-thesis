@@ -1,0 +1,14 @@
+{
+    "SignInForm": {
+        "l-email": "Email",
+        "l-password": "Mật khẩu",
+        "login-now": "Đăng nhập",
+        "signup": "Đăng ký",
+        "or": "Hoặc",
+        "not-account-yet": "Chưa có tài khoản? ",
+        "invalid-email": "Email không hợp lệ",
+        "require-email": "Email là bắt buộc",
+        "require-password": "Mật khẩu là bắt buộc",
+        "invalid-length-password": "Mật khẩu phải dài ít nhất {0} ký tự"
+    }
+}
