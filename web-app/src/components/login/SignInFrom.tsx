@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useEffect } from "react";
-import { GOOGLE_CLIENT_ID } from "../env";
-import { GoogleOAuthResponse } from "../types/GoogleOAuthResponse";
+import { GOOGLE_CLIENT_ID } from "../../env";
+import { GoogleOAuthResponse } from "../../types/GoogleOAuthResponse";
 import jwtDecode from "jwt-decode";
 import {
   Box,
@@ -9,43 +9,44 @@ import {
   TextField,
   Stack,
   Grid,
-  Checkbox,
-  FormControlLabel,
   Button,
+  Link as MuiLink,
 } from "@mui/material";
+import { Link as ReactRouterLink } from "react-router-dom";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useAuthenticationContext } from "../../contexts";
 
 interface FormValues {
   email: string;
   password: string;
-  firstName: string;
-  lastName: string;
 }
 
-const signUpSchema = yup.object({
-  firstName: yup.string().required("First name is required"),
-  lastName: yup.string().required("Last name is required"),
+const signInSchema = yup.object({
   email: yup.string().email("Invalid email").required("Email is required"),
   password: yup
     .string()
     .required("Password is required")
-    .min(8, "Password must be at least 8 characters")
+    .min(8, "Password must be at least 8 characters"),
 });
 
-export default function SignUpForm() {
+export default function SignInForm() {
+  const auth = useAuthenticationContext();
+
   const form = useForm<FormValues>({
     defaultValues: {
       email: "",
       password: "",
-      firstName: "",
-      lastName: "",
     },
-    resolver: yupResolver(signUpSchema)
+    resolver: yupResolver(signInSchema),
   });
 
   const onSubmit = (data: FormValues) => {
     console.log(data);
+    auth.setAccount({
+      isAuthenticated: true,
+      ...data
+    })
   };
 
   const { register, handleSubmit, formState } = form;
@@ -71,7 +72,7 @@ export default function SignUpForm() {
     <Box>
       <Container>
         <div>Back</div>
-        <h1>Join F4U</h1>
+        <h1>Login F4U</h1>
       </Container>
       <Box
         component="form"
@@ -80,20 +81,6 @@ export default function SignUpForm() {
         sx={{ mt: 3 }}
       >
         <Stack spacing={2}>
-          <TextField
-            label="First name"
-            type="text"
-            {...register("firstName")}
-            error={!!errors.firstName}
-            helperText={errors.firstName?.message}
-          />
-          <TextField
-            label="Last name"
-            type="text"
-            {...register("lastName")}
-            error={!!errors.lastName}
-            helperText={errors.lastName?.message}
-          />
           <TextField
             label="Email"
             type="email"
@@ -108,12 +95,6 @@ export default function SignUpForm() {
             error={!!errors.password}
             helperText={errors.password?.message}
           />
-          <Grid container spacing={2}>
-            <FormControlLabel
-              control={<Checkbox value="allowExtraEmails" color="primary" />}
-              label="I want to receive inspiration, marketing promotions and updates via email."
-            />
-          </Grid>
           <Container>
             <div>Or</div>
             <Grid>
@@ -121,8 +102,14 @@ export default function SignUpForm() {
             </Grid>
           </Container>
           <Button type="submit" variant="contained">
-            Join now
+            Login now
           </Button>
+          <Container>
+            <span>Not have a account yet, </span>
+            <MuiLink to="/login?q=register" component={ReactRouterLink}>
+              Register
+            </MuiLink>
+          </Container>
         </Stack>
       </Box>
     </Box>

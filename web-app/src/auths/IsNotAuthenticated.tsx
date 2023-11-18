@@ -25,7 +25,7 @@ export default function IsNotAuthenticated({
     }
     const urlParams = new URLSearchParams(window.location.href);
     const urlToRedirect =
-      redirectUrl ?? urlParams.get("redirect") ?? "/dashboard";
+      redirectUrl ?? urlParams.get("redirect") ?? "/";
     return <Navigate to={urlToRedirect} replace />;
   }
 
