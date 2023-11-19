@@ -18,6 +18,7 @@ import { Link as ReactRouterLink } from "react-router-dom";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useLanguageContext } from "../../contexts";
+import { userFetcher } from "../../api";
 
 interface FormValues {
   email: string;
@@ -54,7 +55,7 @@ export default function SignUpForm() {
   });
 
   const onSubmit = (data: FormValues) => {
-    console.log(data);
+    userFetcher.manualRegister(data).then((result) => console.log(result)).catch(error => console.error(error));
   };
 
   const { register, handleSubmit, formState } = form;
