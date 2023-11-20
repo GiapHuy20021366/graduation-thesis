@@ -30,7 +30,13 @@
         "require-firstname": "Tên là bắt buộc",
         "require-lastname": "Họ là bắt buộc",
         "l-allow-email": "Tôi muốn được cập nhật các thông tin mới nhất qua email",
-        "join-now": "Tham gia ngay"
+        "join-now": "Tham gia ngay",
+        "at-least-one-lower-case": "Mật khẩu phải chứa ít nhất 1 ký tự thường",
+        "at-least-one-upper-case": "Mật khẩu phải chứa ít nhất 1 ký tự in hoa",
+        "at-least-one-digit": "Mật khẩu phải chứa ít nhất 1 ký tự số",
+        "at-least-one-special": "Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt",
+        "no-white-space": "Mật khẩu không được chứa khoảng trắng",
+        "email-existed": "Email đã tồn tại"
     },
     "BeforeJoin": {
         "title": "Trước khi bạn tham gia",

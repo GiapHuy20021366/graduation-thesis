@@ -6,6 +6,7 @@ import IsNotAuthenticated from "./auths/IsNotAuthenticated";
 import DashBoard from "./components/DashBoard";
 import IsAuthenticated from "./auths/IsAuthenticated";
 import PageNotFound from "./components/PageNotFound";
+import SignUpVerifyPage from "./components/signup/SignUpVerifyPage";
 
 function App() {
   return (
@@ -38,6 +39,10 @@ function App() {
                 </IsNotAuthenticated>
               }
             />
+
+            <Route path="signup/verify" element={<SignUpVerifyPage />} />
+
+            <Route path="error/page-wrong" element={<PageNotFound />} />
 
             <Route path="*" element={<PageNotFound />} />
           </Routes>

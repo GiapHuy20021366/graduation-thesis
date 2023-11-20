@@ -18,7 +18,11 @@ export const registAccountByMannual = async (info: MannualAccountRegisterInfo): 
     const account = await User.findOneByEmail(info.email);
     if (account !== null) {
         throw new ResourceExistedError({
-            message: "Email already existed"
+            message: "Email already existed",
+            data: {
+                targetLabel: "email",
+                reason: "EMAIL_EXISTED"
+            }
         });
     }
 

@@ -17,10 +17,13 @@ export const sendActiveMannualAccount = async (info: MannualAccountInfo): Promis
     let result: SMTPTransport.SentMessageInfo | null = null;
     try {
         const { email, token } = info;
+        const activeUrl = toActiveMannualAccountUrl(token);
+        console.log(email, activeUrl);        
         const html = await renderHtmlFromTemplate(mailTemplates.ACTIVE_ACCOUNT_MANNUAL, {
             email: email,
-            activeUrl: toActiveMannualAccountUrl(token)
+            activeUrl: activeUrl
         });
+    
         result = await sendMail({
             from: NODE_MAILER_SENDER,
             to: info.email,

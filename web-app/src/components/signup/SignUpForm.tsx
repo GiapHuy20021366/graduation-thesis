@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { GOOGLE_CLIENT_ID } from "../../env";
 import { GoogleOAuthResponse } from "../../types/GoogleOAuthResponse";
 import jwtDecode from "jwt-decode";
@@ -13,8 +13,11 @@ import {
   FormControlLabel,
   Button,
   Link as MuiLink,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
-import { Link as ReactRouterLink } from "react-router-dom";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useLanguageContext } from "../../contexts";
@@ -28,6 +31,13 @@ interface FormValues {
 }
 
 export default function SignUpForm() {
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword((prevShowPassword) => !prevShowPassword);
+  };
+
   const languageContext = useLanguageContext();
   const lang = languageContext.of(SignUpForm);
 
@@ -41,6 +51,11 @@ export default function SignUpForm() {
     password: yup
       .string()
       .required(lang("require-password"))
+      .matches(/[a-z]/, lang("at-least-one-lower-case"))
+      .matches(/[A-Z]/, lang("at-least-one-upper-case"))
+      .matches(/[0-9]/, lang("at-least-one-digit"))
+      .matches(/[!@#$%^&*(),.?":{}|<>]/, lang("at-least-one-special"))
+      .matches(/^\S*$/, lang("no-white-space"))
       .min(8, lang("invalid-length-password")),
   });
 
@@ -54,16 +69,29 @@ export default function SignUpForm() {
     resolver: yupResolver(signUpSchema),
   });
 
-  const onSubmit = (data: FormValues) => {
-    userFetcher.manualRegister(data).then((result) => console.log(result)).catch(error => console.error(error));
-  };
-
-  const { register, handleSubmit, formState } = form;
+  const { register, handleSubmit, formState, setError } = form;
   const { errors } = formState;
   const handleCallbackResponse = (response: GoogleOAuthResponse) => {
     console.log(response);
     console.log(jwtDecode(response.credential));
   };
+
+    const onSubmit = (data: FormValues) => {
+      userFetcher
+        .manualRegister(data)
+        .then(() => navigate("/signup/verify", { state: data }))
+        .catch((error) => {
+          const targetLabel = error?.data?.targetLabel;
+          const reason = error?.data?.reason;
+          if (targetLabel === "email") {
+            if (reason === "EMAIL_EXISTED") {
+              setError("email", {
+                message: lang("email-existed"),
+              });
+            }
+          }
+        });
+    };
 
   useEffect(() => {
     window.google.accounts.id.initialize({
@@ -108,10 +136,19 @@ export default function SignUpForm() {
         />
         <TextField
           label={lang("l-password")}
-          type="password"
+          type={showPassword ? "text" : "password"}
           {...register("password")}
           error={!!errors.password}
           helperText={errors.password?.message}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={handleTogglePasswordVisibility} edge="end">
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
         <Grid container spacing={2}>
           <FormControlLabel

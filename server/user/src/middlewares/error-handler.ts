@@ -6,7 +6,8 @@ export const errorHandler = (error: Error, _request: Request, response: Response
         return response.status(error.code).json({
             error: {
                 message: error.message,
-                code: error.code
+                code: error.code,
+                data: error.data
             }
         });
     } else {
