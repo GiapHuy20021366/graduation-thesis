@@ -4,8 +4,7 @@ import {
     TAccountRegisterMethod,
     toResponseSuccessData,
 } from "../data";
-import { createMannualAccountFromToken, registAccountByMannual } from "../services";
-import { verifyToken } from "~/utils";
+import { createManualAccountFromToken, registAccountByManual } from "../services";
 
 export interface IRegistAccountBody {
     email?: string;
@@ -21,9 +20,9 @@ export interface IRegistAccountQuery {
 export const registAccount = async (request: Request<{}, {}, IRegistAccountBody, IRegistAccountQuery>, response: Response, next: NextFunction) => {
     const method: TAccountRegisterMethod = request.query.method!;
     switch (method) {
-        case "mannual":
+        case "manual":
             const { email, password, firstName, lastName } = request.body;
-            await registAccountByMannual({
+            await registAccountByManual({
                 email: email!,
                 password: password!,
                 firstName: firstName!,
@@ -33,7 +32,8 @@ export const registAccount = async (request: Request<{}, {}, IRegistAccountBody,
             }).catch(next);
             break;
         case "google-oauth":
-
+            next(new Error("Method not implemented"));
+            break;
         case "facebook-oauth":
             next(new Error("Method not implemented"));
             break;
@@ -41,19 +41,23 @@ export const registAccount = async (request: Request<{}, {}, IRegistAccountBody,
     }
 }
 
-export interface IActiveMannualAccountQuery {
+export interface IActiveManualAccountQuery {
     token?: string
 }
 
-export const activeMannualAccount = async (request: Request<{}, {}, {}, IActiveMannualAccountQuery>, response: Response, next: NextFunction) => {
+export const activeManualAccount = async (request: Request<{}, {}, {}, IActiveManualAccountQuery>, response: Response, next: NextFunction) => {
     const token = request.query.token;
     if (token === undefined) {
         return next(new InvalidDataError({
-            message: "Token not found"
+            message: "Token not found",
+            data: {
+                targetLabel: "token",
+                reason: "TOKEN_NOT_FOUND"
+            }
         }));
     }
 
-    await createMannualAccountFromToken(token).then((result) => {
+    await createManualAccountFromToken(token).then((result) => {
         return response.status(200).json(toResponseSuccessData(result));
     }).catch(next);
 }

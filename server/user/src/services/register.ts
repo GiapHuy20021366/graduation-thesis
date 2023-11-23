@@ -5,16 +5,17 @@ import {
 } from "../config";
 import { operations, brokerChannel } from "../broker";
 import { hashText, signToken, verifyToken } from "../utils";
+import { toAuthToken } from "../data";
 
 
-interface MannualAccountRegisterInfo {
+interface ManualAccountRegisterInfo {
     email: string;
     password: string;
     firstName: string;
     lastName: string;
 }
 
-export const registAccountByMannual = async (info: MannualAccountRegisterInfo): Promise<any> => {
+export const registAccountByManual = async (info: ManualAccountRegisterInfo): Promise<any> => {
     const account = await User.findOneByEmail(info.email);
     if (account !== null) {
         throw new ResourceExistedError({
@@ -32,7 +33,7 @@ export const registAccountByMannual = async (info: MannualAccountRegisterInfo): 
     }, "1h");
     const message = JSON.stringify({
         email: info.email,
-        operation: operations.mail.ACTIVE_MANNUAL_ACCOUNT,
+        operation: operations.mail.ACTIVE_MANUAL_ACCOUNT,
         token: token,
         from: USER_SERVICE
     });
@@ -46,12 +47,15 @@ export const registAccountByMannual = async (info: MannualAccountRegisterInfo): 
 
 };
 
-export const createMannualAccountFromToken = async (token: string): Promise<any> => {
-    const info = verifyToken(token) as MannualAccountRegisterInfo | null;
-    console.log(info);
+export const createManualAccountFromToken = async (token: string): Promise<any> => {
+    const info = verifyToken(token) as ManualAccountRegisterInfo | null;
     if (info === null) {
         throw new InvalidDataError({
-            message: "Token invalid"
+            message: "Token invalid",
+            data: {
+                targetLabel: "token",
+                reason: "INVALID_TOKEN"
+            }
         });
     }
 
@@ -60,7 +64,11 @@ export const createMannualAccountFromToken = async (token: string): Promise<any>
     const account = await User.findOneByEmail(email);
     if (account !== null) {
         throw new ResourceExistedError({
-            message: "Email already existed"
+            message: "Email already existed",
+            data: {
+                targetLabel: "email",
+                reason: "EMAIL_EXISTED"
+            }
         });
     }
 
@@ -71,20 +79,13 @@ export const createMannualAccountFromToken = async (token: string): Promise<any>
         password
     });
 
-    
-    const dataToSignToken = {
-        firstName: newAccount.firstName,
-        lastName: newAccount.lastName,
-        email: newAccount.email
-    };
-    // use for login
-    const tempToken = signToken(dataToSignToken);
-    
     const dataToReturn = {
         firstName: newAccount.firstName,
         lastName: newAccount.lastName,
         email: newAccount.email,
-        token: tempToken
+        avatar: newAccount.avatar,
+        titles: newAccount.titles,
+        token: toAuthToken(newAccount)
     };
 
     return dataToReturn;

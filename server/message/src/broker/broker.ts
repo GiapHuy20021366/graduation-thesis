@@ -1,11 +1,11 @@
 import { ConsumeMessage } from "amqplib";
 import { EXCHANGE_NAME, MESSAGE_SERVICE, consoleLogger } from "../config";
 import { getChannel } from "./channel";
-import { MannualAccountInfo, sendActiveMannualAccount } from "../services";
+import { ManualAccountInfo, sendActiveManualAccount } from "../services";
 
 export const operations = {
   mail: {
-    ACTIVE_MANNUAL_ACCOUNT: "ACTIVE_MANNUAL_ACCOUNT"
+    ACTIVE_MANUAL_ACCOUNT: "ACTIVE_MANUAL_ACCOUNT"
   }
 } as const;
 
@@ -73,9 +73,9 @@ export const exeOperation = async (info: {[key: string]: any}): Promise<boolean>
 
   try {
     switch (info.operation) {
-      case operations.mail.ACTIVE_MANNUAL_ACCOUNT: {
-        const accountInfo = info as MannualAccountInfo;
-        const messageInfo = await sendActiveMannualAccount(accountInfo);
+      case operations.mail.ACTIVE_MANUAL_ACCOUNT: {
+        const accountInfo = info as ManualAccountInfo;
+        const messageInfo = await sendActiveManualAccount(accountInfo);
         if (messageInfo === null) {
           return false;
         }

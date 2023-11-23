@@ -1,6 +1,14 @@
 import express, { Express } from "express";
-import { errorHandler, checkRequestBodyAndParams } from "../middlewares";
-import { registAccount, activeMannualAccount } from "../controllers";
+import {
+    errorHandler,
+    checkRegistBodyAndParams,
+    checkLoginBodyAndParams
+} from "../middlewares";
+import {
+    registAccount,
+    activeManualAccount,
+    loginAccount
+} from "../controllers";
 
 const userRouter = express.Router();
 
@@ -8,13 +16,19 @@ export const initUserRouters = (app: Express): void => {
 
     userRouter.post(
         "/register",
-        checkRequestBodyAndParams,
+        checkRegistBodyAndParams,
         registAccount
+    );
+
+    userRouter.post(
+        "/login",
+        checkLoginBodyAndParams,
+        loginAccount
     );
 
     userRouter.get(
         "/active",
-        activeMannualAccount
+        activeManualAccount
     )
 
     userRouter.use(errorHandler);

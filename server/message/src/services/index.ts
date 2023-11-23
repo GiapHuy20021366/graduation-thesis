@@ -1,1 +1,1 @@
-export { MannualAccountInfo, mailTemplates, sendActiveMannualAccount } from "./account";
+export { ManualAccountInfo, mailTemplates, sendActiveManualAccount } from "./account";

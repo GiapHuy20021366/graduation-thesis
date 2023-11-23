@@ -36,7 +36,7 @@ function WaitingEmailVerify({ account }: IWaitingEmailVerify) {
       <Stack>
         <h1>Verify your account</h1>
         <p>All done, we sent active to your email</p>
-        <Link href={account.email}>{account.email}</Link>
+        <Link href={`https://${account.email}`}>{account.email}</Link>
       </Stack>
       <Stack>
         <p>Don't recieve email,</p>
@@ -50,7 +50,9 @@ function WaitingEmailVerify({ account }: IWaitingEmailVerify) {
 
 function AccountTokenVerify() {
   const location = useLocation();
-  const token = new URLSearchParams(location.search).get("token") as string | undefined;
+  const token = new URLSearchParams(location.search).get("token") as
+    | string
+    | undefined;
 
   return <>{token ? <div>Token is ${token}</div> : <PageNotFound />}</>;
 }

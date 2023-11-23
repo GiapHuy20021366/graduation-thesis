@@ -4,7 +4,7 @@ import { getChannel } from "./channel";
 
 export const operations = {
   mail: {
-    ACTIVE_MANNUAL_ACCOUNT: "ACTIVE_MANNUAL_ACCOUNT"
+    ACTIVE_MANUAL_ACCOUNT: "ACTIVE_MANUAL_ACCOUNT"
   }
 } as const;
 

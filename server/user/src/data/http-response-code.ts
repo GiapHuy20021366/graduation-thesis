@@ -2,4 +2,6 @@ export const HttpResponseCode = {
     INTERNAL_SERVER_ERROR: 500,
     BAD_REQUEST: 400,
     RESOURCE_EXISTED: 422,
+    RESOURCE_NOT_EXISTED: 404,
+    UNAUTHORIZATION_ERROR: 403
 } as const;

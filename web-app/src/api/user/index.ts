@@ -30,7 +30,7 @@ interface AccountResponse {
     error?: ErrorResponse
 }
 
-interface MannualRegisterInfo {
+interface ManualRegisterInfo {
     firstName: string;
     lastName: string;
     email: string;
@@ -39,7 +39,7 @@ interface MannualRegisterInfo {
 
 export interface UserFetcher {
     manualLogin(email: string, password: string): Promise<AccountResponse>;
-    manualRegister(data: MannualRegisterInfo): Promise<AccountResponse>;
+    manualRegister(data: ManualRegisterInfo): Promise<AccountResponse>;
 }
 
 export const userFetcher: UserFetcher = {
@@ -52,17 +52,17 @@ export const userFetcher: UserFetcher = {
             },
             {
                 params: {
-                    method: "mannual"
+                    method: "manual"
                 }
             })
     },
-    manualRegister: async (data: MannualRegisterInfo): Promise<AccountResponse> => {
+    manualRegister: async (data: ManualRegisterInfo): Promise<AccountResponse> => {
         return userInstance.post(
             '/register',
             data,
             {
                 params: {
-                    method: "mannual"
+                    method: "manual"
                 }
             })
     },

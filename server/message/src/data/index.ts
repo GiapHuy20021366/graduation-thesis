@@ -1,1 +1,1 @@
-export { toActiveMannualAccountUrl } from "./to-active-mannual-account-url";
+export { toActiveManualAccountUrl } from "./to-active-manual-account-url";

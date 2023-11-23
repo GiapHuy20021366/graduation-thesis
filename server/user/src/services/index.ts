@@ -1,4 +1,8 @@
 export {
-    registAccountByMannual,
-    createMannualAccountFromToken
-} from "./mannual-register";
+    registAccountByManual,
+    createManualAccountFromToken
+} from "./register";
+
+export {
+    loginAccountByManual
+} from "./login"

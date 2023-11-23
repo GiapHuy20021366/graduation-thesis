@@ -1,21 +1,20 @@
 import { NextFunction, Request, Response } from "express";
 import {
-    IRegistAccountBody,
-    IRegistAccountQuery
+    ILoginAccountBody,
+    ILoginAccountQuery
 } from "../controllers";
-import { TAccountRegisterMethod, validateAccountRegisterMethod, validateEmail, validateName, validatePassword } from "../data";
+import { TAccountRegisterMethod, validateAccountRegisterMethod, validateEmail, validatePassword } from "../data";
 
-export const checkRegistBodyAndParams = async (request: Request<{}, {}, IRegistAccountBody, IRegistAccountQuery>, _response: Response, next: NextFunction) => {
+export const checkLoginBodyAndParams = async (request: Request<{}, {}, ILoginAccountBody, ILoginAccountQuery>, _response: Response, next: NextFunction) => {
     const method: TAccountRegisterMethod | undefined = request.query.method;
-    await validateAccountRegisterMethod(method).catch(next);
+    validateAccountRegisterMethod(method);
     let isAllValid: boolean = false;
     switch (method) {
         case "manual":
-            const { email, password, firstName, lastName } = request.body;
+            const { email, password} = request.body;
             await Promise.all([
                 validateEmail(email),
                 validatePassword(password),
-                validateName(firstName, lastName)
             ]).then((result) => {
                 isAllValid = result.every(t => t);
             }).catch(next);

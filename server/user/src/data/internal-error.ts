@@ -3,7 +3,10 @@ import { HttpResponseCode } from "./http-response-code";
 export interface InternalErrorInfo {
     code?: number;
     message?: string;
-    data?: any;
+    data?: {
+        targetLabel: string;
+        reason: string;
+    };
 }
 
 export class InternalError<T extends InternalErrorInfo> extends Error {

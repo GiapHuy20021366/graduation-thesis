@@ -2,5 +2,11 @@ export {
     registAccount,
     IRegistAccountQuery,
     IRegistAccountBody,
-    activeMannualAccount
-} from "./account-register";
+    activeManualAccount
+} from "./register";
+
+export {
+    ILoginAccountBody,
+    ILoginAccountQuery,
+    loginAccount
+} from "./login"

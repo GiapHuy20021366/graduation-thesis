@@ -1,2 +1,3 @@
 export { errorHandler } from "./error-handler";
-export { checkRequestBodyAndParams } from "./register-checker"
+export { checkRegistBodyAndParams } from "./register-checker"
+export { checkLoginBodyAndParams } from "./login-checker"
