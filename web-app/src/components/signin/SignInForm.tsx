@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { GOOGLE_CLIENT_ID } from "../../env";
 import { GoogleOAuthResponse } from "../../types/GoogleOAuthResponse";
 import jwtDecode from "jwt-decode";
@@ -11,11 +11,15 @@ import {
   Grid,
   Button,
   Link as MuiLink,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
 import { Link as ReactRouterLink } from "react-router-dom";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useAuthenticationContext, useLanguageContext } from "../../contexts";
+import { userErrorReasons, userErrorTargets, userFetcher } from "../../api";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 interface FormValues {
   email: string;
@@ -26,16 +30,26 @@ export default function SignInForm() {
   const auth = useAuthenticationContext();
   const languageContext = useLanguageContext();
   const lang = languageContext.of(SignInForm);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword((prevShowPassword) => !prevShowPassword);
+  };
 
   const signInSchema = yup.object({
     email: yup
       .string()
-      .email(lang("invalid-email"))
-      .required(lang("require-email")),
+      .required(lang("require-email"))
+      .email(lang("invalid-email")),
     password: yup
       .string()
       .required(lang("require-password"))
-      .min(8, lang("invalid-length-password", 8)),
+      .matches(/[a-z]/, lang("at-least-one-lower-case"))
+      .matches(/[A-Z]/, lang("at-least-one-upper-case"))
+      .matches(/[0-9]/, lang("at-least-one-digit"))
+      .matches(/[!@#$%^&*(),.?":{}|<>]/, lang("at-least-one-special"))
+      .matches(/^\S*$/, lang("no-white-space"))
+      .min(8, lang("invalid-length-password")),
   });
 
   const form = useForm<FormValues>({
@@ -46,16 +60,41 @@ export default function SignInForm() {
     resolver: yupResolver(signInSchema),
   });
 
+  const { register, handleSubmit, formState, setError } = form;
+  const { errors } = formState;
+
   const onSubmit = (data: FormValues) => {
-    console.log(data);
-    auth.setAccount({
-      isAuthenticated: true,
-      ...data
-    })
+    userFetcher
+      .manualLogin(data.email, data.password)
+      .then((response) => {
+        const account = response.data;
+        auth.setAccount(account);
+        auth.setToken(account?.token);
+      })
+      .catch((error) => {
+        const target = error?.data?.target as string | undefined;
+        if (target != null) {
+          const reason = error.data.reason as string;
+          switch (target) {
+            case userErrorTargets.EMAIL:
+              if (reason === userErrorReasons.NO_EMAIL_FOUND) {
+                setError("email", {
+                  message: lang("no-email-found"),
+                });
+              }
+              break;
+            case userErrorTargets.PASSWORD:
+              if (reason === userErrorReasons.INCORRECT_PASSWORD) {
+                setError("password", {
+                  message: lang("incorrect-password"),
+                });
+              }
+              break;
+          }
+        }
+      });
   };
 
-  const { register, handleSubmit, formState } = form;
-  const { errors } = formState;
   const handleCallbackResponse = (response: GoogleOAuthResponse) => {
     console.log(response);
     console.log(jwtDecode(response.credential));
@@ -90,10 +129,19 @@ export default function SignInForm() {
         />
         <TextField
           label={lang("l-password")}
-          type="password"
+          type={showPassword ? "text" : "password"}
           {...register("password")}
           error={!!errors.password}
           helperText={errors.password?.message}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={handleTogglePasswordVisibility} edge="end">
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
         <Container>
           <div>{lang("or")}</div>

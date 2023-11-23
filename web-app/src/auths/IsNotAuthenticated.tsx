@@ -18,14 +18,13 @@ export default function IsNotAuthenticated({
   const authentiationContext = useAuthenticationContext();
 
   const { forceLogout, redirectUrl } = options ?? {};
-  if (authentiationContext.account.isAuthenticated === true) {
+  if (authentiationContext.auth != null) {
     if (forceLogout === true) {
       authentiationContext.logout();
       return <>{children}</>;
     }
     const urlParams = new URLSearchParams(window.location.href);
-    const urlToRedirect =
-      redirectUrl ?? urlParams.get("redirect") ?? "/";
+    const urlToRedirect = redirectUrl ?? urlParams.get("redirect") ?? "/";
     return <Navigate to={urlToRedirect} replace />;
   }
 

@@ -8,8 +8,8 @@ export const validateAccountRegisterMethod = async (method?: TAccountRegisterMet
         throw new InvalidDataError({
             message: `Invalid method "${method}" for Account register.`,
             data: {
-                targetLabel: "method",
-                reason: "INVALID_METHOD"
+                target: "method",
+                reason: "invalid-method"
             }
         });
     }
@@ -21,8 +21,8 @@ export const validateEmail = async (email?: string): Promise<boolean> => {
         throw new InvalidDataError({
             message: "Email can not be undefined",
             data: {
-                targetLabel: "email",
-                reason: "EMPTY_EMAIL"
+                target: "email",
+                reason: "empty-email"
             }
         });
     }
@@ -31,8 +31,8 @@ export const validateEmail = async (email?: string): Promise<boolean> => {
         throw new InvalidDataError({
             message: "Invalid email format",
             data: {
-                targetLabel: "email",
-                reason: "INVALID_EMAIL_FORMAT"
+                target: "email",
+                reason: "invalid-email-format"
             }
         });
     }
@@ -44,8 +44,8 @@ export const validatePassword = async (password?: string): Promise<boolean> => {
         throw new InvalidDataError({
             message: "Password can not be undefined",
             data: {
-                targetLabel: "password",
-                reason: "EMPTY_PASSWORD"
+                target: "password",
+                reason: "empty-password"
             }
         });
     }
@@ -53,8 +53,8 @@ export const validatePassword = async (password?: string): Promise<boolean> => {
         throw new InvalidDataError({
             message: "Invalid password format: Length have to larger or equal to 8",
             data: {
-                targetLabel: "password",
-                reason: "INVALID_PASSWORD_LENGTH"
+                target: "password",
+                reason: "invalid-password-length"
             }
         });
     }
@@ -63,8 +63,8 @@ export const validatePassword = async (password?: string): Promise<boolean> => {
         throw new InvalidDataError({
             message: "Invalid password format: At least one upper case character",
             data: {
-                targetLabel: "password",
-                reason: "INVALID_PASSWORD_CHARACTER_UPPER"
+                target: "password",
+                reason: "invalid-password-character-upper"
             }
         });
     }
@@ -73,8 +73,8 @@ export const validatePassword = async (password?: string): Promise<boolean> => {
         throw new InvalidDataError({
             message: "Invalid password format: At least one lower case character",
             data: {
-                targetLabel: "password",
-                reason: "INVALID_PASSWORD_CHARACTER_LOWER"
+                target: "password",
+                reason: "invalid-password-character-lower"
             }
         });
     }
@@ -83,8 +83,8 @@ export const validatePassword = async (password?: string): Promise<boolean> => {
         throw new InvalidDataError({
             message: "Invalid password format: At least one digit character",
             data: {
-                targetLabel: "password",
-                reason: "INVALID_PASSWORD_CHARACTER_DIGIT"
+                target: "password",
+                reason: "invalid-password-character-digit"
             }
         });
     }
@@ -93,8 +93,8 @@ export const validatePassword = async (password?: string): Promise<boolean> => {
         throw new InvalidDataError({
             message: "Invalid password format: At least one special character",
             data: {
-                targetLabel: "password",
-                reason: "INVALID_PASSWORD_CHARACTER_SPECIAL"
+                target: "password",
+                reason: "invalid-password-character-special"
             }
         });
     }
@@ -106,8 +106,8 @@ export const validateName = async (firstName?: string, lastName?: string): Promi
         throw new InvalidDataError({
             message: "First name cannot be empty",
             data: {
-                targetLabel: "firstName",
-                reason: "EMPTY_FIRST_NAME"
+                target: "firstName",
+                reason: "empty-first-name"
             }
         });
     }
@@ -115,8 +115,8 @@ export const validateName = async (firstName?: string, lastName?: string): Promi
         throw new InvalidDataError({
             message: "Last name cannot be empty",
             data: {
-                targetLabel: "lastName",
-                reason: "EMPTY_LAST_NAME"
+                target: "lastName",
+                reason: "empty-last-name"
             }
         });
     }

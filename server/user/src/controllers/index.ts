@@ -1,4 +1,4 @@
-export { 
+export {
     registAccount,
     IRegistAccountQuery,
     IRegistAccountBody,
@@ -9,4 +9,8 @@ export {
     ILoginAccountBody,
     ILoginAccountQuery,
     loginAccount
-} from "./login"
+} from "./login";
+
+export {
+    refreshToken
+} from "./token";

@@ -4,7 +4,7 @@ export interface InternalErrorInfo {
     code?: number;
     message?: string;
     data?: {
-        targetLabel: string;
+        target: string;
         reason: string;
     };
 }

@@ -5,4 +5,8 @@ export {
 
 export {
     loginAccountByManual
-} from "./login"
+} from "./login";
+
+export {
+    refreshToken
+} from "./token";

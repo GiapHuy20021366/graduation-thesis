@@ -51,7 +51,7 @@ export const activeManualAccount = async (request: Request<{}, {}, {}, IActiveMa
         return next(new InvalidDataError({
             message: "Token not found",
             data: {
-                targetLabel: "token",
+                target: "token",
                 reason: "TOKEN_NOT_FOUND"
             }
         }));

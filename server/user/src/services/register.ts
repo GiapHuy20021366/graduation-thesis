@@ -21,8 +21,8 @@ export const registAccountByManual = async (info: ManualAccountRegisterInfo): Pr
         throw new ResourceExistedError({
             message: "Email already existed",
             data: {
-                targetLabel: "email",
-                reason: "EMAIL_EXISTED"
+                target: "email",
+                reason: "email-existed"
             }
         });
     }
@@ -53,8 +53,8 @@ export const createManualAccountFromToken = async (token: string): Promise<any> 
         throw new InvalidDataError({
             message: "Token invalid",
             data: {
-                targetLabel: "token",
-                reason: "INVALID_TOKEN"
+                target: "token",
+                reason: "invalid-token"
             }
         });
     }
@@ -66,8 +66,8 @@ export const createManualAccountFromToken = async (token: string): Promise<any> 
         throw new ResourceExistedError({
             message: "Email already existed",
             data: {
-                targetLabel: "email",
-                reason: "EMAIL_EXISTED"
+                target: "email",
+                reason: "email-existed"
             }
         });
     }

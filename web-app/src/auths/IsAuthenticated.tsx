@@ -18,7 +18,7 @@ export default function IsAuthenticated({
 }: IAuthenticatedProps): JSX.Element {
   const authentiationContext = useAuthenticationContext();
   const { errorElement, redirectUrl, withCallback } = options ?? {};
-  if (authentiationContext.account.isAuthenticated === false) {
+  if (authentiationContext.auth == null) {
     if (redirectUrl === undefined && errorElement !== undefined) {
       return errorElement;
     }

@@ -16,4 +16,5 @@ export { UnauthorizationErrorInfo, UnauthorizationError } from "./unauthorizatio
 
 export { HttpResponseCode } from "./http-response-code";
 export { toResponseSuccessData } from "./to-response-success-data";
-export { toAuthToken } from "./to-auth-token";
+export { toAuthToken, AuthLike } from "./to-auth-token";
+export { AccountExposed } from "./account-exposed"

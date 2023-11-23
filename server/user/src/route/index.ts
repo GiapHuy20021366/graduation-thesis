@@ -7,7 +7,8 @@ import {
 import {
     registAccount,
     activeManualAccount,
-    loginAccount
+    loginAccount,
+    refreshToken
 } from "../controllers";
 
 const userRouter = express.Router();
@@ -29,6 +30,11 @@ export const initUserRouters = (app: Express): void => {
     userRouter.get(
         "/active",
         activeManualAccount
+    )
+
+    userRouter.get(
+        "/token/refresh",
+        refreshToken
     )
 
     userRouter.use(errorHandler);

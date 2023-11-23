@@ -2,4 +2,4 @@
 echo Start building message service in production...
 echo.
 cd ..\..\server\message
-npm run build
+npm run copy-views

@@ -81,9 +81,9 @@ export default function SignUpForm() {
         .manualRegister(data)
         .then(() => navigate("/signup/verify", { state: data }))
         .catch((error) => {
-          const targetLabel = error?.data?.targetLabel;
+          const target = error?.data?.target;
           const reason = error?.data?.reason;
-          if (targetLabel === "email") {
+          if (target === "email") {
             if (reason === "EMAIL_EXISTED") {
               setError("email", {
                 message: lang("email-existed"),
