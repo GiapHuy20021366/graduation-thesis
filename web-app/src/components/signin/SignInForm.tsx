@@ -2,7 +2,6 @@ import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { GOOGLE_CLIENT_ID } from "../../env";
 import { GoogleOAuthResponse } from "../../types/GoogleOAuthResponse";
-import jwtDecode from "jwt-decode";
 import {
   Box,
   Container,
@@ -96,8 +95,15 @@ export default function SignInForm() {
   };
 
   const handleCallbackResponse = (response: GoogleOAuthResponse) => {
-    console.log(response);
-    console.log(jwtDecode(response.credential));
+    userFetcher
+      .googleOAuthLogin(response.credential)
+      .then((response) => {
+        const account = response.data;
+        console.log(account);
+        auth.setAccount(account);
+        auth.setToken(account?.token);
+      })
+      .catch((error) => console.log(error));
   };
 
   useEffect(() => {

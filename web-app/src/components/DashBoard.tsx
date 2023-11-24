@@ -1,4 +1,10 @@
+import { useAuthenticationContext } from "../contexts";
+
 export default function DashBoard() {
-  console.log("Dashboard");
-  return <>Dashboard</>;
+  const auth = useAuthenticationContext();
+  return (
+    <>
+      <button onClick={() => auth.logout()}>Logout</button>
+    </>
+  );
 }

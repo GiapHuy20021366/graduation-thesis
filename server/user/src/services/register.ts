@@ -1,11 +1,12 @@
-import { InvalidDataError, ResourceExistedError } from "../data";
+import { AccountExposed, GoogleOAuthInfo, InternalError, InvalidDataError, ResourceExistedError, UserInfo } from "../data";
 import { User } from "../db/model";
 import {
     USER_SERVICE
 } from "../config";
 import { operations, brokerChannel } from "../broker";
-import { hashText, signToken, verifyToken } from "../utils";
+import { generateRandomPassword, hashText, signToken, verifyToken } from "../utils";
 import { toAuthToken } from "../data";
+import { jwtDecode } from "jwt-decode";
 
 
 interface ManualAccountRegisterInfo {
@@ -39,7 +40,7 @@ export const registAccountByManual = async (info: ManualAccountRegisterInfo): Pr
     });
 
     // send email to user
-    await brokerChannel.toMessageServiceQueue(message);
+    brokerChannel.toMessageServiceQueue(message);
 
     return {
         isSuccessful: true
@@ -47,7 +48,7 @@ export const registAccountByManual = async (info: ManualAccountRegisterInfo): Pr
 
 };
 
-export const createManualAccountFromToken = async (token: string): Promise<any> => {
+export const createManualAccountFromToken = async (token: string): Promise<AccountExposed> => {
     const info = verifyToken(token) as ManualAccountRegisterInfo | null;
     if (info === null) {
         throw new InvalidDataError({
@@ -79,14 +80,96 @@ export const createManualAccountFromToken = async (token: string): Promise<any> 
         password
     });
 
-    const dataToReturn = {
+    return {
         firstName: newAccount.firstName,
         lastName: newAccount.lastName,
         email: newAccount.email,
         avatar: newAccount.avatar,
         titles: newAccount.titles,
         token: toAuthToken(newAccount)
-    };
+    };;
+}
 
-    return dataToReturn;
+export const registAccountByGoogleCridential = async (cridential: string): Promise<AccountExposed> => {
+    let googleOAuth: GoogleOAuthInfo | undefined;
+    try {
+        googleOAuth = jwtDecode(cridential) as GoogleOAuthInfo;
+    } catch (error) {
+        throw new InvalidDataError({
+            message: "Invalid cridential",
+            data: {
+                target: "credential",
+                reason: "invalid-credential"
+            }
+        })
+    }
+    const { email } = googleOAuth;
+    const user = await User.findOneByEmail(email);
+
+    let responseUser: UserInfo | undefined;
+    const newDate = new Date();
+    if (user != null) {
+        // update information
+        const createdAt = user.googleOAuth?.createdAt;
+        const updated: GoogleOAuthInfo = {
+            ...user.googleOAuth,
+            ...googleOAuth,
+            updatedAt: newDate,
+            createdAt: createdAt ?? newDate
+        }
+        user.googleOAuth = updated;
+        user.firstName ??= googleOAuth.given_name || "";
+        user.lastName ??= googleOAuth.family_name || "";
+        user.avatar ??= googleOAuth.picture;
+        user.updatedAt = newDate;
+        await user.save();
+        responseUser = user;
+    } else {
+        const genPassword = generateRandomPassword();
+        const password = hashText(genPassword);
+        if (password == null) {
+            throw new InternalError({
+                message: "Internal server error"
+            });
+        }
+        const newUser: UserInfo = {
+            googleOAuth: {
+                ...googleOAuth,
+                createdAt: newDate,
+                updatedAt: newDate
+            },
+            avatar: googleOAuth.picture,
+            email: googleOAuth.email,
+            firstName: googleOAuth.given_name,
+            lastName: googleOAuth.family_name,
+            createdAt: newDate,
+            updatedAt: newDate,
+            validSince: newDate,
+            password: password,
+            titles: []
+        }
+        const user = new User(newUser);
+        await user.save();
+
+        // send when new account created
+        const message = JSON.stringify({
+            email: email,
+            operation: operations.mail.NEW_ACCOUNT_CREATED,
+            password: genPassword,
+            from: USER_SERVICE
+        });
+        brokerChannel.toMessageServiceQueue(message);
+        
+        responseUser = user;
+    }
+
+    
+    return {
+        firstName: responseUser.firstName,
+        lastName: responseUser.lastName,
+        email: responseUser.email,
+        avatar: responseUser.avatar,
+        titles: responseUser.titles,
+        token: toAuthToken(responseUser)
+    }
 }

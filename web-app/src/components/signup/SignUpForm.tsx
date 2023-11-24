@@ -2,7 +2,6 @@ import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { GOOGLE_CLIENT_ID } from "../../env";
 import { GoogleOAuthResponse } from "../../types/GoogleOAuthResponse";
-import jwtDecode from "jwt-decode";
 import {
   Box,
   Container,
@@ -20,7 +19,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useLanguageContext } from "../../contexts";
+import { useAuthenticationContext, useLanguageContext } from "../../contexts";
 import { userFetcher } from "../../api";
 
 interface FormValues {
@@ -40,6 +39,8 @@ export default function SignUpForm() {
 
   const languageContext = useLanguageContext();
   const lang = languageContext.of(SignUpForm);
+
+  const auth = useAuthenticationContext();
 
   const signUpSchema = yup.object({
     firstName: yup.string().required(lang("require-firstname")),
@@ -71,27 +72,35 @@ export default function SignUpForm() {
 
   const { register, handleSubmit, formState, setError } = form;
   const { errors } = formState;
+
   const handleCallbackResponse = (response: GoogleOAuthResponse) => {
-    console.log(response);
-    console.log(jwtDecode(response.credential));
+    userFetcher
+      .googleOAuthLogin(response.credential)
+      .then((response) => {
+        const account = response.data;
+        console.log(account);
+        auth.setAccount(account);
+        auth.setToken(account?.token);
+      })
+      .catch((error) => console.log(error));
   };
 
-    const onSubmit = (data: FormValues) => {
-      userFetcher
-        .manualRegister(data)
-        .then(() => navigate("/signup/verify", { state: data }))
-        .catch((error) => {
-          const target = error?.data?.target;
-          const reason = error?.data?.reason;
-          if (target === "email") {
-            if (reason === "EMAIL_EXISTED") {
-              setError("email", {
-                message: lang("email-existed"),
-              });
-            }
+  const onSubmit = (data: FormValues) => {
+    userFetcher
+      .manualRegister(data)
+      .then(() => navigate("/signup/verify", { state: data }))
+      .catch((error) => {
+        const target = error?.data?.target;
+        const reason = error?.data?.reason;
+        if (target === "email") {
+          if (reason === "EMAIL_EXISTED") {
+            setError("email", {
+              message: lang("email-existed"),
+            });
           }
-        });
-    };
+        }
+      });
+  };
 
   useEffect(() => {
     window.google.accounts.id.initialize({

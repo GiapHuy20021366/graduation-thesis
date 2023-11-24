@@ -114,10 +114,6 @@ export default function AuthenticationContextProvider({
     localStorage.setItem("account", JSON.stringify(account));
   }, [account]);
 
-  useEffect(() => {
-    console.log("rendering");
-  }, [])
-
   return (
     <AuthenticationContext.Provider
       value={{

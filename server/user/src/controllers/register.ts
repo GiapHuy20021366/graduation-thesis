@@ -4,13 +4,14 @@ import {
     TAccountRegisterMethod,
     toResponseSuccessData,
 } from "../data";
-import { createManualAccountFromToken, registAccountByManual } from "../services";
+import { createManualAccountFromToken, registAccountByGoogleCridential, registAccountByManual } from "../services";
 
 export interface IRegistAccountBody {
     email?: string;
     password?: string;
     firstName?: string;
     lastName?: string;
+    cridential?: string;
 }
 
 export interface IRegistAccountQuery {
@@ -32,7 +33,9 @@ export const registAccount = async (request: Request<{}, {}, IRegistAccountBody,
             }).catch(next);
             break;
         case "google-oauth":
-            next(new Error("Method not implemented"));
+            await registAccountByGoogleCridential(request.body.cridential!).then((result) => {
+                return response.status(200).json(toResponseSuccessData(result));
+            }).catch(next);
             break;
         case "facebook-oauth":
             next(new Error("Method not implemented"));

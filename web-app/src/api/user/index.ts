@@ -47,6 +47,7 @@ export interface UserFetcher {
     manualLogin(email: string, password: string): Promise<AccountResponse>;
     manualRegister(data: ManualRegisterInfo): Promise<AccountResponse>;
     refreshToken(token: string, profile?: boolean): Promise<AccountResponse>;
+    googleOAuthLogin(cridential: string): Promise<AccountResponse>;
 }
 
 export const userFetcher: UserFetcher = {
@@ -85,6 +86,18 @@ export const userFetcher: UserFetcher = {
                 }
             })
     },
+    googleOAuthLogin: async (cridential: string): Promise<AccountResponse> => {
+        return userInstance.post(
+            '/register',
+            {
+                cridential
+            },
+            {
+                params: {
+                    method: "google-oauth"
+                }
+            })
+    }
 };
 
 export const userErrorTargets = {

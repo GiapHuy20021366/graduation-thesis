@@ -21,9 +21,11 @@ const userSchema = new Schema<UserInfo, IUserModel, IUserMethods>({
     locale: String,
     sub: String,
     picture: String,
-    createdAt: Date
+    createdAt: Date,
+    updatedAt: Date
   },
   createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
   validSince: { type: Date, default: Date.now },
   firstName: {
     required: true,

@@ -1,6 +1,7 @@
 export {
     registAccountByManual,
-    createManualAccountFromToken
+    createManualAccountFromToken,
+    registAccountByGoogleCridential
 } from "./register";
 
 export {

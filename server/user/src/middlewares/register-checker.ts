@@ -3,7 +3,7 @@ import {
     IRegistAccountBody,
     IRegistAccountQuery
 } from "../controllers";
-import { TAccountRegisterMethod, validateAccountRegisterMethod, validateEmail, validateName, validatePassword } from "../data";
+import { InvalidDataError, TAccountRegisterMethod, validateAccountRegisterMethod, validateEmail, validateName, validatePassword } from "../data";
 
 export const checkRegistBodyAndParams = async (request: Request<{}, {}, IRegistAccountBody, IRegistAccountQuery>, _response: Response, next: NextFunction) => {
     const method: TAccountRegisterMethod | undefined = request.query.method;
@@ -21,7 +21,19 @@ export const checkRegistBodyAndParams = async (request: Request<{}, {}, IRegistA
             }).catch(next);
             break;
         case "google-oauth":
-            next(new Error("Method not implemented"));
+            const cridential = request.body.cridential;
+            if (cridential == null) {
+                return next(
+                    new InvalidDataError({
+                        message: "Cridential not found",
+                        data: {
+                            target: "cridential",
+                            reason: "cridential-not-found"
+                        }
+                    })
+                )
+            }
+            isAllValid = true;
             break;
         case "facebook-oauth":
             next(new Error("Method not implemented"));

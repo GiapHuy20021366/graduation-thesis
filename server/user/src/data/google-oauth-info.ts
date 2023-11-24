@@ -6,5 +6,7 @@ export interface GoogleOAuthInfo {
     given_name: string,
     locale: string,
     sub: string,
-    picture: string
+    picture: string,
+    createdAt?: Date,
+    updatedAt?: Date
 }
