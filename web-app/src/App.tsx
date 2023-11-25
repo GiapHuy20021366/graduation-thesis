@@ -3,10 +3,11 @@ import SignUpPage from "./components/signup/SignUpPage";
 import SignInPage from "./components/signin/SignInPage";
 import AuthenticationContextProvider from "./contexts/AuthenticationContext";
 import IsNotAuthenticated from "./auths/IsNotAuthenticated";
-import DashBoard from "./components/DashBoard";
+import AppContent from "./components/AppContent";
 import IsAuthenticated from "./auths/IsAuthenticated";
 import PageNotFound from "./components/PageNotFound";
 import SignUpVerifyPage from "./components/signup/SignUpVerifyPage";
+import AppContentContextProvider from "./contexts/AppContentContext";
 
 function App() {
   return (
@@ -15,10 +16,12 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route
-              path=""
+              path="/*"
               element={
                 <IsAuthenticated>
-                  <DashBoard />
+                  <AppContentContextProvider>
+                    <AppContent />
+                  </AppContentContextProvider>
                 </IsAuthenticated>
               }
             />

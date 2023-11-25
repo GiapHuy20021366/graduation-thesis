@@ -23,7 +23,7 @@ export default function IsNotAuthenticated({
       authentiationContext.logout();
       return <>{children}</>;
     }
-    const urlParams = new URLSearchParams(window.location.href);
+    const urlParams = new URLSearchParams(window.location.search);
     const urlToRedirect = redirectUrl ?? urlParams.get("redirect") ?? "/";
     return <Navigate to={urlToRedirect} replace />;
   }

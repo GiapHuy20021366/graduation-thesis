@@ -49,7 +49,9 @@ export const registAccountByManual = async (info: ManualAccountRegisterInfo): Pr
 };
 
 export const createManualAccountFromToken = async (token: string): Promise<AccountExposed> => {
-    const info = verifyToken(token) as ManualAccountRegisterInfo | null;
+    const info = verifyToken(token) as {
+        data: ManualAccountRegisterInfo
+    } | null;
     if (info === null) {
         throw new InvalidDataError({
             message: "Token invalid",
@@ -60,7 +62,7 @@ export const createManualAccountFromToken = async (token: string): Promise<Accou
         });
     }
 
-    const { email, firstName, lastName, password } = info;
+    const { email, firstName, lastName, password } = info.data;
 
     const account = await User.findOneByEmail(email);
     if (account !== null) {
@@ -159,11 +161,11 @@ export const registAccountByGoogleCridential = async (cridential: string): Promi
             from: USER_SERVICE
         });
         brokerChannel.toMessageServiceQueue(message);
-        
+
         responseUser = user;
     }
 
-    
+
     return {
         firstName: responseUser.firstName,
         lastName: responseUser.lastName,
