@@ -48,6 +48,7 @@ export interface UserFetcher {
     manualRegister(data: ManualRegisterInfo): Promise<AccountResponse>;
     refreshToken(token: string, profile?: boolean): Promise<AccountResponse>;
     googleOAuthLogin(cridential: string): Promise<AccountResponse>;
+    activeMannualAccount(token: string): Promise<AccountResponse>;
 }
 
 export const userFetcher: UserFetcher = {
@@ -95,6 +96,16 @@ export const userFetcher: UserFetcher = {
             {
                 params: {
                     method: "google-oauth"
+                }
+            })
+    },
+    activeMannualAccount: async (token: string): Promise<AccountResponse> => {
+        return userInstance.post(
+            '/active',
+            {},
+            {
+                params: {
+                    token
                 }
             })
     }

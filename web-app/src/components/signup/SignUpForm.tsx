@@ -78,7 +78,6 @@ export default function SignUpForm() {
       .googleOAuthLogin(response.credential)
       .then((response) => {
         const account = response.data;
-        console.log(account);
         auth.setAccount(account);
         auth.setToken(account?.token);
       })

@@ -1,9 +1,9 @@
 import { Container, Link, Stack } from "@mui/material";
-import { useState } from "react";
-import { useLocation } from "react-router";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router";
 import { LoadingButton } from "@mui/lab";
 import { userFetcher } from "../../api";
-import PageNotFound from "../PageNotFound";
+import { useAuthenticationContext } from "../../contexts";
 
 interface IAccountInfo {
   email: string;
@@ -49,12 +49,32 @@ function WaitingEmailVerify({ account }: IWaitingEmailVerify) {
 }
 
 function AccountTokenVerify() {
-  const location = useLocation();
-  const token = new URLSearchParams(location.search).get("token") as
-    | string
-    | undefined;
+  const navigate = useNavigate();
+  const auth = useAuthenticationContext();
 
-  return <>{token ? <div>Token is ${token}</div> : <PageNotFound />}</>;
+  useEffect(() => {
+    const location = window.location;
+    const token = new URLSearchParams(location.search).get("token") as
+      | string
+      | undefined;
+    if (token == null) {
+      navigate("/error/page-wrong", { replace: true });
+    } else {
+      userFetcher
+        .activeMannualAccount(token)
+        .then((response) => {
+          const account = response.data;
+          auth.setAccount(account);
+          auth.setToken(account?.token);
+        })
+        .catch((error) => {
+          console.error(error);
+          navigate("/error/page-wrong", { replace: true });
+        });
+    }
+  }, []);
+
+  return <div>Verifying...</div>;
 }
 
 export default function SignUpVerifyPage() {
