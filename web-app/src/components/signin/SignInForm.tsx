@@ -7,7 +7,6 @@ import {
   Container,
   TextField,
   Stack,
-  Grid,
   Button,
   Link as MuiLink,
   InputAdornment,
@@ -123,7 +122,10 @@ export default function SignInForm() {
       component="form"
       noValidate
       onSubmit={handleSubmit(onSubmit)}
-      sx={{ mt: 3 }}
+      sx={{
+        mt: 3,
+        width: ["100%", "60%", "50%", "40%"]
+      }}
     >
       <Stack spacing={2}>
         <TextField
@@ -149,15 +151,22 @@ export default function SignInForm() {
             ),
           }}
         />
-        <Container>
-          <div>{lang("or")}</div>
-          <Grid>
-            <div id="google-oauth" />
-          </Grid>
-        </Container>
         <Button type="submit" variant="contained">
           {lang("login-now")}
         </Button>
+        <Container>
+          <Box
+            sx={{
+              textAlign: "center",
+              margin: "0 0 0.8rem 0",
+            }}
+          >
+            <b>{lang("or")}</b>
+          </Box>
+          <Stack>
+            <div id="google-oauth" />
+          </Stack>
+        </Container>
         <Container>
           <span>{lang("not-account-yet")}</span>
           <MuiLink to="/signup" component={ReactRouterLink}>

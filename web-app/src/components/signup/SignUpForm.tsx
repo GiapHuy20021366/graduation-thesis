@@ -119,7 +119,10 @@ export default function SignUpForm() {
       component="form"
       noValidate
       onSubmit={handleSubmit(onSubmit)}
-      sx={{ mt: 3 }}
+      sx={{
+        mt: 3,
+        width: ["100%", "60%", "50%", "40%"],
+      }}
     >
       <Stack spacing={2}>
         <TextField
@@ -159,7 +162,7 @@ export default function SignUpForm() {
             ),
           }}
         />
-        <Grid container spacing={2}>
+        <Grid container spacing={2} textAlign="left">
           <FormControlLabel
             control={
               <Checkbox
@@ -171,15 +174,22 @@ export default function SignUpForm() {
             label={lang("l-allow-email")}
           />
         </Grid>
-        <Container>
-          <div>{lang("or")}</div>
-          <Grid>
-            <div id="google-oauth" />
-          </Grid>
-        </Container>
         <Button type="submit" variant="contained">
           {lang("join-now")}
         </Button>
+        <Container>
+          <Box
+            sx={{
+              textAlign: "center",
+              margin: "0 0 0.8rem 0",
+            }}
+          >
+            <b>{lang("or")}</b>
+          </Box>
+          <Stack>
+            <div id="google-oauth" />
+          </Stack>
+        </Container>
         <Container>
           <span>{lang("have-account-yet")}</span>
           <MuiLink to="/signin" component={ReactRouterLink}>

@@ -1,4 +1,4 @@
-import { Container, Stack } from "@mui/material";
+import { Stack } from "@mui/material";
 import SignUpForm from "./SignUpForm";
 import { useState } from "react";
 import BeforeJoin from "./BeforeJoin";
@@ -12,12 +12,16 @@ export default function SignUpPage() {
   return (
     <>
       {accepted ? (
-        <Container>
+        <Stack sx={{
+          padding: "1rem",
+          alignItems: "center",
+          textAlign: "center"
+        }}>
           <Stack>
             <h1>{lang("join", "F4U")}</h1>
           </Stack>
           <SignUpForm />
-        </Container>
+        </Stack>
       ) : (
         <BeforeJoin setAccepted={setAccepted} />
       )}
