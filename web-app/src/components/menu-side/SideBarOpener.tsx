@@ -1,19 +1,30 @@
-import { MenuOutlined } from "@mui/icons-material";
+import { MenuOutlined, MenuOpen } from "@mui/icons-material";
 import { useAppContentContext } from "../../contexts";
 
 export default function SideBarOpener() {
   const appContentContext = useAppContentContext();
   const isActive = appContentContext.menuSide.active;
   return (
-    <MenuOutlined
-      onClick={() => appContentContext.setMenuSideActive(!isActive)}
-      sx={{
-        width: "1.5em",
-        height: "1.5em",
-        cursor: "pointer"
-      }}
-    >
-      Toggle Sidebar
-    </MenuOutlined>
+    <>
+      {isActive ? (
+        <MenuOpen
+          onClick={() => appContentContext.setMenuSideActive(false)}
+          sx={{
+            width: "1.3em",
+            height: "1.3em",
+            cursor: "pointer",
+          }}
+        />
+      ) : (
+        <MenuOutlined
+          onClick={() => appContentContext.setMenuSideActive(true)}
+          sx={{
+            width: "1.3em",
+            height: "1.3em",
+            cursor: "pointer",
+          }}
+        />
+      )}
+    </>
   );
 }

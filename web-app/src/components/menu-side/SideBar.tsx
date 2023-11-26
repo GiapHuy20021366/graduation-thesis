@@ -11,6 +11,7 @@ import {
 } from "@mui/icons-material";
 import SideBarItemText from "./SideBarItemText";
 import SideBarItem from "./SideBarItem";
+import SideBarOpener from "./SideBarOpener";
 
 export default function SideBar() {
   const appContentContext = useAppContentContext();
@@ -39,10 +40,17 @@ export default function SideBar() {
                 width: "25%",
                 height: "auto",
                 borderRadius: "50%",
-                margin: "1rem 0",
+                margin: "1rem 0"
               }}
             />
             <SideBarItemText text={authContext.account?.firstName ?? ""} />
+            <Stack
+              sx={{
+                justifyContent: "center",
+              }}
+            >
+              <SideBarOpener />
+            </Stack>
           </Stack>
           <Stack spacing={2}>
             <SideBarItem
