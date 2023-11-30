@@ -11,17 +11,8 @@ export interface IRefreshTokenQuery {
 }
 
 export const refreshToken = async (request: Request<{}, {}, {}, IRefreshTokenQuery>, response: Response, next: NextFunction) => {
-    const token = request.headers.authorization;
-    if (token == null) {
-        return next(new InvalidDataError({
-            message: "Token not found",
-            data: {
-                target: "token",
-                reason: "missing-token-in-headers"
-            }
-        }))
-    }
-    services.refreshToken(token, request.query.profile).then((result) => {
+    const authContext = request.authContext!;
+    services.refreshToken(authContext, request.query.profile).then((result) => {
         return response.status(200).json(toResponseSuccessData(result))
     }).catch(next);
 }

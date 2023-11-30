@@ -1,9 +1,11 @@
-import { Box, Stack } from "@mui/material";
+import { Box, Button, Stack } from "@mui/material";
 import ContentHeader from "./layout/ContentHeader";
 import ContentBody from "./layout/ContentBody";
 import ContentFooter from "./layout/ContentFooter";
+import { useAuthenticationContext } from "../../contexts";
 
 export default function AccountContent() {
+  const authContext = useAuthenticationContext();
   return (
     <Stack
       sx={{
@@ -20,6 +22,9 @@ export default function AccountContent() {
         <Box component="div">
             Account Body
         </Box>
+        <Button onClick={() => authContext.logout()}>
+          Logout
+        </Button>
       </ContentBody>
       <Box display={["block", "none", "none", "none"]}>
         <ContentFooter />

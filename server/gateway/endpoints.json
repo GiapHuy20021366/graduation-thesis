@@ -2,6 +2,13 @@
     {
         "path": "/user",
         "host": "http://localhost",
-        "port": 8001
+        "port": 8001,
+        "token": {
+            "exclude": [
+                "/register",
+                "/login",
+                "/active"
+            ]
+        }
     }
 ]

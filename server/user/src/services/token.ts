@@ -1,21 +1,7 @@
 import { User } from "../db/model";
-import { AccountExposed, AuthLike, InvalidDataError, ResourceNotExistedError, toAuthToken } from "../data";
-import { verifyToken } from "../utils"
+import { AccountExposed, AuthLike, ResourceNotExistedError, toAuthToken } from "../data";
 
-export const refreshToken = async (token: string, profile?: boolean): Promise<AccountExposed> => {
-    const tokenInfo = verifyToken(token);
-    if (tokenInfo == null || typeof tokenInfo === "string") {
-        throw new InvalidDataError({
-            message: "Token invalid",
-            data: {
-                target: "token",
-                reason: "token-invalid"
-            }
-        })
-    }
-
-    const auth = tokenInfo.data as AuthLike;
-
+export const refreshToken = async (auth: AuthLike, profile?: boolean): Promise<AccountExposed> => {
     if (profile) {
         const user = await User.findOneByEmail(auth.email);
         if (user == null) {

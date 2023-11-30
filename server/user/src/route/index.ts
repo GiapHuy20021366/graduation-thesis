@@ -2,7 +2,8 @@ import express, { Express } from "express";
 import {
     errorHandler,
     checkRegistBodyAndParams,
-    checkLoginBodyAndParams
+    checkLoginBodyAndParams,
+    tokenParser
 } from "../middlewares";
 import {
     registAccount,
@@ -34,6 +35,7 @@ export const initUserRouters = (app: Express): void => {
 
     userRouter.get(
         "/token/refresh",
+        tokenParser,
         refreshToken
     )
 
