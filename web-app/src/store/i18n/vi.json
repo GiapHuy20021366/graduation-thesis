@@ -53,5 +53,32 @@
     },
     "SignUpPage": {
         "join": "Tham gia {0}"
+    },
+    "SettingContent": {
+        "title": "Cài đặt",
+        "language": "Ngôn ngữ"
+    },
+    "SettingLanguage": {
+        "choose": "Lựa chọn",
+        "choose-one": "Chọn một ngôn ngữ",
+        "vietnamese": "Tiếng Việt",
+        "english": "Tiếng Anh"
+    },
+    "SideBar": {
+        "home": "Nhà",
+        "my-levels": "Cấp độ",
+        "profile": "Profile",
+        "account": "Tài khoản",
+        "location": "Vị trí",
+        "help": "Trợ giúp",
+        "setting": "Cài đặt",
+        "avatar": "Avatar"
+    },
+    "ContentFooter": {
+        "home": "Nhà",
+        "goals": "Mục tiêu",
+        "add": "Thêm",
+        "forum": "Forum",
+        "message": "Tin nhắn"
     }
 }

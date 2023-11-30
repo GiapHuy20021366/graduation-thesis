@@ -7,12 +7,12 @@ import {
 } from "@mui/icons-material";
 import ContentFooter from "./ContentFooter";
 
-type extension = "notification" | "search" | "location";
+type HeaderExtension = "notification" | "search" | "location";
 
 interface IContentHeader {
   children?: React.ReactNode;
   title?: string;
-  extensions?: extension[];
+  extensions?: HeaderExtension[];
 }
 
 export default function ContentHeader({
@@ -24,6 +24,9 @@ export default function ContentHeader({
     width: "1.3em",
     height: "1.3em",
     cursor: "pointer",
+    ":hover": {
+      color: "gray"
+    }
   };
   return (
     <Box>
