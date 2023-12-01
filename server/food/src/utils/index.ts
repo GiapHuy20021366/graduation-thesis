@@ -1,0 +1,1 @@
+export { hashText, compareHash } from "./bcrypt";
