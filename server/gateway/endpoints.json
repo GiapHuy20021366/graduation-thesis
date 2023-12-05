@@ -10,5 +10,25 @@
                 "/active"
             ]
         }
+    },
+    {
+        "path": "/message",
+        "host": "http://localhost",
+        "port": 8002,
+        "token": {
+            "exclude": [
+                ""
+            ]
+        }
+    },
+    {
+        "path": "/food",
+        "host": "http://localhost",
+        "port": 8003,
+        "token": {
+            "exclude": [
+                ""
+            ]
+        }
     }
 ]
