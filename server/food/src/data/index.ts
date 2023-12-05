@@ -5,3 +5,5 @@ export { ResourceNotExistedErrorInfo, ResourceNotExistedError } from "./resource
 export { UnauthorizationErrorInfo, UnauthorizationError } from "./unauthorization-error";
 
 export { toResponseSuccessData } from "./to-response-success-data";
+
+export { AuthLike } from "./to-auth-token"
