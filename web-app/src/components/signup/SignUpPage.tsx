@@ -2,11 +2,11 @@ import { Stack } from "@mui/material";
 import SignUpForm from "./SignUpForm";
 import { useState } from "react";
 import BeforeJoin from "./BeforeJoin";
-import { useLanguageContext } from "../../contexts";
+import { useI18nContext } from "../../contexts";
 
 export default function SignUpPage() {
   const [accepted, setAccepted] = useState<boolean>(false);
-  const languageContext = useLanguageContext();
+  const languageContext = useI18nContext();
   const lang = languageContext.of(SignUpPage);
 
   return (

@@ -2,12 +2,9 @@ import { Box, Stack } from "@mui/material";
 import ContentHeader from "./layout/ContentHeader";
 import ContentBody from "./layout/ContentBody";
 import ContentFooter from "./layout/ContentFooter";
-import SettingLanguage from "./setting/SettingLanguage";
-import { useI18nContext } from "../../contexts";
+import FoodSharingForm from "./food/FoodSharingForm";
 
-export default function SettingContent() {
-  const languageContext = useI18nContext();
-  const lang = languageContext.of(SettingContent);
+export default function FoodSharingContent() {
   return (
     <Stack
       sx={{
@@ -17,14 +14,11 @@ export default function SettingContent() {
       }}
     >
       <ContentHeader
-        title={lang("title")}
+        title="Sharing"
         extensions={["notification", "location", "search"]}
       />
       <ContentBody>
-        <Stack>
-          <Box component="h2">1. {lang("language")}</Box>
-          <SettingLanguage />
-        </Stack>
+        <FoodSharingForm/>
       </ContentBody>
       <Box display={["block", "none", "none", "none"]}>
         <ContentFooter />

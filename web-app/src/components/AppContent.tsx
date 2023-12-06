@@ -9,6 +9,7 @@ import LocationContent from "./content/LocationContent";
 import HelpContent from "./content/HelpContent";
 import PageNotFound from "./PageNotFound";
 import SettingContent from "./content/SettingContent";
+import FoodSharingContent from "./content/FoodSharingContent";
 
 export default function AppContent() {
   return (
@@ -23,6 +24,7 @@ export default function AppContent() {
         <Route path="/location" element={<LocationContent />} />
         <Route path="/help" element={<HelpContent />} />
         <Route path="/setting" element={<SettingContent />} />
+        <Route path="/sharing" element={<FoodSharingContent />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </Box>

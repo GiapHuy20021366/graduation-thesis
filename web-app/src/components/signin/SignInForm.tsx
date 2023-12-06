@@ -15,7 +15,7 @@ import {
 import { Link as ReactRouterLink } from "react-router-dom";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useAuthenticationContext, useLanguageContext } from "../../contexts";
+import { useAuthContext, useI18nContext } from "../../contexts";
 import { userErrorReasons, userErrorTargets, userFetcher } from "../../api";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
@@ -25,8 +25,8 @@ interface FormValues {
 }
 
 export default function SignInForm() {
-  const auth = useAuthenticationContext();
-  const languageContext = useLanguageContext();
+  const auth = useAuthContext();
+  const languageContext = useI18nContext();
   const lang = languageContext.of(SignInForm);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -124,7 +124,7 @@ export default function SignInForm() {
       onSubmit={handleSubmit(onSubmit)}
       sx={{
         mt: 3,
-        width: ["100%", "60%", "50%", "40%"]
+        width: ["100%", "60%", "50%", "40%"],
       }}
     >
       <Stack spacing={2}>

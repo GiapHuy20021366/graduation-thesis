@@ -5,11 +5,11 @@ import {
   Select,
   SelectChangeEvent,
 } from "@mui/material";
-import { useLanguageContext } from "../../../contexts";
+import { useI18nContext } from "../../../contexts";
 import { LanguageCode } from "../../../store";
 
 export default function SettingLanguage() {
-  const languageContext = useLanguageContext();
+  const languageContext = useI18nContext();
   const lang = languageContext.of(SettingLanguage);
   const onChange = (event: SelectChangeEvent<LanguageCode>) => {
     languageContext.switchLanguage(event.target.value as LanguageCode);

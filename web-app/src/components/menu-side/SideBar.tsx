@@ -1,5 +1,5 @@
 import Drawer from "@mui/material/Drawer";
-import { useAppContentContext, useAuthenticationContext, useLanguageContext } from "../../contexts";
+import { useAppContentContext, useAuthContext, useI18nContext } from "../../contexts";
 import { Box, Container, Divider, Stack } from "@mui/material";
 import {
   HomeOutlined,
@@ -17,8 +17,8 @@ import SideBarOpener from "./SideBarOpener";
 export default function SideBar() {
   const appContentContext = useAppContentContext();
   const isActive = appContentContext.menuSide.active;
-  const authContext = useAuthenticationContext();
-  const languageContext = useLanguageContext();
+  const authContext = useAuthContext();
+  const languageContext = useI18nContext();
   const lang = languageContext.of(SideBar);
 
   return (

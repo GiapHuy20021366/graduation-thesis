@@ -1,4 +1,4 @@
-import { useAuthenticationContext } from "../contexts/useAuthenticationContext";
+import { useAuthContext } from "../contexts/useAuthContext";
 import { Navigate } from "react-router";
 
 interface AuthenticatedOptions {
@@ -16,7 +16,7 @@ export default function IsAuthenticated({
   children,
   options,
 }: IAuthenticatedProps): JSX.Element {
-  const authentiationContext = useAuthenticationContext();
+  const authentiationContext = useAuthContext();
   const { errorElement, redirectUrl, withCallback } = options ?? {};
   if (authentiationContext.auth == null) {
     if (redirectUrl === undefined && errorElement !== undefined) {

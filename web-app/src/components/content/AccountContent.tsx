@@ -2,10 +2,10 @@ import { Box, Button, Stack } from "@mui/material";
 import ContentHeader from "./layout/ContentHeader";
 import ContentBody from "./layout/ContentBody";
 import ContentFooter from "./layout/ContentFooter";
-import { useAuthenticationContext } from "../../contexts";
+import { useAuthContext } from "../../contexts";
 
 export default function AccountContent() {
-  const authContext = useAuthenticationContext();
+  const authContext = useAuthContext();
   return (
     <Stack
       sx={{

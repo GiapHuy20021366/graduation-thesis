@@ -6,10 +6,12 @@ import {
   MessageOutlined,
 } from "@mui/icons-material";
 import { Box, Stack } from "@mui/material";
-import { useLanguageContext } from "../../../contexts";
+import { useI18nContext } from "../../../contexts";
+import { useNavigate } from "react-router";
 
 export default function ContentFooter() {
-  const languageContext = useLanguageContext();
+  const navigate = useNavigate();
+  const languageContext = useI18nContext();
   const lang = languageContext.of(ContentFooter);
   const iconStyle = {
     width: "1.2em",
@@ -40,7 +42,11 @@ export default function ContentFooter() {
         <ListAltOutlined sx={iconStyle} />
         <Box component="span">{lang("goals")}</Box>
       </Stack>
-      <Stack direction="column" sx={generalStyle}>
+      <Stack
+        direction="column"
+        sx={generalStyle}
+        onClick={() => navigate("/sharing")}
+      >
         <AddCircleOutlined
           sx={{
             width: "1.5em",

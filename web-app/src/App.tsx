@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SignUpPage from "./components/signup/SignUpPage";
 import SignInPage from "./components/signin/SignInPage";
-import AuthenticationContextProvider from "./contexts/AuthenticationContext";
+import AuthContextProvider from "./contexts/AuthContext";
 import IsNotAuthenticated from "./auths/IsNotAuthenticated";
 import AppContent from "./components/AppContent";
 import IsAuthenticated from "./auths/IsAuthenticated";
@@ -12,7 +12,7 @@ import AppContentContextProvider from "./contexts/AppContentContext";
 function App() {
   return (
     <>
-      <AuthenticationContextProvider>
+      <AuthContextProvider>
         <BrowserRouter>
           <Routes>
             <Route
@@ -50,7 +50,7 @@ function App() {
             <Route path="*" element={<PageNotFound />} />
           </Routes>
         </BrowserRouter>
-      </AuthenticationContextProvider>
+      </AuthContextProvider>
     </>
   );
 }

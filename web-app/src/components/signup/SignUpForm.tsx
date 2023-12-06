@@ -19,7 +19,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useAuthenticationContext, useLanguageContext } from "../../contexts";
+import { useAuthContext, useI18nContext } from "../../contexts";
 import { userFetcher } from "../../api";
 
 interface FormValues {
@@ -37,10 +37,10 @@ export default function SignUpForm() {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
-  const languageContext = useLanguageContext();
+  const languageContext = useI18nContext();
   const lang = languageContext.of(SignUpForm);
 
-  const auth = useAuthenticationContext();
+  const auth = useAuthContext();
 
   const signUpSchema = yup.object({
     firstName: yup.string().required(lang("require-firstname")),

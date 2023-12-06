@@ -1,6 +1,6 @@
 import { Box, Button, Container, Stack } from "@mui/material";
 import { useNavigate } from "react-router";
-import { useLanguageContext } from "../../contexts";
+import { useI18nContext } from "../../contexts";
 
 interface IBeforeJoinProbs {
   setAccepted: React.Dispatch<React.SetStateAction<boolean>>;
@@ -8,7 +8,7 @@ interface IBeforeJoinProbs {
 
 export default function BeforeJoin({ setAccepted }: IBeforeJoinProbs) {
   const navigate = useNavigate();
-  const languageContext = useLanguageContext();
+  const languageContext = useI18nContext();
   const lang = languageContext.of(BeforeJoin);
 
   return (

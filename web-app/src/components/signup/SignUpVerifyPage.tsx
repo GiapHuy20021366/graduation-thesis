@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { LoadingButton } from "@mui/lab";
 import { userFetcher } from "../../api";
-import { useAuthenticationContext } from "../../contexts";
+import { useAuthContext } from "../../contexts";
 
 interface IAccountInfo {
   email: string;
@@ -50,7 +50,7 @@ function WaitingEmailVerify({ account }: IWaitingEmailVerify) {
 
 function AccountTokenVerify() {
   const navigate = useNavigate();
-  const auth = useAuthenticationContext();
+  const auth = useAuthContext();
 
   useEffect(() => {
     const location = window.location;

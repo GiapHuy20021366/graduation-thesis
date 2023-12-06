@@ -1,9 +1,9 @@
 import { Stack } from "@mui/material";
 import SignInForm from "./SignInForm";
-import { useLanguageContext } from "../../contexts";
+import { useI18nContext } from "../../contexts";
 
 export default function SignInPage() {
-  const languageContext = useLanguageContext();
+  const languageContext = useI18nContext();
   const lang = languageContext.of(SignInPage);
   return (
     <Stack

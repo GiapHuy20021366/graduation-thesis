@@ -19,11 +19,11 @@ interface IAuthInfo {
   token: string;
   updatedAt: number;
 }
-interface IAuthenticationContextProviderProps {
+interface IAuthContextProviderProps {
   children: React.ReactNode;
 }
 
-interface IAuthenticationContext {
+interface IAuthContext {
   account?: IAccount;
   auth?: IAuthInfo;
   token?: string;
@@ -32,15 +32,15 @@ interface IAuthenticationContext {
   logout(): void;
 }
 
-export const AuthenticationContext = createContext<IAuthenticationContext>({
+export const AuthenticationContext = createContext<IAuthContext>({
   setAccount: () => {},
   logout: () => {},
   setToken: () => {},
 });
 
-export default function AuthenticationContextProvider({
+export default function AuthContextProvider({
   children,
-}: IAuthenticationContextProviderProps) {
+}: IAuthContextProviderProps) {
   const [account, setAccount] = useState<IAccount | undefined>();
   const [auth, setAuth] = useState<IAuthInfo | undefined>();
 

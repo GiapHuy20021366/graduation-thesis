@@ -1,3 +1,3 @@
-export { useAuthenticationContext } from "./useAuthenticationContext";
-export { useLanguageContext } from "./useLanguageContext";
+export { useAuthContext } from "./useAuthContext";
+export { useI18nContext } from "./useI18nContext";
 export { useAppContentContext } from "./useAppContentContext";
