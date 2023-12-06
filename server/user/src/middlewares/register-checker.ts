@@ -7,18 +7,21 @@ import { InvalidDataError, TAccountRegisterMethod, validateAccountRegisterMethod
 
 export const checkRegistBodyAndParams = async (request: Request<{}, {}, IRegistAccountBody, IRegistAccountQuery>, _response: Response, next: NextFunction) => {
     const method: TAccountRegisterMethod | undefined = request.query.method;
-    await validateAccountRegisterMethod(method).catch(next);
-    let isAllValid: boolean = false;
+    try {
+        validateAccountRegisterMethod(method)
+    } catch (error) {
+        return next(error);
+    }
     switch (method) {
         case "manual":
             const { email, password, firstName, lastName } = request.body;
-            await Promise.all([
-                validateEmail(email),
-                validatePassword(password),
-                validateName(firstName, lastName)
-            ]).then((result) => {
-                isAllValid = result.every(t => t);
-            }).catch(next);
+            try {
+                validateEmail(email);
+                validatePassword(password);
+                validateName(firstName, lastName);
+            } catch (error) {
+                return next(error);
+            }
             break;
         case "google-oauth":
             const cridential = request.body.cridential;
@@ -33,12 +36,10 @@ export const checkRegistBodyAndParams = async (request: Request<{}, {}, IRegistA
                     })
                 )
             }
-            isAllValid = true;
             break;
         case "facebook-oauth":
-            next(new Error("Method not implemented"));
-            break;
+            return next(new Error("Method not implemented"));
     }
 
-    isAllValid && next();
+    return next();
 }

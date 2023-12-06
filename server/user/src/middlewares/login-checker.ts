@@ -7,25 +7,26 @@ import { TAccountRegisterMethod, validateAccountRegisterMethod, validateEmail, v
 
 export const checkLoginBodyAndParams = async (request: Request<{}, {}, ILoginAccountBody, ILoginAccountQuery>, _response: Response, next: NextFunction) => {
     const method: TAccountRegisterMethod | undefined = request.query.method;
-    validateAccountRegisterMethod(method);
-    let isAllValid: boolean = false;
+    try {
+        validateAccountRegisterMethod(method);
+    } catch (error) {
+        return next(error);
+    }
     switch (method) {
         case "manual":
-            const { email, password} = request.body;
-            await Promise.all([
-                validateEmail(email),
-                validatePassword(password),
-            ]).then((result) => {
-                isAllValid = result.every(t => t);
-            }).catch(next);
+            const { email, password } = request.body;
+            try {
+                validateEmail(email);
+                validatePassword(password);
+            } catch (error) {
+                return next(error);
+            }
             break;
         case "google-oauth":
-            next(new Error("Method not implemented"));
-            break;
+            return next(new Error("Method not implemented"));
         case "facebook-oauth":
-            next(new Error("Method not implemented"));
-            break;
+            return next(new Error("Method not implemented"));
     }
 
-    isAllValid && next();
+    return next();
 }

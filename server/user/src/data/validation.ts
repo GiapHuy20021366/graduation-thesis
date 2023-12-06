@@ -2,7 +2,7 @@ import { InvalidDataError } from "./invalid-data-error";
 
 export type TAccountRegisterMethod = "manual" | "google-oauth" | "facebook-oauth";
 
-export const validateAccountRegisterMethod = async (method?: TAccountRegisterMethod): Promise<boolean> => {
+export const validateAccountRegisterMethod = (method?: TAccountRegisterMethod): boolean => {
     const methods = ["manual", "google-oauth", "facebook-oauth"];
     if (method == undefined || !methods.includes(method)) {
         throw new InvalidDataError({
@@ -16,7 +16,7 @@ export const validateAccountRegisterMethod = async (method?: TAccountRegisterMet
     return true;
 } 
 
-export const validateEmail = async (email?: string): Promise<boolean> => {
+export const validateEmail = (email?: string): boolean => {
     if (email === undefined) {
         throw new InvalidDataError({
             message: "Email can not be undefined",
@@ -39,7 +39,7 @@ export const validateEmail = async (email?: string): Promise<boolean> => {
     return true;
 }
 
-export const validatePassword = async (password?: string): Promise<boolean> => {
+export const validatePassword = (password?: string): boolean => {
     if (password == undefined) {
         throw new InvalidDataError({
             message: "Password can not be undefined",
@@ -101,7 +101,7 @@ export const validatePassword = async (password?: string): Promise<boolean> => {
     return true;
 }
 
-export const validateName = async (firstName?: string, lastName?: string): Promise<boolean> => {
+export const validateName = (firstName?: string, lastName?: string): boolean => {
     if (firstName === undefined || firstName === "") {
         throw new InvalidDataError({
             message: "First name cannot be empty",

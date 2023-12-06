@@ -12,6 +12,15 @@ export const errorHandler = (error: Error, _request: Request, response: Response
         });
     } else {
         console.error(error);
-        return response.status(500).json({ message: "An unkown error occured" });
+        return response.status(500).json({
+            error: {
+                message: "Internal server error",
+                code: 500,
+                data: {
+                    target: "unknown",
+                    reason: "unknown"
+                }
+            }
+        });
     }
 }
