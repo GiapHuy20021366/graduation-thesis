@@ -88,7 +88,10 @@ export const createManualAccountFromToken = async (token: string): Promise<Accou
         email: newAccount.email,
         avatar: newAccount.avatar,
         titles: newAccount.titles,
-        token: toAuthToken(newAccount)
+        token: toAuthToken({
+            email: newAccount.email,
+            _id: newAccount._id.toString()
+        })
     };;
 }
 
@@ -172,6 +175,9 @@ export const registAccountByGoogleCridential = async (cridential: string): Promi
         email: responseUser.email,
         avatar: responseUser.avatar,
         titles: responseUser.titles,
-        token: toAuthToken(responseUser)
+        token: toAuthToken({
+            email: responseUser.email,
+            _id: user!._id.toString()
+        })
     }
 }

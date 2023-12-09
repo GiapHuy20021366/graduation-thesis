@@ -1,4 +1,5 @@
 export default {
     user: "users",
-    food: "foods"
+    image: "images",
+    foodPost: "food-posts"
 }

@@ -14,7 +14,7 @@ export const tokenParser = (request: Request<{}, {}, {}, {}>, _response: Respons
     }
     try {
         const parsed = JSON.parse(jsonToken);
-        if (parsed.email == null) {
+        if (parsed.email == null || parsed._id == null) {
             return next(new UnauthorizationError({
                 message: "Invalid token",
                 data: {

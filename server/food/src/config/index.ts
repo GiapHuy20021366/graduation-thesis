@@ -13,8 +13,36 @@ export const MESSAGE_SERVICE = process.env.MESSAGE_SERVICE as string;
 export const FOOD_SERVICE = process.env.FOOD_SERVICE as string;
 
 export const SALT_ROUNDS = process.env.SALT_ROUNDS as string;
+export const PROXY_URL = process.env.PROXY_URL as string;
+export const POSTMAN_URL = process.env.POSTMAN_URL as string;
+
+export const CLOUDINARY_NAME = process.env.CLOUDINARY_NAME as string;
+export const CLOUDINARY_KEY = process.env.CLOUDINARY_KEY as string;
+export const CLOUDINARY_SECRET = process.env.CLOUDINARY_SECRET as string;
+
+const env = {
+    PORT,
+    MONGODB_LOCAL_URI,
+    AMQP_PATH,
+    RPC_QUEUE_NAME,
+    EXCHANGE_NAME,
+    RPC_REQUEST_TIME_OUT,
+    USER_SERVICE,
+    MESSAGE_SERVICE,
+    FOOD_SERVICE,
+    SALT_ROUNDS,
+    PROXY_URL,
+    POSTMAN_URL,
+    CLOUDINARY_NAME,
+    CLOUDINARY_KEY,
+    CLOUDINARY_SECRET
+}
+
+export default env;
 
 
 // other configs
 export { logger as winstonLogger } from "./winston";
 export { logger as consoleLogger } from "./logger";
+
+export { cloudinary } from "./cloudinary";
