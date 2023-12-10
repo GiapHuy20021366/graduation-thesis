@@ -1,6 +1,6 @@
 [
     {
-        "path": "/user",
+        "path": "/api/user",
         "host": "http://localhost",
         "port": 8001,
         "token": {
@@ -12,7 +12,7 @@
         }
     },
     {
-        "path": "/message",
+        "path": "/api/message",
         "host": "http://localhost",
         "port": 8002,
         "token": {
@@ -22,7 +22,7 @@
         }
     },
     {
-        "path": "/food",
+        "path": "/api/food",
         "host": "http://localhost",
         "port": 8003,
         "token": {
