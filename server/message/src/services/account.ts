@@ -19,7 +19,6 @@ export const sendActiveManualAccount = async (info: ManualAccountInfo): Promise<
     try {
         const { email, token } = info;
         const activeUrl = toActiveManualAccountUrl(token);
-        console.log(email, activeUrl);        
         const html = await renderHtmlFromTemplate(mailTemplates.ACTIVE_ACCOUNT_MANUAL, {
             email: email,
             activeUrl: activeUrl
