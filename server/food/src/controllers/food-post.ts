@@ -11,6 +11,9 @@ import {
 	throwErrorIfNotFound,
 	toResponseSuccessData,
 } from "../data";
+import {
+	postFood as postFoodService
+} from "../services";
 
 interface IPostFoodBody {
 	images?: string[];
@@ -21,6 +24,7 @@ interface IPostFoodBody {
 	quantity?: number;
 	duration?: number;
 	pickUpTimes?: number;
+	cost?: number;
 }
 
 const validatePostFoodBody = (data: IPostFoodBody): void => {
@@ -33,6 +37,7 @@ const validatePostFoodBody = (data: IPostFoodBody): void => {
 		pickUpTimes,
 		quantity,
 		title,
+		cost
 	} = data;
 
 	// throw if not found
@@ -44,6 +49,7 @@ const validatePostFoodBody = (data: IPostFoodBody): void => {
 	throwErrorIfNotFound("pickUpTimes", pickUpTimes);
 	throwErrorIfNotFound("quantity", quantity);
 	throwErrorIfNotFound("title", title);
+	throwErrorIfNotFound("cost", cost);
 
 	// check data format
 	throwErrorIfInvalidFormat(
@@ -107,5 +113,28 @@ export const postFood = async (
 		return next(error);
 	}
 	const auth = req.authContext as AuthLike;
-	return res.status(200).json(toResponseSuccessData({}));
+	const {
+		categories,
+		cost,
+		description,
+		duration,
+		images,
+		location,
+		pickUpTimes,
+		quantity,
+		title
+	} = req.body;
+	postFoodService({
+		categories: categories!,
+		cost: cost!,
+		description: description!,
+		duration: duration!,
+		location: location!,
+		pickupTimes: pickUpTimes!,
+		quantity: quantity!,
+		title: title!,
+		user: auth._id,
+		images: images!
+	}).then(data => res.status(200).json(toResponseSuccessData(data)))
+		.catch(next);
 };

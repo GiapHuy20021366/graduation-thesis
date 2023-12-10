@@ -3,7 +3,7 @@ import collections from '../collections';
 import { ICoordinates, IImage } from '../../data';
 
 export interface FoodPostDocument extends Document {
-    userId: string;
+    user: string;
     images: Schema.Types.ObjectId[];
     createdAt: Date;
     updatedAt: Date;
@@ -14,6 +14,7 @@ export interface FoodPostDocument extends Document {
     quantity: number;
     duration: number;
     pickUpTimes: number;
+    cost: number;
 }
 
 interface IFoodPostMethods {
@@ -23,7 +24,7 @@ interface IFoodPostModel extends Model<FoodPostDocument, {}, IFoodPostMethods> {
 }
 
 const foodPostSchema = new Schema<FoodPostDocument, IFoodPostModel, IFoodPostMethods>({
-    userId: {
+    user: {
         type: String,
         required: true,
         index: true
@@ -73,6 +74,10 @@ const foodPostSchema = new Schema<FoodPostDocument, IFoodPostModel, IFoodPostMet
     pickUpTimes: {
         type: Number,
         required: true
+    },
+    cost: {
+        type: Number,
+        require: true
     }
 });
 

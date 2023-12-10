@@ -2,7 +2,7 @@ import { ICoordinates } from "./coordinates";
 import { IImage } from "./image";
 
 export interface IFoodPost {
-    userId: string;
+    user: string;
     images: IImage[];
     createdAt: Date;
     updatedAt: Date;
