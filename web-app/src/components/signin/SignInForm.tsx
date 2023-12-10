@@ -16,7 +16,8 @@ import { Link as ReactRouterLink } from "react-router-dom";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useAuthContext, useI18nContext } from "../../contexts";
-import { userErrorReasons, userErrorTargets, userFetcher } from "../../api";
+import { userFetcher } from "../../api";
+import { userErrorReason, userErrorTarget } from "../../data";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 interface FormValues {
@@ -74,15 +75,15 @@ export default function SignInForm() {
         if (target != null) {
           const reason = error.data.reason as string;
           switch (target) {
-            case userErrorTargets.EMAIL:
-              if (reason === userErrorReasons.NO_EMAIL_FOUND) {
+            case userErrorTarget.EMAIL:
+              if (reason === userErrorReason.NO_EMAIL_FOUND) {
                 setError("email", {
                   message: lang("no-email-found"),
                 });
               }
               break;
-            case userErrorTargets.PASSWORD:
-              if (reason === userErrorReasons.INCORRECT_PASSWORD) {
+            case userErrorTarget.PASSWORD:
+              if (reason === userErrorReason.INCORRECT_PASSWORD) {
                 setError("password", {
                   message: lang("incorrect-password"),
                 });

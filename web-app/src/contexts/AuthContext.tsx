@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 import { userFetcher } from "../api";
+import { IAuthInfo } from "../data";
 
 interface IAccount {
   firstName: string;
@@ -15,10 +16,6 @@ interface IAccount {
   titles?: string[];
 }
 
-interface IAuthInfo {
-  token: string;
-  updatedAt: number;
-}
 interface IAuthContextProviderProps {
   children: React.ReactNode;
 }
