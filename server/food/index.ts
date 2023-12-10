@@ -1,11 +1,11 @@
 import express, { Express } from "express";
-import { PORT, POSTMAN_URL, PROXY_URL } from "./src/config";
+import { PORT, PROXY_URL } from "./src/config";
 import { connectDB } from "./src/db";
 import { initUserRouters } from "./src/route";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { consoleLogger } from "./src/config";
-import { subscribeMessage, publishMessage } from "./src/broker";
+import { subscribeMessage } from "./src/broker";
 
 const app: Express = express();
 

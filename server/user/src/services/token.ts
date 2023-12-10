@@ -17,7 +17,10 @@ export const refreshToken = async (auth: AuthLike, profile?: boolean): Promise<A
             email: user.email,
             firstName: user.firstName,
             lastName: user.lastName,
-            token: toAuthToken(user),
+            token: toAuthToken({
+                email: user.email,
+                _id: user._id.toString()
+            }),
             avatar: user.avatar,
             titles: user.titles
         }

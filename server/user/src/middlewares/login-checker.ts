@@ -12,6 +12,7 @@ export const checkLoginBodyAndParams = async (request: Request<{}, {}, ILoginAcc
     } catch (error) {
         return next(error);
     }
+    console.log(request.body);
     switch (method) {
         case "manual":
             const { email, password } = request.body;

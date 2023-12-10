@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { InvalidDataError, toResponseSuccessData } from "../data";
+import { toResponseSuccessData } from "../data";
 import * as services from "../services";
 
 export interface IRefreshTokenBody {

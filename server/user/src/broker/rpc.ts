@@ -13,7 +13,7 @@ export const RPCObserver = async () => {
     RPC_QUEUE_NAME,
     async (msg: ConsumeMessage | null) => {
       if (msg != null) {
-        const payload = JSON.parse(msg.content.toString());
+        // const payload = JSON.parse(msg.content.toString());
 
         // Implement response;
         const response = "Response";

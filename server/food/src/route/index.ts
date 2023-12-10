@@ -11,7 +11,7 @@ export const initUserRouters = (app: Express): void => {
 
     userRouter.post("/images/upload", tokenParser, uploadImages);
 
-    userRouter.post("/foods/upload", /*tokenParser,*/ postFood);
+    userRouter.post("/foods/upload", tokenParser, postFood);
 
     userRouter.use(errorHandler);
     app.use("/", userRouter);

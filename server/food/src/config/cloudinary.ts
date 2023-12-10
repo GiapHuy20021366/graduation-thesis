@@ -1,8 +1,6 @@
 import { v2 } from 'cloudinary';
-import multer, { FileFilterCallback } from 'multer';
 
 import { CLOUDINARY_KEY, CLOUDINARY_NAME, CLOUDINARY_SECRET } from "./index";
-import { Request } from 'express';
 
 v2.config({
     cloud_name: CLOUDINARY_NAME,

@@ -17,9 +17,9 @@ export const validateAccountRegisterMethod = (method?: TAccountRegisterMethod): 
 } 
 
 export const validateEmail = (email?: string): boolean => {
-    if (email === undefined) {
+    if (email == null) {
         throw new InvalidDataError({
-            message: "Email can not be undefined",
+            message: "Email not found",
             data: {
                 target: "email",
                 reason: "empty-email"

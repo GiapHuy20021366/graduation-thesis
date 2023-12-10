@@ -5,14 +5,14 @@ import { initUserRouters } from "./src/route";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { consoleLogger } from "./src/config";
-import { subscribeMessage, publishMessage } from "./src/broker";
+import { subscribeMessage } from "./src/broker";
 
 const app: Express = express();
 
 connectDB();
 
-app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 
 // init endpoints
