@@ -19,3 +19,9 @@ export {
 export {
     type IAuthInfo
 } from "./auth-info";
+export {
+    duration
+} from "./duration";
+export {
+    type ICoordinates
+} from "./coordinates";

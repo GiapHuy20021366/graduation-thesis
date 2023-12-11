@@ -31,7 +31,7 @@
     }
   ],
   "files": [
-    "global.ts"
+    "global.ts", "./src/components/content/food/FoodSharingForm.1.tsx"
   ],
   "exclude": [
     "node_modules"

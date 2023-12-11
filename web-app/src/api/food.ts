@@ -9,7 +9,8 @@ import {
     FoodErrorTarget,
     ResponseErrorLike,
     IImageExposed,
-    IAuthInfo
+    IAuthInfo,
+    ICoordinates
 } from '../data';
 
 export const foodEndpoints = {
@@ -32,8 +33,27 @@ foodInstance.interceptors.response.use(
     error => Promise.reject(error?.response?.data?.error)
 );
 
+interface IFoodUploadData {
+    images: string[];
+    title: string;
+    location: ICoordinates;
+    categories: string[];
+    description: string;
+    quantity: number;
+    duration: number;
+    pickUpTimes: number;
+    cost: number;
+}
+
+interface IFoodUploadResponseData {
+    _id: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
 export interface FoodFetcher {
     uploadImage(name: string, base64: string, auth: IAuthInfo): Promise<FoodResponse<IImageExposed[]>>;
+    uploadFood(data: IFoodUploadData, auth: IAuthInfo): Promise<FoodResponse<IFoodUploadResponseData>>;
 }
 
 export const foodFetcher: FoodFetcher = {
@@ -51,4 +71,15 @@ export const foodFetcher: FoodFetcher = {
                 }
             })
     },
+    uploadFood: async (data: IFoodUploadData, auth: IAuthInfo): Promise<FoodResponse<IFoodUploadResponseData>> => {
+        return foodInstance.post(
+            foodEndpoints.uploadFood,
+            data,
+            {
+                headers: {
+                    Authorization: auth.token
+                }
+            }
+        )
+    }
 };

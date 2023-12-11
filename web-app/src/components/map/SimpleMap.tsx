@@ -6,12 +6,7 @@ import {
   Marker,
   InfoBox,
 } from "@react-google-maps/api";
-import { mapIcons } from "../../data";
-
-export interface ICoordinates {
-  lat: number;
-  lng: number;
-}
+import { ICoordinates } from "../../data";
 
 interface ISimpleMapProps {
   containerClassName: string;
