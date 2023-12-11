@@ -9,7 +9,7 @@ interface IPostFoodData {
     description: string;
     quantity: number;
     duration: number;
-    pickupTimes: number;
+    pickUpTimes: number;
     cost: number;
     images: string[];
 }

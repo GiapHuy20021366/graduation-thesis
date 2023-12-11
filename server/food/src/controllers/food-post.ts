@@ -130,7 +130,7 @@ export const postFood = async (
 		description: description!,
 		duration: duration!,
 		location: location!,
-		pickupTimes: pickUpTimes!,
+		pickUpTimes: pickUpTimes!,
 		quantity: quantity!,
 		title: title!,
 		user: auth._id,
