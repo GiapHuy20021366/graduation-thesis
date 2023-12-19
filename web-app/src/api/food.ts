@@ -10,7 +10,7 @@ import {
     ResponseErrorLike,
     IImageExposed,
     IAuthInfo,
-    ICoordinates
+    IFoodUploadData
 } from '../data';
 
 export const foodEndpoints = {
@@ -32,18 +32,6 @@ foodInstance.interceptors.response.use(
     response => response.data,
     error => Promise.reject(error?.response?.data?.error)
 );
-
-interface IFoodUploadData {
-    images: string[];
-    title: string;
-    location: ICoordinates;
-    categories: string[];
-    description: string;
-    quantity: number;
-    duration: number;
-    pickUpTimes: number;
-    cost: number;
-}
 
 interface IFoodUploadResponseData {
     _id: string;

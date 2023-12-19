@@ -18,7 +18,7 @@ export default function FoodSharingContent() {
         extensions={["notification", "location", "search"]}
       />
       <ContentBody>
-        <FoodSharingForm/>
+        <FoodSharingForm />
       </ContentBody>
       <Box display={["block", "none", "none", "none"]}>
         <ContentFooter />

@@ -10,7 +10,7 @@ interface II18nContextProviderProps {
   children: React.ReactNode;
 }
 
-type I18Resolver = (key: string, ...params: any[]) => string;
+export type I18Resolver = (key: string, ...params: any[]) => string;
 
 interface II18nContext {
   language: Language;

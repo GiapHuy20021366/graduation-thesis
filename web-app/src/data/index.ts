@@ -20,8 +20,25 @@ export {
     type IAuthInfo
 } from "./auth-info";
 export {
-    duration
-} from "./duration";
+    DurationType,
+} from "./duration-type";
 export {
     type ICoordinates
 } from "./coordinates";
+export {
+    UnitType
+} from "./unit-type";
+export {
+    QuantityType,
+    toQuantityLevel,
+    toQuantityType
+} from "./quantity-type";
+export {
+    FoodCategory
+} from "./food-category";
+export {
+    type IFoodUploadCost,
+    type IFoodUploadData,
+    type IFoodUploadDuration,
+    type IFoodUpoadCount
+} from "./food-upload-data"

@@ -81,7 +81,15 @@
         "forum": "Forum",
         "message": "Tin nhắn"
     },
-    "FoodSharingForm": {
-        
+    "FoodSharingForm": {},
+    "FoodCategoryPicker": {
+        "VEGETABLES": "Rau củ",
+        "FRUITS": "Hoa quả",
+        "GAINS_AND_CEREALS": "Ngũ cốc",
+        "ANIMAL_PRODUCT": "Động vật",
+        "PROCESSED_FOODS": "Chế biến sẵn",
+        "SALADS": "Rau sống",
+        "BEVERAGES": "Đồ uống",
+        "SEAFOOD": "Hải sản"
     }
 }
