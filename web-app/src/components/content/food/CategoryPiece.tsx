@@ -19,18 +19,22 @@ export default function CategoryPiece({ text, onRemove }: ICategoryPiece) {
         position: "relative",
       }}
     >
-      <Box component="div" minWidth={30} padding={"0 0.5em"}>{text}</Box>
-      <ClearOutlined
-        sx={{
-          position: "absolute",
-          top: 0,
-          right: 0,
-          cursor: "pointer",
-          width: "1rem",
-          height: "1rem"
-        }}
-        onClick={() => onRemove && onRemove()}
-      />
+      <Box component="div" minWidth={30} padding={"0 0.5em"}>
+        {text}
+      </Box>
+      {onRemove != null && (
+        <ClearOutlined
+          sx={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            cursor: "pointer",
+            width: "1rem",
+            height: "1rem",
+          }}
+          onClick={() => onRemove && onRemove()}
+        />
+      )}
     </Box>
   );
 }

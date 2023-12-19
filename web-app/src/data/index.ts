@@ -41,4 +41,8 @@ export {
     type IFoodUploadData,
     type IFoodUploadDuration,
     type IFoodUpoadCount
-} from "./food-upload-data"
+} from "./food-upload-data";
+export {
+    type IFoodSearchInfo,
+    fakeOneFoodSearch
+} from "./food-search-info";

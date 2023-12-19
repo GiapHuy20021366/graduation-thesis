@@ -6,6 +6,7 @@ import {
   RoomOutlined,
 } from "@mui/icons-material";
 import ContentFooter from "./ContentFooter";
+import { useNavigate } from "react-router";
 
 type HeaderExtension = "notification" | "search" | "location";
 
@@ -20,13 +21,14 @@ export default function ContentHeader({
   title,
   extensions,
 }: IContentHeader) {
+  const navigate = useNavigate();
   const iconStyle = {
     width: "1.3em",
     height: "1.3em",
     cursor: "pointer",
     ":hover": {
-      color: "gray"
-    }
+      color: "gray",
+    },
   };
   return (
     <Box>
@@ -38,9 +40,9 @@ export default function ContentHeader({
               case "notification":
                 return <NotificationsOutlined sx={iconStyle} key={index} />;
               case "search":
-                return <SearchOutlined sx={iconStyle} key={index} />;
+                return <SearchOutlined sx={iconStyle} key={index} onClick={() => navigate("/search")}/>;
               case "location":
-                return <RoomOutlined sx={iconStyle} key={index} />;
+                return <RoomOutlined sx={iconStyle} key={index}/>;
             }
           })}
 

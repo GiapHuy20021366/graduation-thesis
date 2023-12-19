@@ -10,7 +10,9 @@ import {
     ResponseErrorLike,
     IImageExposed,
     IAuthInfo,
-    IFoodUploadData
+    IFoodUploadData,
+    IFoodSearchInfo,
+    fakeOneFoodSearch
 } from '../data';
 
 export const foodEndpoints = {
@@ -42,6 +44,7 @@ interface IFoodUploadResponseData {
 export interface FoodFetcher {
     uploadImage(name: string, base64: string, auth: IAuthInfo): Promise<FoodResponse<IImageExposed[]>>;
     uploadFood(data: IFoodUploadData, auth: IAuthInfo): Promise<FoodResponse<IFoodUploadResponseData>>;
+    searchFood(): Promise<FoodResponse<IFoodSearchInfo[]>>
 }
 
 export const foodFetcher: FoodFetcher = {
@@ -69,5 +72,14 @@ export const foodFetcher: FoodFetcher = {
                 }
             }
         )
+    },
+    searchFood: async (): Promise<FoodResponse<IFoodSearchInfo[]>> => {
+        const data: IFoodSearchInfo[] = [];
+        for (let i = 0; i < 64; ++i) {
+            data.push(fakeOneFoodSearch());
+        }
+        return {
+            data: data
+        };
     }
 };
