@@ -1,4 +1,4 @@
-import { Box, Divider, ImageListItem, Skeleton, Stack } from "@mui/material";
+import { Box, Divider, Skeleton, Stack } from "@mui/material";
 import { IFoodSearchInfo, toQuantityType } from "../../../data";
 import { useAuthContext } from "../../../contexts";
 import CategoryPiece from "../food/CategoryPiece";
@@ -25,8 +25,9 @@ export default function FoodSearchItem({ item }: IFoodSearchItem) {
         <img
           src={item.images[0]}
           style={{
-            width: "20%",
+            maxWidth: "20%",
             height: "auto",
+            objectFit: "cover",
           }}
         />
         <Box flex={1}>
@@ -49,7 +50,7 @@ export default function FoodSearchItem({ item }: IFoodSearchItem) {
           <Box>
             <Stack direction="row">
               <b>Địa chỉ: </b>
-              <Skeleton variant="text" sx={{flex: 1, marginLeft: "0.5rem"}}/>
+              <Skeleton variant="text" sx={{ flex: 1, marginLeft: "0.5rem" }} />
             </Stack>
           </Box>
         </Box>
@@ -60,10 +61,10 @@ export default function FoodSearchItem({ item }: IFoodSearchItem) {
           component="img"
           src={authContext.account?.avatar}
           sx={{
-            width: "10%",
+            maxWidth: ["13%", "16%", "19%", "22%"],
             height: "auto",
             borderRadius: "50%",
-            margin: "1rem 0 0 0",
+            objectFit: "contain",
           }}
         />
         <Stack

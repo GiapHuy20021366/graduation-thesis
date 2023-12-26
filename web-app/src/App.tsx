@@ -8,6 +8,7 @@ import IsAuthenticated from "./auths/IsAuthenticated";
 import PageNotFound from "./components/PageNotFound";
 import SignUpVerifyPage from "./components/signup/SignUpVerifyPage";
 import AppContentContextProvider from "./contexts/AppContentContext";
+import ToastifyUtil from "./components/util/ToastifyUtil";
 
 function App() {
   return (
@@ -50,6 +51,10 @@ function App() {
             <Route path="*" element={<PageNotFound />} />
           </Routes>
         </BrowserRouter>
+        {/* Utils */}
+        <>
+          <ToastifyUtil />
+        </>
       </AuthContextProvider>
     </>
   );

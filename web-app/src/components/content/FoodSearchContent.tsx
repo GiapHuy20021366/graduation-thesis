@@ -8,7 +8,7 @@ export default function FoodSearchContent() {
   return (
     <Stack
       sx={{
-        height: "98vh",
+        height: "100vh",
         boxSizing: "border-box",
         justifyContent: "space-between",
       }}

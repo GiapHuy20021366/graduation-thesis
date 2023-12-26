@@ -31,6 +31,7 @@ export default function ContentFooter() {
       direction="row"
       sx={{
         justifyContent: "center",
+        margin: 0,
       }}
       spacing={3}
     >

@@ -5,5 +5,10 @@ interface IContentBody {
 }
 
 export default function ContentBody({ children }: IContentBody) {
-  return <Stack flex={1} display="flex" alignItems="center">{children}</Stack>;
+  return <Stack sx={{
+    flex: 1,
+    alignItems: "center",
+    overflowY: "auto",
+    margin: 0
+  }}>{children}</Stack>;
 }

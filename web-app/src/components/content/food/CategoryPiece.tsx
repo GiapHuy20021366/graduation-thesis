@@ -17,6 +17,7 @@ export default function CategoryPiece({ text, onRemove }: ICategoryPiece) {
         boxSizing: "border-box",
         margin: "4px",
         position: "relative",
+        fontSize: "0.75em"
       }}
     >
       <Box component="div" minWidth={30} padding={"0 0.5em"}>

@@ -31,7 +31,11 @@ export default function ContentHeader({
     },
   };
   return (
-    <Box>
+    <Box
+      sx={{
+        margin: 0,
+      }}
+    >
       <Stack direction="row" spacing={1}>
         <SideBarOpener />
         {extensions &&
@@ -40,9 +44,15 @@ export default function ContentHeader({
               case "notification":
                 return <NotificationsOutlined sx={iconStyle} key={index} />;
               case "search":
-                return <SearchOutlined sx={iconStyle} key={index} onClick={() => navigate("/search")}/>;
+                return (
+                  <SearchOutlined
+                    sx={iconStyle}
+                    key={index}
+                    onClick={() => navigate("/search")}
+                  />
+                );
               case "location":
-                return <RoomOutlined sx={iconStyle} key={index}/>;
+                return <RoomOutlined sx={iconStyle} key={index} />;
             }
           })}
 
