@@ -1,16 +1,27 @@
 import { ICoordinates } from "./coordinates";
-import { IImage } from "./image";
+
+export interface IFoodPostUser {
+    _id: string;
+    exposeName: string;
+}
+
+export interface IFoodPostLocation {
+    name: string;
+    coordinates: ICoordinates
+}
+
 
 export interface IFoodPost {
-    user: string;
-    images: IImage[];
-    createdAt: Date;
-    updatedAt: Date;
+    user: IFoodPostUser;
+    images: string[];
     title: string;
-    location: ICoordinates;
+    location: IFoodPostLocation;
     categories: string[];
     description: string;
     quantity: number;
-    duration: number;
-    pickUpTimes: number;
+    duration: Date;
+    price: number;
+    isEdited: boolean;
+    createdAt: Date;
+    updatedAt: Date;
 }

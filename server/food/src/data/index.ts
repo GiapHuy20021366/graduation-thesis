@@ -20,7 +20,7 @@ export { IImage } from "./image";
 export { ImageRourceType, imageResourceTypes } from "./image-source-type";
 export { IImageExposed } from "./image-exposed";
 export { ICoordinates } from "./coordinates";
-export { IFoodPost } from "./food-post";
+export { IFoodPost, IFoodPostLocation, IFoodPostUser } from "./food-post";
 export {
     isObjectId,
     isAllObjectId,
