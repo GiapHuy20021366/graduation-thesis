@@ -1,22 +1,39 @@
 import { ConsumeMessage } from "amqplib";
 import { v4 as uuid4 } from "uuid";
-import { RPC_QUEUE_NAME, RPC_REQUEST_TIME_OUT } from "../config";
+import { USER_SERVICE_RPC_QUEUE, RPC_REQUEST_TIME_OUT } from "../config";
 import { getChannel } from "./channel";
+import { RpcAction, RpcQueueName, RpcRequest, RpcResponse } from "../data";
+import { rpcGetUserInfo } from "~/services";
 
 export const RPCObserver = async () => {
   const channel = await getChannel();
-  await channel.assertQueue(RPC_QUEUE_NAME, {
+  await channel.assertQueue(USER_SERVICE_RPC_QUEUE, {
     durable: false,
   });
   channel.prefetch(1);
   channel.consume(
-    RPC_QUEUE_NAME,
+    USER_SERVICE_RPC_QUEUE,
     async (msg: ConsumeMessage | null) => {
       if (msg != null) {
-        // const payload = JSON.parse(msg.content.toString());
+        const request = JSON.parse(msg.content.toString()) as RpcRequest;
 
-        // Implement response;
-        const response = "Response";
+        const response: RpcResponse = {};
+        switch (request.action) {
+          case RpcAction.USER_RPC_GET_INFO: {
+            const userRequest = request as RpcRequest<{ _id: string }>;
+            try {
+              response.data = await rpcGetUserInfo(userRequest.payload._id);
+            } catch (error) {
+              response.err = {
+                code: 500,
+                reason: "unknown",
+                target: "unknown"
+              }
+            }
+
+            break;
+          }
+        }
 
         channel.sendToQueue(
           msg.properties.replyTo,
@@ -35,7 +52,7 @@ export const RPCObserver = async () => {
 };
 
 const requestData = async (
-  RPC_QUEUE_NAME: string,
+  RPC_QUEUE_NAME: string, // target service rpc queue
   requestPayload: any,
   uuid: string
 ): Promise<string | null> => {
@@ -82,7 +99,7 @@ const requestData = async (
   }
 };
 
-export const RPCRequest = async (RPCQueueName: string, requestPayload: any) => {
+export const RPCRequest = async (RPCQueueName: RpcQueueName, requestPayload: RpcRequest) => {
   const uuid = uuid4();
   return await requestData(RPCQueueName, requestPayload, uuid);
 };

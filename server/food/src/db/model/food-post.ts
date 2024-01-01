@@ -2,7 +2,11 @@ import { Model, Schema, model, Document } from 'mongoose';
 import collections from '../collections';
 import { IImage, IFoodPost } from '../../data';
 
-export interface FoodPostDocument extends IFoodPost, Document { }
+export interface FoodPostDocument extends IFoodPost, Document {
+    isEdited: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+}
 
 interface IFoodPostMethods {
 }

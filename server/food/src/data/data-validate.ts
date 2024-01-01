@@ -45,6 +45,11 @@ export const isCoordinates = (value: any): boolean => {
     return true;
 };
 
+export const isLocation = (value: any): boolean => {
+    if (typeof value !== "object") return false;
+    return isNotEmptyString(value.name) && isCoordinates(value.coordinates);
+}
+
 export const isNotEmptyStringArray = (value: any) => {
     if (!Array.isArray(value)) return false;
     return value.every((v) => typeof v === "string" && v.length > 0);

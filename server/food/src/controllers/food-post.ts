@@ -1,10 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import {
 	AuthLike,
-	ICoordinates,
 	isAllNotEmptyString,
-	isAllObjectId,
-	isCoordinates,
+	isLocation,
 	isNotEmptyString,
 	isNumber,
 	throwErrorIfInvalidFormat,
@@ -18,13 +16,12 @@ import {
 interface IPostFoodBody {
 	images?: string[];
 	title?: string;
-	location?: ICoordinates;
+	location?: any;
 	categories?: string[];
 	description?: string;
 	quantity?: number;
 	duration?: number;
-	pickUpTimes?: number;
-	cost?: number;
+	price?: number;
 }
 
 const validatePostFoodBody = (data: IPostFoodBody): void => {
@@ -34,28 +31,26 @@ const validatePostFoodBody = (data: IPostFoodBody): void => {
 		description,
 		duration,
 		location,
-		pickUpTimes,
 		quantity,
 		title,
-		cost
+		price
 	} = data;
 
 	// throw if not found
 	throwErrorIfNotFound("images", images);
+	throwErrorIfNotFound("title", title);
+	throwErrorIfNotFound("location", location);
 	throwErrorIfNotFound("categories", categories);
 	throwErrorIfNotFound("description", description);
 	throwErrorIfNotFound("duration", duration);
-	throwErrorIfNotFound("location", location);
-	throwErrorIfNotFound("pickUpTimes", pickUpTimes);
 	throwErrorIfNotFound("quantity", quantity);
-	throwErrorIfNotFound("title", title);
-	throwErrorIfNotFound("cost", cost);
+	throwErrorIfNotFound("price", price);
 
 	// check data format
 	throwErrorIfInvalidFormat(
 		"images",
 		images,
-		[isAllObjectId]
+		[isAllNotEmptyString]
 	);
 
 	throwErrorIfInvalidFormat(
@@ -79,13 +74,7 @@ const validatePostFoodBody = (data: IPostFoodBody): void => {
 	throwErrorIfInvalidFormat(
 		"location",
 		location,
-		[isCoordinates]
-	);
-
-	throwErrorIfInvalidFormat(
-		"pickUpTimes",
-		pickUpTimes,
-		[isNumber]
+		[isLocation]
 	);
 
 	throwErrorIfInvalidFormat(
@@ -114,27 +103,25 @@ export const postFood = async (
 	}
 	const auth = req.authContext as AuthLike;
 	const {
-		categories,
-		cost,
-		description,
-		duration,
 		images,
+		title,
 		location,
-		pickUpTimes,
+		categories,
+		description,
 		quantity,
-		title
+		duration,
+		price,
 	} = req.body;
 	postFoodService({
-		categories: categories!,
-		cost: cost!,
-		description: description!,
-		duration: duration!,
-		location: location!,
-		pickUpTimes: pickUpTimes!,
-		quantity: quantity!,
-		title: title!,
 		user: auth._id,
-		images: images!
+		images: images!,
+		title: title!,
+		location: location!,
+		categories: categories!,
+		description: description!,
+		quantity: quantity!,
+		duration: new Date(duration!),
+		price: price!,
 	}).then(data => res.status(200).json(toResponseSuccessData(data)))
 		.catch(next);
 };

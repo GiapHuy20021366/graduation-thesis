@@ -5,11 +5,13 @@ import { initUserRouters } from "./src/route";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { consoleLogger } from "./src/config";
-import { subscribeMessage } from "./src/broker";
+import { RPCObserver, subscribeMessage } from "./src/broker";
+
 
 const app: Express = express();
 
 connectDB();
+RPCObserver();
 
 app.use(cors({
   credentials: true,
@@ -28,6 +30,3 @@ app.listen(PORT, () => {
 subscribeMessage().then(() => {
   consoleLogger.info("[MESSAGE BROKER] start listening messages");
 });
-
-
-// RPCObserver();

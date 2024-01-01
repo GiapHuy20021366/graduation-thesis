@@ -17,6 +17,7 @@ export const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1h";
 
 export const USER_SERVICE = process.env.USER_SERVICE as string;
 export const MESSAGE_SERVICE = process.env.MESSAGE_SERVICE as string;
+export const FOOD_SERVICE = process.env.FOOD_SERVICE as string;
 
 
 // other configs

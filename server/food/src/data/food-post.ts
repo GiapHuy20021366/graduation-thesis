@@ -10,7 +10,6 @@ export interface IFoodPostLocation {
     coordinates: ICoordinates
 }
 
-
 export interface IFoodPost {
     user: IFoodPostUser;
     images: string[];
@@ -21,7 +20,4 @@ export interface IFoodPost {
     quantity: number;
     duration: Date;
     price: number;
-    isEdited: boolean;
-    createdAt: Date;
-    updatedAt: Date;
 }

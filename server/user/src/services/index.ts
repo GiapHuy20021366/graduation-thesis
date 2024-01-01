@@ -11,3 +11,7 @@ export {
 export {
     refreshToken
 } from "./token";
+
+export {
+    rpcGetUserInfo,
+} from "./rpc";

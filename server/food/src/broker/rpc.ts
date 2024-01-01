@@ -1,23 +1,39 @@
 import { ConsumeMessage } from "amqplib";
 import { v4 as uuid4 } from "uuid";
-import { RPC_QUEUE_NAME, RPC_REQUEST_TIME_OUT } from "../config";
+import { FOOD_SERVICE_RPC_QUEUE, RPC_REQUEST_TIME_OUT } from "../config";
 import { getChannel } from "./channel";
+import { RpcQueueName, RpcRequest, RpcResponse, RpcSource } from "../data";
 
 export const RPCObserver = async () => {
   const channel = await getChannel();
-  await channel.assertQueue(RPC_QUEUE_NAME, {
+  await channel.assertQueue(FOOD_SERVICE_RPC_QUEUE, {
     durable: false,
   });
   channel.prefetch(1);
   channel.consume(
-    RPC_QUEUE_NAME,
+    FOOD_SERVICE_RPC_QUEUE,
     async (msg: ConsumeMessage | null) => {
       if (msg != null) {
-        // const payload = JSON.parse(msg.content.toString());
+        const payload = JSON.parse(msg.content.toString()) as RpcRequest;
+        switch (payload.source) {
+          case RpcSource.FOOD: {
+            // 
+            break;
+          }
+          case RpcSource.MESSAGE: {
+            // 
+            break;
+          }
+          case RpcSource.USER: {
+            // 
+            break;
+          }
+        }
+        const response: RpcResponse = {
+
+        }
 
         // Implement response;
-        const response = "Response";
-
         channel.sendToQueue(
           msg.properties.replyTo,
           Buffer.from(JSON.stringify(response)),
@@ -34,11 +50,11 @@ export const RPCObserver = async () => {
   );
 };
 
-const requestData = async (
-  RPC_QUEUE_NAME: string,
-  requestPayload: any,
+const requestData = async <T> (
+  RPC_QUEUE_NAME: RpcQueueName,
+  requestPayload: RpcRequest,
   uuid: string
-): Promise<string | null> => {
+): Promise<RpcResponse<T> | null> => {
   try {
     const channel = await getChannel();
 
@@ -57,7 +73,13 @@ const requestData = async (
       // timeout
       const timeout = setTimeout(() => {
         channel.close();
-        resolve("Request time out!");
+        resolve({
+          err: {
+            code: 500,
+            target: "timeout",
+            reason: "timeout"
+          }
+        });
       }, RPC_REQUEST_TIME_OUT);
 
       channel.consume(
@@ -82,8 +104,8 @@ const requestData = async (
   }
 };
 
-export const RPCRequest = async (RPCQueueName: string, requestPayload: any) => {
+export const RPCRequest = async <T> (RPCQueueName: RpcQueueName, request: RpcRequest) => {
   const uuid = uuid4();
-  return await requestData(RPCQueueName, requestPayload, uuid);
+  return await requestData<T>(RPCQueueName, request, uuid);
 };
 

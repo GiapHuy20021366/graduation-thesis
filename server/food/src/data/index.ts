@@ -32,6 +32,7 @@ export {
     isNotEmptyString,
     isAllNotEmptyString,
     isCoordinates,
+    isLocation,
     isNotEmptyStringArray
 } from "./data-validate";
 export {
@@ -40,3 +41,18 @@ export {
     toInvalidFormatError,
     toNotFoundError
 } from "./to-error";
+
+export {
+    RpcAction,
+} from "./rpc-action";
+export {
+    RpcQueueName
+} from "./rpc-queue-name";
+export {
+    RpcSource
+} from "./rpc-source";
+export {
+    RpcRequest,
+    RpcResponse,
+    RpcResponseErr
+} from "./rpc-request-and-response"

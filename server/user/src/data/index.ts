@@ -17,4 +17,19 @@ export { UnauthorizationErrorInfo, UnauthorizationError } from "./unauthorizatio
 export { HttpResponseCode } from "./http-response-code";
 export { toResponseSuccessData } from "./to-response-success-data";
 export { toAuthToken, AuthLike } from "./to-auth-token";
-export { AccountExposed } from "./account-exposed"
+export { AccountExposed } from "./account-exposed";
+
+export {
+    RpcAction,
+} from "./rpc-action";
+export {
+    RpcQueueName
+} from "./rpc-queue-name";
+export {
+    RpcSource
+} from "./rpc-source";
+export {
+    RpcRequest,
+    RpcResponse,
+    RpcResponseErr
+} from "./rpc-request-and-response";
