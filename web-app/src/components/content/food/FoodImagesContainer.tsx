@@ -1,31 +1,72 @@
-import { Box, ImageList, ImageListItem, Skeleton } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  ImageList,
+  ImageListItem,
+  Skeleton,
+  Typography,
+} from "@mui/material";
 import ImagePicker from "./ImagePicker";
 import { ClearOutlined } from "@mui/icons-material";
 import { IImageExposed } from "../../../data";
+import { useAuthContext, useFoodSharingFormContext } from "../../../contexts";
+import { foodFetcher } from "../../../api";
 
 interface IFoodImagesContainerProps {
-  onPicked?: (image: string) => void;
-  onRemoved?: (index: number) => void;
-  images: (IImageExposed | null)[];
   maxPicked: number;
 }
 
 export default function FoodImagesContainer({
-  onPicked,
-  onRemoved,
-  images,
-  maxPicked
+  maxPicked,
 }: IFoodImagesContainerProps) {
+  const formContext = useFoodSharingFormContext();
+  const authContext = useAuthContext();
+  const { auth } = authContext;
+  const { images, setImages } = formContext;
   const handlePicked = (image: File): void => {
     const reader = new FileReader();
     reader.onload = () => {
       const result = reader.result;
       if (result != null) {
-        onPicked && onPicked(result.toString());
+        handleImagePicked(result.toString());
       }
     };
 
     reader.readAsDataURL(image);
+  };
+
+  const handleImagePicked = (image: string): void => {
+    const index = images.length;
+    const newImages = [...images, null];
+    setImages(newImages);
+    if (auth) {
+      foodFetcher
+        .uploadImage("", image, auth)
+        .then((result) => {
+          const _images = result.data;
+          if (_images) {
+            const image = _images[0];
+            if (image) {
+              const cpyImages = [...images];
+              cpyImages[index] = image;
+              setImages(cpyImages);
+            }
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          const imgsToSet = newImages.slice(0, -1);
+          setImages(imgsToSet);
+        });
+    }
+  };
+
+  const handleImageRemoved = (index: number): void => {
+    if (0 <= index && index < images.length) {
+      const cpyImages = images.slice();
+      cpyImages.splice(index, 1);
+      setImages(cpyImages);
+    }
   };
 
   return (
@@ -49,17 +90,21 @@ export default function FoodImagesContainer({
                 />
               )}
               {image != null && (
-                <ClearOutlined
+                <IconButton
+                  color="error"
+                  onClick={() => handleImageRemoved(index)}
                   sx={{
                     position: "absolute",
                     top: 0,
                     right: 0,
                     cursor: "pointer",
-                    color: "red",
-                    backgroundColor: "yellow",
+                    padding: 0,
+                    backgroundColor: "black",
+                    borderRadius: 0,
                   }}
-                  onClick={() => onRemoved && onRemoved(index)}
-                />
+                >
+                  <ClearOutlined />
+                </IconButton>
               )}
             </ImageListItem>
           );
@@ -70,13 +115,18 @@ export default function FoodImagesContainer({
               sx={{
                 width: "100%",
                 height: "100%",
-                border: "1px solid black",
+                // border: "1px solid black",
               }}
               onPicked={handlePicked}
             />
           </ImageListItem>
         )}
       </ImageList>
+      {images.length === 0 && (
+        <Typography component="legend">
+          You need to pick at least one image
+        </Typography>
+      )}
     </Box>
   );
 }

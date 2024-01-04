@@ -55,11 +55,13 @@ export default function I18nContextProvider({
       | undefined;
     return (key: string, ...params: any[]): string => {
       if (componentLanguage == null) {
-        return `!<${componentName}>.[${key}]`;
+        // return `!<${componentName}>.[${key}]`;
+        return key;
       }
       const template = componentLanguage[key] as string | undefined;
       if (template == null) {
-        return `<${componentName}>.![${key}]`;
+        // return `<${componentName}>.![${key}]`;
+        return key;
       }
 
       return template.replace(/\{.*?\}/g, (match: string): string => {

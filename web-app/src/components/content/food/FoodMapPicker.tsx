@@ -4,85 +4,74 @@ import {
   Dialog,
   DialogTitle,
   Divider,
-  ImageListItem,
+  IconButton,
   Stack,
 } from "@mui/material";
-import { ICoordinates } from "../../../data";
-import { memo, useCallback, useEffect, useState } from "react";
+import { GeoCodeMapsData, ICoordinates } from "../../../data";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { GOOGLE_MAP_API_KEY } from "../../../env";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
-import axios from "axios";
+import { KeyboardArrowRight } from "@mui/icons-material";
+import { geocodeMapFindAddess } from "../../../api";
+import { useFoodSharingFormContext } from "../../../contexts";
 
-interface IFoodMapPicker {
-  onPicked?: (location: ICoordinates) => void;
-}
-
-const FoodMapPicker = memo(({ onPicked }: IFoodMapPicker) => {
+const FoodMapPicker = memo(() => {
   const [open, setOpen] = useState<boolean>(false);
+  const formContext = useFoodSharingFormContext();
+  const { location, setLocation } =
+    formContext;
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: GOOGLE_MAP_API_KEY,
   });
-  const [locationName, setLocationName] = useState<string>("My location");
+
+  const [fetching, setFetching] = useState<boolean>(false);
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [center, setCenter] = useState<ICoordinates>({
-    lat: -3.745,
-    lng: -38.523,
-  });
-  const [choosed, setChoosed] = useState<ICoordinates>({
-    lat: -3.745,
-    lng: -38.523,
-  });
+  const timeout = useRef<number | null>(null);
+  const [lastFetchedPos, setLastFetchedPos] = useState<ICoordinates | null>(null);
+
+  const fetchAddress = useCallback((pos: ICoordinates) => {
+    const timeOutId = timeout.current;
+    if (timeOutId != null) {
+      clearTimeout(timeOutId);
+      timeout.current = null;
+    }
+    timeout.current = setTimeout(() => {
+      try {
+        setFetching(true);
+        geocodeMapFindAddess(pos).then((data: GeoCodeMapsData | null) => {
+          if (data != null) {
+            const address = data.displayName;
+            setLocation({
+              name: address,
+              coordinates: pos,
+            });
+            setLastFetchedPos(pos);
+          } else {
+            console.log("Cannot find the location name");
+          }
+        });
+      } catch (error) {
+        console.error("Error fetching location information:", error);
+      } finally {
+        setFetching(false);
+      }
+    }, 1000);
+  }, [setLocation]);
 
   const handleMapClick = (event: google.maps.MapMouseEvent) => {
     const { latLng } = event;
     if (latLng != null) {
       const lat = latLng.lat();
       const lng = latLng.lng();
-      setChoosed({ lat, lng });
-      onPicked && onPicked({ lat, lng });
-      try {
-        setLocationName("Loading...");
-        axios
-          .get(
-            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${choosed.lat},${choosed.lng}&key=${GOOGLE_MAP_API_KEY}`
-          )
-          .then((response) => {
-            const locationName = response.data.results[0]?.formatted_address;
-            if (locationName != null) {
-              setLocationName(locationName);
-            } else {
-              setLocationName("Cannot find the location name");
-            }
-          });
-      } catch (error) {
-        console.error("Error fetching location information:", error);
-      }
+      const clickedPos = {lat, lng}
+      fetchAddress(clickedPos);
     }
   };
 
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position: GeolocationPosition) => {
-          const pos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
-          setCenter(pos);
-          setChoosed(pos);
-          console.log("center", pos);
-        },
-        (error: GeolocationPositionError) => {
-          console.log(error);
-        }
-      );
-    }
-  }, []);
-
   const onLoad = useCallback((map: google.maps.Map) => {
-    const bounds = new window.google.maps.LatLngBounds(center);
+    const bounds = new window.google.maps.LatLngBounds();
     map.fitBounds(bounds);
     setMap(map);
   }, []);
@@ -90,29 +79,56 @@ const FoodMapPicker = memo(({ onPicked }: IFoodMapPicker) => {
   const onUnmount = useCallback((): void => {
     setMap(null);
   }, []);
+
+  useEffect(() => {
+    const cur = location.coordinates;
+    const last = lastFetchedPos;
+    let needFetch: boolean = false;
+    needFetch ||= last == null;
+    if (last != null) {
+      needFetch ||= last.lat !== cur.lat;
+      needFetch ||= last.lng !== cur.lng;
+    }
+    needFetch && fetchAddress(cur);
+  }, [location.coordinates, lastFetchedPos, fetchAddress]);
+
+  useEffect(() => {
+    if (open) {
+      if (map != null) {
+        setTimeout(() => {
+          map.setCenter(location.coordinates);
+          map.setZoom(15);
+        }, 0);
+      }
+    }
+  }, [open, map, location.coordinates])
+
+
   return (
     <Box>
-      <Stack direction={"row"}>
-        <Box sx={{padding: "8px 0"}}>{locationName}</Box>
-        <Button
+      <Stack
+        direction="row"
+        sx={{
+          alignItems: "center",
+        }}
+      >
+        <h4>Location</h4>
+        <IconButton
+          color="primary"
           sx={{
             marginLeft: "auto",
           }}
           onClick={() => setOpen(true)}
         >
-          <u>Picker</u>
-        </Button>
+          <KeyboardArrowRight />
+        </IconButton>
       </Stack>
-
-      <img
-        src={`/imgs/map-sample.png`}
-        alt={"img"}
-        loading="lazy"
-        style={{
-            width: "100%",
-            height: "auto",
-        }}
-      />
+      <Divider />
+      <Stack direction={"row"}>
+        <Box sx={{ padding: "8px 0" }}>
+          {fetching ? "Loading..." : location.name}
+        </Box>
+      </Stack>
       <Dialog open={open} fullScreen>
         <Stack direction={"row"}>
           <DialogTitle>Map Picker</DialogTitle>
@@ -121,17 +137,17 @@ const FoodMapPicker = memo(({ onPicked }: IFoodMapPicker) => {
           </Button>
         </Stack>
         <Divider />
-        <Box component="h4">{locationName}</Box>
+        <Box component="h4">{fetching ? "Loading..." : location.name}</Box>
         {isLoaded && (
           <GoogleMap
-            center={center}
-            zoom={15}
+            center={location.coordinates}
+            zoom={16}
             onLoad={onLoad}
             onUnmount={onUnmount}
             mapContainerClassName={"google-map-container"}
             onClick={handleMapClick}
           >
-            <Marker position={choosed} />
+            <Marker position={location.coordinates} />
           </GoogleMap>
         )}
       </Dialog>

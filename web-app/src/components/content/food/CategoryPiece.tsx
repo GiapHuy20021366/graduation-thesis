@@ -1,5 +1,4 @@
-import { ClearOutlined } from "@mui/icons-material";
-import { Box } from "@mui/material";
+import { Chip } from "@mui/material";
 
 interface ICategoryPiece {
   text: string;
@@ -8,34 +7,13 @@ interface ICategoryPiece {
 
 export default function CategoryPiece({ text, onRemove }: ICategoryPiece) {
   return (
-    <Box
+    <Chip
+      label={text}
+      variant="outlined"
+      onDelete={onRemove}
       sx={{
-        display: "inline-block",
-        border: "1px solid #bdbdbd",
-        borderRadius: "4px",
-        padding: "8px",
-        boxSizing: "border-box",
-        margin: "4px",
-        position: "relative",
-        fontSize: "0.75em"
+        mr: 1,
       }}
-    >
-      <Box component="div" minWidth={30} padding={"0 0.5em"}>
-        {text}
-      </Box>
-      {onRemove != null && (
-        <ClearOutlined
-          sx={{
-            position: "absolute",
-            top: 0,
-            right: 0,
-            cursor: "pointer",
-            width: "1rem",
-            height: "1rem",
-          }}
-          onClick={() => onRemove && onRemove()}
-        />
-      )}
-    </Box>
+    />
   );
 }

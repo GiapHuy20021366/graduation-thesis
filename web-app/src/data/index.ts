@@ -34,15 +34,28 @@ export {
     toQuantityType
 } from "./quantity-type";
 export {
-    FoodCategory
+    FoodCategory,
+    randomCategories
 } from "./food-category";
 export {
-    type IFoodUploadCost,
     type IFoodUploadData,
-    type IFoodUploadDuration,
-    type IFoodUpoadCount
+    type IFoodUpLoadLocation
 } from "./food-upload-data";
 export {
     type IFoodSearchInfo,
     fakeOneFoodSearch
 } from "./food-search-info";
+export {
+    type GeoCodeMapsAddress,
+    type GeoCodeMapsData
+} from "./geocode-maps-address";
+
+export {
+    convertDateToString,
+    convertStringToDate,
+    type TimeStamp,
+    toNextLunch,
+    toNextMidnight,
+    toTime,
+    toTimeInfo
+} from "./date-util";

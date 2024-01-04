@@ -26,8 +26,8 @@ export default function ImagePicker({ sx, onPicked }: IImagePickerProps) {
         ...sx,
         position: "relative",
         ":hover": {
-            backgroundColor: "yellow"
-        }
+          backgroundColor: "#F3F6F9",
+        },
       }}
     >
       <input
@@ -54,7 +54,7 @@ export default function ImagePicker({ sx, onPicked }: IImagePickerProps) {
         }}
         onClick={handleClick}
       >
-        <IconButton>
+        <IconButton color="primary">
           <AddBox />
         </IconButton>
       </Box>

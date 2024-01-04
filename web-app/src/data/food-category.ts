@@ -10,3 +10,16 @@ export const FoodCategory = {
 }
 
 export type FoodCategory = typeof FoodCategory[keyof typeof FoodCategory];
+
+export const randomCategories = (size: number): FoodCategory[] => {
+    const result: FoodCategory[] = [];
+    const categories = Object.values(FoodCategory);
+    for (let i = 0; i < size; ++i) {
+        const randomIndex = Math.floor(Math.random() * categories.length);
+        const category = categories[randomIndex];
+        if (!result.includes(category)) {
+            result.push(category);
+        }
+    }
+    return result;
+}

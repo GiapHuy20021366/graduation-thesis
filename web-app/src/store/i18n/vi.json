@@ -81,7 +81,27 @@
         "forum": "Forum",
         "message": "Tin nhắn"
     },
-    "FoodSharingForm": {},
+    "FoodSharingForm": {
+        "empty-title": "Tiêu đề không được để trống",
+        "empty-duration": "Thời hạn không được để trống",
+        "empty-count": "Số lượng không được để trống",
+        "l-title": "Tiêu đề",
+        "l-duration": "Thời hạn",
+        "HOUR": "Giờ",
+        "DAY": "Ngày",
+        "l-count": "Số lượng",
+        "PIECE": "Cái",
+        "KILOGAM": "Kilogam",
+        "GAM": "Gam",
+        "POUND": "Pound",
+        "METER": "Mét",
+        "CENTIMETER": "Centimet",
+        "l-quantity": "Chất lượng",
+        "PRETTY_GOOD": "Siêu tốt",
+
+
+        "l-cost": "Giá"
+    },
     "FoodCategoryPicker": {
         "VEGETABLES": "Rau củ",
         "FRUITS": "Hoa quả",

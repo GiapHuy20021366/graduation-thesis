@@ -5,106 +5,77 @@ import {
   FormControl,
   InputAdornment,
   MenuItem,
+  Rating,
   Select,
+  SelectChangeEvent,
   Stack,
+  Step,
+  StepLabel,
+  Stepper,
   TextField,
 } from "@mui/material";
 import FoodImagesContainer from "./FoodImagesContainer";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { foodFetcher } from "../../../api";
-import { useAuthContext } from "../../../contexts";
+import { useAuthContext, useFoodSharingFormContext, useI18nContext } from "../../../contexts";
 import {
-  IImageExposed,
   DurationType,
-  UnitType,
-  QuantityType,
   FoodCategory,
   toQuantityType,
-  toQuantityLevel,
-  ICoordinates,
   IFoodUploadData,
+  convertDateToString,
+  toTime,
+  convertStringToDate,
 } from "../../../data";
-import * as yup from "yup";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router";
 import DescriptionEditor from "./DescriptionEditor";
 import { RichTextEditorRef } from "mui-tiptap";
 import FoodCategoryPicker from "./FoodCategoryPicker";
 import FoodMapPicker from "./FoodMapPicker";
+import FoodSharingNavigator from "./FoodSharingNavigator";
 
-interface FoodValues {
-  title: string;
-  duration: number;
-  count: number;
-}
+const FormPage = {
+  PAGE_FIRST: 0,
+  PAGE_SECOND: 1,
+  PAGE_SUBMIT: 2,
+} as const;
+
+const FormStepLable = {
+  FIRST: "LABLE_FIRST",
+  SECOND: "LABLE_SECOND",
+  LAST: "LABLE_LAST",
+} as const;
+
+type FormStepLable = (typeof FormStepLable)[keyof typeof FormStepLable];
+
+const steps: FormStepLable[] = [
+  FormStepLable.FIRST,
+  FormStepLable.SECOND,
+  FormStepLable.LAST,
+];
 
 export default function FoodSharingForm() {
-  const [images, setImages] = useState<(IImageExposed | null)[]>([]);
-  const [categories, setCategories] = useState<FoodCategory[]>([]);
+  const formContext = useFoodSharingFormContext();
+  const {
+    images,
+    categories, setCategories,
+    duration, setDuration,
+    location,
+    price, setPrice,
+    quantity, setQuantity,
+    title, setTitle,
+  } = formContext;
+  
+  const [hover, setHover] = useState<number>(-1);
+  const [durationType, setDurationType] = useState<DurationType>(
+    DurationType.UNTIL_MIDNIGHT
+  );
   const descriptionEditorRef = useRef<RichTextEditorRef>(null);
-  const [quantity, setQuantity] = useState<number>(5);
-  const [cost, setCost] = useState<number>(0);
-  const unitRef = useRef<HTMLSelectElement>(null);
-  const durationTypeRef = useRef<HTMLSelectElement>(null);
-  const [location, setLocation] = useState<ICoordinates>({ lat: 0, lng: 0 });
-  // const languageContext = useI18nContext();
-  // const lang = languageContext.of(FoodSharingForm);
+  const languageContext = useI18nContext();
+  const lang = languageContext.of(FoodSharingForm);
   const authContext = useAuthContext();
   const auth = authContext.auth;
   const navigate = useNavigate();
-
-  const foodSchema = yup.object({
-    title: yup.string().required("Title can not be empty"),
-    duration: yup.number().required("Duration can not be empty"),
-    count: yup.number().required("Count can not be empty"),
-  });
-
-  const form = useForm<FoodValues>({
-    defaultValues: {
-      title: "",
-      duration: 1,
-      count: 1,
-    },
-    resolver: yupResolver(foodSchema),
-  });
-
-  const { register, handleSubmit, formState } = form;
-  const { errors } = formState;
-
-  const handleImageRemoved = (index: number): void => {
-    if (0 <= index && index < images.length) {
-      const cpyImages = images.slice();
-      cpyImages.splice(index, 1);
-      setImages(cpyImages);
-    }
-  };
-
-  const handleImagePicked = (image: string): void => {
-    const index = images.length;
-    const newImages = [...images, null];
-    setImages(newImages);
-    if (auth) {
-      foodFetcher
-        .uploadImage("", image, auth)
-        .then((result) => {
-          const _images = result.data;
-          if (_images) {
-            const image = _images[0];
-            if (image) {
-              const cpyImages = [...images];
-              cpyImages[index] = image;
-              setImages(cpyImages);
-            }
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          const imgsToSet = newImages.slice(0, -1);
-          setImages(imgsToSet);
-        });
-    }
-  };
 
   const handleCategoryPicked = (category: FoodCategory) => {
     const newCategories = [...categories, category];
@@ -119,32 +90,24 @@ export default function FoodSharingForm() {
     }
   };
 
-  const onSubmit = (data: FoodValues) => {
-    const imgs = images.filter((img) => img != null).map((img) => img!._id);
+  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const imageUrls = images
+      .filter((img) => img != null)
+      .map((img) => img!.url);
     const description = descriptionEditorRef.current?.editor?.getHTML() ?? "";
-    const durationType =
-      (durationTypeRef.current?.value as DurationType | undefined) ??
-      DurationType.UNKNOWN;
-    const countUnit =
-      (unitRef.current?.value as UnitType | undefined) ?? UnitType.UNKNOWN;
+    const durationInDate = convertStringToDate(duration);
+
     const foodUploadData: IFoodUploadData = {
-      images: imgs,
-      title: data.title,
-      description: description,
+      images: imageUrls,
       categories: categories,
-      location: location,
-      duration: {
-        value: data.duration,
-        unit: durationType,
-      },
-      count: {
-        value: data.count,
-        unit: countUnit,
-      },
+      description: description,
+      duration: durationInDate.getTime(),
+      price: price,
       quantity: quantity,
-      cost: {
-        value: cost,
-      },
+      title: title,
+      location: location,
     };
     if (auth) {
       console.log(foodUploadData);
@@ -154,22 +117,24 @@ export default function FoodSharingForm() {
     }
   };
 
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position: GeolocationPosition) => {
-          const pos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
-          setLocation(pos);
-        },
-        (error: GeolocationPositionError) => {
-          console.log(error);
-        }
-      );
-    }
-  }, []);
+  const onDurationTypeSelectChange = (
+    event: SelectChangeEvent<DurationType>
+  ): void => {
+    const type = event.target.value as DurationType;
+    setDurationType(type);
+    const time = toTime(type);
+    setDuration(convertDateToString(time));
+  };
+
+  const onDurationChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ): void => {
+    const value = event.target.value;
+    setDuration(value);
+    setDurationType(DurationType.CUSTOM);
+  };
+
+  const [activeStep, setActiveStep] = useState<number>(0);
 
   return (
     <Box
@@ -179,178 +144,212 @@ export default function FoodSharingForm() {
         mt: 3,
         width: ["100%", "80%", "60%", "50%"],
       }}
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={(event) => onSubmit(event)}
     >
-      <Stack spacing={2}>
-        <FormControl
-          variant="outlined"
-          fullWidth
+      <Box
+        width="100%"
+        sx={{
+          position: "sticky",
+          top: 0,
+          backgroundColor: "white",
+          zIndex: 100,
+          marginBottom: "1em",
+        }}
+      >
+        <Stepper
+          activeStep={activeStep}
           sx={{
-            border: "1px solid #bdbdbd",
-            borderRadius: "4px",
-            padding: "8px",
             width: "100%",
-            boxSizing: "border-box",
           }}
         >
-          <Stack>
-            <Box component="h4">Images</Box>
-            <Divider />
-            <FoodImagesContainer
-              images={images}
-              onPicked={handleImagePicked}
-              onRemoved={handleImageRemoved}
-              maxPicked={5}
-            />
-          </Stack>
-        </FormControl>
-        <TextField
-          label="Title"
-          type="text"
-          {...register("title")}
-          error={!!errors.title}
-          helperText={errors.title?.message}
-        />
-        <DescriptionEditor editorRef={descriptionEditorRef} />
-        <FoodCategoryPicker
-          categories={categories}
-          onPicked={handleCategoryPicked}
-          onRemoved={handleCategoryRemoved}
-        />
-        <FormControl
-          variant="outlined"
-          fullWidth
-          sx={{
-            border: "1px solid #bdbdbd",
-            borderRadius: "4px",
-            padding: "8px",
-            width: "100%",
-            boxSizing: "border-box",
+          {steps.map((label, index) => {
+            let mobileDisplay = "none";
+            if (index === activeStep || index === activeStep + 1) {
+              mobileDisplay = "block";
+            }
+            if (index === activeStep - 1 && activeStep === steps.length - 1) {
+              mobileDisplay = "block";
+            }
+            return (
+              <Step
+                key={label}
+                sx={{
+                  display: [mobileDisplay, "block", "block", "block"],
+                }}
+              >
+                <StepLabel>{lang(label)}</StepLabel>
+              </Step>
+            );
+          })}
+        </Stepper>
+        <FoodSharingNavigator
+          prev={{
+            active: activeStep !== FormPage.PAGE_FIRST,
+            onClick: () => setActiveStep(activeStep - 1),
           }}
-        >
-          <Stack>
-            <Box component="h4">Location</Box>
-            <Divider />
-            <FoodMapPicker onPicked={(location) => setLocation(location)} />
-          </Stack>
-        </FormControl>
-        <TextField
-          label="Duration"
-          type="number"
-          variant="outlined"
-          {...register("duration")}
-          error={!!errors.duration}
-          helperText={errors.duration?.message}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <Select
-                  variant="standard"
-                  disableUnderline={true}
-                  displayEmpty={true}
-                  defaultValue={DurationType.DAY}
-                  ref={durationTypeRef}
-                >
-                  <MenuItem value={DurationType.DAY}>Day</MenuItem>
-                  <MenuItem value={DurationType.HOUR}>Hour</MenuItem>
-                </Select>
-              </InputAdornment>
-            ),
-            inputProps: { min: 1, max: 5 },
-            type: "number",
-            defaultValue: 1,
+          next={{
+            active: activeStep !== FormPage.PAGE_SUBMIT,
+            onClick: () => setActiveStep(activeStep + 1),
           }}
         />
-        <TextField
-          label="Count"
-          type="number"
-          {...register("count")}
-          error={!!errors.count}
-          helperText={errors.count?.message}
-          variant="outlined"
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <Select
-                  defaultValue={UnitType.PIECE}
-                  variant="standard"
-                  disableUnderline={true}
-                  displayEmpty={true}
-                  ref={unitRef}
-                >
-                  <MenuItem value={UnitType.PIECE}>Piece</MenuItem>
-                  <MenuItem value={UnitType.KILOGAM}>Kilogam</MenuItem>
-                  <MenuItem value={UnitType.GAM}>Gam</MenuItem>
-                  <MenuItem value={UnitType.POUND}>Pouce</MenuItem>
-                  <MenuItem value={UnitType.METER}>Meter</MenuItem>
-                  <MenuItem value={UnitType.CENTIMETER}>Centimeter</MenuItem>
-                </Select>
-              </InputAdornment>
-            ),
-            inputProps: { min: 1, max: 5 },
-            type: "number",
-            defaultValue: 1,
-          }}
-        />
-        <TextField
-          label="Quantity"
-          variant="outlined"
-          fullWidth
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <Select
-                  value={toQuantityType(quantity)}
-                  onChange={(event) =>
-                    setQuantity(toQuantityLevel(event.target.value))
-                  }
-                  variant="standard"
-                  disableUnderline={true}
-                  displayEmpty={true}
-                >
-                  <MenuItem value={QuantityType.PRETTY_GOOD}>
-                    Pretty good
-                  </MenuItem>
-                  <MenuItem value={QuantityType.TOTAL_GOOD}>
-                    Total good
-                  </MenuItem>
-                  <MenuItem value={QuantityType.SEEM_GOOD}>Seem good</MenuItem>
-                  <MenuItem value={QuantityType.USABLE}>Usage</MenuItem>
-                  <MenuItem value={QuantityType.SEEM_USABLE}>
-                    Seem usage
-                  </MenuItem>
-                </Select>
-              </InputAdornment>
-            ),
-            inputProps: { min: 1, max: 5 },
-            type: "number",
-            value: quantity,
-            onChange: (event) =>
-              setQuantity(
-                Math.max(0, Math.min(5, Math.round(+event.target.value)))
+      </Box>
+      {activeStep === FormPage.PAGE_FIRST && (
+        <Stack spacing={2}>
+          <FormControl
+            variant="outlined"
+            fullWidth
+            sx={{
+              border: "1px solid #bdbdbd",
+              borderRadius: "4px",
+              padding: "8px",
+              width: "100%",
+              boxSizing: "border-box",
+            }}
+          >
+            <Stack>
+              <Box component="h4">Images</Box>
+              <Divider />
+              <FoodImagesContainer
+                maxPicked={5}
+              />
+            </Stack>
+          </FormControl>
+          <TextField
+            label={lang("l-title")}
+            type="text"
+            variant="standard"
+            value={title}
+            placeholder="Tell everybody what you want to share"
+            onChange={(event) => setTitle(event.target.value)}
+          />
+          <DescriptionEditor editorRef={descriptionEditorRef} />
+          <FormControl
+            variant="outlined"
+            fullWidth
+            sx={{
+              border: "1px solid #bdbdbd",
+              borderRadius: "4px",
+              padding: "8px",
+              width: "100%",
+              boxSizing: "border-box",
+            }}
+          >
+            <FoodMapPicker />
+          </FormControl>
+          <TextField
+            label={lang("l-duration")}
+            variant="standard"
+            type="datetime-local"
+            value={duration}
+            onChange={(event) => onDurationChange(event)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Select
+                    variant="standard"
+                    disableUnderline={true}
+                    displayEmpty={true}
+                    fullWidth
+                    value={durationType}
+                    onChange={(event) => onDurationTypeSelectChange(event)}
+                  >
+                    <MenuItem value={DurationType.UNTIL_MIDNIGHT}>
+                      {lang("UTIL_MIDNIGHT")}
+                    </MenuItem>
+                    <MenuItem value={DurationType.UNTIL_LUNCH}>
+                      {lang("UTIL_LUNCH")}
+                    </MenuItem>
+                    <MenuItem value={DurationType.ONE_DAY}>
+                      {lang("ONE_DAY")}
+                    </MenuItem>
+                    <MenuItem value={DurationType.TWO_DAYS}>
+                      {lang("TWO_DAYS")}
+                    </MenuItem>
+                    <MenuItem value={DurationType.THREE_DAYS}>
+                      {lang("THREE_DAYS")}
+                    </MenuItem>
+                    <MenuItem value={DurationType.CUSTOM}>
+                      {lang("CUSTOM")}
+                    </MenuItem>
+                  </Select>
+                </InputAdornment>
               ),
+            }}
+          />
+          <Stack
+            direction="row"
+            sx={{
+              borderBottom: "1px solid #bdbdbd",
+              borderRadius: "4px",
+              width: "100%",
+              boxSizing: "border-box",
+              flexWrap: "wrap",
+              alignContent: "center",
+            }}
+          >
+            <Box component="h4" mr={1}>
+              {lang("l-quantity")}:
+            </Box>
+            <Stack direction="row" alignItems="center">
+              <Rating
+                value={quantity}
+                onChange={(_event, newValue) => {
+                  setQuantity(newValue || 1);
+                }}
+                onChangeActive={(_event, newHover) => {
+                  setHover(newHover);
+                }}
+                sx={{
+                  width: "fit-content",
+                }}
+                size="medium"
+              />
+              <Box sx={{ ml: 2 }}>
+                {lang(toQuantityType(hover !== -1 ? hover : quantity))}
+              </Box>
+            </Stack>
+          </Stack>
+        </Stack>
+      )}
+
+      {activeStep === FormPage.PAGE_SECOND && (
+        <Stack spacing={2}>
+          <FoodCategoryPicker
+            categories={categories}
+            onPicked={handleCategoryPicked}
+            onRemoved={handleCategoryRemoved}
+          />
+          <TextField
+            label={lang("l-cost")}
+            type="number"
+            variant="outlined"
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  {price ? "VNĐ" : "Free"}
+                </InputAdornment>
+              ),
+              inputProps: { min: 0 },
+              type: "number",
+              value: price,
+              onChange: (event) => setPrice(+event.target.value),
+            }}
+          />
+        </Stack>
+      )}
+
+      {activeStep === FormPage.PAGE_SUBMIT && (
+        <Button
+          type="submit"
+          variant="contained"
+          sx={{
+            marginBottom: "1em",
           }}
-        />
-        <TextField
-          label="Cost"
-          type="number"
-          variant="outlined"
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                {cost ? "VNĐ" : "Free"}
-              </InputAdornment>
-            ),
-            inputProps: { min: 0 },
-            type: "number",
-            value: cost,
-            onChange: (event) => setCost(+event.target.value),
-          }}
-        />
-        <Button type="submit" variant="contained">
+          fullWidth
+        >
           Share now!
         </Button>
-      </Stack>
+      )}
     </Box>
   );
 }

@@ -43,7 +43,6 @@ export default function FoodCategoryPicker({
     if (value != null) {
       !categories.includes(value) && onPicked && onPicked(value);
     }
-    console.log(value);
     const input = inputRef.current;
     if (input) {
       input.value = "";
@@ -89,7 +88,7 @@ export default function FoodCategoryPicker({
           <TextField
             {...params}
             label="Search"
-            variant="outlined"
+            variant="standard"
             fullWidth
             inputRef={inputRef}
             InputProps={{
