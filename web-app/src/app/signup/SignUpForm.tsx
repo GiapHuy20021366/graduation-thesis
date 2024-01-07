@@ -185,8 +185,8 @@ export default function SignUpForm() {
           >
             <b>{lang("or")}</b>
           </Box>
-          <Stack>
-            <div id="google-oauth" />
+          <Stack alignItems="center">
+            <Box id="google-oauth" width="fit-content" />
           </Stack>
         </Container>
         <Container>

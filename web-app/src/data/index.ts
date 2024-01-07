@@ -43,6 +43,7 @@ export {
 } from "./food-upload-data";
 export {
     type IFoodSearchInfo,
+    type IFoodPostUser,
     fakeOneFoodSearch
 } from "./food-search-info";
 export {
@@ -57,5 +58,12 @@ export {
     toNextLunch,
     toNextMidnight,
     toTime,
-    toTimeInfo
+    toTimeInfo,
+    toLeftTime
 } from "./date-util";
+export {
+    toDistance
+} from "./location-util";
+export {
+    type IFoodPostData
+} from "./food-post";

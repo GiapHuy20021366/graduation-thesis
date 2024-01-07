@@ -3,7 +3,7 @@ import { v4 as uuid4 } from "uuid";
 import { USER_SERVICE_RPC_QUEUE, RPC_REQUEST_TIME_OUT } from "../config";
 import { getChannel } from "./channel";
 import { RpcAction, RpcQueueName, RpcRequest, RpcResponse } from "../data";
-import { rpcGetUserInfo } from "~/services";
+import { rpcGetUserInfo } from "../services";
 
 export const RPCObserver = async () => {
   const channel = await getChannel();
@@ -14,6 +14,7 @@ export const RPCObserver = async () => {
   channel.consume(
     USER_SERVICE_RPC_QUEUE,
     async (msg: ConsumeMessage | null) => {
+      console.log(msg);
       if (msg != null) {
         const request = JSON.parse(msg.content.toString()) as RpcRequest;
 

@@ -1,5 +1,6 @@
 import {
   Box,
+  Divider,
   IconButton,
   ImageList,
   ImageListItem,
@@ -70,7 +71,17 @@ export default function FoodImagesContainer({
   };
 
   return (
-    <Box>
+    <Box
+      sx={{
+        border: "1px solid #bdbdbd",
+        borderRadius: "4px",
+        padding: "8px",
+        width: "100%",
+        boxSizing: "border-box",
+      }}
+    >
+      <Box component="h4">Images</Box>
+      <Divider />
       <ImageList cols={4} rowHeight={164}>
         {images.map((image: IImageExposed | null, index: number) => {
           return (

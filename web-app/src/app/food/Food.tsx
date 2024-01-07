@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
-import PageNotFound from "../common/PageNotFound";
 import FoodSharingPage from "./sharing/FoodSharingPage";
 import FoodSearchPage from "./search/FoodSearchPage";
+import FoodPost from "./post/FoodPost";
 
 export default function Food() {
   return (
@@ -9,7 +9,7 @@ export default function Food() {
       <Route path="/" element={<FoodSharingPage />} />
       <Route path="/sharing" element={<FoodSharingPage />} />
       <Route path="/search" element={<FoodSearchPage />} />
-      <Route path="*" element={<PageNotFound />} />
+      <Route path="/:id" element={<FoodPost />} />
     </Routes>
   );
 }

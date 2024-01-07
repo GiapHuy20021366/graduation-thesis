@@ -28,6 +28,7 @@ interface IFoodSharingFormContext {
   duration: string;
   quantity: number;
   title: string;
+  description: string;
 
   setImages: Dispatch<SetStateAction<(IImageExposed | null)[]>>;
   setCategories: Dispatch<SetStateAction<FoodCategory[]>>;
@@ -38,6 +39,7 @@ interface IFoodSharingFormContext {
   setDuration: Dispatch<SetStateAction<string>>;
   setQuantity: Dispatch<SetStateAction<number>>;
   setTitle: Dispatch<SetStateAction<string>>;
+  setDescription: Dispatch<SetStateAction<string>>;
 }
 
 export const FoodSharingFormContext = createContext<IFoodSharingFormContext>({
@@ -54,6 +56,7 @@ export const FoodSharingFormContext = createContext<IFoodSharingFormContext>({
   price: 0,
   quantity: toQuantityLevel(QuantityType.TOTAL_GOOD),
   title: "",
+  description: "",
 
   setCategories: () => {},
   setDuration: () => {},
@@ -64,6 +67,7 @@ export const FoodSharingFormContext = createContext<IFoodSharingFormContext>({
   setPrice: () => {},
   setQuantity: () => {},
   setTitle: () => {},
+  setDescription: () => {}
 });
 
 export default function FoodSharingFormContextProvider({
@@ -87,6 +91,7 @@ export default function FoodSharingFormContextProvider({
     toQuantityLevel(QuantityType.TOTAL_GOOD)
   );
   const [title, setTitle] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
 
   const setLocationName = (name: string) => {
     setLocation({
@@ -140,7 +145,9 @@ export default function FoodSharingFormContextProvider({
         title,
         setTitle,
         setLocationName,
-        setCoordinates
+        setCoordinates,
+        description,
+        setDescription
       }}
     >
       {children}

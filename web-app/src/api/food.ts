@@ -12,12 +12,14 @@ import {
     IAuthInfo,
     IFoodUploadData,
     IFoodSearchInfo,
-    fakeOneFoodSearch
+    fakeOneFoodSearch,
+    IFoodPostData
 } from '../data';
 
 export const foodEndpoints = {
     uploadImages: "/images/upload",
-    uploadFood: "/foods/upload"
+    uploadFood: "/foods/upload",
+    findFoodPost: "/foods"
 } as const;
 
 export interface FoodResponseError extends ResponseErrorLike<FoodErrorTarget, FoodErrorReason> { }
@@ -44,7 +46,8 @@ interface IFoodUploadResponseData {
 export interface FoodFetcher {
     uploadImage(name: string, base64: string, auth: IAuthInfo): Promise<FoodResponse<IImageExposed[]>>;
     uploadFood(data: IFoodUploadData, auth: IAuthInfo): Promise<FoodResponse<IFoodUploadResponseData>>;
-    searchFood(): Promise<FoodResponse<IFoodSearchInfo[]>>
+    searchFood(): Promise<FoodResponse<IFoodSearchInfo[]>>;
+    findFoodPost(id: string, auth: IAuthInfo): Promise<FoodResponse<IFoodPostData>>;
 }
 
 export const foodFetcher: FoodFetcher = {
@@ -81,5 +84,15 @@ export const foodFetcher: FoodFetcher = {
         return {
             data: data
         };
+    },
+    findFoodPost: async (id: string, auth: IAuthInfo): Promise<FoodResponse<IFoodPostData>> => {
+        return foodInstance.get(
+            `${foodEndpoints.findFoodPost}/${id}`,
+            {
+                headers: {
+                    Authorization: auth.token
+                }
+            }
+        )
     }
 };

@@ -14,13 +14,22 @@ declare module '@mui/material/styles' {
     }
 }
 
+export const breakPoints = {
+    mobile: 0,
+    tablet: 640,
+    laptop: 1024,
+    desktop: 1280
+} as const;
+
+export type BreakPoint = typeof breakPoints[keyof typeof breakPoints];
+
 export const globalTheme = createTheme({
     breakpoints: {
         values: {
-            mobile: 0,
-            tablet: 640,
-            laptop: 1024,
-            desktop: 1280,
+            mobile: breakPoints.mobile,
+            tablet: breakPoints.tablet,
+            laptop: breakPoints.laptop,
+            desktop: breakPoints.desktop,
         }
     }
 })

@@ -1,5 +1,11 @@
-import { Autocomplete, Box, Divider, TextField } from "@mui/material";
-import { useRef } from "react";
+import {
+  Autocomplete,
+  Box,
+  Divider,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { useState } from "react";
 import CategoryPiece from "./CategoryPiece";
 import { FoodCategory } from "../../../data";
 import { useI18nContext } from "../../../hooks";
@@ -16,14 +22,21 @@ interface CategoryOption {
   value: string;
 }
 
+const toCategoryOption = (
+  category: FoodCategory,
+  lang: I18Resolver
+): CategoryOption => {
+  return {
+    key: category,
+    value: lang(category),
+  };
+};
+
 const toCategoryOptions = (
   categories: FoodCategory[],
   lang: I18Resolver
 ): CategoryOption[] => {
-  return categories.map((category) => ({
-    key: category,
-    value: lang(category),
-  }));
+  return categories.map((category) => toCategoryOption(category, lang));
 };
 
 export default function FoodCategoryPicker({
@@ -35,20 +48,22 @@ export default function FoodCategoryPicker({
   const lang = i18nContext.of(FoodCategoryPicker);
   const displayCategories = toCategoryOptions(categories, lang);
   const options = toCategoryOptions(Object.keys(FoodCategory), lang);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [valueCategory, setValueCategory] = useState<CategoryOption>(
+    toCategoryOption(FoodCategory.EMPTY, lang)
+  );
+  const [inputCategory, setInputCategory] = useState<string>(
+    FoodCategory.EMPTY
+  );
 
   const handleChange = (
     _event: React.SyntheticEvent<Element, Event>,
     value: FoodCategory | undefined
   ) => {
-    if (value != null) {
+    if (value != null && value !== FoodCategory.EMPTY) {
       !categories.includes(value) && onPicked && onPicked(value);
     }
-    const input = inputRef.current;
-    if (input) {
-      input.value = "";
-      console.log(input);
-    }
+    setInputCategory(FoodCategory.EMPTY);
+    setValueCategory(toCategoryOption(FoodCategory.EMPTY, lang));
   };
 
   return (
@@ -62,6 +77,10 @@ export default function FoodCategoryPicker({
       }}
     >
       <Box component="h4">Category</Box>
+      <Typography>
+        Help every body looking easily by providing category of your sharing
+        food!
+      </Typography>
       <Divider />
       <Box padding={"1rem 0"}>
         {displayCategories.map((category, index) => {
@@ -76,13 +95,17 @@ export default function FoodCategoryPicker({
       </Box>
       <Autocomplete
         options={options}
+        value={valueCategory}
         onChange={(event, value) => handleChange(event, value?.key)}
         openOnFocus={true}
-        filterOptions={(options) =>
-          options.filter(
-            (option) => option.value.indexOf(inputRef.current?.value ?? "") >= 0
-          )
-        }
+        inputValue={inputCategory}
+        onInputChange={(_event, value) => setInputCategory(value)}
+        filterOptions={(options, state) => {
+          state.inputValue;
+          return options.filter(
+            (option) => option.value.indexOf(inputCategory) >= 0
+          );
+        }}
         isOptionEqualToValue={(option, value) => option.key === value.key}
         getOptionLabel={(option) => option.value}
         renderInput={(params) => (
@@ -91,7 +114,6 @@ export default function FoodCategoryPicker({
             label="Search"
             variant="standard"
             fullWidth
-            inputRef={inputRef}
             InputProps={{
               ...params.InputProps,
               endAdornment: <>{params.InputProps.endAdornment}</>,

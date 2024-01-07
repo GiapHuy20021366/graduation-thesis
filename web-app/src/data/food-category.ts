@@ -6,7 +6,8 @@ export const FoodCategory = {
     PROCESSED_FOODS: "PROCESSED_FOODS",
     SALADS: "SALADS",
     BEVERAGES: "BEVERAGES",
-    SEAFOOD: "SEAFOOD"
+    SEAFOOD: "SEAFOOD",
+    EMPTY: ""
 }
 
 export type FoodCategory = typeof FoodCategory[keyof typeof FoodCategory];

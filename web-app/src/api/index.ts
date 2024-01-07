@@ -3,7 +3,12 @@ export {
 } from "./user";
 
 export {
-    foodFetcher
+    foodFetcher,
+    type FoodFetcher,
+    type FoodResponse,
+    type FoodResponseError,
+    foodEndpoints,
+    foodInstance
 } from "./food";
 
 export {

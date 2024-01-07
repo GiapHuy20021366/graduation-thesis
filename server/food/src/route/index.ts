@@ -1,6 +1,6 @@
 import express, { Express } from "express";
 import { errorHandler, tokenParser } from "../middlewares";
-import { postFood, uploadImages } from "../controllers";
+import { findFoodPost, postFood, uploadImages } from "../controllers";
 
 const userRouter = express.Router();
 
@@ -12,6 +12,7 @@ export const initUserRouters = (app: Express): void => {
     userRouter.post("/images/upload", tokenParser, uploadImages);
 
     userRouter.post("/foods/upload", tokenParser, postFood);
+    userRouter.get("/foods/:id", tokenParser, findFoodPost);
 
     userRouter.use(errorHandler);
     app.use("/", userRouter);

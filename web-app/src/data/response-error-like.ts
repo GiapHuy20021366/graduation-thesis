@@ -1,6 +1,6 @@
 export interface ResponseErrorLike<Target, Reason> {
     code: number;
-    msg: string;
+    message: string;
     data?: {
         target: Target;
         reason: Reason;

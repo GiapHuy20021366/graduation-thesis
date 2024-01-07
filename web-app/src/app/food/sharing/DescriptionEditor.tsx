@@ -1,6 +1,4 @@
-import {
-  ExpandMore,
-} from "@mui/icons-material";
+import { ExpandMore } from "@mui/icons-material";
 import {
   Accordion,
   AccordionDetails,
@@ -18,13 +16,9 @@ import {
   MenuDivider,
   MenuSelectHeading,
   RichTextEditor,
-  type RichTextEditorRef,
 } from "mui-tiptap";
 import { useState } from "react";
-
-interface IDescriptionEditorProps {
-  editorRef?: React.RefObject<RichTextEditorRef>;
-}
+import { useFoodSharingFormContext } from "../../../hooks";
 
 const EditMode = {
   HIDE: "HIDE",
@@ -34,10 +28,10 @@ const EditMode = {
 
 export type EditMode = (typeof EditMode)[keyof typeof EditMode];
 
-export default function DescriptionEditor({
-  editorRef,
-}: IDescriptionEditorProps) {
+export default function DescriptionEditor() {
   const [editable, setEditable] = useState<EditMode>(EditMode.EDIT);
+  const form = useFoodSharingFormContext();
+  const { setDescription } = form;
 
   return (
     <Box spellCheck={false}>
@@ -50,7 +44,7 @@ export default function DescriptionEditor({
               margin: 0,
               ">.Mui-expanded": {
                 margin: 0,
-              }
+              },
             },
           }}
         >
@@ -64,10 +58,10 @@ export default function DescriptionEditor({
           }}
         >
           <RichTextEditor
-            ref={editorRef}
             extensions={[StarterKit]}
             content="Description"
             spell-check={false}
+            onUpdate={({ editor }) => setDescription(editor.getHTML())}
             renderControls={() => (
               <Box>
                 {

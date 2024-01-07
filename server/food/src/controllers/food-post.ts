@@ -1,16 +1,19 @@
 import { NextFunction, Request, Response } from "express";
 import {
 	AuthLike,
+	InvalidDataError,
 	isAllNotEmptyString,
 	isLocation,
 	isNotEmptyString,
 	isNumber,
+	isObjectId,
 	throwErrorIfInvalidFormat,
 	throwErrorIfNotFound,
 	toResponseSuccessData,
 } from "../data";
 import {
-	postFood as postFoodService
+	postFood as postFoodService,
+	findFoodPostById
 } from "../services";
 
 interface IPostFoodBody {
@@ -59,11 +62,11 @@ const validatePostFoodBody = (data: IPostFoodBody): void => {
 		[isAllNotEmptyString]
 	);
 
-	throwErrorIfInvalidFormat(
-		"description",
-		description,
-		[isNotEmptyString]
-	);
+	// throwErrorIfInvalidFormat(
+	// 	"description",
+	// 	description,
+	// 	[isNotEmptyString]
+	// );
 
 	throwErrorIfInvalidFormat(
 		"duration",
@@ -83,11 +86,11 @@ const validatePostFoodBody = (data: IPostFoodBody): void => {
 		[isNumber]
 	);
 
-	throwErrorIfInvalidFormat(
-		"title",
-		title,
-		[isNotEmptyString]
-	);
+	// throwErrorIfInvalidFormat(
+	// 	"title",
+	// 	title,
+	// 	[isNotEmptyString]
+	// );
 
 };
 
@@ -125,3 +128,34 @@ export const postFood = async (
 	}).then(data => res.status(200).json(toResponseSuccessData(data)))
 		.catch(next);
 };
+
+export const findFoodPost = async (
+	req: Request<{ id?: string }, {}, {}, {}>,
+	res: Response,
+	next: NextFunction
+) => {
+	const id = req.params.id;
+	if (id == null || id.length === 0) {
+		return next(new InvalidDataError({
+			message: "Invalid food id",
+			data: {
+				target: "id",
+				reason: "invalid"
+			}
+		}))
+	}
+
+	if (!isObjectId(id)) {
+		return next(new InvalidDataError({
+			message: "Invalid id format",
+			data: {
+				target: "id",
+				reason: "invalid"
+			}
+		}))
+	}
+
+	findFoodPostById(id)
+		.then(data => res.status(200).send(toResponseSuccessData(data)))
+		.catch(next);
+}

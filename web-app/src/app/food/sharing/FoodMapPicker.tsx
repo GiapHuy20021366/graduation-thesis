@@ -105,7 +105,15 @@ const FoodMapPicker = memo(() => {
 
 
   return (
-    <Box>
+    <Box
+      sx={{
+        border: "1px solid #bdbdbd",
+        borderRadius: "4px",
+        padding: "8px",
+        width: "100%",
+        boxSizing: "border-box",
+      }}
+    >
       <Stack
         direction="row"
         sx={{

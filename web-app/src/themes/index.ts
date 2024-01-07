@@ -1,1 +1,1 @@
-export { globalTheme } from "./global-theme";
+export { globalTheme, type BreakPoint, breakPoints } from "./global-theme";

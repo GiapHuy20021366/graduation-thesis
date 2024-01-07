@@ -1,3 +1,5 @@
-export default function Post() {
-  return <>Post</>;
+import FoodPostPage from "./FoodPostPage";
+
+export default function FoodPost() {
+  return <FoodPostPage />;
 }

@@ -1,2 +1,2 @@
 export { uploadImages } from "./image";
-export { postFood } from "./food-post";
+export { postFood, findFoodPost } from "./food-post";

@@ -1,8 +1,6 @@
 import {
   Box,
   Button,
-  Divider,
-  FormControl,
   InputAdornment,
   MenuItem,
   Rating,
@@ -15,12 +13,15 @@ import {
   TextField,
 } from "@mui/material";
 import FoodImagesContainer from "./FoodImagesContainer";
-import { useRef, useState } from "react";
-import { foodFetcher } from "../../../api";
+import { useState } from "react";
+import { foodFetcher, FoodResponseError } from "../../../api";
 import {
   useAuthContext,
   useFoodSharingFormContext,
   useI18nContext,
+  useLoading,
+  usePageProgessContext,
+  useToastContext,
 } from "../../../hooks";
 import {
   DurationType,
@@ -33,10 +34,10 @@ import {
 } from "../../../data";
 import { useNavigate } from "react-router";
 import DescriptionEditor from "./DescriptionEditor";
-import { RichTextEditorRef } from "mui-tiptap";
 import FoodCategoryPicker from "./FoodCategoryPicker";
 import FoodMapPicker from "./FoodMapPicker";
 import FoodSharingNavigator from "./FoodSharingNavigator";
+import FoodPrice from "./FoodPrice";
 
 const FormPage = {
   PAGE_FIRST: 0,
@@ -55,31 +56,39 @@ type FormStepLable = (typeof FormStepLable)[keyof typeof FormStepLable];
 const steps: FormStepLable[] = [
   FormStepLable.FIRST,
   FormStepLable.SECOND,
-  FormStepLable.LAST,
+  // FormStepLable.LAST,
 ];
 
 export default function FoodSharingForm() {
   const formContext = useFoodSharingFormContext();
   const {
     images,
-    categories, setCategories,
-    duration, setDuration,
+    categories,
+    setCategories,
+    duration,
+    setDuration,
     location,
-    price, setPrice,
-    quantity, setQuantity,
-    title, setTitle,
+    price,
+    quantity,
+    setQuantity,
+    title,
+    setTitle,
+    description
   } = formContext;
-  
+
   const [hover, setHover] = useState<number>(-1);
   const [durationType, setDurationType] = useState<DurationType>(
     DurationType.UNTIL_MIDNIGHT
   );
-  const descriptionEditorRef = useRef<RichTextEditorRef>(null);
   const languageContext = useI18nContext();
   const lang = languageContext.of(FoodSharingForm);
   const authContext = useAuthContext();
   const auth = authContext.auth;
   const navigate = useNavigate();
+
+  const callingApi = useLoading();
+  const progess = usePageProgessContext();
+  const toast = useToastContext();
 
   const handleCategoryPicked = (category: FoodCategory) => {
     const newCategories = [...categories, category];
@@ -96,11 +105,11 @@ export default function FoodSharingForm() {
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (callingApi.isActice) return;
 
     const imageUrls = images
       .filter((img) => img != null)
       .map((img) => img!.url);
-    const description = descriptionEditorRef.current?.editor?.getHTML() ?? "";
     const durationInDate = convertStringToDate(duration);
 
     const foodUploadData: IFoodUploadData = {
@@ -113,11 +122,28 @@ export default function FoodSharingForm() {
       title: title,
       location: location,
     };
+    console.log(foodUploadData);
     if (auth) {
       console.log(foodUploadData);
+      callingApi.active();
+      progess.start();
+
       foodFetcher
         .uploadFood(foodUploadData, auth)
-        .then((data) => navigate(`/food/${data.data?._id}`, { replace: true }));
+        .then((data) => navigate(`/food/${data.data?._id}`, { replace: true }))
+        .catch((error) => {
+          const data = error?.data;
+          if (data != null) {
+            const foodErr = error as FoodResponseError;
+            toast.error(foodErr.message);
+          } else {
+            toast.error("Server not response");
+          }
+        })
+        .finally(() => {
+          callingApi.deactive();
+          progess.end();
+        });
     }
   };
 
@@ -179,7 +205,9 @@ export default function FoodSharingForm() {
                 key={label}
                 sx={{
                   display: [mobileDisplay, "block", "block", "block"],
+                  cursor: "pointer",
                 }}
+                onClick={() => index < activeStep && setActiveStep(index)}
               >
                 <StepLabel>{lang(label)}</StepLabel>
               </Step>
@@ -199,25 +227,8 @@ export default function FoodSharingForm() {
       </Box>
       {activeStep === FormPage.PAGE_FIRST && (
         <Stack spacing={2}>
-          <FormControl
-            variant="outlined"
-            fullWidth
-            sx={{
-              border: "1px solid #bdbdbd",
-              borderRadius: "4px",
-              padding: "8px",
-              width: "100%",
-              boxSizing: "border-box",
-            }}
-          >
-            <Stack>
-              <Box component="h4">Images</Box>
-              <Divider />
-              <FoodImagesContainer
-                maxPicked={5}
-              />
-            </Stack>
-          </FormControl>
+          <FoodImagesContainer maxPicked={8} />
+
           <TextField
             label={lang("l-title")}
             type="text"
@@ -226,20 +237,11 @@ export default function FoodSharingForm() {
             placeholder="Tell everybody what you want to share"
             onChange={(event) => setTitle(event.target.value)}
           />
-          <DescriptionEditor editorRef={descriptionEditorRef} />
-          <FormControl
-            variant="outlined"
-            fullWidth
-            sx={{
-              border: "1px solid #bdbdbd",
-              borderRadius: "4px",
-              padding: "8px",
-              width: "100%",
-              boxSizing: "border-box",
-            }}
-          >
-            <FoodMapPicker />
-          </FormControl>
+
+          <DescriptionEditor/>
+
+          <FoodMapPicker />
+
           <TextField
             label={lang("l-duration")}
             variant="standard"
@@ -280,6 +282,7 @@ export default function FoodSharingForm() {
               ),
             }}
           />
+
           <Stack
             direction="row"
             sx={{
@@ -323,26 +326,23 @@ export default function FoodSharingForm() {
             onPicked={handleCategoryPicked}
             onRemoved={handleCategoryRemoved}
           />
-          <TextField
-            label={lang("l-cost")}
-            type="number"
-            variant="outlined"
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  {price ? "VNĐ" : "Free"}
-                </InputAdornment>
-              ),
-              inputProps: { min: 0 },
-              type: "number",
-              value: price,
-              onChange: (event) => setPrice(+event.target.value),
+
+          <FoodPrice />
+
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{
+              marginBottom: "1em",
             }}
-          />
+            fullWidth
+          >
+            Share now!
+          </Button>
         </Stack>
       )}
 
-      {activeStep === FormPage.PAGE_SUBMIT && (
+      {/* {activeStep === FormPage.PAGE_SUBMIT && (
         <Button
           type="submit"
           variant="contained"
@@ -353,7 +353,7 @@ export default function FoodSharingForm() {
         >
           Share now!
         </Button>
-      )}
+      )} */}
     </Box>
   );
 }

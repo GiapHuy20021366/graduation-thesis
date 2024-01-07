@@ -32,7 +32,7 @@ const foodPostSchema = new Schema<FoodPostDocument, IFoodPostModel, IFoodPostMet
     },
     title: {
         type: String,
-        required: true,
+        // required: true,
     },
     location: {
         name: String,
@@ -53,7 +53,7 @@ const foodPostSchema = new Schema<FoodPostDocument, IFoodPostModel, IFoodPostMet
     },
     description: {
         type: String,
-        required: true
+        // required: true
     },
     quantity: {
         type: Number,

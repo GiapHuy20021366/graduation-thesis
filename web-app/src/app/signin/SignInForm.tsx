@@ -15,11 +15,15 @@ import {
 import { Link as ReactRouterLink } from "react-router-dom";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useAuthContext, useI18nContext } from "../../hooks";
+import {
+  useAuthContext,
+  useI18nContext,
+  usePageProgessContext,
+  useToastContext,
+} from "../../hooks";
 import { userFetcher } from "../../api";
 import { userErrorReason, userErrorTarget } from "../../data";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-
 interface FormValues {
   email: string;
   password: string;
@@ -30,6 +34,8 @@ export default function SignInForm() {
   const languageContext = useI18nContext();
   const lang = languageContext.of(SignInForm);
   const [showPassword, setShowPassword] = useState(false);
+  const toastContext = useToastContext();
+  const progessContext = usePageProgessContext();
 
   const handleTogglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
@@ -63,6 +69,7 @@ export default function SignInForm() {
   const { errors } = formState;
 
   const onSubmit = (data: FormValues) => {
+    progessContext.start();
     userFetcher
       .manualLogin(data.email, data.password)
       .then((response) => {
@@ -90,11 +97,26 @@ export default function SignInForm() {
               }
               break;
           }
+        } else {
+          // Server not response
+          toastContext.error("Server not response", {
+            autoClose: 4000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
         }
+      })
+      .finally(() => {
+        progessContext.end();
       });
   };
 
   const handleCallbackResponse = (response: GoogleOAuthResponse) => {
+    progessContext.start();
     userFetcher
       .googleOAuthLogin(response.credential)
       .then((response) => {
@@ -103,7 +125,21 @@ export default function SignInForm() {
         auth.setAccount(account);
         auth.setToken(account?.token);
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        toastContext.error("Cannot login at this time", {
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        console.log(error);
+      })
+      .finally(() => {
+        progessContext.end();
+      });
   };
 
   useEffect(() => {
@@ -164,8 +200,8 @@ export default function SignInForm() {
           >
             <b>{lang("or")}</b>
           </Box>
-          <Stack>
-            <div id="google-oauth" />
+          <Stack alignItems="center">
+            <Box id="google-oauth" width="fit-content" />
           </Stack>
         </Container>
         <Container>

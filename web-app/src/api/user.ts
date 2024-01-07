@@ -28,8 +28,12 @@ export const userInstance = axios.create({
 });
 
 userInstance.interceptors.response.use(
-    response => response.data,
-    error => Promise.reject(error?.response?.data?.error)
+    (response) => response.data,
+    (error) => {
+        const errInfo = error?.response?.data?.error;
+        if (errInfo != null) return Promise.reject(errInfo);
+        else Promise.reject(error);
+    }
 );
 
 interface AccountInfo {

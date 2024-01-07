@@ -1,9 +1,10 @@
-export { 
-    saveImage, 
-    uploadImage, 
-    uploadImages 
+export {
+    saveImage,
+    uploadImage,
+    uploadImages
 } from "./image";
 
 export {
-    postFood
+    postFood,
+    findFoodPostById
 } from "./food-post";

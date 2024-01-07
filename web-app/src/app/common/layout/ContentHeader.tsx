@@ -36,7 +36,7 @@ export default function ContentHeader({
         margin: 0,
       }}
     >
-      <Stack direction="row" spacing={1}>
+      <Stack direction="row" spacing={1} alignItems="center">
         <SideBarOpener />
         {extensions &&
           extensions.map((extension, index) => {

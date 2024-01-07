@@ -1,6 +1,6 @@
 import { RPCRequest } from "../broker";
-import { IFoodPost, InternalError, RpcAction, RpcQueueName, RpcSource } from "../data";
-import { FoodPost } from "../db/model";
+import { IFoodPost, InternalError, ResourceNotExistedError, RpcAction, RpcQueueName, RpcSource } from "../data";
+import { FoodPost, FoodPostDocument } from "../db/model";
 
 interface IPostFoodData extends Omit<IFoodPost, 'user'> {
     user: string;
@@ -42,11 +42,32 @@ export const postFood = async (data: IPostFoodData): Promise<IPostFoodReturn> =>
             }
         })
     }
-    const foodPost = new FoodPost(data);
+    const user = rpcUser.data;
+    const foodPost = new FoodPost({
+        ...data,
+        user: {
+            _id: user._id,
+            exposeName: user.firstName + " " + user.lastName
+        }
+    });
     await foodPost.save();
     return {
         _id: foodPost._id,
         createdAt: foodPost.createdAt,
         updatedAt: foodPost.updatedAt,
     }
-} 
+}
+
+export const findFoodPostById = async (id: string): Promise<FoodPostDocument> => {
+    const foodPost = await FoodPost.findById(id);
+    if (foodPost == null) {
+        throw new ResourceNotExistedError({
+            message: `No food post with id ${id} found`,
+            data: {
+                target: "id",
+                reason: "not-found"
+            }
+        })
+    }
+    return foodPost;
+}

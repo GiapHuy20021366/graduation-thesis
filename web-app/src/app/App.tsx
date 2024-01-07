@@ -7,54 +7,54 @@ import AppContent from "./AppContent";
 import IsAuthenticated from "./common/auth/IsAuthenticated";
 import PageNotFound from "./common/PageNotFound";
 import Verify from "./verify/Verify";
-import ToastifyUtil from "./common/util/ToastifyUtil";
 import I18nContextProvider from "./I18nContext";
+import ToastContextProvider from "./ToastContext";
+import PageProgessContextProvider from "./PageProgessContext";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
     <I18nContextProvider>
-      <AuthContextProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route
-              path="/*"
-              element={
-                <IsAuthenticated>
-                  <AppContent />
-                </IsAuthenticated>
-              }
-            />
-            <Route
-              path="/signin"
-              element={
-                <IsNotAuthenticated>
-                  <SignIn />
-                </IsNotAuthenticated>
-              }
-            />
+      <PageProgessContextProvider>
+        <AuthContextProvider>
+          <ToastContextProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route
+                  path="/*"
+                  element={
+                    <IsAuthenticated>
+                      <AppContent />
+                    </IsAuthenticated>
+                  }
+                />
+                <Route
+                  path="/signin"
+                  element={
+                    <IsNotAuthenticated>
+                      <SignIn />
+                    </IsNotAuthenticated>
+                  }
+                />
 
-            <Route
-              path="/signup"
-              element={
-                <IsNotAuthenticated>
-                  <SignUp />
-                </IsNotAuthenticated>
-              }
-            />
+                <Route
+                  path="/signup"
+                  element={
+                    <IsNotAuthenticated>
+                      <SignUp />
+                    </IsNotAuthenticated>
+                  }
+                />
 
-            <Route path="/verify/*" element={<Verify />} />
+                <Route path="/verify/*" element={<Verify />} />
 
-            <Route path="/error/page-wrong" element={<PageNotFound />} />
-            <Route path="*" element={<PageNotFound />} />
-          </Routes>
-        </BrowserRouter>
-
-        {/* Utils */}
-        <>
-          <ToastifyUtil />
-        </>
-
-      </AuthContextProvider>
+                <Route path="/error/page-wrong" element={<PageNotFound />} />
+                <Route path="*" element={<PageNotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </ToastContextProvider>
+        </AuthContextProvider>
+      </PageProgessContextProvider>
     </I18nContextProvider>
   );
 }
