@@ -3,6 +3,7 @@ import {
   ArrowForwardIosOutlined,
 } from "@mui/icons-material";
 import { Button, Stack } from "@mui/material";
+import { useI18nContext } from "../../../hooks";
 
 interface IFoodSharingNavigator {
   prev: {
@@ -16,6 +17,8 @@ interface IFoodSharingNavigator {
 }
 
 export default function FoodSharingNavigator({prev, next}:  IFoodSharingNavigator) {
+  const i18n = useI18nContext();
+  const lang = i18n.of(FoodSharingNavigator);
   return (
     <Stack
       direction="row"
@@ -33,7 +36,7 @@ export default function FoodSharingNavigator({prev, next}:  IFoodSharingNavigato
         onClick={prev.onClick}
         disabled={!prev.active}
       >
-        Back
+        {lang("back")}
       </Button>
       <Button
         variant="text"
@@ -44,7 +47,7 @@ export default function FoodSharingNavigator({prev, next}:  IFoodSharingNavigato
         onClick={next.onClick}
         disabled={!next.active}
       >
-        Next
+        {lang("next")}
       </Button>
     </Stack>
   );

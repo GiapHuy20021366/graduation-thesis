@@ -45,9 +45,9 @@ export default function FoodCategoryPicker({
   onRemoved,
 }: IFoodCategoryPicker) {
   const i18nContext = useI18nContext();
-  const lang = i18nContext.of(FoodCategoryPicker);
+  const lang = i18nContext.of(FoodCategoryPicker, "Categories");
   const displayCategories = toCategoryOptions(categories, lang);
-  const options = toCategoryOptions(Object.keys(FoodCategory), lang);
+  const options = toCategoryOptions(Object.values(FoodCategory), lang);
   const [valueCategory, setValueCategory] = useState<CategoryOption>(
     toCategoryOption(FoodCategory.EMPTY, lang)
   );
@@ -76,11 +76,8 @@ export default function FoodCategoryPicker({
         boxSizing: "border-box",
       }}
     >
-      <Box component="h4">Category</Box>
-      <Typography>
-        Help every body looking easily by providing category of your sharing
-        food!
-      </Typography>
+      <Box component="h4">{lang("category")}</Box>
+      <Typography>{lang("category-body")}</Typography>
       <Divider />
       <Box padding={"1rem 0"}>
         {displayCategories.map((category, index) => {
@@ -103,7 +100,9 @@ export default function FoodCategoryPicker({
         filterOptions={(options, state) => {
           state.inputValue;
           return options.filter(
-            (option) => option.value.indexOf(inputCategory) >= 0
+            (option) =>
+              option.value.indexOf(inputCategory) >= 0 &&
+              option.key !== FoodCategory.EMPTY
           );
         }}
         isOptionEqualToValue={(option, value) => option.key === value.key}
@@ -111,7 +110,8 @@ export default function FoodCategoryPicker({
         renderInput={(params) => (
           <TextField
             {...params}
-            label="Search"
+            label={lang("l-search")}
+            placeholder={lang("search-placeholder")}
             variant="standard"
             fullWidth
             InputProps={{

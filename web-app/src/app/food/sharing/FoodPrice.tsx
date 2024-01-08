@@ -57,14 +57,12 @@ export default function FoodPrice() {
         boxSizing: "border-box",
       }}
     >
-      <Box component="h4">Price</Box>
-      <Typography>
-        Help every body known the price of your sharing food!
-      </Typography>
+      <Box component="h4">{lang("price")}</Box>
+      <Typography>{lang("price-description")}</Typography>
       <Divider />
       <Stack direction="row" alignItems="center" gap={1} mt={1}>
         <Select
-          label={lang("l-cost")}
+          label={lang("l-price")}
           variant="standard"
           disableUnderline={true}
           displayEmpty={true}
@@ -75,7 +73,7 @@ export default function FoodPrice() {
           }}
           ref={selectRef}
         >
-          <MenuItem value={0}>FREE</MenuItem>
+          <MenuItem value={0}>{lang("FREE")}</MenuItem>
           <MenuItem value={9999}>{lang("9 999 VNĐ")}</MenuItem>
           <MenuItem value={29999}>{lang("29 999 VNĐ")}</MenuItem>
           <MenuItem value={49999}>{lang("49 999 VNĐ")}</MenuItem>

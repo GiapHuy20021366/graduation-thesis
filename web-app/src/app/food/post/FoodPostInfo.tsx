@@ -53,7 +53,12 @@ interface IFoodPostInfoDataDisplayProps {
 
 function FoodPostInfoDataDisplay({ data }: IFoodPostInfoDataDisplayProps) {
   const i18n = useI18nContext();
-  const lang = i18n.of(FoodPostInfoDataDisplay);
+  const lang = i18n.of(
+    FoodPostInfoDataDisplay,
+    "Commons",
+    "Categories",
+    "Quantities"
+  );
   const navigate = useNavigate();
   return (
     <FullWidthBox>
@@ -75,8 +80,9 @@ function FoodPostInfoDataDisplay({ data }: IFoodPostInfoDataDisplayProps) {
                 width: "100%",
                 height: "260px",
               }}
+              key={url}
             >
-              <img src={url} loading="lazy" width={"100%"} key={url}/>
+              <img src={url} loading="lazy" width={"100%"} />
             </Box>
           );
         })}
@@ -90,7 +96,7 @@ function FoodPostInfoDataDisplay({ data }: IFoodPostInfoDataDisplayProps) {
         p={1}
       >
         <Box component={"h4"} textTransform={"capitalize"} sx={{ mb: 2 }}>
-          {data.title || "This food has no title"}
+          {data.title || lang("no-title")}
         </Box>
         <Stack direction="row">
           <Typography>{toDistance(data.location.coordinates)} kms</Typography>
@@ -123,7 +129,9 @@ function FoodPostInfoDataDisplay({ data }: IFoodPostInfoDataDisplayProps) {
           </Stack>
         </Stack>
         <Stack direction={"row"} alignItems={"center"}>
-          <Typography>{data.price ? `đ ${data.price}` : "Free"}</Typography>
+          <Typography>
+            {data.price ? `đ ${data.price}` : lang("free")}
+          </Typography>
           <TimelapseOutlined
             color="info"
             sx={{
@@ -133,7 +141,7 @@ function FoodPostInfoDataDisplay({ data }: IFoodPostInfoDataDisplayProps) {
           <CountDown time={data.duration} sx={{ ml: 1 }} />
         </Stack>
         <Stack direction="row" alignItems={"center"}>
-          <Typography>Quantity: </Typography>
+          <Typography>{lang("quantity")}: </Typography>
           <Rating
             value={data.quantity}
             sx={{
@@ -153,14 +161,20 @@ function FoodPostInfoDataDisplay({ data }: IFoodPostInfoDataDisplayProps) {
         </Stack>
       </Stack>
       <Stack sx={{ backgroundColor: "white", my: 2 }} minHeight={100} p={1}>
-        <Box component={"h4"}>Thể loại của thực phẩm</Box>
+        <Box component={"h4"}>{lang("category")}</Box>
         <Divider />
         {data.categories.length === 0 && (
-          <Typography>Sản phẩm này không có thể loại</Typography>
+          <Typography>{lang("no-category")}</Typography>
         )}
         <Stack my={1} direction={"row"} gap={1}>
           {data.categories.map((category) => {
-            return <Chip label={category} sx={{ width: "fit-content" }} key={category}/>;
+            return (
+              <Chip
+                label={lang(category)}
+                sx={{ width: "fit-content", cursor: "pointer" }}
+                key={category}
+              />
+            );
           })}
         </Stack>
       </Stack>
@@ -188,12 +202,12 @@ function FoodPostInfoDataDisplay({ data }: IFoodPostInfoDataDisplayProps) {
       </Stack>
 
       <Stack sx={{ backgroundColor: "white" }} minHeight={100} p={1}>
-        <Box component={"h4"}>Mô tả sản phẩm</Box>
+        <Box component={"h4"}>{lang("description")}</Box>
         <Divider />
         {data.description ? (
-          <Box>Description</Box>
+          <Box>{data.description}</Box>
         ) : (
-          <Typography>Sản phẩm này không có mô tả</Typography>
+          <Typography>{lang("no-description")}</Typography>
         )}
       </Stack>
     </FullWidthBox>

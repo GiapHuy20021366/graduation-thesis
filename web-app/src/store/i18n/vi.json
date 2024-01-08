@@ -97,12 +97,36 @@
         "METER": "Mét",
         "CENTIMETER": "Centimet",
         "l-quantity": "Chất lượng",
+        "l-cost": "Giá",
+        "LABLE_FIRST": "Thông tin cơ bản",
+        "LABLE_SECOND": "Hoàn thiện",
+        "LABLE_LAST": "Hoàn tất",
+        "title-placeholder": "Bạn muốn chia sẻ thực phẩm nào đến mọi người",
+        "share-now": "Chia sẻ ngay bây giờ"
+    },
+    "Quantities": {
         "PRETTY_GOOD": "Siêu tốt",
-
-
-        "l-cost": "Giá"
+        "TOTAL_GOOD": "Tốt",
+        "SEEM_GOOD": "Có vẻ tốt",
+        "USABLE": "Có thể sử dụng",
+        "SEEM_USABLE": "Còn sử dụng",
+        "UNKNOWN": "Không xác định"
+    },
+    "Durations": {
+        "ONE_DAY": "1 ngày",
+        "TWO_DAYS": "2 ngày",
+        "THREE_DAYS": "3 ngày",
+        "UNTIL_MIDNIGHT": "Cho đến nửa đêm",
+        "CUSTOM": "Tùy chỉnh",
+        "UNTIL_LUNCH": "Cho đến trưa"
     },
     "FoodCategoryPicker": {
+        "category": "Loại thực phẩm",
+        "category-body": "Giúp mọi người tìm kiếm một cách dễ dàng hơn bằng cách cho biết chủ đề thực phẩm bạn muốn chia sẻ.",
+        "l-search": "Tìm kiếm",
+        "search-placeholder": "Tìm kiếm nhãn thực phẩm"
+    },
+    "Categories": {
         "VEGETABLES": "Rau củ",
         "FRUITS": "Hoa quả",
         "GAINS_AND_CEREALS": "Ngũ cốc",
@@ -111,5 +135,47 @@
         "SALADS": "Rau sống",
         "BEVERAGES": "Đồ uống",
         "SEAFOOD": "Hải sản"
+    },
+    "CountDown": {
+        "days": "Ngày",
+        "left": "còn lại"
+    },
+    "DescriptionEditor": {
+        "description": "Mô tả",
+        "edit": "Chỉnh sửa",
+        "preview": "Xem"
+    },
+    "FoodImagesContainer": {
+        "images": "Hình ảnh thực phẩm",
+        "at-least-message": "Bạn cần chọn ít nhất một hình ảnh",
+        "error-retry": "Vui lòng thử lại"
+    },
+    "FoodMapPicker": {
+        "location": "Vị trí",
+        "map-picker": "Chọn địa điểm",
+        "loading": "Đang tìm kiếm",
+        "close": "Đóng"
+    },
+    "FoodPrice": {
+        "price": "Giá cả",
+        "price-description": "Giúp mọi người biết ý định chia sẻ của bạn bằng cách cung cấp thông tin về giá cả.",
+        "l-price": "Giá cả",
+        "CUSTOM": "Khác",
+        "FREE": "Miễn phí"
+    },
+    "FoodSharingNavigator": {
+        "next": "Tiếp theo",
+        "back": "Quay lại"
+    },
+    "Commons": {
+        "quantity": "Chất lượng",
+        "category": "Thể loại thực phẩm"
+    },
+    "FoodPostInfoDataDisplay": {
+        "no-title": "Thực phẩm này không có tiêu đề",
+        "free": "Miễn phí",
+        "no-category": "Thực phẩm này không có thể loại",
+        "description": "Mô tả thực phẩm",
+        "no-description": "Thực phẩm này không có mô tả"
     }
 }

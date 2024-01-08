@@ -31,7 +31,7 @@
     }
   ],
   "files": [
-    "global.ts", "./src/app/food/post/FoodPostInfoDataDisplay.tsx",
+    "global.ts",
   ],
   "exclude": [
     "node_modules"

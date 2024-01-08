@@ -10,7 +10,12 @@ import {
 import ImagePicker from "./ImagePicker";
 import { ClearOutlined } from "@mui/icons-material";
 import { IImageExposed } from "../../../data";
-import { useAuthContext, useFoodSharingFormContext } from "../../../hooks";
+import {
+  useAuthContext,
+  useFoodSharingFormContext,
+  useI18nContext,
+  useToastContext,
+} from "../../../hooks";
 import { foodFetcher } from "../../../api";
 
 interface IFoodImagesContainerProps {
@@ -35,6 +40,9 @@ export default function FoodImagesContainer({
 
     reader.readAsDataURL(image);
   };
+  const i18n = useI18nContext();
+  const lang = i18n.of(FoodImagesContainer);
+  const toast = useToastContext();
 
   const handleImagePicked = (image: string): void => {
     const index = images.length;
@@ -58,6 +66,7 @@ export default function FoodImagesContainer({
           console.log(error);
           const imgsToSet = newImages.slice(0, -1);
           setImages(imgsToSet);
+          toast.error(lang("error-retry"))
         });
     }
   };
@@ -80,7 +89,7 @@ export default function FoodImagesContainer({
         boxSizing: "border-box",
       }}
     >
-      <Box component="h4">Images</Box>
+      <Box component="h4">{lang("images")}</Box>
       <Divider />
       <ImageList cols={4} rowHeight={164}>
         {images.map((image: IImageExposed | null, index: number) => {
@@ -134,9 +143,7 @@ export default function FoodImagesContainer({
         )}
       </ImageList>
       {images.length === 0 && (
-        <Typography component="legend">
-          You need to pick at least one image
-        </Typography>
+        <Typography component="legend">{lang("at-least-message")}</Typography>
       )}
     </Box>
   );

@@ -27,6 +27,7 @@ export default function SideBar() {
         anchor="left"
         open={isActive}
         onClose={() => appContentContext.setMenuSideActive(false)}
+        variant="temporary"
       >
         <Container
           sx={{

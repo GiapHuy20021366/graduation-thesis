@@ -73,7 +73,7 @@ export default function FoodSharingForm() {
     setQuantity,
     title,
     setTitle,
-    description
+    description,
   } = formContext;
 
   const [hover, setHover] = useState<number>(-1);
@@ -81,7 +81,7 @@ export default function FoodSharingForm() {
     DurationType.UNTIL_MIDNIGHT
   );
   const languageContext = useI18nContext();
-  const lang = languageContext.of(FoodSharingForm);
+  const lang = languageContext.of(FoodSharingForm, "Quantities", "Durations");
   const authContext = useAuthContext();
   const auth = authContext.auth;
   const navigate = useNavigate();
@@ -220,7 +220,7 @@ export default function FoodSharingForm() {
             onClick: () => setActiveStep(activeStep - 1),
           }}
           next={{
-            active: activeStep !== FormPage.PAGE_SUBMIT,
+            active: activeStep !== FormPage.PAGE_SECOND,
             onClick: () => setActiveStep(activeStep + 1),
           }}
         />
@@ -234,11 +234,11 @@ export default function FoodSharingForm() {
             type="text"
             variant="standard"
             value={title}
-            placeholder="Tell everybody what you want to share"
+            placeholder={lang("title-placeholder")}
             onChange={(event) => setTitle(event.target.value)}
           />
 
-          <DescriptionEditor/>
+          <DescriptionEditor />
 
           <FoodMapPicker />
 
@@ -259,11 +259,11 @@ export default function FoodSharingForm() {
                     value={durationType}
                     onChange={(event) => onDurationTypeSelectChange(event)}
                   >
-                    <MenuItem value={DurationType.UNTIL_MIDNIGHT}>
-                      {lang("UTIL_MIDNIGHT")}
-                    </MenuItem>
                     <MenuItem value={DurationType.UNTIL_LUNCH}>
-                      {lang("UTIL_LUNCH")}
+                      {lang("UNTIL_LUNCH")}
+                    </MenuItem>
+                    <MenuItem value={DurationType.UNTIL_MIDNIGHT}>
+                      {lang("UNTIL_MIDNIGHT")}
                     </MenuItem>
                     <MenuItem value={DurationType.ONE_DAY}>
                       {lang("ONE_DAY")}
@@ -337,7 +337,7 @@ export default function FoodSharingForm() {
             }}
             fullWidth
           >
-            Share now!
+            {lang("share-now")}
           </Button>
         </Stack>
       )}

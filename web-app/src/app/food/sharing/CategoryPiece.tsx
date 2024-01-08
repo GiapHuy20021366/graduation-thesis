@@ -13,6 +13,7 @@ export default function CategoryPiece({ text, onRemove }: ICategoryPiece) {
       onDelete={onRemove}
       sx={{
         mr: 1,
+        mt: 1
       }}
     />
   );

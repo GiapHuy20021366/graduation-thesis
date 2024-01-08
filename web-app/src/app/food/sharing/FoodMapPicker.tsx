@@ -13,7 +13,7 @@ import { GOOGLE_MAP_API_KEY } from "../../../env";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import { KeyboardArrowRight } from "@mui/icons-material";
 import { geocodeMapFindAddess } from "../../../api";
-import { useFoodSharingFormContext } from "../../../hooks";
+import { useFoodSharingFormContext, useI18nContext } from "../../../hooks";
 
 const FoodMapPicker = memo(() => {
   const [open, setOpen] = useState<boolean>(false);
@@ -30,16 +30,20 @@ const FoodMapPicker = memo(() => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const timeout = useRef<number | null>(null);
   const [lastFetchedPos, setLastFetchedPos] = useState<ICoordinates | null>(null);
+  
+  const i18n = useI18nContext();
+  const lang = i18n.of("FoodMapPicker");
 
   const fetchAddress = useCallback((pos: ICoordinates) => {
     const timeOutId = timeout.current;
     if (timeOutId != null) {
       clearTimeout(timeOutId);
+      setFetching(false);
       timeout.current = null;
     }
+    setFetching(true);
     timeout.current = setTimeout(() => {
       try {
-        setFetching(true);
         geocodeMapFindAddess(pos).then((data: GeoCodeMapsData | null) => {
           if (data != null) {
             const address = data.displayName;
@@ -120,7 +124,7 @@ const FoodMapPicker = memo(() => {
           alignItems: "center",
         }}
       >
-        <h4>Location</h4>
+        <h4>{lang("location")}</h4>
         <IconButton
           color="primary"
           sx={{
@@ -134,18 +138,18 @@ const FoodMapPicker = memo(() => {
       <Divider />
       <Stack direction={"row"}>
         <Box sx={{ padding: "8px 0" }}>
-          {fetching ? "Loading..." : location.name}
+          {fetching ? lang("loading") : location.name}
         </Box>
       </Stack>
       <Dialog open={open} fullScreen>
         <Stack direction={"row"}>
-          <DialogTitle>Map Picker</DialogTitle>
-          <Button sx={{ marginLeft: "auto" }} onClick={() => setOpen(false)}>
-            Close
+          <DialogTitle>{lang("map-picker")}</DialogTitle>
+          <Button sx={{ marginLeft: "auto" }} onClick={() => setOpen(false)} variant="text">
+            {lang("close")}
           </Button>
         </Stack>
         <Divider />
-        <Box component="h4">{fetching ? "Loading..." : location.name}</Box>
+        <Box component="h4">{fetching ? lang("loading") : location.name}</Box>
         {isLoaded && (
           <GoogleMap
             center={location.coordinates}

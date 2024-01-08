@@ -15,7 +15,7 @@ export type I18Resolver = (key: string, ...params: any[]) => string;
 interface II18nContext {
   language: Language;
   switchLanguage(code: LanguageCode): void;
-  of(component: React.ComponentType<any>): I18Resolver;
+  of(...components: (string | React.ComponentType<any>)[]): I18Resolver;
 }
 
 export const I18nContext = createContext<II18nContext>({
@@ -48,17 +48,29 @@ export default function I18nContextProvider({
       });
   };
 
-  const of = (component: React.ComponentType<any>): I18Resolver => {
-    const componentName = component.name;
-    const componentLanguage = language.value[componentName] as
-      | LanguageComponent
-      | undefined;
-    return (key: string, ...params: any[]): string => {
-      if (componentLanguage == null) {
-        // return `!<${componentName}>.[${key}]`;
-        return key;
+  const of = (
+    ...components: (string | React.ComponentType<any>)[]
+  ): I18Resolver => {
+    const keyToLang: { [key: string]: string } = {};
+    for (let i = 0; i < components.length; ++i) {
+      const component = components[i];
+      let componentName: string | null = null;
+      if (typeof component === "string") {
+        componentName = component;
+      } else {
+        componentName = component.name;
       }
-      const template = componentLanguage[key] as string | undefined;
+      const componentLanguage = language.value[componentName] as
+        | LanguageComponent
+        | undefined;
+      if (componentLanguage != null) {
+        Object.entries(componentLanguage).forEach(([key, val]) => {
+          keyToLang[key] = val;
+        });
+      }
+    }
+    return (key: string, ...params: any[]): string => {
+      const template = keyToLang[key] as string | undefined;
       if (template == null) {
         // return `<${componentName}>.![${key}]`;
         return key;

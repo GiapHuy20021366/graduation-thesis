@@ -18,7 +18,7 @@ import {
   RichTextEditor,
 } from "mui-tiptap";
 import { useState } from "react";
-import { useFoodSharingFormContext } from "../../../hooks";
+import { useFoodSharingFormContext, useI18nContext } from "../../../hooks";
 
 const EditMode = {
   HIDE: "HIDE",
@@ -30,6 +30,8 @@ export type EditMode = (typeof EditMode)[keyof typeof EditMode];
 
 export default function DescriptionEditor() {
   const [editable, setEditable] = useState<EditMode>(EditMode.EDIT);
+  const i18n = useI18nContext();
+  const lang = i18n.of(DescriptionEditor);
   const form = useFoodSharingFormContext();
   const { setDescription } = form;
 
@@ -49,7 +51,7 @@ export default function DescriptionEditor() {
           }}
         >
           <Box component="h4" sx={{ padding: 0, margin: 0 }}>
-            Description
+            {lang("description")}
           </Box>
         </AccordionSummary>
         <AccordionDetails
@@ -59,7 +61,6 @@ export default function DescriptionEditor() {
         >
           <RichTextEditor
             extensions={[StarterKit]}
-            content="Description"
             spell-check={false}
             onUpdate={({ editor }) => setDescription(editor.getHTML())}
             renderControls={() => (
@@ -73,8 +74,10 @@ export default function DescriptionEditor() {
                         setEditable(event.target.value as EditMode)
                       }
                     >
-                      <MenuItem value={EditMode.EDIT}>Edit</MenuItem>
-                      <MenuItem value={EditMode.PREVIEW}>Preview</MenuItem>
+                      <MenuItem value={EditMode.EDIT}>{lang("edit")}</MenuItem>
+                      <MenuItem value={EditMode.PREVIEW}>
+                        {lang("preview")}
+                      </MenuItem>
                     </Select>
                     {editable === EditMode.EDIT && (
                       <>
