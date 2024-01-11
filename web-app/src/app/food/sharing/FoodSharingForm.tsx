@@ -166,13 +166,32 @@ export default function FoodSharingForm() {
 
   const [activeStep, setActiveStep] = useState<number>(0);
 
+  const setNextStep = (): void => {
+    switch(activeStep) {
+      case FormPage.PAGE_FIRST: {
+        if (images.length === 0) {
+          toast.error(lang("empty-images-error"));
+          return;
+        }
+        if (title.trim().length === 0) {
+          toast.error(lang("empty-title-error"));
+          return;
+        }
+        break;
+      }
+    }
+    setActiveStep(activeStep + 1)
+  }
+
   return (
     <Box
       component="form"
       noValidate
       sx={{
         mt: 3,
-        width: ["100%", "80%", "60%", "50%"],
+        width: "100%",
+        padding: "4px",
+        boxSizing: "border-box",
       }}
       onSubmit={(event) => onSubmit(event)}
     >
@@ -221,7 +240,7 @@ export default function FoodSharingForm() {
           }}
           next={{
             active: activeStep !== FormPage.PAGE_SECOND,
-            onClick: () => setActiveStep(activeStep + 1),
+            onClick: () => setNextStep(),
           }}
         />
       </Box>
@@ -236,6 +255,7 @@ export default function FoodSharingForm() {
             value={title}
             placeholder={lang("title-placeholder")}
             onChange={(event) => setTitle(event.target.value)}
+            spellCheck={"false"}
           />
 
           <DescriptionEditor />

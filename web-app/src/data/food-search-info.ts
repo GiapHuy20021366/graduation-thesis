@@ -6,6 +6,7 @@ export interface IFoodPostUser {
     exposeName: string;
 }
 export interface IFoodSearchInfo {
+    _id: string;
     user: IFoodPostUser;
     images: string[];
     title: string;
@@ -19,7 +20,14 @@ export interface IFoodSearchInfo {
 }
 
 export const fakeOneFoodSearch = (): IFoodSearchInfo => {
+    const ids = [
+        "659cf8be07081ed2741a3537",
+        "659cd6fe07081ed2741a3530",
+        "659ad0b87d87b713fa87f7a7"
+    ]
+    const random = Math.floor(Math.random() * ids.length);
     return {
+        _id: ids[random],
         user: {
             _id: "Sample",
             exposeName: "GiapHuy1603",

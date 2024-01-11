@@ -13,7 +13,9 @@ import {
     IFoodUploadData,
     IFoodSearchInfo,
     fakeOneFoodSearch,
-    IFoodPostData
+    IFoodPostData,
+    OrderState,
+    FoodCategory
 } from '../data';
 
 export const foodEndpoints = {
@@ -43,10 +45,32 @@ interface IFoodUploadResponseData {
     updatedAt: Date;
 }
 
+export interface IFoodSearchPrice {
+    min: number;
+    max: number;
+    active: boolean;
+}
+
+export interface IFoodSeachOrder {
+    orderDistance: OrderState;
+    orderNew: OrderState;
+    orderPrice: OrderState;
+    orderQuantity: OrderState;
+}
+export interface IFoodSearchParams {
+    order: IFoodSeachOrder;
+    maxDistance: number;
+    query: string;
+    categories: FoodCategory[];
+    maxDuration: number;
+    price: IFoodSearchPrice;
+    minQuantity: number;
+}
+
 export interface FoodFetcher {
     uploadImage(name: string, base64: string, auth: IAuthInfo): Promise<FoodResponse<IImageExposed[]>>;
     uploadFood(data: IFoodUploadData, auth: IAuthInfo): Promise<FoodResponse<IFoodUploadResponseData>>;
-    searchFood(): Promise<FoodResponse<IFoodSearchInfo[]>>;
+    searchFood(data: IFoodSearchParams, auth: IAuthInfo): Promise<FoodResponse<IFoodSearchInfo[]>>;
     findFoodPost(id: string, auth: IAuthInfo): Promise<FoodResponse<IFoodPostData>>;
 }
 
@@ -76,7 +100,8 @@ export const foodFetcher: FoodFetcher = {
             }
         )
     },
-    searchFood: async (): Promise<FoodResponse<IFoodSearchInfo[]>> => {
+    searchFood: async (params: IFoodSearchParams, auth: IAuthInfo): Promise<FoodResponse<IFoodSearchInfo[]>> => {
+        console.log(params, auth);
         const data: IFoodSearchInfo[] = [];
         for (let i = 0; i < 64; ++i) {
             data.push(fakeOneFoodSearch());

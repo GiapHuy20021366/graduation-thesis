@@ -102,24 +102,24 @@ function FoodPostInfoDataDisplay({ data }: IFoodPostInfoDataDisplayProps) {
           <Typography>{toDistance(data.location.coordinates)} kms</Typography>
           <LocalOfferOutlined color="secondary" sx={{ ml: 1 }} />
           <Stack direction="row" marginLeft={"auto"}>
-            <Badge
-              badgeContent={4}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
+            <IconButton
+              sx={{
+                ":hover": {
+                  color: "red",
+                },
               }}
-              color="secondary"
             >
-              <IconButton
-                sx={{
-                  ":hover": {
-                    color: "red",
-                  },
+              <Badge
+                badgeContent={4}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
                 }}
+                color="secondary"
               >
                 <Favorite />
-              </IconButton>
-            </Badge>
+              </Badge>
+            </IconButton>
             <IconButton color="info">
               <Share />
             </IconButton>
@@ -232,6 +232,7 @@ export default function FoodPostInfo() {
           setData(data.data);
         })
         .catch((err) => {
+          setFound(false)
           console.log(err);
         })
         .finally(() => {

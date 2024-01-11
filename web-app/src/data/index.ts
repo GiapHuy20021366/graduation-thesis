@@ -67,3 +67,7 @@ export {
 export {
     type IFoodPostData
 } from "./food-post";
+export {
+    OrderState,
+    toNextOrderState
+} from "./order-state";

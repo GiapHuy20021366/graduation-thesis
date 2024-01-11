@@ -8,7 +8,10 @@ export {
     type FoodResponse,
     type FoodResponseError,
     foodEndpoints,
-    foodInstance
+    foodInstance,
+    type IFoodSeachOrder,
+    type IFoodSearchParams,
+    type IFoodSearchPrice
 } from "./food";
 
 export {
