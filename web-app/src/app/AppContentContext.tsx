@@ -1,4 +1,4 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useRef, useState } from "react";
 
 interface IAppContentContextProviderProps {
   children: React.ReactNode;
@@ -19,6 +19,7 @@ interface IAppContentContext {
   setMenuSideActive(active: boolean): void;
   setMainLeftVisible(visible: boolean): void;
   setMainRightVisible(visible: boolean): void;
+  mainRef?: React.RefObject<HTMLDivElement>;
 }
 
 export const AppContentContext = createContext<IAppContentContext>({
@@ -44,6 +45,7 @@ export default function AppContentContextProvider({
     visibleLeft: true,
     visibleRight: true,
   });
+  const mainRef = useRef<HTMLDivElement>(null);
 
   const setMenuSideActive = (active: boolean): void => {
     setMenuSide({
@@ -74,6 +76,7 @@ export default function AppContentContextProvider({
         mainContent,
         setMainLeftVisible,
         setMainRightVisible,
+        mainRef,
       }}
     >
       {children}

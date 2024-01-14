@@ -94,6 +94,10 @@ export default function FoodPrice() {
           InputProps={{
             endAdornment: <Box>VNĐ</Box>,
           }}
+          inputProps={{
+            min: 0,
+            step: 1000,
+          }}
         />
       </Stack>
     </Stack>

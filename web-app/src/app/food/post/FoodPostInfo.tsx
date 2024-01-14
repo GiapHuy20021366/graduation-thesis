@@ -17,7 +17,7 @@ import { useAuthContext, useI18nContext, useLoading } from "../../../hooks";
 import { useEffect, useState } from "react";
 import { foodFetcher } from "../../../api";
 import { IFoodPostData, toDistance, toQuantityType } from "../../../data";
-import FullWidthBox from "../../common/layout/FullWidthBox";
+import FullWidthBox from "../../common/custom/FullWidthBox";
 import {
   Favorite,
   LocalOfferOutlined,

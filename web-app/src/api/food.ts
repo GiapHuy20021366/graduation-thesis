@@ -15,7 +15,10 @@ import {
     fakeOneFoodSearch,
     IFoodPostData,
     OrderState,
-    FoodCategory
+    FoodCategory,
+    ItemAddedBy,
+    ItemAvailable,
+    IPagination
 } from '../data';
 
 export const foodEndpoints = {
@@ -65,6 +68,9 @@ export interface IFoodSearchParams {
     maxDuration: number;
     price: IFoodSearchPrice;
     minQuantity: number;
+    addedBy: ItemAddedBy;
+    available: ItemAvailable;
+    pagination?: IPagination;
 }
 
 export interface FoodFetcher {
@@ -103,7 +109,7 @@ export const foodFetcher: FoodFetcher = {
     searchFood: async (params: IFoodSearchParams, auth: IAuthInfo): Promise<FoodResponse<IFoodSearchInfo[]>> => {
         console.log(params, auth);
         const data: IFoodSearchInfo[] = [];
-        for (let i = 0; i < 64; ++i) {
+        for (let i = 0; i < 12; ++i) {
             data.push(fakeOneFoodSearch());
         }
         return {

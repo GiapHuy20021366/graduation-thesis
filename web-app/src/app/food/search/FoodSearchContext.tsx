@@ -4,14 +4,19 @@ import React, {
   createContext,
   useState,
 } from "react";
-import { FoodCategory, OrderState } from "../../../data";
+import {
+  FoodCategory,
+  ItemAddedBy,
+  ItemAvailable,
+  OrderState,
+} from "../../../data";
 import { IFoodSeachOrder, IFoodSearchPrice } from "../../../api";
 
 interface IFoodSearchContextProviderProps {
   children?: React.ReactNode;
 }
 
-interface IFoodSearchContext {
+export interface IFoodSearchContext {
   maxDistance: number;
   query: string;
   categories: FoodCategory[];
@@ -20,6 +25,9 @@ interface IFoodSearchContext {
   minQuantity: number;
 
   order: IFoodSeachOrder;
+
+  addedBy: ItemAddedBy;
+  available: ItemAvailable;
 
   setMaxDistance: Dispatch<SetStateAction<number>>;
   setQuery: Dispatch<SetStateAction<string>>;
@@ -32,13 +40,16 @@ interface IFoodSearchContext {
   setOrderNew: Dispatch<SetStateAction<OrderState>>;
   setOrderPrice: Dispatch<SetStateAction<OrderState>>;
   setOrderQuantity: Dispatch<SetStateAction<OrderState>>;
+
+  setAddedBy: Dispatch<SetStateAction<ItemAddedBy>>;
+  setAvailable: Dispatch<SetStateAction<ItemAvailable>>;
 }
 
 export const FoodSearchContext = createContext<IFoodSearchContext>({
   maxDistance: -1,
   categories: [],
   maxDuration: -1,
-  minQuantity: 0,
+  minQuantity: 1,
   price: {
     min: 0,
     max: 0,
@@ -53,6 +64,9 @@ export const FoodSearchContext = createContext<IFoodSearchContext>({
     orderPrice: OrderState.NONE,
   },
 
+  addedBy: ItemAddedBy.ALL,
+  available: ItemAvailable.AVAILABLE_ONLY,
+
   setMaxDistance: () => {},
   setCategories: () => {},
   setMaxDuration: () => {},
@@ -64,6 +78,9 @@ export const FoodSearchContext = createContext<IFoodSearchContext>({
   setOrderNew: () => {},
   setOrderPrice: () => {},
   setOrderQuantity: () => {},
+
+  setAddedBy: () => {},
+  setAvailable: () => {},
 });
 
 export default function FoodSearchContextProvider({
@@ -87,6 +104,10 @@ export default function FoodSearchContextProvider({
   const [orderQuantity, setOrderQuantity] = useState<OrderState>(
     OrderState.NONE
   );
+  const [addedBy, setAddedBy] = useState<ItemAddedBy>(ItemAddedBy.ALL);
+  const [available, setAvailable] = useState<ItemAvailable>(
+    ItemAvailable.AVAILABLE_ONLY
+  );
   return (
     <FoodSearchContext.Provider
       value={{
@@ -96,6 +117,8 @@ export default function FoodSearchContextProvider({
         minQuantity,
         price,
         query,
+        addedBy,
+        available,
         setCategories,
         setMaxDistance,
         setMaxDuration,
@@ -112,6 +135,8 @@ export default function FoodSearchContextProvider({
         setOrderNew,
         setOrderPrice,
         setOrderQuantity,
+        setAddedBy,
+        setAvailable,
       }}
     >
       {children}

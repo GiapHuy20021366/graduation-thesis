@@ -20,12 +20,23 @@ import {
   TextField,
   Tooltip,
 } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
-import { IFoodSearchInfo, OrderState, toNextOrderState } from "../../../data";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  IFoodSearchInfo,
+  OrderState,
+  toNextOrderState,
+} from "../../../data";
 import FoodSearchItem from "./FoodSearchItem";
 import { IFoodSeachOrder, IFoodSearchParams, foodFetcher } from "../../../api";
-import FoodSearchFilter from "./FoodSearchCondition";
-import { useAuthContext, useFoodSearchContext } from "../../../hooks";
+import FoodSearchFilter, { IFilterParams } from "./FoodSearchFilter";
+import {
+  useAppContentContext,
+  useAuthContext,
+  useFoodSearchContext,
+  useLoading,
+} from "../../../hooks";
+import { IFoodSearchContext } from "./FoodSearchContext";
+import FoodItemSkeleton from "./FoodItemSkeleton";
 
 interface IOrderIconProps {
   order?: OrderState;
@@ -37,6 +48,59 @@ function OrderIcon({ order }: IOrderIconProps) {
   if (order === OrderState.NONE) return <ImportExport />;
   return <></>;
 }
+
+const SearchTab = {
+  RELATED: 0,
+  TIME: 1,
+  DISTANCE: 2,
+  PRICE: 3,
+  QUANTITY: 4,
+} as const;
+
+type SearchTab = (typeof SearchTab)[keyof typeof SearchTab];
+
+const toOrder = (
+  tab: SearchTab,
+  searchContext: IFoodSearchContext
+): IFoodSeachOrder => {
+  const result: IFoodSeachOrder = {
+    orderDistance: OrderState.NONE,
+    orderPrice: OrderState.NONE,
+    orderNew: OrderState.NONE,
+    orderQuantity: OrderState.NONE,
+  };
+  switch (tab) {
+    case SearchTab.RELATED:
+      break;
+    case SearchTab.PRICE:
+      result.orderPrice = searchContext.order.orderPrice;
+      break;
+    case SearchTab.DISTANCE:
+      result.orderDistance = searchContext.order.orderDistance;
+      break;
+    case SearchTab.QUANTITY:
+      result.orderQuantity = searchContext.order.orderQuantity;
+      break;
+    case SearchTab.TIME:
+      result.orderNew = searchContext.order.orderNew;
+      break;
+  }
+  return result;
+};
+
+const toSearchParams = (context: IFoodSearchContext): IFoodSearchParams => {
+  return {
+    categories: context.categories,
+    maxDistance: context.maxDistance,
+    maxDuration: context.maxDuration,
+    minQuantity: context.minQuantity,
+    order: context.order,
+    price: context.price,
+    query: context.query,
+    addedBy: context.addedBy,
+    available: context.available,
+  };
+};
 
 export default function FoodSearchBody() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -50,7 +114,7 @@ export default function FoodSearchBody() {
     "Option 5",
     "Option 6",
   ]);
-  const [tab, setTab] = useState<number>(0);
+  const [tab, setTab] = useState<SearchTab>(SearchTab.RELATED);
 
   const searchContext = useFoodSearchContext();
   const {
@@ -60,11 +124,6 @@ export default function FoodSearchBody() {
     setOrderPrice,
     setOrderNew,
     setOrderQuantity,
-    categories,
-    maxDistance,
-    maxDuration,
-    minQuantity,
-    price,
     order,
   } = searchContext;
 
@@ -72,6 +131,9 @@ export default function FoodSearchBody() {
 
   const authContext = useAuthContext();
   const auth = authContext.auth;
+
+  const searching = useLoading();
+  const appContentContext = useAppContentContext();
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -86,15 +148,26 @@ export default function FoodSearchBody() {
 
   const searchFood = (params: IFoodSearchParams) => {
     console.log(params);
-    if (auth != null) {
-      foodFetcher.searchFood(params, auth).then((data) => {
-        setResult(data.data ?? []);
-      });
+
+    if (auth != null && params.query && !searching.isActice) {
+      searching.active();
+      setResult([]);
+      foodFetcher
+        .searchFood(params, auth)
+        .then((data) => {
+          setTimeout(() => {
+            setResult(data.data ?? []);
+            searching.deactive();
+          }, 200);
+        })
+        .catch(() => {
+          searching.deactive();
+        });
     }
   };
 
   const doSearch = () => {
-    searchFood(searchContext);
+    searchFood(toSearchParams(searchContext));
   };
 
   const handleSearchQueryChange = (
@@ -103,32 +176,28 @@ export default function FoodSearchBody() {
   ): void => {
     setQuery(value ?? "");
     if (value) {
-      searchFood({ ...searchContext, query: value });
+      searchFood(toSearchParams({ ...searchContext, query: value }));
     }
   };
 
   const onTabRelativeClick = () => {
-    if (tab === 0) return;
+    if (tab === SearchTab.RELATED) return;
     const order: IFoodSeachOrder = {
       orderDistance: OrderState.NONE,
       orderNew: OrderState.NONE,
       orderPrice: OrderState.NONE,
       orderQuantity: OrderState.NONE,
     };
-    const searchParams: IFoodSearchParams = {
+    const searchParams: IFoodSearchParams = toSearchParams({
+      ...searchContext,
       order,
-      categories,
-      maxDistance,
-      maxDuration,
-      minQuantity,
-      price,
-      query,
-    };
-    console.log(searchParams);
+    });
+    searchFood(searchParams);
   };
 
   const onTabOrderNewClick = () => {
-    const newOrder = tab === 1 ? toNextOrderState(orderNew) : orderNew;
+    const newOrder =
+      tab === SearchTab.TIME ? toNextOrderState(orderNew) : orderNew;
     setOrderNew(newOrder);
     const order: IFoodSeachOrder = {
       orderDistance: OrderState.NONE,
@@ -136,21 +205,18 @@ export default function FoodSearchBody() {
       orderPrice: OrderState.NONE,
       orderQuantity: OrderState.NONE,
     };
-    const searchParams: IFoodSearchParams = {
+    const searchParams: IFoodSearchParams = toSearchParams({
+      ...searchContext,
       order,
-      categories,
-      maxDistance,
-      maxDuration,
-      minQuantity,
-      price,
-      query,
-    };
-    console.log(searchParams);
+    });
+    searchFood(searchParams);
   };
 
   const onTabOrderDistanceClick = () => {
     const distanceOrder =
-      tab === 2 ? toNextOrderState(orderDistance) : orderDistance;
+      tab === SearchTab.DISTANCE
+        ? toNextOrderState(orderDistance)
+        : orderDistance;
     setOrderDistance(distanceOrder);
     const order: IFoodSeachOrder = {
       orderDistance: OrderState.NONE,
@@ -158,20 +224,16 @@ export default function FoodSearchBody() {
       orderPrice: OrderState.NONE,
       orderQuantity: OrderState.NONE,
     };
-    const searchParams: IFoodSearchParams = {
+    const searchParams: IFoodSearchParams = toSearchParams({
+      ...searchContext,
       order,
-      categories,
-      maxDistance,
-      maxDuration,
-      minQuantity,
-      price,
-      query,
-    };
-    console.log(searchParams);
+    });
+    searchFood(searchParams);
   };
 
   const onTabOrderPriceClick = () => {
-    const priceOrder = tab === 3 ? toNextOrderState(orderPrice) : orderPrice;
+    const priceOrder =
+      tab === SearchTab.PRICE ? toNextOrderState(orderPrice) : orderPrice;
     setOrderPrice(priceOrder);
     const order: IFoodSeachOrder = {
       orderDistance: OrderState.NONE,
@@ -179,21 +241,18 @@ export default function FoodSearchBody() {
       orderPrice: OrderState.NONE,
       orderQuantity: OrderState.NONE,
     };
-    const searchParams: IFoodSearchParams = {
+    const searchParams: IFoodSearchParams = toSearchParams({
+      ...searchContext,
       order,
-      categories,
-      maxDistance,
-      maxDuration,
-      minQuantity,
-      price,
-      query,
-    };
-    console.log(searchParams);
+    });
+    searchFood(searchParams);
   };
 
   const onTabOrderQuantityClick = () => {
     const quantityOrder =
-      tab === 4 ? toNextOrderState(orderQuantity) : orderQuantity;
+      tab === SearchTab.QUANTITY
+        ? toNextOrderState(orderQuantity)
+        : orderQuantity;
     setOrderQuantity(quantityOrder);
     const order: IFoodSeachOrder = {
       orderDistance: OrderState.NONE,
@@ -201,17 +260,77 @@ export default function FoodSearchBody() {
       orderPrice: OrderState.NONE,
       orderQuantity: OrderState.NONE,
     };
+    const searchParams: IFoodSearchParams = toSearchParams({
+      ...searchContext,
+      order,
+    });
+    searchFood(searchParams);
+  };
+
+  const onApplyFilter = (params: IFilterParams): void => {
+    setOpenFilter(false);
+    searchContext.setAddedBy(params.addedBy);
+    searchContext.setAvailable(params.available);
+    searchContext.setMaxDistance(params.maxDistance);
+    searchContext.setMaxDuration(params.maxDuration);
+    searchContext.setCategories(params.categories);
+    searchContext.setMinQuantity(params.minQuantity);
+    searchContext.setPrice(params.price);
+    const order = toOrder(tab, {
+      ...searchContext,
+      ...params,
+    });
     const searchParams: IFoodSearchParams = {
       order,
-      categories,
-      maxDistance,
-      maxDuration,
-      minQuantity,
-      price,
       query,
+      ...params,
     };
-    console.log(searchParams);
+    searchFood(searchParams);
   };
+
+  const doSearchMore = useCallback(() => {
+    const params = toSearchParams(searchContext);
+    params.pagination = {
+      skip: result.length,
+      limit: 24,
+    };
+    if (auth != null && searchContext.query && !searching.isActice) {
+      searching.active();
+      foodFetcher
+        .searchFood(params, auth)
+        .then((data) => {
+          setTimeout(() => {
+            const datas = data.data ?? [];
+            const newData = [...result, ...datas];
+            setResult(newData);
+            searching.deactive();
+          }, 1000);
+        })
+        .catch(() => {
+          searching.deactive();
+        });
+    }
+  }, [auth, result, searchContext, searching]);
+
+  useEffect(() => {
+    const mainRef = appContentContext.mainRef?.current;
+    let listener = null;
+    if (mainRef != null) {
+      listener = (event: Event) => {
+        const element = event.target as HTMLDivElement;
+        const isAtBottom =
+          element.scrollTop + element.clientHeight === element.scrollHeight;
+
+        if (isAtBottom) {
+          doSearchMore();
+        }
+      };
+      mainRef.addEventListener("scroll", listener);
+    }
+    return () => {
+      mainRef && mainRef.removeEventListener("scroll", listener!);
+    };
+  }, [appContentContext.mainRef, doSearchMore]);
 
   return (
     <Stack height="100%" width="100%" direction="column">
@@ -335,16 +454,26 @@ export default function FoodSearchBody() {
       <FoodSearchFilter
         isActive={openFilter}
         onClose={() => setOpenFilter(false)}
+        onApply={(params) => onApplyFilter(params)}
       />
       <Stack
         flex={1}
         sx={{
           overflowY: "auto",
+          width: "100%",
+          boxSizing: "border-box",
+          minHeight: "80vh",
         }}
       >
         {result.map((food, index) => {
           return <FoodSearchItem item={food} key={index} />;
         })}
+        {searching.isActice && (
+          <>
+            <FoodItemSkeleton />
+            <FoodItemSkeleton />
+          </>
+        )}
       </Stack>
     </Stack>
   );
