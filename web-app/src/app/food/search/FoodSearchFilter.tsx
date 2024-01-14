@@ -111,9 +111,9 @@ export default function FoodSearchFilter({
       available: available,
       maxDistance: maxDistance,
       maxDuration: maxDuration,
-      categories: categories,
+      categories: categoryActive ? categories : [],
       minQuantity: minQuantity,
-      price: price
+      price: price,
     };
     onApply(params);
   };

@@ -7,7 +7,8 @@ export interface IFoodPostUser {
 
 export interface IFoodPostLocation {
     name: string;
-    coordinates: ICoordinates
+    coordinates: ICoordinates;
+    two_array?: number[];
 }
 
 export interface IFoodPost {

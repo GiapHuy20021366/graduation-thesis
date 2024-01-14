@@ -14,7 +14,6 @@ export const RPCObserver = async () => {
   channel.consume(
     USER_SERVICE_RPC_QUEUE,
     async (msg: ConsumeMessage | null) => {
-      console.log(msg);
       if (msg != null) {
         const request = JSON.parse(msg.content.toString()) as RpcRequest;
 

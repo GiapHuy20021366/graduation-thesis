@@ -32,7 +32,8 @@ const foodPostSchema = new Schema<FoodPostDocument, IFoodPostModel, IFoodPostMet
     },
     title: {
         type: String,
-        // required: true,
+        required: true,
+        index: "text",
     },
     location: {
         name: String,
@@ -45,11 +46,17 @@ const foodPostSchema = new Schema<FoodPostDocument, IFoodPostModel, IFoodPostMet
                 type: Number,
                 require: true
             },
+        },
+        two_array: {
+            type: [Number],
+            default: [0, 0],
+            index: "2dsphere"
         }
     },
     categories: {
         type: [String],
-        require: true
+        require: true,
+        index: "text"
     },
     description: {
         type: String,
@@ -61,11 +68,13 @@ const foodPostSchema = new Schema<FoodPostDocument, IFoodPostModel, IFoodPostMet
     },
     duration: {
         type: Date,
-        required: true
+        required: true,
+        index: "descending"
     },
     price: {
         type: Number,
-        require: true
+        require: true,
+        index: "descending"
     },
     isEdited: {
         type: Boolean,

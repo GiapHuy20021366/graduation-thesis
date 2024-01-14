@@ -182,6 +182,5 @@ export const searchFoodPost = async (
 		}));
 	}
 	const paramsToSerach = toFoodSearchParams(params);
-	const data = await searchFoodService(paramsToSerach);
-	return res.status(200).json(toResponseSuccessData(data));
+	searchFoodService(paramsToSerach).then((data) => res.status(200).json(toResponseSuccessData(data))).catch(next);
 }

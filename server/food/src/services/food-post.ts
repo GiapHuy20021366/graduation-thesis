@@ -1,5 +1,5 @@
 import { RPCRequest } from "../broker";
-import { IFoodPost, IFoodSearchParams, InternalError, ResourceNotExistedError, RpcAction, RpcQueueName, RpcSource } from "../data";
+import { IFoodPost, IFoodPostLocation, IFoodSearchParams, InternalError, ResourceNotExistedError, RpcAction, RpcQueueName, RpcSource } from "../data";
 import { FoodPost, FoodPostDocument } from "../db/model";
 
 interface IPostFoodData extends Omit<IFoodPost, 'user'> {
@@ -43,8 +43,14 @@ export const postFood = async (data: IPostFoodData): Promise<IPostFoodReturn> =>
         })
     }
     const user = rpcUser.data;
+    const { lat, lng } = data.location.coordinates;
+    const locationWith2D: IFoodPostLocation = {
+        ...data.location,
+        two_array: [lng, lat]
+    }
     const foodPost = new FoodPost({
         ...data,
+        location: locationWith2D,
         user: {
             _id: user._id,
             exposeName: user.firstName + " " + user.lastName
@@ -73,9 +79,101 @@ export const findFoodPostById = async (id: string): Promise<FoodPostDocument> =>
 }
 
 export const searchFood = async (params: IFoodSearchParams): Promise<FoodPostDocument[]> => {
-    const foodPost = await FoodPost.find();
-    if (foodPost == null) {
-        throw new InternalError()
+    const options: any = {
+        $text: {
+            $search: params.query
+        },
     }
-    return foodPost;
+
+    const { currentLocation, maxDistance, categories, available, minQuantity, maxDuration, price, pagination, order } = params;
+
+    // max distance on location
+    if (currentLocation) {
+        const maxDis = maxDistance != undefined ? maxDistance : Number.MAX_SAFE_INTEGER;
+        options["location.two_array"] = {
+            $geoWithin: {
+                $centerSphere: [
+                    [currentLocation.lng, currentLocation.lat],
+                    maxDis / 6371
+                ]
+            }
+        }
+    }
+    // categories
+    if (categories) {
+        options["categories"] = {
+            $in: categories
+        }
+    }
+
+    // Available
+    if (available) {
+        switch (available) {
+            case "ALL":
+                break;
+            case "AVAILABLE_ONLY":
+                options["duration"] = {
+                    $gt: Date.now()
+                }
+                break;
+            case "JUST_GONE":
+                options["duration"] = {
+                    $lte: Date.now()
+                }
+                break;
+        }
+    }
+
+    // Quantity
+    if (minQuantity) {
+        options["quantity"] = {
+            $gte: minQuantity
+        }
+    }
+
+    // Max duration
+    if (maxDuration) {
+        options["duration"] = {
+            $gte: Date.now() + maxDuration * 24 * 60 * 60 * 1000 // days to miliseconds
+        }
+    }
+
+    if (price && price.active) {
+        options["price"] = {
+            $gte: price.min,
+            $lte: price.max
+        }
+    }
+
+    const sort: any = {
+        score: { $meta: 'textScore' }
+    }
+
+    if (order) {
+        sort["createdAt"] = order.orderNew;
+        sort["price"] = order.orderPrice;
+        sort["quantity"] = order.orderQuantity;
+
+        if (currentLocation) {
+            sort["location.two_array"] = order.orderDistance
+        }
+    }
+
+    const query = FoodPost.find(
+        options,
+        {
+            score: {
+                $meta: 'textScore'
+            }
+        })
+        .sort(sort);
+
+    // Pagination
+    if (pagination) {
+        query.skip(pagination.skip).limit(pagination.limit);
+    }
+
+    const result = await query.exec();
+    if (result == null) throw new InternalError();
+    return result;
 }
