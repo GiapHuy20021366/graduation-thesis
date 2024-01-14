@@ -46,8 +46,8 @@ export interface TimeStamp {
     ms: number;
 }
 
-export const toTimeInfo = (date: Date | number): TimeStamp => {
-    if (typeof date === "number") return toTimeInfo(new Date(date));
+export const toTimeInfo = (date: Date | number | string): TimeStamp => {
+    if (typeof date === "number" || typeof date === "string") return toTimeInfo(new Date(date));
 
     const day = date.getDate();
     const month = date.getMonth() + 1;

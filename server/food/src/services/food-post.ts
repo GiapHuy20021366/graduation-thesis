@@ -1,5 +1,5 @@
 import { RPCRequest } from "../broker";
-import { IFoodPost, InternalError, ResourceNotExistedError, RpcAction, RpcQueueName, RpcSource } from "../data";
+import { IFoodPost, IFoodSearchParams, InternalError, ResourceNotExistedError, RpcAction, RpcQueueName, RpcSource } from "../data";
 import { FoodPost, FoodPostDocument } from "../db/model";
 
 interface IPostFoodData extends Omit<IFoodPost, 'user'> {
@@ -68,6 +68,14 @@ export const findFoodPostById = async (id: string): Promise<FoodPostDocument> =>
                 reason: "not-found"
             }
         })
+    }
+    return foodPost;
+}
+
+export const searchFood = async (params: IFoodSearchParams): Promise<FoodPostDocument[]> => {
+    const foodPost = await FoodPost.find();
+    if (foodPost == null) {
+        throw new InternalError()
     }
     return foodPost;
 }

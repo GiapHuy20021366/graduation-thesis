@@ -1,19 +1,21 @@
 import { NextFunction, Request, Response } from "express";
 import {
 	AuthLike,
+	IFoodSearchParams,
 	InvalidDataError,
 	isAllNotEmptyString,
 	isLocation,
-	isNotEmptyString,
 	isNumber,
 	isObjectId,
 	throwErrorIfInvalidFormat,
 	throwErrorIfNotFound,
+	toFoodSearchParams,
 	toResponseSuccessData,
 } from "../data";
 import {
 	postFood as postFoodService,
-	findFoodPostById
+	findFoodPostById,
+	searchFood as searchFoodService
 } from "../services";
 
 interface IPostFoodBody {
@@ -158,4 +160,28 @@ export const findFoodPost = async (
 	findFoodPostById(id)
 		.then(data => res.status(200).send(toResponseSuccessData(data)))
 		.catch(next);
+}
+
+interface IFoodSearchBody extends Omit<IFoodSearchParams, "query"> {
+	query?: string;
+}
+
+export const searchFoodPost = async (
+	req: Request<{}, {}, IFoodSearchBody, {}>,
+	res: Response,
+	next: NextFunction
+) => {
+	const params = req.body;
+	const query = params.query;
+	if (typeof query !== "string" || !query) {
+		return next(new InvalidDataError({
+			data: {
+				target: "query",
+				reason: "no-query-found"
+			}
+		}));
+	}
+	const paramsToSerach = toFoodSearchParams(params);
+	const data = await searchFoodService(paramsToSerach);
+	return res.status(200).json(toResponseSuccessData(data));
 }

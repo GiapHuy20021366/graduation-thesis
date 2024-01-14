@@ -6,5 +6,6 @@ export {
 
 export {
     postFood,
-    findFoodPostById
+    findFoodPostById,
+    searchFood
 } from "./food-post";

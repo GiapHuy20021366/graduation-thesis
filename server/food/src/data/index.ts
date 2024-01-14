@@ -55,4 +55,29 @@ export {
     RpcRequest,
     RpcResponse,
     RpcResponseErr
-} from "./rpc-request-and-response"
+} from "./rpc-request-and-response";
+export {
+    IFoodSeachOrder,
+    IFoodSearchParams,
+    IFoodSearchPrice,
+    toFoodSearchParams,
+    toAddedBy,
+    toAvailable,
+    toPagination,
+    toValidCategories,
+    toValidOrder,
+    toValidPrice,
+    toValidSearchNumber
+} from "./food-search-params";
+export {
+    ItemAddedBy
+} from "./item-added-by";
+export {
+    ItemAvailable
+} from "./item-available";
+export {
+    OrderState
+} from "./order-state";
+export {
+    IPagination
+} from "./pagination";

@@ -1,24 +1,19 @@
 import { ICoordinates } from "./coordinates";
 
+export const getCurrentLocation = (): Promise<ICoordinates> => {
+    return new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+            position => resolve({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            }),
+            error => reject(error)
+        );
+    });
+}
+
 export const toDistance = (pos1: ICoordinates, pos2?: ICoordinates): number => {
-    if (pos2 == null) {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position: GeolocationPosition) => {
-                    pos2 = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude,
-                    };
-                },
-                (error: GeolocationPositionError) => {
-                    console.log(error);
-                }
-            );
-        }
-    }
-
     if (pos2 == null) return 0;
-
     const { lat: lat1, lng: lon1 } = pos1;
     const { lat: lat2, lng: lon2 } = pos2!;
     const R = 6371;

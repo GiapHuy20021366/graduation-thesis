@@ -1,4 +1,7 @@
-import React, { createContext, useRef, useState } from "react";
+import React, { createContext, useEffect, useRef, useState } from "react";
+import { ICoordinates } from "../data";
+import { getCurrentLocation } from "../data/location-util";
+import { useToastContext } from "../hooks";
 
 interface IAppContentContextProviderProps {
   children: React.ReactNode;
@@ -20,6 +23,7 @@ interface IAppContentContext {
   setMainLeftVisible(visible: boolean): void;
   setMainRightVisible(visible: boolean): void;
   mainRef?: React.RefObject<HTMLDivElement>;
+  currentLocation?: ICoordinates;
 }
 
 export const AppContentContext = createContext<IAppContentContext>({
@@ -68,6 +72,20 @@ export default function AppContentContextProvider({
     });
   };
 
+  const [currentLocation, setCurrentLocation] = useState<
+    ICoordinates | undefined
+  >();
+
+  const toastContext = useToastContext();
+
+  useEffect(() => {
+    getCurrentLocation()
+      .then((location) => setCurrentLocation(location))
+      .catch(() => {
+        toastContext.error("Can not get location now!");
+      });
+  }, [toastContext]);
+
   return (
     <AppContentContext.Provider
       value={{
@@ -77,6 +95,7 @@ export default function AppContentContextProvider({
         setMainLeftVisible,
         setMainRightVisible,
         mainRef,
+        currentLocation,
       }}
     >
       {children}

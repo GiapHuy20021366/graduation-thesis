@@ -22,6 +22,7 @@ import {
 } from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  ICoordinates,
   IFoodSearchInfo,
   OrderState,
   toNextOrderState,
@@ -88,7 +89,10 @@ const toOrder = (
   return result;
 };
 
-const toSearchParams = (context: IFoodSearchContext): IFoodSearchParams => {
+const toSearchParams = (
+  context: IFoodSearchContext,
+  location?: ICoordinates
+): IFoodSearchParams => {
   return {
     categories: context.categories,
     maxDistance: context.maxDistance,
@@ -99,6 +103,7 @@ const toSearchParams = (context: IFoodSearchContext): IFoodSearchParams => {
     query: context.query,
     addedBy: context.addedBy,
     available: context.available,
+    currentLocation: location,
   };
 };
 
@@ -167,7 +172,9 @@ export default function FoodSearchBody() {
   };
 
   const doSearch = () => {
-    searchFood(toSearchParams(searchContext));
+    searchFood(
+      toSearchParams(searchContext, appContentContext.currentLocation)
+    );
   };
 
   const handleSearchQueryChange = (
@@ -176,7 +183,12 @@ export default function FoodSearchBody() {
   ): void => {
     setQuery(value ?? "");
     if (value) {
-      searchFood(toSearchParams({ ...searchContext, query: value }));
+      searchFood(
+        toSearchParams(
+          { ...searchContext, query: value },
+          appContentContext.currentLocation
+        )
+      );
     }
   };
 
@@ -188,10 +200,13 @@ export default function FoodSearchBody() {
       orderPrice: OrderState.NONE,
       orderQuantity: OrderState.NONE,
     };
-    const searchParams: IFoodSearchParams = toSearchParams({
-      ...searchContext,
-      order,
-    });
+    const searchParams: IFoodSearchParams = toSearchParams(
+      {
+        ...searchContext,
+        order,
+      },
+      appContentContext.currentLocation
+    );
     searchFood(searchParams);
   };
 
@@ -205,10 +220,13 @@ export default function FoodSearchBody() {
       orderPrice: OrderState.NONE,
       orderQuantity: OrderState.NONE,
     };
-    const searchParams: IFoodSearchParams = toSearchParams({
-      ...searchContext,
-      order,
-    });
+    const searchParams: IFoodSearchParams = toSearchParams(
+      {
+        ...searchContext,
+        order,
+      },
+      appContentContext.currentLocation
+    );
     searchFood(searchParams);
   };
 
@@ -224,10 +242,13 @@ export default function FoodSearchBody() {
       orderPrice: OrderState.NONE,
       orderQuantity: OrderState.NONE,
     };
-    const searchParams: IFoodSearchParams = toSearchParams({
-      ...searchContext,
-      order,
-    });
+    const searchParams: IFoodSearchParams = toSearchParams(
+      {
+        ...searchContext,
+        order,
+      },
+      appContentContext.currentLocation
+    );
     searchFood(searchParams);
   };
 
@@ -241,10 +262,13 @@ export default function FoodSearchBody() {
       orderPrice: OrderState.NONE,
       orderQuantity: OrderState.NONE,
     };
-    const searchParams: IFoodSearchParams = toSearchParams({
-      ...searchContext,
-      order,
-    });
+    const searchParams: IFoodSearchParams = toSearchParams(
+      {
+        ...searchContext,
+        order,
+      },
+      appContentContext.currentLocation
+    );
     searchFood(searchParams);
   };
 
@@ -260,10 +284,13 @@ export default function FoodSearchBody() {
       orderPrice: OrderState.NONE,
       orderQuantity: OrderState.NONE,
     };
-    const searchParams: IFoodSearchParams = toSearchParams({
-      ...searchContext,
-      order,
-    });
+    const searchParams: IFoodSearchParams = toSearchParams(
+      {
+        ...searchContext,
+        order,
+      },
+      appContentContext.currentLocation
+    );
     searchFood(searchParams);
   };
 
@@ -289,7 +316,10 @@ export default function FoodSearchBody() {
   };
 
   const doSearchMore = useCallback(() => {
-    const params = toSearchParams(searchContext);
+    const params = toSearchParams(
+      searchContext,
+      appContentContext.currentLocation
+    );
     params.pagination = {
       skip: result.length,
       limit: 24,
@@ -310,7 +340,13 @@ export default function FoodSearchBody() {
           searching.deactive();
         });
     }
-  }, [auth, result, searchContext, searching]);
+  }, [
+    appContentContext.currentLocation,
+    auth,
+    result,
+    searchContext,
+    searching,
+  ]);
 
   useEffect(() => {
     const mainRef = appContentContext.mainRef?.current;

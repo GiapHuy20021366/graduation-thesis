@@ -13,12 +13,14 @@ import {
   toQuantityType,
   toTimeInfo,
 } from "../../../data";
-import { useI18nContext } from "../../../hooks";
+import { useAppContentContext, useI18nContext } from "../../../hooks";
 import { deepOrange } from "@mui/material/colors";
 import { useNavigate } from "react-router";
 import {
   LocalOfferOutlined,
   LocationOnOutlined,
+  ProductionQuantityLimitsOutlined,
+  SocialDistanceOutlined,
   TimelapseOutlined,
 } from "@mui/icons-material";
 
@@ -27,7 +29,7 @@ interface IFoodSearchItemProps {
 }
 
 interface IFoodItemDurationProps {
-  duration: number;
+  duration?: number;
 }
 
 const toPad = (num: number): string => {
@@ -35,7 +37,7 @@ const toPad = (num: number): string => {
 };
 
 function FoodItemDuration({ duration }: IFoodItemDurationProps) {
-  const timeInfo = toTimeInfo(duration);
+  const timeInfo = toTimeInfo(duration ?? new Date());
   return (
     <>
       {toPad(timeInfo.day)}/{toPad(timeInfo.month)}/{toPad(timeInfo.year)}{" "}
@@ -50,6 +52,7 @@ export default function FoodSearchItem({ item }: IFoodSearchItemProps) {
   const i18n = useI18nContext();
   const lang = i18n.of("Categories", "Quantities");
   const quantityType = toQuantityType(item.quantity);
+  const appContentContext = useAppContentContext();
 
   return (
     <Stack
@@ -91,28 +94,33 @@ export default function FoodSearchItem({ item }: IFoodSearchItemProps) {
           </Stack>
           <Stack direction={"row"} gap={1} mt={1}>
             <LocalOfferOutlined color="secondary" />
+            <Typography>{item.price ? `${item.price} VNĐ` : "Free"}</Typography>
+          </Stack>
+          <Stack direction="row" alignItems={"center"} gap={1}>
+            <ProductionQuantityLimitsOutlined color="info" />
+            <Rating
+              value={item.quantity}
+              sx={{
+                width: "fit-content",
+              }}
+              size="small"
+              readOnly
+            />
+            <Typography component="legend">{lang(quantityType)}</Typography>
+          </Stack>
+          <Stack mt={1} direction={"row"} gap={1}>
+            <SocialDistanceOutlined color="info" />
             <Typography>
-              {item.price ? `${item.price} "VNĐ"}` : "Free"}
+              {toDistance(
+                item.location.coordinates,
+                appContentContext.currentLocation
+              ) * 1000}{" "}
+              m
             </Typography>
           </Stack>
           <Stack direction={"row"} gap={1} mt={1}>
             <LocationOnOutlined color="info" />
             <Typography>{item.location.name}</Typography>
-          </Stack>
-          <Stack mt={1}>
-            <Typography>{toDistance(item.location.coordinates)} kms</Typography>
-          </Stack>
-          <Stack direction="row" alignItems={"center"}>
-            <Typography component="legend">{lang(quantityType)}</Typography>
-            <Rating
-              value={item.quantity}
-              sx={{
-                width: "fit-content",
-                ml: 1,
-              }}
-              size="small"
-              readOnly
-            />
           </Stack>
         </Box>
       </Stack>

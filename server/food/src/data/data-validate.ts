@@ -25,7 +25,7 @@ export const isAllNotEmptyString = (value: any): boolean => {
 }
 
 export const isNumber = (value: any): boolean => {
-    return typeof value === "number";
+    return typeof value === "number" && !isNaN(value);
 };
 
 export const isArray = (value: any): boolean => {

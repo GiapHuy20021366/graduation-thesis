@@ -12,19 +12,20 @@ import {
     IAuthInfo,
     IFoodUploadData,
     IFoodSearchInfo,
-    fakeOneFoodSearch,
     IFoodPostData,
     OrderState,
     FoodCategory,
     ItemAddedBy,
     ItemAvailable,
-    IPagination
+    IPagination,
+    ICoordinates
 } from '../data';
 
 export const foodEndpoints = {
     uploadImages: "/images/upload",
     uploadFood: "/foods/upload",
-    findFoodPost: "/foods"
+    findFoodPost: "/foods",
+    searchFood: "/foods/search"
 } as const;
 
 export interface FoodResponseError extends ResponseErrorLike<FoodErrorTarget, FoodErrorReason> { }
@@ -71,6 +72,7 @@ export interface IFoodSearchParams {
     addedBy: ItemAddedBy;
     available: ItemAvailable;
     pagination?: IPagination;
+    currentLocation?: ICoordinates;
 }
 
 export interface FoodFetcher {
@@ -107,14 +109,15 @@ export const foodFetcher: FoodFetcher = {
         )
     },
     searchFood: async (params: IFoodSearchParams, auth: IAuthInfo): Promise<FoodResponse<IFoodSearchInfo[]>> => {
-        console.log(params, auth);
-        const data: IFoodSearchInfo[] = [];
-        for (let i = 0; i < 12; ++i) {
-            data.push(fakeOneFoodSearch());
-        }
-        return {
-            data: data
-        };
+        return foodInstance.post(
+            foodEndpoints.searchFood,
+            params,
+            {
+                headers: {
+                    Authorization: auth.token
+                }
+            }
+        )
     },
     findFoodPost: async (id: string, auth: IAuthInfo): Promise<FoodResponse<IFoodPostData>> => {
         return foodInstance.get(

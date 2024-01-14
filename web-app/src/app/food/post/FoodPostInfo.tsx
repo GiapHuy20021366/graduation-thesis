@@ -13,7 +13,12 @@ import {
 import Carousel from "react-material-ui-carousel";
 import PageNotFound from "../../common/PageNotFound";
 import { useNavigate, useParams } from "react-router";
-import { useAuthContext, useI18nContext, useLoading } from "../../../hooks";
+import {
+  useAppContentContext,
+  useAuthContext,
+  useI18nContext,
+  useLoading,
+} from "../../../hooks";
 import { useEffect, useState } from "react";
 import { foodFetcher } from "../../../api";
 import { IFoodPostData, toDistance, toQuantityType } from "../../../data";
@@ -59,6 +64,7 @@ function FoodPostInfoDataDisplay({ data }: IFoodPostInfoDataDisplayProps) {
     "Categories",
     "Quantities"
   );
+  const appContentContext = useAppContentContext();
   const navigate = useNavigate();
   return (
     <FullWidthBox>
@@ -99,7 +105,13 @@ function FoodPostInfoDataDisplay({ data }: IFoodPostInfoDataDisplayProps) {
           {data.title || lang("no-title")}
         </Box>
         <Stack direction="row">
-          <Typography>{toDistance(data.location.coordinates)} kms</Typography>
+          <Typography>
+            {toDistance(
+              data.location.coordinates,
+              appContentContext.currentLocation
+            )}{" "}
+            kms
+          </Typography>
           <LocalOfferOutlined color="secondary" sx={{ ml: 1 }} />
           <Stack direction="row" marginLeft={"auto"}>
             <IconButton
@@ -232,7 +244,7 @@ export default function FoodPostInfo() {
           setData(data.data);
         })
         .catch((err) => {
-          setFound(false)
+          setFound(false);
           console.log(err);
         })
         .finally(() => {
