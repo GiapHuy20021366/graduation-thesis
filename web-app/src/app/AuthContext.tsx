@@ -9,6 +9,7 @@ import { userFetcher } from "../api";
 import { IAuthInfo } from "../data";
 
 interface IAccount {
+  id_: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -83,7 +84,10 @@ export default function AuthContextProvider({
         const auth = JSON.parse(authValue) as IAuthInfo;
         if (auth.updatedAt <= Date.now() - 55 * 60 * 1000) {
           setAuth(undefined);
-        } else if (auth.updatedAt < Date.now() - 30 * 60 * 1000 || account == null) {
+        } else if (
+          auth.updatedAt < Date.now() - 30 * 60 * 1000 ||
+          account == null
+        ) {
           // RefreshToken
           userFetcher
             .refreshToken(auth.token, true)

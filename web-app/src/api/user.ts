@@ -37,6 +37,7 @@ userInstance.interceptors.response.use(
 );
 
 interface AccountInfo {
+    id_: string;
     email: string;
     firstName: string;
     lastName: string;

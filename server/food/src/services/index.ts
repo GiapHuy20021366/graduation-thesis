@@ -1,11 +1,9 @@
-export {
-    saveImage,
-    uploadImage,
-    uploadImages
-} from "./image";
+export { saveImage, uploadImage, uploadImages } from "./image";
+
+export { postFood, findFoodPostById, searchFood } from "./food-post";
 
 export {
-    postFood,
-    findFoodPostById,
-    searchFood
-} from "./food-post";
+  getQueryHistoryByUserId,
+  saveSearchHistory,
+  searchHistory,
+} from "./food-search-history";

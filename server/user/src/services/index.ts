@@ -1,17 +1,11 @@
 export {
-    registAccountByManual,
-    createManualAccountFromToken,
-    registAccountByGoogleCridential
+  registAccountByManual,
+  createManualAccountFromToken,
+  registAccountByGoogleCridential,
 } from "./register";
 
-export {
-    loginAccountByManual
-} from "./login";
+export { loginAccountByManual } from "./login";
 
-export {
-    refreshToken
-} from "./token";
+export { refreshToken } from "./token";
 
-export {
-    rpcGetUserInfo,
-} from "./rpc";
+export { rpcGetUserInfo } from "./rpc";

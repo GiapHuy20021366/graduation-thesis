@@ -1,6 +1,7 @@
 import {
   ArrowDownward,
   ArrowUpward,
+  History,
   ImportExport,
   SearchOutlined,
   TuneOutlined,
@@ -38,6 +39,7 @@ import {
 } from "../../../hooks";
 import { IFoodSearchContext } from "./FoodSearchContext";
 import FoodItemSkeleton from "./FoodItemSkeleton";
+import { IFoodSearchHistorySimple } from "../../../api/food";
 
 interface IOrderIconProps {
   order?: OrderState;
@@ -111,14 +113,7 @@ export default function FoodSearchBody() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [result, setResult] = useState<IFoodSearchInfo[]>([]);
   const [openFilter, setOpenFilter] = useState<boolean>(false);
-  const [options, setOptions] = useState<string[]>([
-    "Option 1",
-    "Option 2",
-    "Option 3",
-    "Option 4",
-    "Option 5",
-    "Option 6",
-  ]);
+  const [options, setOptions] = useState<IFoodSearchHistorySimple[]>([]);
   const [tab, setTab] = useState<SearchTab>(SearchTab.RELATED);
 
   const searchContext = useFoodSearchContext();
@@ -151,6 +146,21 @@ export default function FoodSearchBody() {
     setQuery(value);
   };
 
+  useEffect(() => {
+    const params: any = {};
+    if (query.trim() === "" && authContext.account != null) {
+      params["users"] = [authContext.account.id_];
+    }
+    if (query.trim() !== "") {
+      params["query"] = query.trim();
+    }
+    if (authContext.auth != null) {
+      foodFetcher.searchHistory(params, authContext.auth).then((data) => {
+        setOptions(data.data ?? []);
+      });
+    }
+  }, [authContext.account, authContext.auth, query]);
+
   const searchFood = (params: IFoodSearchParams) => {
     console.log(params);
 
@@ -179,13 +189,14 @@ export default function FoodSearchBody() {
 
   const handleSearchQueryChange = (
     _event: React.SyntheticEvent<Element, Event>,
-    value: string | null
+    value: IFoodSearchHistorySimple | string | null
   ): void => {
-    setQuery(value ?? "");
+    const val = typeof value === "string" ? value : value?.query ?? "";
+    setQuery(val);
     if (value) {
       searchFood(
         toSearchParams(
-          { ...searchContext, query: value },
+          { ...searchContext, query: val },
           appContentContext.currentLocation
         )
       );
@@ -389,6 +400,9 @@ export default function FoodSearchBody() {
           filterOptions={(options) => options}
           onInputChange={handleInputChange}
           onChange={handleSearchQueryChange}
+          getOptionLabel={(option) =>
+            typeof option === "string" ? option : option.query
+          }
           sx={{
             width: ["100%", "90%", "80%"],
           }}
@@ -397,7 +411,12 @@ export default function FoodSearchBody() {
               <ListItemIcon>
                 <SearchOutlined />
               </ListItemIcon>
-              <ListItemText primary={option} />
+              <ListItemText primary={option.query} />
+              {option.userId === authContext?.account?.id_ && (
+                <ListItemIcon>
+                  <History />
+                </ListItemIcon>
+              )}
             </ListItem>
           )}
           renderInput={(params) => (
