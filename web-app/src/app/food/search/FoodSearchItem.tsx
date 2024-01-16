@@ -50,7 +50,7 @@ function FoodItemDuration({ duration }: IFoodItemDurationProps) {
 export default function FoodSearchItem({ item }: IFoodSearchItemProps) {
   const navigate = useNavigate();
   const i18n = useI18nContext();
-  const lang = i18n.of("Categories", "Quantities");
+  const lang = i18n.of(FoodSearchItem, "Categories", "Quantities");
   const quantityType = toQuantityType(item.quantity);
   const appContentContext = useAppContentContext();
 
@@ -94,7 +94,7 @@ export default function FoodSearchItem({ item }: IFoodSearchItemProps) {
           </Stack>
           <Stack direction={"row"} gap={1} mt={1}>
             <LocalOfferOutlined color="secondary" />
-            <Typography>{item.price ? `${item.price} VNĐ` : "Free"}</Typography>
+            <Typography>{item.price ? `${item.price} VNĐ` : lang("l-free")}</Typography>
           </Stack>
           <Stack direction="row" alignItems={"center"} gap={1}>
             <ProductionQuantityLimitsOutlined color="info" />

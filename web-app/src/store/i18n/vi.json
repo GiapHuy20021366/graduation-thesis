@@ -179,5 +179,47 @@
         "no-category": "Thực phẩm này không có thể loại",
         "description": "Mô tả thực phẩm",
         "no-description": "Thực phẩm này không có mô tả"
+    },
+    "FoodSearchBody": {
+        "search-placeholder": "Tìm kiếm thực phẩm bạn muốn",
+        "l-search": "Tìm kiếm",
+        "l-advance-search": "Nâng cao",
+        "l-relative": "Liên quan",
+        "l-time": "Thời gian",
+        "l-distance": "Khoảng cách",
+        "l-price": "Giá cả",
+        "l-quantity": "Chất lượng"
+    },
+    "FoodSearchFilter": {
+        "search-filter": "Tìm kiếm nâng cao",
+        "item-added-by": "Được thêm bởi",
+        "item-available": "Có sẵn",
+        "max-distance": "Khoảng cách tối đa",
+        "max-duration": "Thời hạn tối đa",
+        "category": "Loại thực phẩm",
+        "l-search": "Tìm kiếm",
+        "search-placeholder": "Tìm kiếm nhãn thực phẩm",
+        "min-quantity": "Chất lượng tối thiểu",
+        "price-range": "Khoảng giá",
+        "reset": "Đặt lại",
+        "apply": "Áp dụng",
+        "l-max": "Tối đa",
+        "l-min": "Tối thiểu",
+        "l-custom": "Tùy chỉnh",
+        "l-free": "Miễn phí",
+        "l-all": "Tất cả",
+        "l-just-gone": "Đã hết",
+        "l-available-only": "Có sẵn",
+        "l-volunteer": "Tình nguyện",
+        "l-personal": "Cá nhân"
+    },
+    "DayValues": {
+        "12-hours": "12 giờ",
+        "1-day": "1 ngày",
+        "2-days": "2 ngày",
+        "3-days": "3 ngày"
+    },
+    "FoodSearchItem": {
+        "l-free": "Miễn phí"
     }
 }

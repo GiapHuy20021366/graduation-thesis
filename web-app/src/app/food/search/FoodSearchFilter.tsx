@@ -86,7 +86,7 @@ export default function FoodSearchFilter({
   });
 
   const i18nContext = useI18nContext();
-  const lang = i18nContext.of("Categories", "Quantities");
+  const lang = i18nContext.of(FoodSearchFilter, "Categories", "Quantities");
 
   const handleReset = () => {
     setAddedBy(ItemAddedBy.ALL);
@@ -186,7 +186,7 @@ export default function FoodSearchFilter({
               top: 0,
             }}
           >
-            Bộ lọc tìm kiếm
+            {lang("search-filter")}
           </Box>
           <Divider />
           <Stack
@@ -198,7 +198,9 @@ export default function FoodSearchFilter({
             p={1}
           >
             <Box>
-              <Typography sx={{ fontWeight: 600 }}>Item Added By:</Typography>
+              <Typography sx={{ fontWeight: 600 }}>
+                {lang("item-added-by")}:
+              </Typography>
               <ToggleChipGroup
                 value={addedBy}
                 onValueChange={(value) => setAddedBy(value)}
@@ -211,17 +213,17 @@ export default function FoodSearchFilter({
               >
                 <ToggleChip
                   variant="outlined"
-                  label={"All"}
+                  label={lang("l-all")}
                   value={ItemAddedBy.ALL}
                 />
                 <ToggleChip
                   variant="outlined"
-                  label={"Personal"}
+                  label={lang("l-psersonal")}
                   value={ItemAddedBy.PERSONAL}
                 />
                 <ToggleChip
                   variant="outlined"
-                  label={"Volunteer"}
+                  label={lang("l-volunteer")}
                   value={ItemAddedBy.VOLUNTEER}
                 />
               </ToggleChipGroup>
@@ -229,7 +231,7 @@ export default function FoodSearchFilter({
             <Divider variant="inset" />
             <Box>
               <Typography sx={{ fontWeight: 600 }}>
-                Item Availability:
+                {lang("item-available")}:
               </Typography>
               <ToggleChipGroup
                 value={available}
@@ -243,24 +245,26 @@ export default function FoodSearchFilter({
               >
                 <ToggleChip
                   variant="outlined"
-                  label={"All"}
+                  label={lang("l-all")}
                   value={ItemAvailable.ALL}
                 />
                 <ToggleChip
                   variant="outlined"
-                  label={"Available only"}
+                  label={lang("l-available-only")}
                   value={ItemAvailable.AVAILABLE_ONLY}
                 />
                 <ToggleChip
                   variant="outlined"
-                  label={"Just gone"}
+                  label={lang("l-just-gone")}
                   value={ItemAvailable.JUST_GONE}
                 />
               </ToggleChipGroup>
             </Box>
             <Divider variant="inset" />
             <Box>
-              <Typography sx={{ fontWeight: 600 }}>Max Distance:</Typography>
+              <Typography sx={{ fontWeight: 600 }}>
+                {lang("max-distance")}:
+              </Typography>
               <ToggleChipGroup
                 value={maxDistance}
                 onValueChange={(value) => setMaxDistance(value)}
@@ -275,7 +279,11 @@ export default function FoodSearchFilter({
                 }}
                 exclusive
               >
-                <ToggleChip variant="outlined" label={"All"} value={-1} />
+                <ToggleChip
+                  variant="outlined"
+                  label={lang("l-all")}
+                  value={-1}
+                />
                 <ToggleChip variant="outlined" label={"0.5 km"} value={0.5} />
                 <ToggleChip variant="outlined" label={"1 km"} value={1} />
                 <ToggleChip variant="outlined" label={"2 km"} value={2} />
@@ -287,7 +295,9 @@ export default function FoodSearchFilter({
             </Box>
             <Divider variant="inset" />
             <Box>
-              <Typography sx={{ fontWeight: 600 }}>Max Duration:</Typography>
+              <Typography sx={{ fontWeight: 600 }}>
+                {lang("max-duration")}:
+              </Typography>
               <ToggleChipGroup
                 value={maxDuration}
                 onValueChange={(value) => setMaxDuration(value)}
@@ -302,23 +312,47 @@ export default function FoodSearchFilter({
                 }}
                 exclusive
               >
-                <ToggleChip variant="outlined" label={"All"} value={-1} />
-                <ToggleChip variant="outlined" label={"12 hours"} value={0.5} />
-                <ToggleChip variant="outlined" label={"1 day"} value={1} />
-                <ToggleChip variant="outlined" label={"2 days"} value={2} />
-                <ToggleChip variant="outlined" label={"5 days"} value={3} />
+                <ToggleChip
+                  variant="outlined"
+                  label={lang("l-all")}
+                  value={-1}
+                />
+                <ToggleChip
+                  variant="outlined"
+                  label={lang("12-hours")}
+                  value={0.5}
+                />
+                <ToggleChip
+                  variant="outlined"
+                  label={lang("1-day")}
+                  value={1}
+                />
+                <ToggleChip
+                  variant="outlined"
+                  label={lang("2-days")}
+                  value={2}
+                />
+                <ToggleChip
+                  variant="outlined"
+                  label={lang("3-days")}
+                  value={3}
+                />
               </ToggleChipGroup>
             </Box>
             <Divider variant="inset" />
             <Box>
               <Stack direction={"row"} gap={1} alignItems={"center"}>
-                <Typography sx={{ fontWeight: 600 }}>Categories:</Typography>
+                <Typography sx={{ fontWeight: 600 }}>
+                  {lang("category")}:
+                </Typography>
                 <Switch
                   color="secondary"
                   onChange={(_event, checked) => setCategoryActive(checked)}
                   checked={categoryActive}
                 />
-                <Typography>{categoryActive ? "Custom" : "All"}</Typography>
+                <Typography>
+                  {categoryActive ? lang("l-custom") : lang("l-all")}
+                </Typography>
               </Stack>
               <Stack
                 sx={{
@@ -368,7 +402,9 @@ export default function FoodSearchFilter({
             </Box>
             <Divider variant="inset" />
             <Box>
-              <Typography sx={{ fontWeight: 600 }}>Min Quantity:</Typography>
+              <Typography sx={{ fontWeight: 600 }}>
+                {lang("min-quantity")}:
+              </Typography>
               <Stack direction="row" alignItems={"center"}>
                 <Rating
                   value={minQuantity}
@@ -386,7 +422,9 @@ export default function FoodSearchFilter({
             </Box>
             <Divider variant="inset" />
             <Box>
-              <Typography sx={{ fontWeight: 600 }}>Price Range:</Typography>
+              <Typography sx={{ fontWeight: 600 }}>
+                {lang("price-range")}:
+              </Typography>
               <ToggleChipGroup
                 value={priceOption}
                 onValueChange={(value) => setPriceOption(value)}
@@ -403,17 +441,17 @@ export default function FoodSearchFilter({
               >
                 <ToggleChip
                   variant="outlined"
-                  label={"All"}
+                  label={lang("l-all")}
                   value={PriceOptions.ALL}
                 />
                 <ToggleChip
                   variant="outlined"
-                  label={"Free"}
+                  label={lang("l-free")}
                   value={PriceOptions.FREE}
                 />
                 <ToggleChip
                   variant="outlined"
-                  label={"Custom"}
+                  label={lang("l-custom")}
                   value={PriceOptions.CUSTOM}
                 />
               </ToggleChipGroup>
@@ -428,7 +466,7 @@ export default function FoodSearchFilter({
                     <TextField
                       type="number"
                       value={priceRange.min}
-                      label={"Min"}
+                      label={lang("l-min")}
                       inputProps={{
                         min: 0,
                         step: 1000,
@@ -438,7 +476,7 @@ export default function FoodSearchFilter({
                     <TextField
                       type="number"
                       value={priceRange.max}
-                      label={"Max"}
+                      label={lang("l-max")}
                       inputProps={{
                         min: 0,
                         step: 1000,
@@ -493,10 +531,10 @@ export default function FoodSearchFilter({
           <Divider />
           <Stack direction={"row"} gap={1} justifyContent={"center"} p={3}>
             <Button variant="outlined" sx={{ flex: 1 }} onClick={handleReset}>
-              Reset
+              {lang("reset")}
             </Button>
             <Button variant="contained" sx={{ flex: 1 }} onClick={handleApply}>
-              Apply
+              {lang("apply")}
             </Button>
           </Stack>
         </Stack>

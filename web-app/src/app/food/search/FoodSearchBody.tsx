@@ -35,6 +35,7 @@ import {
   useAppContentContext,
   useAuthContext,
   useFoodSearchContext,
+  useI18nContext,
   useLoading,
 } from "../../../hooks";
 import { IFoodSearchContext } from "./FoodSearchContext";
@@ -115,6 +116,8 @@ export default function FoodSearchBody() {
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [options, setOptions] = useState<IFoodSearchHistorySimple[]>([]);
   const [tab, setTab] = useState<SearchTab>(SearchTab.RELATED);
+  const i18nContext = useI18nContext();
+  const lang = i18nContext.of(FoodSearchBody);
 
   const searchContext = useFoodSearchContext();
   const {
@@ -425,7 +428,7 @@ export default function FoodSearchBody() {
               {...params}
               margin="normal"
               variant="outlined"
-              placeholder="Search your food"
+              placeholder={lang("search-placeholder")}
               InputProps={{
                 ...params.InputProps,
                 style: {
@@ -442,13 +445,13 @@ export default function FoodSearchBody() {
                   <>
                     {params.InputProps.endAdornment}
                     <InputAdornment position="end">
-                      <Tooltip title={"Search"}>
+                      <Tooltip title={lang("l-search")}>
                         <IconButton color="info" onClick={() => doSearch()}>
                           <SearchOutlined />
                         </IconButton>
                       </Tooltip>
                       <Tooltip
-                        title={"Advantage search"}
+                        title={lang("l-advance-search")}
                         onClick={() => setOpenFilter(true)}
                       >
                         <IconButton color="info">
@@ -477,27 +480,27 @@ export default function FoodSearchBody() {
               },
             }}
           >
-            <Tab label="Liên quan" onClick={onTabRelativeClick} />
+            <Tab label={lang("l-relative")} onClick={onTabRelativeClick} />
             <Tab
-              label="Thời điểm"
+              label={lang("l-time")}
               icon={<OrderIcon order={orderNew} />}
               iconPosition="end"
               onClick={onTabOrderNewClick}
             />
             <Tab
-              label="Khoảng cách"
+              label={lang("l-distance")}
               icon={<OrderIcon order={orderDistance} />}
               iconPosition="end"
               onClick={onTabOrderDistanceClick}
             />
             <Tab
-              label="Giá"
+              label={lang("l-price")}
               icon={<OrderIcon order={orderPrice} />}
               iconPosition="end"
               onClick={onTabOrderPriceClick}
             />
             <Tab
-              label="Chất lượng"
+              label={lang("l-quantity")}
               icon={<OrderIcon order={orderQuantity} />}
               iconPosition="end"
               onClick={onTabOrderQuantityClick}
