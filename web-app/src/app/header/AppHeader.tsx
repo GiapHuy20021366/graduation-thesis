@@ -12,6 +12,7 @@ export default function AppHeader() {
         padding: 0,
         margin: 0,
         boxSizing: "border-box",
+        boxShadow: 1
       }}
     >
       <Grid2

@@ -10,6 +10,7 @@ import PageNotFound from "../common/PageNotFound";
 import Setting from "../setting/Setting";
 import Food from "../food/Food";
 import Search from "../search/Search";
+import Arround from "../around/Arround";
 
 export default function AppMainCenter() {
   return (
@@ -26,6 +27,7 @@ export default function AppMainCenter() {
         <Route path="/profile/*" element={<Profile />} />
         <Route path="/account/*" element={<Account />} />
         <Route path="/location/*" element={<Location />} />
+        <Route path="/arround/*" element={<Arround />} />
         <Route path="/help/*" element={<Help />} />
         <Route path="/setting/*" element={<Setting />} />
         <Route path="/food/*" element={<Food />} />

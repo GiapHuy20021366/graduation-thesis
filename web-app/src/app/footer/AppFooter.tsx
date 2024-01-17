@@ -9,7 +9,8 @@ export default function AppFooter() {
         padding: 0,
         margin: 0,
         boxSizing: "border-box",
-        display: ["block", "none"]
+        display: ["block", "none"],
+        boxShadow: 1,
       }}
     >
       <AppFooterExtensions />

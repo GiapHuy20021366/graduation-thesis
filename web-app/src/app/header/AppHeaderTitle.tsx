@@ -37,12 +37,18 @@ function SearchTitle() {
   return <span>Food</span>;
 }
 
+function ArroundTitle() {
+  return <span>Arround</span>;
+}
+
 export default function AppHeaderTitle() {
   return (
-    <Box sx={{
-      fontWeight: 600,
-      fontSize: "1.5rem"
-    }}>
+    <Box
+      sx={{
+        fontWeight: 600,
+        fontSize: "1.5rem",
+      }}
+    >
       <Routes>
         <Route path="/" element={<HomeTitle />} />
         <Route path="/home/*" element={<HomeTitle />} />
@@ -50,6 +56,7 @@ export default function AppHeaderTitle() {
         <Route path="/profile/*" element={<ProfileTitle />} />
         <Route path="/account/*" element={<AccountTitle />} />
         <Route path="/location/*" element={<LocationTitle />} />
+        <Route path="/arround/*" element={<ArroundTitle />} />
         <Route path="/help/*" element={<HelpTitle />} />
         <Route path="/setting/*" element={<SettingTitle />} />
         <Route path="/food/*" element={<FoodTitle />} />

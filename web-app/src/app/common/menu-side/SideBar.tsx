@@ -1,5 +1,9 @@
 import Drawer from "@mui/material/Drawer";
-import { useAppContentContext, useAuthContext, useI18nContext } from "../../../hooks";
+import {
+  useAppContentContext,
+  useAuthContext,
+  useI18nContext,
+} from "../../../hooks";
 import { Box, Container, Divider, Stack } from "@mui/material";
 import {
   HomeOutlined,
@@ -9,6 +13,7 @@ import {
   RoomOutlined,
   HelpOutlineOutlined,
   SettingsOutlined,
+  People,
 } from "@mui/icons-material";
 import SideBarItemText from "./SideBarItemText";
 import SideBarItem from "./SideBarItem";
@@ -82,6 +87,11 @@ export default function SideBar() {
               muiIcon={<RoomOutlined />}
               text={lang("location")}
               activeUrl="/location"
+            />
+            <SideBarItem
+              muiIcon={<People />}
+              text={lang("users-around-me")}
+              activeUrl="/arround/users"
             />
             <SideBarItem
               muiIcon={<HelpOutlineOutlined />}

@@ -72,7 +72,9 @@
         "location": "Vị trí",
         "help": "Trợ giúp",
         "setting": "Cài đặt",
-        "avatar": "Avatar"
+        "avatar": "Avatar",
+        "users-around-me": "Mọi người",
+        "foods-around-me": "Thực phẩm"
     },
     "ContentFooter": {
         "home": "Nhà",

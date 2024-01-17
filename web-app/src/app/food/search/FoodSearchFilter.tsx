@@ -86,7 +86,12 @@ export default function FoodSearchFilter({
   });
 
   const i18nContext = useI18nContext();
-  const lang = i18nContext.of(FoodSearchFilter, "Categories", "Quantities");
+  const lang = i18nContext.of(
+    FoodSearchFilter,
+    "Categories",
+    "Quantities",
+    "DayValues"
+  );
 
   const handleReset = () => {
     setAddedBy(ItemAddedBy.ALL);
@@ -137,7 +142,7 @@ export default function FoodSearchFilter({
 
   const toQuantityLang = (quantity: number, hover: number) => {
     if (hover < 0) {
-      return quantity ? lang(toQuantityType(quantity)) : lang("ALL");
+      return quantity ? lang(toQuantityType(quantity)) : lang("l-all");
     }
     return lang(toQuantityType(hover));
   };
@@ -218,7 +223,7 @@ export default function FoodSearchFilter({
                 />
                 <ToggleChip
                   variant="outlined"
-                  label={lang("l-psersonal")}
+                  label={lang("l-personal")}
                   value={ItemAddedBy.PERSONAL}
                 />
                 <ToggleChip
