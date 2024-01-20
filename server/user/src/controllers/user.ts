@@ -6,9 +6,13 @@ import {
   isCoordinates,
   isLocation,
   isNumber,
+  isObjectId,
   toResponseSuccessData,
 } from "../data";
-import { searchUsersAround as searchUsersAroundService } from "../services";
+import {
+  searchUsersAround as searchUsersAroundService,
+  getBasicUserInfo as getBasicUserInfoService,
+} from "../services";
 
 interface ISearchUsersAroundParams {
   currentLocation?: ICoordinates;
@@ -53,5 +57,25 @@ export const searchUsersAround = async (
     location: currentLocation!,
     maxDistance: maxDistance!,
     pagination: paginationParam,
-  }).then((data) => res.status(200).json(toResponseSuccessData(data)));
+  })
+    .then((data) => res.status(200).json(toResponseSuccessData(data)))
+    .catch(next);
+};
+
+export const getBasicUserInfo = (
+  req: Request<{ id?: string }, {}, {}, {}>,
+  res: Response,
+  next: NextFunction
+) => {
+  const id = req.params.id;
+  if (!isObjectId(id)) {
+    return next(
+      new InvalidDataError({
+        message: `Invalid id found: ${id}`,
+      })
+    );
+  }
+  getBasicUserInfoService(id!)
+    .then((data) => res.status(200).json(toResponseSuccessData(data)))
+    .catch(next);
 };

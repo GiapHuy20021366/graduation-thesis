@@ -12,4 +12,4 @@ export { rpcGetUserInfo } from "./rpc";
 
 export { setUserLocation } from "./location";
 
-export { searchUsersAround } from "./user";
+export { searchUsersAround, getBasicUserInfo } from "./user";

@@ -4,6 +4,7 @@ import {
   ILocation,
   IPagination,
   InternalError,
+  ResourceNotExistedError,
   UserInfo,
 } from "../data";
 
@@ -56,4 +57,26 @@ export const searchUsersAround = async (params: {
     }
   });
   return result;
+};
+
+export const getBasicUserInfo = async (id: string) => {
+  const user = await User.findById(id);
+  if (user == null) {
+    throw new ResourceNotExistedError({
+      message: `No user with id ${id} found`,
+      data: {
+        target: "user",
+        reason: "no-user-found",
+      },
+    });
+  }
+
+  return {
+    id_: user._id.toString(),
+    avartar: user.avatar,
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    location: user.location,
+  };
 };

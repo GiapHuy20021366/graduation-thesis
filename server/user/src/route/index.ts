@@ -12,6 +12,7 @@ import {
   refreshToken,
   setUserLocation,
   searchUsersAround,
+  getBasicUserInfo,
 } from "../controllers";
 
 const userRouter = express.Router();
@@ -28,6 +29,8 @@ export const initUserRouters = (app: Express): void => {
   userRouter.put("/location", tokenParser, setUserLocation);
 
   userRouter.post("/search/location", tokenParser, searchUsersAround);
+
+  userRouter.get("/info/:id", tokenParser, getBasicUserInfo);
 
   userRouter.use(errorHandler);
   app.use("/", userRouter);
