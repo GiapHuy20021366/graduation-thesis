@@ -2,26 +2,28 @@ import express, { Express } from "express";
 import { errorHandler, tokenParser } from "../middlewares";
 import {
   findFoodPost,
+  likeOrUnlikeFoodPost,
   postFood,
   searchFoodPost,
   searchHistory,
   uploadImages,
 } from "../controllers";
 
-const userRouter = express.Router();
+const foodRouter = express.Router();
 
 export const initUserRouters = (app: Express): void => {
-  userRouter.get("/", (_req, res) => {
+  foodRouter.get("/", (_req, res) => {
     return res.send("Hello from food service");
   });
 
-  userRouter.post("/images/upload", tokenParser, uploadImages);
+  foodRouter.post("/images/upload", tokenParser, uploadImages);
 
-  userRouter.post("/foods/upload", tokenParser, postFood);
-  userRouter.post("/foods/search", tokenParser, searchFoodPost);
-  userRouter.post("/foods/search/history", tokenParser, searchHistory);
-  userRouter.get("/foods/:id", tokenParser, findFoodPost);
+  foodRouter.post("/foods/upload", tokenParser, postFood);
+  foodRouter.post("/foods/search", tokenParser, searchFoodPost);
+  foodRouter.post("/foods/search/history", tokenParser, searchHistory);
+  foodRouter.get("/foods/:id", tokenParser, findFoodPost);
+  foodRouter.put("/foods/like/:id", tokenParser, likeOrUnlikeFoodPost);
 
-  userRouter.use(errorHandler);
-  app.use("/", userRouter);
+  foodRouter.use(errorHandler);
+  app.use("/", foodRouter);
 };

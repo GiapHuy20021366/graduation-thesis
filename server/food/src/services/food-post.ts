@@ -9,7 +9,7 @@ import {
   RpcQueueName,
   RpcSource,
 } from "../data";
-import { FoodPost, FoodPostDocument } from "../db/model";
+import { FoodPost, FoodPostDocument, FoodUserLike } from "../db/model";
 
 interface IPostFoodData extends Omit<IFoodPost, "user"> {
   user: string;
@@ -76,8 +76,9 @@ export const postFood = async (
 };
 
 export const findFoodPostById = async (
-  id: string
-): Promise<FoodPostDocument> => {
+  id: string,
+  userId?: string
+): Promise<FoodPostDocument & { liked?: boolean }> => {
   const foodPost = await FoodPost.findById(id);
   if (foodPost == null) {
     throw new ResourceNotExistedError({
@@ -88,7 +89,18 @@ export const findFoodPostById = async (
       },
     });
   }
-  return foodPost;
+  const result: FoodPostDocument & { liked?: boolean } = {
+    ...foodPost,
+  };
+  if (userId) {
+    const liked = await FoodUserLike.findOne({
+      user: userId,
+      foodPost: foodPost._id,
+    });
+    if (liked != null) result.liked = true;
+  }
+
+  return result;
 };
 
 export const searchFood = async (
@@ -201,4 +213,58 @@ export const searchFood = async (
   const result = await query.exec();
   if (result == null) throw new InternalError();
   return result;
+};
+
+export const userLikeOrUnlikeFoodPost = async (
+  userId: string,
+  foodPostId: string,
+  like?: boolean
+) => {
+  const foodPost = await FoodPost.findById(foodPostId);
+  if (foodPost == null) {
+    throw new ResourceNotExistedError({
+      message: `No food post with id ${foodPostId} found`,
+      data: {
+        target: "food-post",
+        reason: "not-found",
+      },
+    });
+  }
+
+  const liked = await FoodUserLike.findOne({
+    foodPost: foodPostId,
+    user: userId,
+  });
+
+  // Like but already like
+  if (liked != null && like) {
+    return liked;
+  }
+
+  // Like when no already like
+  if (liked == null && like) {
+    const newLike = new FoodUserLike({
+      foodPost: foodPostId,
+      user: userId,
+    });
+    await newLike.save();
+    const newLikeCount = (foodPost.likeCount ?? 0) + 1;
+    foodPost.likeCount = newLikeCount;
+    await foodPost.save();
+    return newLike;
+  }
+
+  // Unlike when has no already like
+  if (liked == null && !like) {
+    return;
+  }
+
+  // Unlike and has like before
+  if (liked != null && !like) {
+    await FoodUserLike.deleteOne({ _id: liked._id });
+    const newLikeCount = Math.max((foodPost.likeCount ?? 0) - 1, 0);
+    foodPost.likeCount = newLikeCount;
+    await foodPost.save();
+    return liked;
+  }
 };

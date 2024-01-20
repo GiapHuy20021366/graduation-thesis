@@ -72,3 +72,4 @@ export {
   IHistorySearchParams,
   toHistorySearchParams,
 } from "./history-search-params";
+export { IFoodUserLike } from "./food-user-like";

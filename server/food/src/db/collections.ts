@@ -2,5 +2,6 @@ export default {
     user: "users",
     image: "images",
     foodPost: "food-posts",
-    foodSearchHistory: "search-histories"
+    foodSearchHistory: "search-histories",
+    foodUserLike: "food-post-user-likes"
 }

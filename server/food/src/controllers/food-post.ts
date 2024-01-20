@@ -17,6 +17,7 @@ import {
   findFoodPostById,
   searchFood as searchFoodService,
   saveSearchHistory,
+  userLikeOrUnlikeFoodPost,
 } from "../services";
 
 interface IPostFoodBody {
@@ -142,7 +143,9 @@ export const findFoodPost = async (
     );
   }
 
-  findFoodPostById(id)
+  const auth = req.authContext as AuthLike;
+
+  findFoodPostById(id, auth._id)
     .then((data) => res.status(200).send(toResponseSuccessData(data)))
     .catch(next);
 };
@@ -172,6 +175,30 @@ export const searchFoodPost = async (
   const paramsToSerach = toFoodSearchParams(params);
   saveSearchHistory(auth._id, paramsToSerach);
   searchFoodService(paramsToSerach)
+    .then((data) => res.status(200).json(toResponseSuccessData(data)))
+    .catch(next);
+};
+
+export const likeOrUnlikeFoodPost = (
+  req: Request<{ id?: string }, {}, {}, { action?: string }>,
+  res: Response,
+  next: NextFunction
+) => {
+  const foodId = req.params.id;
+  if (!isObjectId(foodId)) {
+    return next(
+      new InvalidDataError({
+        message: `Invalid data foodId: ${foodId}`,
+        data: {
+          reason: "invalid-food-id",
+          target: "food-id",
+        },
+      })
+    );
+  }
+  const action = req.query.action ?? "LIKE";
+  const auth = req.authContext as AuthLike;
+  userLikeOrUnlikeFoodPost(auth._id, foodId!, action === "LIKE")
     .then((data) => res.status(200).json(toResponseSuccessData(data)))
     .catch(next);
 };
