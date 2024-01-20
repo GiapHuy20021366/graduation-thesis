@@ -1,44 +1,34 @@
 import express, { Express } from "express";
 import {
-    errorHandler,
-    checkRegistBodyAndParams,
-    checkLoginBodyAndParams,
-    tokenParser
+  errorHandler,
+  checkRegistBodyAndParams,
+  checkLoginBodyAndParams,
+  tokenParser,
 } from "../middlewares";
 import {
-    registAccount,
-    activeManualAccount,
-    loginAccount,
-    refreshToken
+  registAccount,
+  activeManualAccount,
+  loginAccount,
+  refreshToken,
+  setUserLocation,
+  searchUsersAround,
 } from "../controllers";
 
 const userRouter = express.Router();
 
 export const initUserRouters = (app: Express): void => {
+  userRouter.post("/register", checkRegistBodyAndParams, registAccount);
 
-    userRouter.post(
-        "/register",
-        checkRegistBodyAndParams,
-        registAccount
-    );
+  userRouter.post("/login", checkLoginBodyAndParams, loginAccount);
 
-    userRouter.post(
-        "/login",
-        checkLoginBodyAndParams,
-        loginAccount
-    );
+  userRouter.get("/active", activeManualAccount);
 
-    userRouter.get(
-        "/active",
-        activeManualAccount
-    )
+  userRouter.get("/token/refresh", tokenParser, refreshToken);
 
-    userRouter.get(
-        "/token/refresh",
-        tokenParser,
-        refreshToken
-    )
+  userRouter.put("/location", tokenParser, setUserLocation);
 
-    userRouter.use(errorHandler);
-    app.use("/", userRouter);
-}
+  userRouter.post("/search/location", tokenParser, searchUsersAround);
+
+  userRouter.use(errorHandler);
+  app.use("/", userRouter);
+};

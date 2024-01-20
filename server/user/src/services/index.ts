@@ -9,3 +9,7 @@ export { loginAccountByManual } from "./login";
 export { refreshToken } from "./token";
 
 export { rpcGetUserInfo } from "./rpc";
+
+export { setUserLocation } from "./location";
+
+export { searchUsersAround } from "./user";

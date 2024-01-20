@@ -251,8 +251,8 @@ export default function FoodSearchBody() {
         : orderDistance;
     setOrderDistance(distanceOrder);
     const order: IFoodSeachOrder = {
-      orderDistance: OrderState.NONE,
-      orderNew: distanceOrder,
+      orderDistance: distanceOrder,
+      orderNew: OrderState.NONE,
       orderPrice: OrderState.NONE,
       orderQuantity: OrderState.NONE,
     };
@@ -272,8 +272,8 @@ export default function FoodSearchBody() {
     setOrderPrice(priceOrder);
     const order: IFoodSeachOrder = {
       orderDistance: OrderState.NONE,
-      orderNew: priceOrder,
-      orderPrice: OrderState.NONE,
+      orderNew: OrderState.NONE,
+      orderPrice: priceOrder,
       orderQuantity: OrderState.NONE,
     };
     const searchParams: IFoodSearchParams = toSearchParams(
@@ -294,9 +294,9 @@ export default function FoodSearchBody() {
     setOrderQuantity(quantityOrder);
     const order: IFoodSeachOrder = {
       orderDistance: OrderState.NONE,
-      orderNew: quantityOrder,
+      orderNew: OrderState.NONE,
       orderPrice: OrderState.NONE,
-      orderQuantity: OrderState.NONE,
+      orderQuantity: quantityOrder,
     };
     const searchParams: IFoodSearchParams = toSearchParams(
       {

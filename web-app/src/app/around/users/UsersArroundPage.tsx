@@ -281,6 +281,10 @@ export default function UsersArroundPage() {
               direction={"row"}
               width={"100%"}
               justifyContent={"space-around"}
+              sx={{
+                boxSizing: "border-box",
+                boxShadow: 1,
+              }}
             >
               <Chip
                 icon={<SocialDistance />}
@@ -288,7 +292,7 @@ export default function UsersArroundPage() {
                 sx={{
                   backgroundColor: "white",
                   color: "black",
-                  fontSize: "1.3rem",
+                  fontSize: "1.2rem",
                 }}
               />
               <Chip
@@ -297,7 +301,7 @@ export default function UsersArroundPage() {
                 sx={{
                   backgroundColor: "white",
                   color: "black",
-                  fontSize: "1.3rem",
+                  fontSize: "1.2rem",
                 }}
               />
               <Chip
@@ -306,7 +310,7 @@ export default function UsersArroundPage() {
                 sx={{
                   backgroundColor: "white",
                   color: "black",
-                  fontSize: "1.3rem",
+                  fontSize: "1.2rem",
                 }}
               />
             </Stack>
