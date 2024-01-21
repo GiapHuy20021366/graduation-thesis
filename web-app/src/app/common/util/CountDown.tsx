@@ -27,7 +27,7 @@ export default function CountDown({ time, sx }: ICountDownProps) {
     };
   }, [time]);
 
-  const { days, hours, minutes, seconds } = toLeftTime(timeLeft);
+  const { days, hours, minutes, seconds } = toLeftTime(Math.max(0, timeLeft));
 
   return (
     <Stack sx={sx}>

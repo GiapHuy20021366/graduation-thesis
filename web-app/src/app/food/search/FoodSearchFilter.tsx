@@ -11,7 +11,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ToggleChipGroup from "../../common/custom/ToggleChipGroup";
 import ToggleChip from "../../common/custom/ToggleChip";
 import {
@@ -121,6 +121,7 @@ export default function FoodSearchFilter({
       price: price,
     };
     onApply(params);
+    backup();
   };
 
   const handleCategoryPicked = (category: FoodCategory | null): void => {
@@ -168,6 +169,52 @@ export default function FoodSearchFilter({
       max: +event.target.value,
     });
   };
+
+  const backup = () => {
+    localStorage.setItem(
+      "food.search.state.filter",
+      JSON.stringify({
+        addedBy,
+        available,
+        maxDistance,
+        categories,
+        categoryActive,
+        minQuantity,
+        quantityHover,
+        maxDuration,
+        priceOption,
+        priceRange,
+      })
+    );
+  };
+
+  const restore = () => {
+    const saved = localStorage.getItem("food.search.state.filter");
+    if (saved) {
+      try {
+        const meta = JSON.parse(saved);
+        if (meta) {
+          setAddedBy(meta.addedBy);
+          setAvailable(meta.available);
+          setMaxDistance(meta.maxDistance);
+          setCategories(meta.categories);
+          setCategoryActive(meta.categoryActive);
+          setMinQuantity(meta.minQuantity);
+          setQuantityHover(meta.quantityHover);
+          setMaxDuration(meta.maxDuration);
+          setPriceOption(meta.priceOption);
+          setPriceRange(meta.priceRange);
+        }
+      } catch (error) {
+        // DO nothing
+      }
+    }
+  };
+
+  useEffect(() => {
+    restore();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Container>

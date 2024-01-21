@@ -26,6 +26,7 @@ import {
 
 interface IFoodSearchItemProps {
   item: IFoodSearchInfo;
+  onBeforeNavigate?: () => void;
 }
 
 interface IFoodItemDurationProps {
@@ -47,12 +48,22 @@ function FoodItemDuration({ duration }: IFoodItemDurationProps) {
   );
 }
 
-export default function FoodSearchItem({ item }: IFoodSearchItemProps) {
+export default function FoodSearchItem({
+  item,
+  onBeforeNavigate,
+}: IFoodSearchItemProps) {
   const navigate = useNavigate();
   const i18n = useI18nContext();
   const lang = i18n.of(FoodSearchItem, "Categories", "Quantities");
   const quantityType = toQuantityType(item.quantity);
   const appContentContext = useAppContentContext();
+
+  const handleNavigate = () => {
+    if (onBeforeNavigate != null) {
+      onBeforeNavigate();
+    }
+    navigate(`/food/${item._id}`);
+  };
 
   return (
     <Stack
@@ -75,7 +86,7 @@ export default function FoodSearchItem({ item }: IFoodSearchItemProps) {
             objectFit: "cover",
             cursor: "pointer",
           }}
-          onClick={() => navigate(`/food/${item._id}`)}
+          onClick={handleNavigate}
         />
         <Box flex={1}>
           <Box
@@ -84,7 +95,7 @@ export default function FoodSearchItem({ item }: IFoodSearchItemProps) {
             sx={{
               cursor: "pointer",
             }}
-            onClick={() => navigate(`/food/${item._id}`)}
+            onClick={handleNavigate}
           >
             {item.title}
           </Box>
@@ -94,7 +105,9 @@ export default function FoodSearchItem({ item }: IFoodSearchItemProps) {
           </Stack>
           <Stack direction={"row"} gap={1} mt={1}>
             <LocalOfferOutlined color="secondary" />
-            <Typography>{item.price ? `${item.price} VNĐ` : lang("l-free")}</Typography>
+            <Typography>
+              {item.price ? `${item.price} VNĐ` : lang("l-free")}
+            </Typography>
           </Stack>
           <Stack direction="row" alignItems={"center"} gap={1}>
             <ProductionQuantityLimitsOutlined color="info" />

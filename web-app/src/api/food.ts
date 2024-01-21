@@ -24,6 +24,7 @@ export const foodEndpoints = {
   findFoodPost: "/foods",
   searchFood: "/foods/search",
   searchHistory: "/foods/search/history",
+  likeFood: "/foods/like",
 } as const;
 
 export interface FoodResponseError
@@ -107,6 +108,11 @@ export interface FoodFetcher {
     params: IFoodSearchHistoryParams,
     auth: IAuthInfo
   ): Promise<FoodResponse<IFoodSearchHistorySimple[]>>;
+  likeFood(
+    foodId: string,
+    action: "LIKE" | "UNLIKE" | undefined,
+    auth: IAuthInfo
+  ): Promise<FoodResponse<void>>;
 }
 
 export const foodFetcher: FoodFetcher = {
@@ -166,5 +172,22 @@ export const foodFetcher: FoodFetcher = {
         Authorization: auth.token,
       },
     });
+  },
+  likeFood: (
+    foodId: string,
+    action: "LIKE" | "UNLIKE" | undefined,
+    auth: IAuthInfo
+  ): Promise<FoodResponse<void>> => {
+    return foodInstance.put(
+      foodEndpoints.likeFood + "/" + foodId,
+      {
+        action: action ?? "LIKE",
+      },
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
   },
 };

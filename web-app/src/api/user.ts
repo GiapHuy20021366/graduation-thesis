@@ -17,6 +17,7 @@ export const userEndpoints = {
   refeshToken: "/token/refresh",
   activeManual: "/active",
   userNear: "/users/near",
+  getInfo: "/info", // :id
 } as const;
 
 export interface UserResponseError
@@ -79,6 +80,7 @@ export interface UserFetcher {
     params: IGetUserNearParams,
     auth: IAuthInfo
   ): Promise<UserResponse<IUserInfo[]>>;
+  getUserInfo(id: string, auth: IAuthInfo): Promise<UserResponse<IUserInfo>>;
 }
 
 export const userFetcher: UserFetcher = {
@@ -162,6 +164,16 @@ export const userFetcher: UserFetcher = {
     return {
       data: data,
     };
+  },
+  getUserInfo: (
+    id: string,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IUserInfo>> => {
+    return userInstance.get(`${userEndpoints.getInfo}/${id}`, {
+      headers: {
+        Authorization: auth.token,
+      },
+    });
   },
 };
 

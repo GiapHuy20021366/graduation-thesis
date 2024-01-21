@@ -161,7 +161,6 @@ export const searchFoodPost = async (
 ) => {
   const params = req.body;
   const query = params.query;
-  const auth = req.authContext as AuthLike;
   if (typeof query !== "string" || !query) {
     return next(
       new InvalidDataError({
@@ -172,6 +171,7 @@ export const searchFoodPost = async (
       })
     );
   }
+  const auth = req.authContext as AuthLike;
   const paramsToSerach = toFoodSearchParams(params);
   saveSearchHistory(auth._id, paramsToSerach);
   searchFoodService(paramsToSerach)

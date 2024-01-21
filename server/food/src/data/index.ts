@@ -73,3 +73,4 @@ export {
   toHistorySearchParams,
 } from "./history-search-params";
 export { IFoodUserLike } from "./food-user-like";
+export { toDistance } from "./to-distance";

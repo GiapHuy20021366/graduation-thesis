@@ -7,6 +7,7 @@ export interface FoodPostDocument extends IFoodPost, Document {
   createdAt: Date;
   updatedAt: Date;
   likeCount: number;
+  _doc: any;
 }
 
 interface IFoodPostMethods {}

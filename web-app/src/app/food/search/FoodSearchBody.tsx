@@ -41,14 +41,15 @@ import {
 import { IFoodSearchContext } from "./FoodSearchContext";
 import FoodItemSkeleton from "./FoodItemSkeleton";
 import { IFoodSearchHistorySimple } from "../../../api/food";
+import OutSearchResult from "../../common/OutSearchResult";
 
 interface IOrderIconProps {
   order?: OrderState;
 }
 
 function OrderIcon({ order }: IOrderIconProps) {
-  if (order === OrderState.INCREASE) return <ArrowDownward />;
-  if (order === OrderState.DECREASE) return <ArrowUpward />;
+  if (order === OrderState.INCREASE) return <ArrowUpward />;
+  if (order === OrderState.DECREASE) return <ArrowDownward />;
   if (order === OrderState.NONE) return <ImportExport />;
   return <></>;
 }
@@ -110,14 +111,19 @@ const toSearchParams = (
   };
 };
 
+type IFoodSearchHistoryAndKey = IFoodSearchHistorySimple & {
+  key: number;
+};
+
 export default function FoodSearchBody() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [result, setResult] = useState<IFoodSearchInfo[]>([]);
   const [openFilter, setOpenFilter] = useState<boolean>(false);
-  const [options, setOptions] = useState<IFoodSearchHistorySimple[]>([]);
+  const [options, setOptions] = useState<IFoodSearchHistoryAndKey[]>([]);
   const [tab, setTab] = useState<SearchTab>(SearchTab.RELATED);
   const i18nContext = useI18nContext();
   const lang = i18nContext.of(FoodSearchBody);
+  const [isOut, setIsOut] = useState<boolean>(false);
 
   const searchContext = useFoodSearchContext();
   const {
@@ -159,29 +165,39 @@ export default function FoodSearchBody() {
     }
     if (authContext.auth != null) {
       foodFetcher.searchHistory(params, authContext.auth).then((data) => {
-        setOptions(data.data ?? []);
+        const datas = data.data;
+        if (datas && datas.length > 0) {
+          setOptions(datas.map((data, index) => ({ ...data, key: index })));
+        }
       });
     }
   }, [authContext.account, authContext.auth, query]);
 
   const searchFood = (params: IFoodSearchParams) => {
-    console.log(params);
+    if (auth == null) return;
+    if (!params.query) return;
+    if (searching.isActice) return;
 
-    if (auth != null && params.query && !searching.isActice) {
-      searching.active();
-      setResult([]);
-      foodFetcher
-        .searchFood(params, auth)
-        .then((data) => {
-          setTimeout(() => {
-            setResult(data.data ?? []);
-            searching.deactive();
-          }, 200);
-        })
-        .catch(() => {
+    setIsOut(false);
+
+    searching.active();
+    setResult([]);
+    foodFetcher
+      .searchFood(params, auth)
+      .then((data) => {
+        setTimeout(() => {
+          const datas = data.data;
+          if (datas == null || datas.length === 0) {
+            setIsOut(true);
+          } else {
+            setResult(datas);
+          }
           searching.deactive();
-        });
-    }
+        }, 200);
+      })
+      .catch(() => {
+        searching.deactive();
+      });
   };
 
   const doSearch = () => {
@@ -325,11 +341,21 @@ export default function FoodSearchBody() {
       order,
       query,
       ...params,
+      currentLocation: appContentContext.currentLocation,
     };
     searchFood(searchParams);
   };
 
+  const tryDoSearchMore = () => {
+    setIsOut(false);
+    doSearchMore();
+  };
+
   const doSearchMore = useCallback(() => {
+    if (isOut) return;
+    if (auth == null) return;
+    if (!searchContext.query) return;
+    if (searching.isActice) return;
     const params = toSearchParams(
       searchContext,
       appContentContext.currentLocation
@@ -338,25 +364,29 @@ export default function FoodSearchBody() {
       skip: result.length,
       limit: 24,
     };
-    if (auth != null && searchContext.query && !searching.isActice) {
-      searching.active();
-      foodFetcher
-        .searchFood(params, auth)
-        .then((data) => {
-          setTimeout(() => {
-            const datas = data.data ?? [];
+
+    searching.active();
+    foodFetcher
+      .searchFood(params, auth)
+      .then((data) => {
+        setTimeout(() => {
+          const datas = data.data ?? [];
+          if (datas.length === 0) {
+            setIsOut(true);
+          } else {
             const newData = [...result, ...datas];
             setResult(newData);
-            searching.deactive();
-          }, 1000);
-        })
-        .catch(() => {
+          }
           searching.deactive();
-        });
-    }
+        }, 1000);
+      })
+      .catch(() => {
+        searching.deactive();
+      });
   }, [
     appContentContext.currentLocation,
     auth,
+    isOut,
     result,
     searchContext,
     searching,
@@ -382,157 +412,227 @@ export default function FoodSearchBody() {
     };
   }, [appContentContext.mainRef, doSearchMore]);
 
+  const backup = () => {
+    const mainCur = appContentContext.mainRef?.current;
+    const scroll = {
+      scrollX: mainCur?.scrollLeft ?? 0,
+      scrollY: mainCur?.scrollTop ?? 0,
+    };
+    const save = JSON.stringify({
+      ...searchContext,
+      scroll,
+      result,
+      tab,
+    });
+    localStorage.setItem("food.search.state", save);
+    console.log("save", save);
+  };
+
+  const restore = () => {
+    try {
+      const saved = localStorage.getItem("food.search.state");
+      if (!saved) return;
+      const meta = JSON.parse(saved);
+      console.log(meta);
+      if (meta != null) {
+        searchContext.setAddedBy(meta.addedBy);
+        searchContext.setAvailable(meta.available);
+        searchContext.setCategories(meta.categories);
+        searchContext.setMaxDistance(meta.maxDistance);
+        searchContext.setMaxDuration(meta.maxDuration);
+        searchContext.setMinQuantity(meta.minQuantity);
+        searchContext.setOrderDistance(meta.order.orderDistance);
+        searchContext.setOrderNew(meta.order.orderNew);
+        searchContext.setOrderQuantity(meta.order.orderQuantity);
+        searchContext.setOrderPrice(meta.order.orderPrice);
+        searchContext.setPrice(meta.price);
+        searchContext.setQuery(meta.query);
+        setResult(meta.result);
+        setTab(meta.tab);
+        const mainCur = appContentContext.mainRef?.current;
+        if (mainCur) {
+          setTimeout(() => {
+            mainCur.scrollTo(meta.scroll.scrollX, meta.scroll.scrollY);
+          }, 200);
+        }
+      }
+    } catch (error) {
+      // DO nothing
+    }
+  };
+
+  useEffect(() => {
+    restore();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
-    <Stack height="100%" width="100%" direction="column">
-      <Box
-        sx={{
-          position: "sticky",
-          top: 0,
-          mt: 1,
-          width: "100%",
-          padding: "5px",
-          boxSizing: "border-box",
-          backgroundColor: "white",
-          zIndex: 100,
-        }}
-      >
-        <Autocomplete
-          freeSolo
-          fullWidth
-          options={options}
-          filterOptions={(options) => options}
-          onInputChange={handleInputChange}
-          onChange={handleSearchQueryChange}
-          getOptionLabel={(option) =>
-            typeof option === "string" ? option : option.query
-          }
+    <Box width={"100%"} boxSizing={"border-box"}>
+      <Stack width="100%" direction="column">
+        <Box
           sx={{
-            width: ["100%", "90%", "80%"],
+            position: "sticky",
+            top: 1,
+            mt: 1,
+            width: "100%",
+            padding: "5px",
+            boxSizing: "border-box",
+            backgroundColor: "white",
+            zIndex: 100,
           }}
-          renderOption={(props, option) => (
-            <ListItem disablePadding {...props}>
-              <ListItemIcon>
-                <SearchOutlined />
-              </ListItemIcon>
-              <ListItemText primary={option.query} />
-              {option.userId === authContext?.account?.id_ && (
-                <ListItemIcon>
-                  <History />
-                </ListItemIcon>
-              )}
-            </ListItem>
-          )}
-          renderInput={(params) => (
-            <TextField
-              inputRef={inputRef}
-              {...params}
-              margin="normal"
-              variant="outlined"
-              placeholder={lang("search-placeholder")}
-              InputProps={{
-                ...params.InputProps,
-                style: {
-                  borderRadius: 40,
-                  paddingLeft: "1em",
-                  margin: "auto",
-                },
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchOutlined />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <>
-                    {params.InputProps.endAdornment}
-                    <InputAdornment position="end">
-                      <Tooltip title={lang("l-search")}>
-                        <IconButton color="info" onClick={() => doSearch()}>
-                          <SearchOutlined />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip
-                        title={lang("l-advance-search")}
-                        onClick={() => setOpenFilter(true)}
-                      >
-                        <IconButton color="info">
-                          <TuneOutlined />
-                        </IconButton>
-                      </Tooltip>
-                    </InputAdornment>
-                  </>
-                ),
-              }}
-            />
-          )}
-        />
-        <Stack width="100%" direction={"row"}>
-          <Tabs
-            value={tab}
-            onChange={(
-              _event: React.SyntheticEvent<Element, Event>,
-              value: any
-            ) => setTab(value)}
-            variant="scrollable"
-            scrollButtons={false}
+        >
+          <Autocomplete
+            freeSolo
+            fullWidth
+            options={options}
+            filterOptions={(options) => options}
+            inputValue={query}
+            value={query}
+            onInputChange={handleInputChange}
+            onChange={handleSearchQueryChange}
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option.query
+            }
             sx={{
-              ".MuiTab-root": {
-                textTransform: "initial",
-              },
+              width: ["100%", "90%", "80%"],
             }}
-          >
-            <Tab label={lang("l-relative")} onClick={onTabRelativeClick} />
-            <Tab
-              label={lang("l-time")}
-              icon={<OrderIcon order={orderNew} />}
-              iconPosition="end"
-              onClick={onTabOrderNewClick}
+            renderOption={(props, option) => (
+              <ListItem disablePadding {...props} key={option.key}>
+                <ListItemIcon>
+                  <SearchOutlined />
+                </ListItemIcon>
+                <ListItemText primary={option.query} />
+                {option.userId === authContext?.account?.id_ && (
+                  <ListItemIcon>
+                    <History />
+                  </ListItemIcon>
+                )}
+              </ListItem>
+            )}
+            renderInput={(params) => (
+              <TextField
+                inputRef={inputRef}
+                {...params}
+                margin="normal"
+                variant="outlined"
+                placeholder={lang("search-placeholder")}
+                InputProps={{
+                  ...params.InputProps,
+                  style: {
+                    borderRadius: 40,
+                    paddingLeft: "1em",
+                    margin: "auto",
+                  },
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchOutlined />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <>
+                      {params.InputProps.endAdornment}
+                      <InputAdornment position="end">
+                        <Tooltip title={lang("l-search")}>
+                          <IconButton color="info" onClick={() => doSearch()}>
+                            <SearchOutlined />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip
+                          title={lang("l-advance-search")}
+                          onClick={() => setOpenFilter(true)}
+                        >
+                          <IconButton color="info">
+                            <TuneOutlined />
+                          </IconButton>
+                        </Tooltip>
+                      </InputAdornment>
+                    </>
+                  ),
+                }}
+              />
+            )}
+          />
+          <Stack width="100%" direction={"row"}>
+            <Tabs
+              value={tab}
+              onChange={(
+                _event: React.SyntheticEvent<Element, Event>,
+                value: any
+              ) => setTab(value)}
+              variant="scrollable"
+              scrollButtons={false}
+              sx={{
+                ".MuiTab-root": {
+                  textTransform: "initial",
+                },
+              }}
+            >
+              <Tab label={lang("l-relative")} onClick={onTabRelativeClick} />
+              <Tab
+                label={lang("l-time")}
+                icon={<OrderIcon order={orderNew} />}
+                iconPosition="end"
+                onClick={onTabOrderNewClick}
+              />
+              <Tab
+                label={lang("l-distance")}
+                icon={<OrderIcon order={orderDistance} />}
+                iconPosition="end"
+                onClick={onTabOrderDistanceClick}
+              />
+              <Tab
+                label={lang("l-price")}
+                icon={<OrderIcon order={orderPrice} />}
+                iconPosition="end"
+                onClick={onTabOrderPriceClick}
+              />
+              <Tab
+                label={lang("l-quantity")}
+                icon={<OrderIcon order={orderQuantity} />}
+                iconPosition="end"
+                onClick={onTabOrderQuantityClick}
+              />
+            </Tabs>
+          </Stack>
+        </Box>
+        <Divider />
+        <FoodSearchFilter
+          isActive={openFilter}
+          onClose={() => setOpenFilter(false)}
+          onApply={(params) => onApplyFilter(params)}
+        />
+        <Stack
+          flex={1}
+          sx={{
+            overflowY: "auto",
+            width: "100%",
+            boxSizing: "border-box",
+            minHeight: "80vh",
+          }}
+        >
+          {result.map((food, index) => {
+            return (
+              <FoodSearchItem
+                item={food}
+                key={index}
+                onBeforeNavigate={() => backup()}
+              />
+            );
+          })}
+          {searching.isActice && (
+            <>
+              <FoodItemSkeleton />
+            </>
+          )}
+          {isOut && (
+            <OutSearchResult
+              textLabel={lang("Bạn đã tìm kiếm hết")}
+              chipLabel={lang("Thử lại")}
+              onTryClick={() => tryDoSearchMore()}
             />
-            <Tab
-              label={lang("l-distance")}
-              icon={<OrderIcon order={orderDistance} />}
-              iconPosition="end"
-              onClick={onTabOrderDistanceClick}
-            />
-            <Tab
-              label={lang("l-price")}
-              icon={<OrderIcon order={orderPrice} />}
-              iconPosition="end"
-              onClick={onTabOrderPriceClick}
-            />
-            <Tab
-              label={lang("l-quantity")}
-              icon={<OrderIcon order={orderQuantity} />}
-              iconPosition="end"
-              onClick={onTabOrderQuantityClick}
-            />
-          </Tabs>
+          )}
         </Stack>
-      </Box>
-      <Divider />
-      <FoodSearchFilter
-        isActive={openFilter}
-        onClose={() => setOpenFilter(false)}
-        onApply={(params) => onApplyFilter(params)}
-      />
-      <Stack
-        flex={1}
-        sx={{
-          overflowY: "auto",
-          width: "100%",
-          boxSizing: "border-box",
-          minHeight: "80vh",
-        }}
-      >
-        {result.map((food, index) => {
-          return <FoodSearchItem item={food} key={index} />;
-        })}
-        {searching.isActice && (
-          <>
-            <FoodItemSkeleton />
-            <FoodItemSkeleton />
-          </>
-        )}
       </Stack>
-    </Stack>
+    </Box>
   );
 }

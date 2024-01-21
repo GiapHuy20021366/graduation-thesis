@@ -4,10 +4,12 @@ import {
   IFoodPostLocation,
   IFoodSearchParams,
   InternalError,
+  OrderState,
   ResourceNotExistedError,
   RpcAction,
   RpcQueueName,
   RpcSource,
+  toDistance,
 } from "../data";
 import { FoodPost, FoodPostDocument, FoodUserLike } from "../db/model";
 
@@ -75,10 +77,14 @@ export const postFood = async (
   };
 };
 
+interface IFoodPostReturn extends FoodPostDocument {
+  liked?: boolean;
+}
+
 export const findFoodPostById = async (
   id: string,
   userId?: string
-): Promise<FoodPostDocument & { liked?: boolean }> => {
+): Promise<IFoodPostReturn> => {
   const foodPost = await FoodPost.findById(id);
   if (foodPost == null) {
     throw new ResourceNotExistedError({
@@ -89,8 +95,8 @@ export const findFoodPostById = async (
       },
     });
   }
-  const result: FoodPostDocument & { liked?: boolean } = {
-    ...foodPost,
+  const result: IFoodPostReturn = {
+    ...foodPost._doc,
   };
   if (userId) {
     const liked = await FoodUserLike.findOne({
@@ -124,16 +130,15 @@ export const searchFood = async (
     order,
   } = params;
 
+  console.log("params: ", params);
+
   // max distance on location
   if (currentLocation) {
     const maxDis =
       maxDistance != undefined ? maxDistance : Number.MAX_SAFE_INTEGER;
     options["location.two_array"] = {
       $geoWithin: {
-        $centerSphere: [
-          [currentLocation.lng, currentLocation.lat],
-          maxDis / 6371,
-        ],
+        $center: [[currentLocation.lng, currentLocation.lat], maxDis],
       },
     };
   }
@@ -183,21 +188,24 @@ export const searchFood = async (
     };
   }
 
-  const sort: any = {
-    score: { $meta: "textScore" },
-  };
+  const sort: any = {};
 
   if (order) {
-    sort["createdAt"] = order.orderNew;
-    sort["price"] = order.orderPrice;
-    sort["quantity"] = order.orderQuantity;
-
-    if (currentLocation) {
-      sort["location.two_array"] = order.orderDistance;
+    if (order.orderNew) {
+      sort["createdAt"] = order.orderNew;
     }
-
-    console.log(order, sort);
+    if (order.orderPrice) {
+      sort["price"] = order.orderPrice;
+    }
+    if (order.orderQuantity) {
+      sort["quantity"] = order.orderQuantity;
+    }
   }
+
+  // score final
+  sort["score"] = { $meta: "textScore" };
+
+  console.log(JSON.stringify(options), sort);
 
   const query = FoodPost.find(options, {
     score: {
@@ -212,6 +220,21 @@ export const searchFood = async (
 
   const result = await query.exec();
   if (result == null) throw new InternalError();
+
+  // Sort follow location
+  if (order) {
+    if (currentLocation && order.orderDistance) {
+      result.sort((f1, f2) => {
+        const pos1 = f1.location.coordinates;
+        const pos2 = f2.location.coordinates;
+        const delta =
+          toDistance(pos1, currentLocation) - toDistance(pos2, currentLocation);
+        if (order.orderDistance === OrderState.INCREASE) return delta;
+        return -delta;
+      });
+      sort["location.two_array"] = order.orderDistance;
+    }
+  }
   return result;
 };
 
