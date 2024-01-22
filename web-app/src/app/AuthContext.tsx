@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { userFetcher } from "../api";
-import { IAuthInfo } from "../data";
+import { IAuthInfo, ILocation } from "../data";
 
 interface IAccount {
   id_: string;
@@ -15,6 +15,7 @@ interface IAccount {
   email: string;
   avatar?: string;
   titles?: string[];
+  location?: ILocation;
 }
 
 interface IAuthContextProviderProps {

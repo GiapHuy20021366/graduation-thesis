@@ -43,5 +43,6 @@ export const loginAccountByManual = async (
     }),
     avatar: user.avatar,
     titles: user.titles,
+    location: user.location,
   };
 };

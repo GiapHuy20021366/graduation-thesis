@@ -6,10 +6,16 @@ import {
 } from "@react-google-maps/api";
 import { GOOGLE_MAP_API_KEY } from "../../env";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { GeoCodeMapsData, ICoordinates, mapIcons } from "../../data";
+import { GeoCodeMapsData, ICoordinates, ILocation, mapIcons } from "../../data";
 import { Box, Button, Chip, Stack, TextField } from "@mui/material";
 import { CenterFocusStrongOutlined } from "@mui/icons-material";
-import { geocodeMapFindAddess } from "../../api";
+import { geocodeMapFindAddess, userFetcher } from "../../api";
+import { useAuthContext, useToastContext } from "../../hooks";
+
+const isDiffLocation = (pos1: ICoordinates, pos2?: ICoordinates): boolean => {
+  if (pos2 == null) return true;
+  return pos1.lat !== pos2.lat || pos1.lng !== pos2.lng;
+};
 
 export default function LocationPage() {
   const { isLoaded } = useJsApiLoader({
@@ -28,6 +34,10 @@ export default function LocationPage() {
   const [fetching, setFetching] = useState<boolean>(false);
   const [lastFetchedPos, setLastFetchedPos] = useState<ICoordinates>();
   const timeout = useRef<number>();
+  const authContext = useAuthContext();
+  const auth = authContext.auth;
+  const [home, setHome] = useState<ILocation>();
+  const toastContext = useToastContext();
 
   const fetchAddress = useCallback((pos: ICoordinates) => {
     const timeOutId = timeout.current;
@@ -101,7 +111,31 @@ export default function LocationPage() {
 
   const handleSetMyLocation = () => {
     console.log("Location");
+    if (auth == null) return;
+    if (selected == null) return;
+
+    const newLocation: ILocation = {
+      name: locationName,
+      coordinates: selected,
+    };
+
+    userFetcher
+      .setLocation(newLocation, auth)
+      .then(() => {
+        setHome(newLocation);
+        toastContext.success("Set location successful");
+      })
+      .catch(() => {
+        toastContext.error("Can not set location now");
+      });
   };
+
+  useEffect(() => {
+    const userLocation = authContext.account?.location;
+    if (userLocation != null && home == null) {
+      setHome(userLocation);
+    }
+  }, [authContext.account, home]);
 
   const handleMapClick = (e: google.maps.MapMouseEvent) => {
     const latLng = e.latLng;
@@ -147,10 +181,10 @@ export default function LocationPage() {
             }}
             onClick={handleMapClick}
           >
-            {selected && (
+            {selected && isDiffLocation(selected, home?.coordinates) && (
               <MarkerF
                 icon={{
-                  url: mapIcons.home,
+                  url: mapIcons.homePin,
                   scaledSize: new google.maps.Size(40, 40),
                 }}
                 position={selected}
@@ -172,6 +206,20 @@ export default function LocationPage() {
                     </Box>
                   </InfoWindowF>
                 )}
+              </MarkerF>
+            )}
+            {home != null && (
+              <MarkerF
+                icon={{
+                  url: mapIcons.homeGreen,
+                  scaledSize: new google.maps.Size(40, 40),
+                }}
+                position={home.coordinates}
+              >
+                <InfoWindowF position={home.coordinates}>
+                  <Box sx={{ width: 200 }}>
+                  </Box>
+                </InfoWindowF>
               </MarkerF>
             )}
           </GoogleMap>

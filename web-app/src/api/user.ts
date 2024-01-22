@@ -9,6 +9,7 @@ import {
   ICoordinates,
   IAuthInfo,
   IUserInfo,
+  ILocation,
 } from "../data";
 
 export const userEndpoints = {
@@ -17,7 +18,8 @@ export const userEndpoints = {
   refeshToken: "/token/refresh",
   activeManual: "/active",
   userNear: "/users/near",
-  getInfo: "/info", // :id
+  getInfo: "/info", // :id,
+  setLocation: "/location",
 } as const;
 
 export interface UserResponseError
@@ -81,6 +83,10 @@ export interface UserFetcher {
     auth: IAuthInfo
   ): Promise<UserResponse<IUserInfo[]>>;
   getUserInfo(id: string, auth: IAuthInfo): Promise<UserResponse<IUserInfo>>;
+  setLocation(
+    location: ILocation,
+    auth: IAuthInfo
+  ): Promise<UserResponse<void>>;
 }
 
 export const userFetcher: UserFetcher = {
@@ -170,6 +176,16 @@ export const userFetcher: UserFetcher = {
     auth: IAuthInfo
   ): Promise<UserResponse<IUserInfo>> => {
     return userInstance.get(`${userEndpoints.getInfo}/${id}`, {
+      headers: {
+        Authorization: auth.token,
+      },
+    });
+  },
+  setLocation: (
+    location: ILocation,
+    auth: IAuthInfo
+  ): Promise<UserResponse<void>> => {
+    return userInstance.put(userEndpoints.setLocation, location, {
       headers: {
         Authorization: auth.token,
       },

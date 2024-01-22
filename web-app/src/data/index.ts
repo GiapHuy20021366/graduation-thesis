@@ -51,3 +51,5 @@ export { ItemAddedBy } from "./item-added-by";
 export { ItemAvailable } from "./item-available";
 export { type IPagination } from "./pagination";
 export { type IUserInfo } from "./user-info";
+export { type ILocation } from "./location";
+export { UserRole } from "./user-role";

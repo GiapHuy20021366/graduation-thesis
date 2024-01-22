@@ -43,6 +43,7 @@ export default function FoodPostInfo({ foodId }: IFoodPostInfoProps) {
     if (foodPostId != null) {
       fetchingFood(foodPostId);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

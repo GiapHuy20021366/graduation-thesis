@@ -1,3 +1,5 @@
+import { ILocation } from "./user-info";
+
 export interface AccountExposed {
     id_: string;
     email: string;
@@ -6,4 +8,5 @@ export interface AccountExposed {
     titles?: string[];
     avatar?: string;
     token: string;
+    location?: ILocation;
 }

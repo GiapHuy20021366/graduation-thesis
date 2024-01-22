@@ -130,8 +130,6 @@ export const searchFood = async (
     order,
   } = params;
 
-  console.log("params: ", params);
-
   // max distance on location
   if (currentLocation) {
     const maxDis =
@@ -204,8 +202,6 @@ export const searchFood = async (
 
   // score final
   sort["score"] = { $meta: "textScore" };
-
-  console.log(JSON.stringify(options), sort);
 
   const query = FoodPost.find(options, {
     score: {

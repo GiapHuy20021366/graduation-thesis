@@ -1,3 +1,6 @@
 export const mapIcons = {
-    home: "/svg/location-pin.svg"
-}
+  homePin: "/svg/location-pin.svg",
+  homeGreen: "/svg/home-green.svg",
+  bluePerson: "/svg/blue-person.svg",
+  userBlue: "/svg/user-blue.svg",
+};

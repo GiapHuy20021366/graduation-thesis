@@ -32,6 +32,7 @@ export const refreshToken = async (
       }),
       avatar: user.avatar,
       titles: user.titles,
+      location: user.location
     };
   } else {
     return {

@@ -108,6 +108,7 @@ export const createManualAccountFromToken = async (
       email: newAccount.email,
       _id: newAccount._id.toString(),
     }),
+    location: newAccount.location,
   };
 };
 
@@ -197,5 +198,6 @@ export const registAccountByGoogleCridential = async (
       email: responseUser.email,
       _id: user!._id.toString(),
     }),
+    location: responseUser.location,
   };
 };
