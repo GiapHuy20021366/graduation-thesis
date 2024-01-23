@@ -89,7 +89,10 @@ export const saveSearchHistory = (
 ): void => {
   const record = new FoodSeachHistory({
     userId: userId,
-    params: params,
+    params: {
+      ...params,
+      query: params.query ?? "",
+    },
   });
   record.save();
 };

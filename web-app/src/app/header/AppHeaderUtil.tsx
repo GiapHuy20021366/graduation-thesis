@@ -22,7 +22,7 @@ export default function AppHeaderUntil() {
       direction={"row"}
       sx={{
         alignItems: "center",
-        pt: 1
+        pt: 1,
       }}
     >
       <SideBarOpener />
@@ -49,6 +49,7 @@ export default function AppHeaderUntil() {
           sx={{
             color: "black",
           }}
+          onClick={() => navigate("/arround/users")}
         >
           <RoomOutlined sx={iconStyle} />
         </IconButton>

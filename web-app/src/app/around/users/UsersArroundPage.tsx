@@ -407,21 +407,6 @@ export default function UsersArroundPage() {
                   </MarkerF>
                 );
               })}
-            {home != null && (
-              <MarkerF
-                icon={{
-                  url: mapIcons.homeGreen,
-                  scaledSize: new google.maps.Size(40, 40),
-                }}
-                position={home.coordinates}
-              >
-                <InfoWindowF position={home.coordinates}>
-                  <Box sx={{ width: 200 }}>
-                    <span>Nhà của bạn</span>
-                  </Box>
-                </InfoWindowF>
-              </MarkerF>
-            )}
 
             {/* Restaurant */}
             {roles.includes(UserRole.RESTAURANT) &&

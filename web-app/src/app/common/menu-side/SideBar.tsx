@@ -14,6 +14,7 @@ import {
   HelpOutlineOutlined,
   SettingsOutlined,
   People,
+  LunchDiningOutlined,
 } from "@mui/icons-material";
 import SideBarItemText from "./SideBarItemText";
 import SideBarItem from "./SideBarItem";
@@ -92,6 +93,11 @@ export default function SideBar() {
               muiIcon={<People />}
               text={lang("users-around-me")}
               activeUrl="/arround/users"
+            />
+            <SideBarItem
+              muiIcon={<LunchDiningOutlined />}
+              text={lang("food-around-me")}
+              activeUrl="/arround/food"
             />
             <SideBarItem
               muiIcon={<HelpOutlineOutlined />}

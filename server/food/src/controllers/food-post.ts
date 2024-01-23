@@ -160,17 +160,17 @@ export const searchFoodPost = async (
   next: NextFunction
 ) => {
   const params = req.body;
-  const query = params.query;
-  if (typeof query !== "string" || !query) {
-    return next(
-      new InvalidDataError({
-        data: {
-          target: "query",
-          reason: "no-query-found",
-        },
-      })
-    );
-  }
+  // const query = params.query;
+  // if (typeof query !== "string" || !query) {
+  //   return next(
+  //     new InvalidDataError({
+  //       data: {
+  //         target: "query",
+  //         reason: "no-query-found",
+  //       },
+  //     })
+  //   );
+  // }
   const auth = req.authContext as AuthLike;
   const paramsToSerach = toFoodSearchParams(params);
   saveSearchHistory(auth._id, paramsToSerach);

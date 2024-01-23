@@ -49,7 +49,7 @@ export const FoodSearchContext = createContext<IFoodSearchContext>({
   maxDistance: -1,
   categories: [],
   maxDuration: -1,
-  minQuantity: 1,
+  minQuantity: 5,
   price: {
     min: 0,
     max: 0,
@@ -90,7 +90,7 @@ export default function FoodSearchContextProvider({
   const [categories, setCategories] = useState<FoodCategory[]>([]);
   const [maxDuration, setMaxDuration] = useState<number>(-1);
   const [query, setQuery] = useState<string>("");
-  const [minQuantity, setMinQuantity] = useState<number>(0);
+  const [minQuantity, setMinQuantity] = useState<number>(5);
   const [price, setPrice] = useState<IFoodSearchPrice>({
     active: false,
     min: 0,

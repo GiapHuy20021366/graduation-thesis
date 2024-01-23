@@ -33,7 +33,6 @@ const foodSeachHistorySchema = new Schema<
     maxDistance: Number,
     query: {
       type: String,
-      required: true,
       index: "text",
     },
     categories: [String],

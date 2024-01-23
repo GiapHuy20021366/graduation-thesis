@@ -112,12 +112,6 @@ export const findFoodPostById = async (
 export const searchFood = async (
   params: IFoodSearchParams
 ): Promise<FoodPostDocument[]> => {
-  const options: any = {
-    $text: {
-      $search: params.query,
-    },
-  };
-
   const {
     currentLocation,
     maxDistance,
@@ -129,6 +123,15 @@ export const searchFood = async (
     pagination,
     order,
   } = params;
+  const options: any = {};
+  const meta: any = {};
+  const sort: any = {};
+
+  if (params.query.length > 0) {
+    options["$text"] = {
+      $search: params.query,
+    };
+  }
 
   // max distance on location
   if (currentLocation) {
@@ -186,8 +189,6 @@ export const searchFood = async (
     };
   }
 
-  const sort: any = {};
-
   if (order) {
     if (order.orderNew) {
       sort["createdAt"] = order.orderNew;
@@ -201,13 +202,16 @@ export const searchFood = async (
   }
 
   // score final
-  sort["score"] = { $meta: "textScore" };
-
-  const query = FoodPost.find(options, {
-    score: {
+  if (params.query.length > 0) {
+    sort["score"] = {
       $meta: "textScore",
-    },
-  }).sort(sort);
+    };
+    meta["score"] = {
+      $meta: "textScore",
+    };
+  }
+
+  const query = FoodPost.find(options, meta).sort(sort);
 
   // Pagination
   if (pagination) {
