@@ -208,7 +208,7 @@ const fakeOneUser = (params: IGetUserNearParams): IUserInfo => {
     email: "something@gmail.com",
     firstName: "A",
     lastName: "B",
-    id_: "fake",
+    id_: String(Math.random() * 1000000),
     location: {
       name: "Fake",
       coordinates: userCoor,

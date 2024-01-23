@@ -2,6 +2,7 @@ import React, {
   Dispatch,
   SetStateAction,
   createContext,
+  useCallback,
   useEffect,
   useState,
 } from "react";
@@ -29,12 +30,14 @@ interface IAuthContext {
   setAccount: Dispatch<SetStateAction<IAccount | undefined>>;
   setToken(token?: string, time?: number): void;
   logout(): void;
+  updateLocation(location: ILocation): void;
 }
 
 export const AuthenticationContext = createContext<IAuthContext>({
   setAccount: () => {},
   logout: () => {},
   setToken: () => {},
+  updateLocation: () => {},
 });
 
 export default function AuthContextProvider({
@@ -116,6 +119,18 @@ export default function AuthContextProvider({
     localStorage.setItem("account", JSON.stringify(account));
   }, [account]);
 
+  const updateLocation = useCallback(
+    (location: ILocation) => {
+      if (account != null) {
+        setAccount({
+          ...account,
+          location: location,
+        });
+      }
+    },
+    [account]
+  );
+
   return (
     <AuthenticationContext.Provider
       value={{
@@ -124,6 +139,7 @@ export default function AuthContextProvider({
         logout,
         setToken,
         auth,
+        updateLocation
       }}
     >
       {children}

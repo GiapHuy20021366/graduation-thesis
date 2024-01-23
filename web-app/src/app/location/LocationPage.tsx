@@ -123,6 +123,7 @@ export default function LocationPage() {
       .setLocation(newLocation, auth)
       .then(() => {
         setHome(newLocation);
+        authContext.updateLocation(newLocation);
         toastContext.success("Set location successful");
       })
       .catch(() => {

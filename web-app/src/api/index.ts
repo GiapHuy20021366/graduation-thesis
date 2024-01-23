@@ -1,4 +1,12 @@
-export { userFetcher, type IGetUserNearParams } from "./user";
+export {
+  userFetcher,
+  type IGetUserNearParams,
+  type UserFetcher,
+  type UserResponse,
+  type UserResponseError,
+  userEndpoints,
+  userInstance,
+} from "./user";
 
 export {
   foodFetcher,

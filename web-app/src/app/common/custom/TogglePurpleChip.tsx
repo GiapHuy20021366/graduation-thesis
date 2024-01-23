@@ -1,4 +1,4 @@
-import { Chip, ChipProps} from "@mui/material";
+import { Chip, ChipProps, alpha} from "@mui/material";
 import React from "react";
 
 type ITogglePurpleChipProps = ChipProps & {
@@ -36,7 +36,7 @@ const TogglePurpleChip = React.forwardRef<
     color: active ? "white" : "black",
     cursor: "pointer",
     ":hover": {
-      backgroundColor: "purple",
+      backgroundColor: active ? "purple" : alpha("#A020F0", 0.5),
       color: "white",
     },
   };
