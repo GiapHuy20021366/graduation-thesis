@@ -27,6 +27,7 @@ import {
 } from "../../../hooks";
 import FoodAroundFilter, { IFilterParams } from "./FoodAroundFilter";
 import { IFoodSearchParams, foodFetcher } from "../../../api";
+import InfoWindowFood from "./InfoWindowFood";
 
 export default function FoodAroundBody() {
   const { isLoaded } = useJsApiLoader({
@@ -105,6 +106,7 @@ export default function FoodAroundBody() {
             setFoods(datas);
           }
           fetching.deactive();
+          setLoadActive(false);
         }, 200);
       })
       .catch(() => {
@@ -192,10 +194,36 @@ export default function FoodAroundBody() {
       currentLocation: appContentContext.currentLocation,
     };
     searchFood(paramsToSearch);
+    setFilterOpen(false);
   };
 
   const onMapClick = () => {
     setFilterOpen(false);
+  };
+
+  const onButtonLoadClick = () => {
+    const paramsToSearch: IFoodSearchParams = {
+      addedBy: searchContext.addedBy,
+      available: searchContext.available,
+      categories: searchContext.categories,
+      maxDistance: searchContext.maxDistance,
+      maxDuration: searchContext.maxDuration,
+      minQuantity: searchContext.minQuantity,
+      order: {
+        orderDistance: OrderState.NONE,
+        orderNew: OrderState.NONE,
+        orderPrice: OrderState.NONE,
+        orderQuantity: OrderState.NONE,
+      },
+      price: searchContext.price,
+      query: searchContext.query,
+      pagination: {
+        skip: 0,
+        limit: 200,
+      },
+      currentLocation: appContentContext.currentLocation,
+    };
+    searchFood(paramsToSearch);
   };
 
   return (
@@ -284,7 +312,7 @@ export default function FoodAroundBody() {
                       position={coordinate}
                       onCloseClick={() => toggleMarker(food._id)}
                     >
-                      <span>{JSON.stringify(food)}</span>
+                      <InfoWindowFood food={food} />
                     </InfoWindowF>
                   )}
                 </MarkerF>
@@ -337,7 +365,7 @@ export default function FoodAroundBody() {
           />
           <Chip
             label={"Load this area"}
-            onClick={() => console.log("I'm here")}
+            onClick={onButtonLoadClick}
             sx={{
               backgroundColor: "purple",
               width: "fit-content",

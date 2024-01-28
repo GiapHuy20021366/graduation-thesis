@@ -14,7 +14,12 @@ import {
 } from "@mui/material";
 import FoodImagesContainer from "./FoodImagesContainer";
 import { useState } from "react";
-import { foodFetcher, FoodResponseError } from "../../../api";
+import {
+  foodFetcher,
+  FoodResponse,
+  FoodResponseError,
+  IFoodUploadResponseData,
+} from "../../../api";
 import {
   useAuthContext,
   useFoodSharingFormContext,
@@ -74,6 +79,7 @@ export default function FoodSharingForm() {
     title,
     setTitle,
     description,
+    editDataRef,
   } = formContext;
 
   const [hover, setHover] = useState<number>(-1);
@@ -122,14 +128,17 @@ export default function FoodSharingForm() {
       title: title,
       location: location,
     };
-    console.log(foodUploadData);
     if (auth) {
-      console.log(foodUploadData);
       callingApi.active();
       progess.start();
 
-      foodFetcher
-        .uploadFood(foodUploadData, auth)
+      const editData = editDataRef?.current;
+      const promise: Promise<FoodResponse<IFoodUploadResponseData>> =
+        editData == null
+          ? foodFetcher.uploadFood(foodUploadData, auth)
+          : foodFetcher.updateFood({ ...editData, ...foodUploadData }, auth);
+
+      promise
         .then((data) => navigate(`/food/${data.data?._id}`, { replace: true }))
         .catch((error) => {
           const data = error?.data;
@@ -167,7 +176,7 @@ export default function FoodSharingForm() {
   const [activeStep, setActiveStep] = useState<number>(0);
 
   const setNextStep = (): void => {
-    switch(activeStep) {
+    switch (activeStep) {
       case FormPage.PAGE_FIRST: {
         if (images.length === 0) {
           toast.error(lang("empty-images-error"));
@@ -180,8 +189,8 @@ export default function FoodSharingForm() {
         break;
       }
     }
-    setActiveStep(activeStep + 1)
-  }
+    setActiveStep(activeStep + 1);
+  };
 
   return (
     <Box
@@ -357,7 +366,9 @@ export default function FoodSharingForm() {
             }}
             fullWidth
           >
-            {lang("share-now")}
+            {editDataRef?.current == null
+              ? lang("share-now")
+              : lang("update-now")}
           </Button>
         </Stack>
       )}

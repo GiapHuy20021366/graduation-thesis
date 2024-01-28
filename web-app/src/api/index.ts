@@ -18,6 +18,7 @@ export {
   type IFoodSeachOrder,
   type IFoodSearchParams,
   type IFoodSearchPrice,
+  type IFoodUploadResponseData,
 } from "./food";
 
 export { geocodeMapFindAddess } from "./map";

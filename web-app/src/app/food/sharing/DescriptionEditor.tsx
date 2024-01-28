@@ -33,7 +33,7 @@ export default function DescriptionEditor() {
   const i18n = useI18nContext();
   const lang = i18n.of(DescriptionEditor);
   const form = useFoodSharingFormContext();
-  const { setDescription } = form;
+  const { description, setDescription } = form;
 
   return (
     <Box spellCheck={false}>
@@ -62,6 +62,7 @@ export default function DescriptionEditor() {
           <RichTextEditor
             extensions={[StarterKit]}
             spell-check={false}
+            content={description}
             onUpdate={({ editor }) => setDescription(editor.getHTML())}
             renderControls={() => (
               <Box>

@@ -36,6 +36,7 @@ import {
 import { deepOrange } from "@mui/material/colors";
 import { foodFetcher, userFetcher } from "../../../api";
 import CountDown from "../../common/util/CountDown";
+import FoodPostButtonWithMenu from "./FoodPostButtonWithMenu";
 
 interface IFoodPostInfoDataDisplayProps {
   data: IFoodPostData;
@@ -122,6 +123,9 @@ export default function FoodPostInfoDataDisplay({
         <Box component={"h4"} textTransform={"capitalize"} sx={{ mb: 2 }}>
           {data.title || lang("no-title")}
         </Box>
+        {/* <FoodPostMenu /> */}
+        <FoodPostButtonWithMenu data={data} />
+
         <Stack direction="row">
           <Typography>
             {toDistance(

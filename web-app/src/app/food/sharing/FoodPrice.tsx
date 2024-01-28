@@ -66,7 +66,7 @@ export default function FoodPrice() {
           variant="standard"
           disableUnderline={true}
           displayEmpty={true}
-          defaultValue={String(price)}
+          value={String(price)}
           onChange={onSelectPriceChange}
           sx={{
             flex: 1,

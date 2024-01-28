@@ -44,7 +44,7 @@ foodInstance.interceptors.response.use(
   (error) => Promise.reject(error?.response?.data?.error)
 );
 
-interface IFoodUploadResponseData {
+export interface IFoodUploadResponseData {
   _id: string;
   createdAt: Date;
   updatedAt: Date;
@@ -96,6 +96,10 @@ export interface FoodFetcher {
     data: IFoodUploadData,
     auth: IAuthInfo
   ): Promise<FoodResponse<IFoodUploadResponseData>>;
+  updateFood(
+    data: IFoodPostData,
+    auth: IAuthInfo
+  ): Promise<FoodResponse<IFoodUploadResponseData>>;
   searchFood(
     data: IFoodSearchParams,
     auth: IAuthInfo
@@ -138,6 +142,16 @@ export const foodFetcher: FoodFetcher = {
     auth: IAuthInfo
   ): Promise<FoodResponse<IFoodUploadResponseData>> => {
     return foodInstance.post(foodEndpoints.uploadFood, data, {
+      headers: {
+        Authorization: auth.token,
+      },
+    });
+  },
+  updateFood: async (
+    data: IFoodPostData,
+    auth: IAuthInfo
+  ): Promise<FoodResponse<IFoodUploadResponseData>> => {
+    return foodInstance.put(foodEndpoints.uploadFood, data, {
       headers: {
         Authorization: auth.token,
       },

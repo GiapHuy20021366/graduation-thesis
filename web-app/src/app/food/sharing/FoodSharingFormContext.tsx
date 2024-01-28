@@ -3,11 +3,13 @@ import React, {
   SetStateAction,
   createContext,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import {
   FoodCategory,
   ICoordinates,
+  IFoodPostData,
   IFoodUpLoadLocation,
   IImageExposed,
   QuantityType,
@@ -15,10 +17,6 @@ import {
   toNextMidnight,
   toQuantityLevel,
 } from "../../../data";
-
-interface IFoodSharingFormContextProviderProps {
-  children?: React.ReactNode;
-}
 
 interface IFoodSharingFormContext {
   images: (IImageExposed | null)[];
@@ -40,9 +38,11 @@ interface IFoodSharingFormContext {
   setQuantity: Dispatch<SetStateAction<number>>;
   setTitle: Dispatch<SetStateAction<string>>;
   setDescription: Dispatch<SetStateAction<string>>;
+
+  editDataRef?: React.MutableRefObject<IFoodPostData | undefined>;
 }
 
-export const FoodSharingFormContext = createContext<IFoodSharingFormContext>({
+const defaultSharingContext: IFoodSharingFormContext = {
   images: [],
   categories: [],
   duration: convertDateToString(toNextMidnight(new Date())),
@@ -67,48 +67,82 @@ export const FoodSharingFormContext = createContext<IFoodSharingFormContext>({
   setPrice: () => {},
   setQuantity: () => {},
   setTitle: () => {},
-  setDescription: () => {}
-});
+  setDescription: () => {},
+};
+
+export const FoodSharingFormContext = createContext<IFoodSharingFormContext>(
+  defaultSharingContext
+);
+
+const toImageExposeds = (
+  imgs?: string[] | (IImageExposed | null)[]
+): IImageExposed[] => {
+  if (imgs == null) return [];
+  return imgs.map((img, idx) => {
+    if (typeof img === "string")
+      return {
+        _id: String(idx),
+        name: String(idx),
+        url: img,
+      };
+    else return img;
+  }) as IImageExposed[];
+};
+
+interface IFoodSharingFormContextProviderProps {
+  children?: React.ReactNode;
+  preData?: IFoodPostData;
+}
 
 export default function FoodSharingFormContextProvider({
   children,
+  preData,
 }: IFoodSharingFormContextProviderProps) {
-  const [images, setImages] = useState<(IImageExposed | null)[]>([]);
-  const [categories, setCategories] = useState<FoodCategory[]>([]);
-  const [duration, setDuration] = useState<string>(
-    convertDateToString(toNextMidnight(new Date()))
-  );
-  const [location, setLocation] = useState<IFoodUpLoadLocation>({
-    name: "",
-    coordinates: {
-      lat: 0,
-      lng: 0,
-    },
-  });
+  // Props state from edit function
+  const defaultData = preData ?? defaultSharingContext;
+  const editDataRef = useRef(preData);
 
-  const [price, setPrice] = useState<number>(0);
-  const [quantity, setQuantity] = useState<number>(
-    toQuantityLevel(QuantityType.TOTAL_GOOD)
+  const [images, setImages] = useState<(IImageExposed | null)[]>(
+    toImageExposeds(defaultData?.images)
   );
-  const [title, setTitle] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
+
+  const [categories, setCategories] = useState<FoodCategory[]>(
+    defaultData.categories
+  );
+
+  const [duration, setDuration] = useState<string>(
+    preData != null
+      ? convertDateToString(new Date(defaultData.duration))
+      : (defaultData.duration as string)
+  );
+
+  const [location, setLocation] = useState<IFoodUpLoadLocation>(
+    defaultData.location
+  );
+
+  const [price, setPrice] = useState<number>(defaultData.price);
+  const [quantity, setQuantity] = useState<number>(defaultData.quantity);
+  const [title, setTitle] = useState<string>(defaultData.title);
+  const [description, setDescription] = useState<string>(
+    defaultData.description
+  );
 
   const setLocationName = (name: string) => {
     setLocation({
-        ...location,
-        name: name
-    })
-  }
+      ...location,
+      name: name,
+    });
+  };
 
   const setCoordinates = (pos: ICoordinates) => {
     setLocation({
-        ...location,
-        coordinates: pos
-    })
-  }
+      ...location,
+      coordinates: pos,
+    });
+  };
 
   useEffect(() => {
-    if (navigator.geolocation) {
+    if (preData == null && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position: GeolocationPosition) => {
           const pos = {
@@ -125,7 +159,7 @@ export default function FoodSharingFormContextProvider({
         }
       );
     }
-  }, []);
+  }, [preData]);
 
   return (
     <FoodSharingFormContext.Provider
@@ -147,7 +181,9 @@ export default function FoodSharingFormContextProvider({
         setLocationName,
         setCoordinates,
         description,
-        setDescription
+        setDescription,
+
+        editDataRef,
       }}
     >
       {children}
