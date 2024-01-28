@@ -77,6 +77,39 @@ export const postFood = async (
   };
 };
 
+export const updateFoodPost = async (
+  data: IPostFoodData,
+  foodId: string
+): Promise<IPostFoodReturn> => {
+  const foodPost = await FoodPost.findById(foodId);
+  if (foodPost == null) {
+    throw new ResourceNotExistedError({
+      message: `No food post with id ${foodId} found`,
+      data: {
+        reason: "not-found",
+        target: "_id",
+      },
+    });
+  }
+  foodPost.updatedAt = new Date();
+  foodPost.isEdited = true;
+  foodPost.title = data.title;
+  foodPost.duration = data.duration;
+  foodPost.images = data.images;
+  foodPost.location = data.location;
+  foodPost.categories = data.categories;
+  foodPost.description = data.description;
+  foodPost.quantity = data.quantity;
+  foodPost.price = data.price;
+
+  await foodPost.save();
+  return {
+    _id: foodPost._id,
+    createdAt: foodPost.createdAt,
+    updatedAt: foodPost.updatedAt,
+  };
+};
+
 interface IFoodPostReturn extends FoodPostDocument {
   liked?: boolean;
 }

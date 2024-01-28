@@ -113,6 +113,57 @@ export const postFood = async (
     .catch(next);
 };
 
+interface IUpdateFoodPostBody extends IPostFoodBody {
+  _id?: string;
+}
+export const updateFoodPost = async (
+  req: Request<{}, {}, IUpdateFoodPostBody, {}>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    validatePostFoodBody(req.body);
+    if (!isObjectId(req.body._id)) {
+      return next(
+        new InvalidDataError({
+          message: `Invalid _id: ${req.body._id}`,
+          data: {
+            target: "_id",
+            reason: "invalid",
+          },
+        })
+      );
+    }
+  } catch (error) {
+    return next(error);
+  }
+  const auth = req.authContext as AuthLike;
+  const {
+    _id,
+    images,
+    title,
+    location,
+    categories,
+    description,
+    quantity,
+    duration,
+    price,
+  } = req.body;
+  postFoodService({
+    user: auth._id,
+    images: images!,
+    title: title!,
+    location: location!,
+    categories: categories!,
+    description: description!,
+    quantity: quantity!,
+    duration: new Date(duration!),
+    price: price!,
+  })
+    .then((data) => res.status(200).json(toResponseSuccessData(data)))
+    .catch(next);
+};
+
 export const findFoodPost = async (
   req: Request<{ id?: string }, {}, {}, {}>,
   res: Response,

@@ -6,6 +6,7 @@ import {
   postFood,
   searchFoodPost,
   searchHistory,
+  updateFoodPost,
   uploadImages,
 } from "../controllers";
 
@@ -19,6 +20,8 @@ export const initUserRouters = (app: Express): void => {
   foodRouter.post("/images/upload", tokenParser, uploadImages);
 
   foodRouter.post("/foods/upload", tokenParser, postFood);
+  foodRouter.put("/foods/upload", tokenParser, updateFoodPost);
+
   foodRouter.post("/foods/search", tokenParser, searchFoodPost);
   foodRouter.post("/foods/search/history", tokenParser, searchHistory);
   foodRouter.get("/foods/:id", tokenParser, findFoodPost);

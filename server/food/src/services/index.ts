@@ -5,6 +5,7 @@ export {
   findFoodPostById,
   searchFood,
   userLikeOrUnlikeFoodPost,
+  updateFoodPost,
 } from "./food-post";
 
 export {
