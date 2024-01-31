@@ -67,3 +67,4 @@ export { PlaceType } from "./place-type";
 export { IPlace } from "./place";
 export { IPlaceRating } from "./place-rating";
 export { IRating } from "./rating";
+export { IPlaceAuthorExposed, IPlaceExposed } from "./place-exposed";

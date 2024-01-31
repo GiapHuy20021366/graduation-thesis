@@ -1,9 +1,10 @@
-import { Model, Schema, model, Document, ObjectId } from "mongoose";
+import { Model, Schema, model, ObjectId } from "mongoose";
 import collections from "../collections";
-import { IPlace } from "../../data";
+import { IPlace, IRating } from "../../data";
 
-export interface PlaceDocument extends Omit<IPlace, "author">, Document {
+export interface IPlaceSchema extends Omit<IPlace, "author"> {
   author: ObjectId;
+  rating: IRating;
   active: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -11,9 +12,9 @@ export interface PlaceDocument extends Omit<IPlace, "author">, Document {
 
 interface IPlaceMethods {}
 
-interface IPlaceModel extends Model<PlaceDocument, {}, IPlaceMethods> {}
+interface IPlaceModel extends Model<IPlaceSchema, {}, IPlaceMethods> {}
 
-const placeSchema = new Schema<PlaceDocument, IPlaceModel, IPlaceMethods>({
+const placeSchema = new Schema<IPlaceSchema, IPlaceModel, IPlaceMethods>({
   exposeName: {
     type: String,
     required: true,
@@ -84,7 +85,7 @@ const placeSchema = new Schema<PlaceDocument, IPlaceModel, IPlaceMethods>({
 
 // Methods
 
-export const Place = model<PlaceDocument, IPlaceModel>(
+export const Place = model<IPlaceSchema, IPlaceModel>(
   "Place",
   placeSchema,
   collections.place

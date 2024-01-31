@@ -13,3 +13,11 @@ export { rpcGetUserInfo } from "./rpc";
 export { setUserLocation } from "./location";
 
 export { searchUsersAround, getBasicUserInfo } from "./user";
+
+export {
+  createNewPlace,
+  updatePlace,
+  activePlace,
+  followPlace,
+  unfollowPlace,
+} from "./place";

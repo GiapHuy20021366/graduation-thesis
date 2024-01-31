@@ -1,21 +1,25 @@
-import { Model, Schema, model, Document, ObjectId } from "mongoose";
+import { Model, Schema, model, ObjectId } from "mongoose";
 import collections from "../collections";
 import { FollowRole, IFollower } from "../../data";
 
-export interface FollowerDocument
-  extends Omit<IFollower, "place" | "user" | "subcriber">,
-    Document {
+export interface IFollowerSchema
+  extends Omit<IFollower, "place" | "user" | "subcriber"> {
   place: ObjectId;
   user: ObjectId;
   subcriber: ObjectId;
   createdAt: Date;
+  updatedAt: Date;
 }
 
 interface IFollowerMethods {}
 
-interface IFollowerModel extends Model<FollowerDocument, {}, IFollowerMethods> {}
+interface IFollowerModel extends Model<IFollowerSchema, {}, IFollowerMethods> {}
 
-const followerSchema = new Schema<FollowerDocument, IFollowerModel, IFollowerMethods>({
+const followerSchema = new Schema<
+  IFollowerSchema,
+  IFollowerModel,
+  IFollowerMethods
+>({
   place: {
     type: Schema.ObjectId,
     ref: "Place",
@@ -41,13 +45,17 @@ const followerSchema = new Schema<FollowerDocument, IFollowerModel, IFollowerMet
     type: Date,
     default: Date.now,
   },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 // Statics
 
 // Methods
 
-export const Follower = model<FollowerDocument, IFollowerModel>(
+export const Follower = model<IFollowerSchema, IFollowerModel>(
   "Follower",
   followerSchema,
   collections.userAndPlaceFollower

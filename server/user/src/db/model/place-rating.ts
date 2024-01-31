@@ -1,10 +1,9 @@
-import { Model, Schema, model, Document, ObjectId } from "mongoose";
+import { Model, Schema, model, ObjectId } from "mongoose";
 import collections from "../collections";
 import { IPlaceRating } from "../../data";
 
-export interface PlaceRatingDocument
-  extends Omit<IPlaceRating, "place" | "user">,
-    Document {
+export interface IPlaceRatingSchema
+  extends Omit<IPlaceRating, "place" | "user"> {
   place: ObjectId;
   user: ObjectId;
   createdAt: Date;
@@ -14,10 +13,10 @@ export interface PlaceRatingDocument
 interface IPlaceRatingMethods {}
 
 interface IPlaceRatingModel
-  extends Model<PlaceRatingDocument, {}, IPlaceRatingMethods> {}
+  extends Model<IPlaceRatingSchema, {}, IPlaceRatingMethods> {}
 
 const placeRatingSchema = new Schema<
-  PlaceRatingDocument,
+  IPlaceRatingSchema,
   IPlaceRatingModel,
   IPlaceRatingMethods
 >({
@@ -47,7 +46,7 @@ const placeRatingSchema = new Schema<
 
 // Methods
 
-export const PlaceRating = model<PlaceRatingDocument, IPlaceRatingModel>(
+export const PlaceRating = model<IPlaceRatingSchema, IPlaceRatingModel>(
   "PlaceRating",
   placeRatingSchema,
   collections.placeRating

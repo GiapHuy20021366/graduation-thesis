@@ -7,17 +7,15 @@ import {
 } from "./data-validate";
 import { ILocation } from "./location";
 import { PlaceType } from "./place-type";
-import { IRating } from "./rating";
 
 export interface IPlace {
   exposeName: string;
-  description: string;
+  description?: string;
   categories: string[];
   location: ILocation;
   avartar?: string;
   images: string[];
   author: string; // author id
-  rating: IRating;
   type: PlaceType;
 }
 
@@ -40,10 +38,6 @@ export const toPlace = (value: any): IPlace | undefined => {
     avartar: value.avartar,
     images: value.images,
     author: value.author as string,
-    rating: {
-      count: 0,
-      mean: 0,
-    },
     type: PlaceType.PERSONAL,
   };
   if (Object.values(PlaceType).includes(value.type)) {
