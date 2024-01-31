@@ -5,7 +5,6 @@ import {
   IPagination,
   InternalError,
   ResourceNotExistedError,
-  UserInfo,
 } from "../data";
 
 interface SearchedUser {

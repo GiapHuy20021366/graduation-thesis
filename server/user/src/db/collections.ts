@@ -1,3 +1,6 @@
 export default {
-    user: "users"
-}
+  user: "users",
+  place: "places",
+  userAndPlaceFollower: "user-place-followers",
+  placeRating: "placeRatings",
+};

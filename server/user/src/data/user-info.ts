@@ -1,12 +1,5 @@
-import { ICoordinates } from "./coordinates";
 import { GoogleOAuthInfo } from "./google-oauth-info";
-
-export interface ILocation {
-  name: string;
-  coordinates: ICoordinates;
-  two_array?: number[];
-}
-
+import { ILocation } from "./location";
 export interface UserInfo {
   googleOAuth?: GoogleOAuthInfo;
   createdAt: Date;

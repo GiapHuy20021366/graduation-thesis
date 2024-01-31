@@ -1,5 +1,5 @@
 export { GoogleOAuthInfo } from "./google-oauth-info";
-export { UserInfo, ILocation } from "./user-info";
+export { UserInfo } from "./user-info";
 export {
   TAccountRegisterMethod,
   validateAccountRegisterMethod,
@@ -53,3 +53,17 @@ export {
   isPagination,
 } from "./data-validate";
 export { IPagination } from "./pagination";
+export { ILocation } from "./location";
+export {
+  FollowRole,
+  FollowType,
+  IFollower,
+  IFollowerBase,
+  IUserFollower,
+  toFollower,
+  IPlaceFollower,
+} from "./user-place-follower";
+export { PlaceType } from "./place-type";
+export { IPlace } from "./place";
+export { IPlaceRating } from "./place-rating";
+export { IRating } from "./rating";
