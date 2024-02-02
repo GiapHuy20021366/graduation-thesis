@@ -20,4 +20,8 @@ export {
   activePlace,
   followPlace,
   unfollowPlace,
+  IPlaceData,
+  ratingPlace,
+  searchPlaces,
+  getPlaceInfo,
 } from "./place";

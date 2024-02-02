@@ -64,7 +64,7 @@ export {
   IPlaceFollower,
 } from "./user-place-follower";
 export { PlaceType } from "./place-type";
-export { IPlace } from "./place";
+export { IPlace, toPlace } from "./place";
 export { IPlaceRating } from "./place-rating";
 export { IRating } from "./rating";
 export { IPlaceAuthorExposed, IPlaceExposed } from "./place-exposed";
@@ -75,3 +75,9 @@ export {
   toPlaceSearchParams,
 } from "./place-search-params";
 export { toDistance } from "./to-distance";
+export {
+  throwErrorIfInvalidFormat,
+  throwErrorIfNotFound,
+  toInvalidFormatError,
+  toNotFoundError,
+} from "./to-error";

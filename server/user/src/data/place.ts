@@ -26,7 +26,11 @@ export const toPlace = (value: any): IPlace | undefined => {
   if (value.categories != null && !isAllNotEmptyString(value.categories))
     return;
   if (!isLocation(value.location)) return;
-  if (value.avartar != null && isEmptyString(value.avartar)) return;
+  if (
+    value.avartar != null &&
+    (isEmptyString(value.avartar) || !isString(value.avartar))
+  )
+    return;
   if (value.images != null && !isAllNotEmptyString(value.images)) return;
   if (!isObjectId(value.author)) return;
 

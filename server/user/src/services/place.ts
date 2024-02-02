@@ -5,6 +5,8 @@ import {
   IPlace,
   IPlaceAuthorExposed,
   IPlaceExposed,
+  IPlaceFollower,
+  IPlaceRating,
   InternalError,
   OrderState,
   ResourceNotExistedError,
@@ -13,9 +15,9 @@ import {
 } from "../data";
 import { Follower, Place, PlaceRating } from "../db/model";
 
-interface IPlaceData extends IPlace {}
+export interface IPlaceData extends Omit<IPlace, "author"> {}
 export const createNewPlace = async (data: IPlaceData, authorId: string) => {
-  const dataToCreate = { ...data };
+  const dataToCreate = { ...data, authorId: authorId };
   const coordinates = data.location.coordinates;
   dataToCreate.location.two_array = [coordinates.lng, coordinates.lat];
 
@@ -175,7 +177,7 @@ export const activePlace = async (
 export const followPlace = async (
   placeId: string,
   userId: string,
-  followType: number
+  followType: FollowType
 ) => {
   const place = await Place.findById(placeId);
   if (place == null) {
@@ -350,7 +352,7 @@ export const ratingPlace = async (
   });
 
   const total = place.rating.mean * place.rating.count;
-  if (score == null) {
+  if (score == null || isNaN(score)) {
     if (rating != null) {
       const newTotal = total - rating.score;
       const newCount = place.rating.count - 1;
@@ -393,4 +395,68 @@ export const ratingPlace = async (
   return {
     isRating: true,
   };
+};
+
+interface IPlaceInfo extends Omit<IPlaceExposed, "author"> {
+  userRating?: IPlaceRating;
+  userFollow?: IPlaceFollower;
+  author: string | IPlaceAuthorExposed;
+}
+
+export const getPlaceInfo = async (placeId: string, userId?: string) => {
+  const place = await Place.findById(placeId).populate<{
+    author: IPlaceAuthorExposed;
+  }>("author");
+  if (place == null) {
+    throw new ResourceNotExistedError({
+      message: `No place with id ${placeId} found`,
+      data: {
+        target: "place-id",
+        reason: "not-found",
+      },
+    });
+  }
+  const result: IPlaceInfo = {
+    _id: place._id.toString(),
+    active: place.active,
+    author: place.author,
+    categories: place.categories,
+    createdAt: place.createdAt,
+    exposeName: place.exposeName,
+    images: place.images,
+    location: place.location,
+    rating: place.rating,
+    type: place.type,
+    updatedAt: place.updatedAt,
+    avartar: place.avartar,
+    description: place.description,
+  };
+  if (userId != null) {
+    const follower = await Follower.findOne({
+      role: FollowRole.PLACE,
+      subcriber: userId,
+      place: placeId,
+    });
+    if (follower) {
+      result.userFollow = {
+        place: placeId,
+        role: FollowRole.PLACE,
+        subcriber: userId,
+        type: follower.type,
+      };
+    }
+
+    const rating = await PlaceRating.findOne({
+      user: userId,
+      place: placeId,
+    });
+    if (rating) {
+      result.userRating = {
+        place: placeId,
+        score: rating.score,
+        user: userId,
+      };
+    }
+  }
+  return result;
 };
