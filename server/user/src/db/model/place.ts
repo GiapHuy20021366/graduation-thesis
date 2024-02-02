@@ -1,6 +1,6 @@
 import { Model, Schema, model, ObjectId } from "mongoose";
 import collections from "../collections";
-import { IPlace, IRating } from "../../data";
+import { IPlace, IRating, PlaceType } from "../../data";
 
 export interface IPlaceSchema extends Omit<IPlace, "author"> {
   author: ObjectId;
@@ -49,6 +49,12 @@ const placeSchema = new Schema<IPlaceSchema, IPlaceModel, IPlaceMethods>({
       default: [0, 0],
       index: "2dsphere",
     },
+  },
+  type: {
+    type: Number,
+    required: true,
+    index: true,
+    default: PlaceType.PERSONAL,
   },
   avartar: String,
   author: {

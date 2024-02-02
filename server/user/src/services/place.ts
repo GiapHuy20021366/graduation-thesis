@@ -1,13 +1,17 @@
+import { IPlaceSearchParams } from "~/data/place-search-params";
 import {
   FollowRole,
   FollowType,
   IPlace,
   IPlaceAuthorExposed,
   IPlaceExposed,
+  InternalError,
+  OrderState,
   ResourceNotExistedError,
   UnauthorizationError,
-} from "~/data";
-import { Follower, Place } from "../db/model";
+  toDistance,
+} from "../data";
+import { Follower, Place, PlaceRating } from "../db/model";
 
 interface IPlaceData extends IPlace {}
 export const createNewPlace = async (data: IPlaceData, authorId: string) => {
@@ -232,8 +236,161 @@ export const unfollowPlace = async (placeId: string, userId: string) => {
   return { unfollow: true };
 };
 
-// user find places
+export const searchPlaces = async (params: IPlaceSearchParams) => {
+  const {
+    currentLocation,
+    maxDistance,
+    pagination,
+    order,
+    author,
+    query: searchQuery,
+    minRating,
+    types,
+  } = params;
+  const options: any = {};
+  const meta: any = {};
+  const sort: any = {};
 
-// user report place
+  if (searchQuery != null && searchQuery.length > 0) {
+    options["$text"] = {
+      $search: searchQuery,
+    };
+  }
 
-// user voting place
+  // max distance on location
+  if (currentLocation) {
+    const maxDis =
+      maxDistance != undefined ? maxDistance : Number.MAX_SAFE_INTEGER;
+    options["location.two_array"] = {
+      $geoWithin: {
+        $center: [[currentLocation.lng, currentLocation.lat], maxDis],
+      },
+    };
+  }
+
+  // Quantity
+  if (minRating) {
+    options["rating.mean"] = {
+      $gte: minRating,
+    };
+  }
+
+  // author
+  if (author) {
+    options["author"] = author;
+  }
+
+  if (types != null && types.length > 0) {
+    options["type"] = {
+      $in: types,
+    };
+  }
+
+  // score final
+  if (searchQuery != null && searchQuery.length > 0) {
+    sort["score"] = {
+      $meta: "textScore",
+    };
+    meta["score"] = {
+      $meta: "textScore",
+    };
+  }
+
+  if (order) {
+    if (order.rating) {
+      sort["rating.mean"] = order.rating;
+    }
+  }
+
+  const query = Place.find(options, meta).sort(sort);
+
+  // Pagination
+  if (pagination) {
+    query.skip(pagination.skip).limit(pagination.limit);
+  }
+
+  const result = await query.exec();
+  if (result == null) throw new InternalError();
+
+  // Sort follow location
+  if (order) {
+    if (currentLocation && order.distance) {
+      result.sort((f1, f2) => {
+        const pos1 = f1.location.coordinates;
+        const pos2 = f2.location.coordinates;
+        const delta =
+          toDistance(pos1, currentLocation) - toDistance(pos2, currentLocation);
+        if (order.distance === OrderState.INCREASE) return delta;
+        return -delta;
+      });
+      sort["location.two_array"] = order.distance;
+    }
+  }
+  return result;
+};
+
+export const ratingPlace = async (
+  placeId: string,
+  userId: string,
+  score: number | undefined
+) => {
+  const place = await Place.findById(placeId);
+  if (place == null) {
+    throw new ResourceNotExistedError({
+      message: `No place with id ${placeId} found`,
+      data: {
+        target: "place-id",
+        reason: "not-found",
+      },
+    });
+  }
+  const rating = await PlaceRating.findOne({
+    place: placeId,
+    user: userId,
+  });
+
+  const total = place.rating.mean * place.rating.count;
+  if (score == null) {
+    if (rating != null) {
+      const newTotal = total - rating.score;
+      const newCount = place.rating.count - 1;
+      const newMean = newTotal / Math.max(1, newCount);
+
+      place.rating.count = newCount;
+      place.rating.mean = newMean;
+      await place.save();
+      await rating.deleteOne();
+    }
+  } else {
+    if (rating != null) {
+      const newTotal = total - rating.score + score;
+      const newMean = newTotal / Math.max(1, place.rating.count);
+
+      // update
+      place.rating.mean = newMean;
+      rating.score = score;
+      rating.updatedAt = new Date();
+
+      await place.save();
+      await rating.save();
+    } else {
+      const newTotal = total + score;
+      const newCount = place.rating.count + 1;
+      const newMean = newTotal / Math.max(1, newCount);
+
+      place.rating.count = newCount;
+      place.rating.mean = newMean;
+      const newRating = new PlaceRating({
+        user: userId,
+        place: placeId,
+        score: score,
+      });
+
+      await newRating.save();
+      await place.save();
+    }
+  }
+  return {
+    isRating: true,
+  };
+};

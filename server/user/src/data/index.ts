@@ -68,3 +68,10 @@ export { IPlace } from "./place";
 export { IPlaceRating } from "./place-rating";
 export { IRating } from "./rating";
 export { IPlaceAuthorExposed, IPlaceExposed } from "./place-exposed";
+export { OrderState } from "./order-state";
+export {
+  IPlaceSearchOrder,
+  IPlaceSearchParams,
+  toPlaceSearchParams,
+} from "./place-search-params";
+export { toDistance } from "./to-distance";
