@@ -11,15 +11,11 @@ import Setting from "../setting/Setting";
 import Food from "../food/Food";
 import Search from "../search/Search";
 import Arround from "../around/Arround";
+import Place from "../place/Place";
 
 export default function AppMainCenter() {
   return (
-    <Grid2
-      mobile={12}
-      tablet={9}
-      laptop={8}
-      desktop={6}
-    >
+    <Grid2 mobile={12} tablet={9} laptop={8} desktop={6}>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/home/*" element={<Home />} />
@@ -32,6 +28,7 @@ export default function AppMainCenter() {
         <Route path="/setting/*" element={<Setting />} />
         <Route path="/food/*" element={<Food />} />
         <Route path="/search/*" element={<Search />} />
+        <Route path="/place/*" element={<Place />} />
         <Route path="/*" element={<PageNotFound />} />
       </Routes>
     </Grid2>
