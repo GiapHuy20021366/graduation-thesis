@@ -23,9 +23,9 @@ function App() {
                 <Route
                   path="/*"
                   element={
-                    <IsAuthenticated>
+                    // <IsAuthenticated>
                       <AppContent />
-                    </IsAuthenticated>
+                    // </IsAuthenticated>
                   }
                 />
                 <Route

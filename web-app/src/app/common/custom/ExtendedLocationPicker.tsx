@@ -1,37 +1,43 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Box, Button, Chip, Stack, StackProps, TextField } from "@mui/material";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  Chip,
+  IconButton,
+  Stack,
+  StackProps,
+  TextField,
+  Tooltip,
+} from "@mui/material";
 import {
   GoogleMap,
   InfoWindowF,
   MarkerF,
   useJsApiLoader,
 } from "@react-google-maps/api";
-import { CenterFocusStrongOutlined } from "@mui/icons-material";
-import { geocodeMapFindAddess } from "../../../api";
-import {
-  ICoordinates,
-  ILocation,
-  GeoCodeMapsData,
-  mapIcons,
-} from "../../../data";
+import { CenterFocusStrongOutlined, CloseOutlined } from "@mui/icons-material";
+import { ICoordinates, ILocation, mapIcons } from "../../../data";
 import { GOOGLE_MAP_API_KEY } from "../../../env";
-import { useAuthContext } from "../../../hooks";
-
-const isDiffLocation = (pos1: ICoordinates, pos2?: ICoordinates): boolean => {
-  if (pos2 == null) return true;
-  return pos1.lat !== pos2.lat || pos1.lng !== pos2.lng;
-};
+import { RequestStatus, useFetchLocation } from "../../../hooks";
 
 type ExtendedLocationPickerProps = StackProps & {
   defaultLocation?: ILocation;
   onSetLocation?: (newLocation: ILocation) => void;
+  onCloseClick?: () => void;
+  homeLocation?: ILocation;
 };
 
 const ExtendedLocationPicker = React.forwardRef<
   HTMLDivElement,
   ExtendedLocationPickerProps
 >((props, ref) => {
-  const { defaultLocation, onSetLocation, ...rest } = props;
+  const {
+    defaultLocation,
+    onSetLocation,
+    onCloseClick,
+    homeLocation,
+    ...rest
+  } = props;
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -47,56 +53,17 @@ const ExtendedLocationPicker = React.forwardRef<
     defaultLocation?.coordinates
   );
   const [infoOpen, setInfoOpen] = useState<boolean>(false);
-  const [locationName, setLocationName] = useState<string>(
-    defaultLocation?.name ?? "My current location"
-  );
-  const [fetching, setFetching] = useState<boolean>(false);
-  const [lastFetchedPos, setLastFetchedPos] = useState<
-    ICoordinates | undefined
-  >(defaultLocation?.coordinates);
-  const timeout = useRef<number>();
-  const authContext = useAuthContext();
-  const [home, setHome] = useState<ILocation>();
 
-  const fetchAddress = useCallback((pos: ICoordinates) => {
-    const timeOutId = timeout.current;
-    if (timeOutId != null) {
-      clearTimeout(timeOutId);
-      setFetching(false);
-      timeout.current = undefined;
+  const fetchLocation = useFetchLocation({ defaultLocation });
+
+  const handleSetLocation = () => {
+    const fetchedLocation = fetchLocation.location;
+    if (fetchedLocation) {
+      onSetLocation && onSetLocation(fetchedLocation);
     }
-    setFetching(true);
-    timeout.current = setTimeout(() => {
-      try {
-        geocodeMapFindAddess(pos).then((data: GeoCodeMapsData | null) => {
-          if (data != null) {
-            const address = data.displayName;
-            setLocationName(address);
-            setLastFetchedPos(pos);
-          } else {
-            console.log("Cannot find the location name");
-          }
-        });
-      } catch (error) {
-        console.error("Error fetching location information:", error);
-      } finally {
-        setFetching(false);
-      }
-    }, 1000);
-  }, []);
+  };
 
-  useEffect(() => {
-    if (
-      lastFetchedPos == null ||
-      selected == null ||
-      selected.lat !== lastFetchedPos.lat ||
-      selected.lng !== lastFetchedPos.lng
-    ) {
-      selected && fetchAddress(selected);
-    }
-  }, [fetchAddress, lastFetchedPos, selected]);
-
-  const setCurrentLocation = () => {
+  const setCurrentLocation = useCallback(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position: GeolocationPosition) => {
@@ -104,54 +71,53 @@ const ExtendedLocationPicker = React.forwardRef<
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           };
-          setCenter(pos);
-          setSelected(pos);
+          fetchLocation.fetch(pos, {
+            onSuccess: (location) => {
+              setSelected(location.coordinates);
+            },
+          });
         },
         (error: GeolocationPositionError) => {
           console.log(error);
         }
       );
     }
-  };
+  }, [fetchLocation]);
 
   useEffect(() => {
-    if (!props.defaultLocation) {
+    if (fetchLocation.location == null) {
       setCurrentLocation();
     }
-  }, [props.defaultLocation]);
+  }, [fetchLocation.location, setCurrentLocation]);
 
   const handleLocateMe = () => {
     setCenter({ ...center });
-    setSelected({ ...center });
     setInfoOpen(true);
+    fetchLocation.fetch(center, {
+      onSuccess: () => {
+        setSelected(center);
+      },
+    });
   };
 
   const handleOpenInfo = () => {
     setInfoOpen(!infoOpen);
   };
 
-  const handleSetMyLocation = () => {
-    onSetLocation &&
-      selected &&
-      onSetLocation({
-        name: locationName,
-        coordinates: selected,
-      });
-  };
-
-  useEffect(() => {
-    const userLocation = authContext.account?.location;
-    if (userLocation != null && home == null) {
-      setHome(userLocation);
-    }
-  }, [authContext.account, home]);
-
   const handleMapClick = (e: google.maps.MapMouseEvent) => {
     const latLng = e.latLng;
     if (latLng) {
       const lat = latLng.lat();
       const lng = latLng.lng();
-      setSelected({ lat, lng });
+      const pos = {
+        lat,
+        lng,
+      };
+      fetchLocation.fetch(pos, {
+        onSuccess: (location) => {
+          setSelected(location.coordinates);
+        },
+      });
     }
   };
 
@@ -173,7 +139,11 @@ const ExtendedLocationPicker = React.forwardRef<
             readOnly: true,
           }}
           multiline
-          value={fetching ? "Loading..." : locationName}
+          value={
+            fetchLocation.status === RequestStatus.INCHING
+              ? "Loading..."
+              : fetchLocation.location?.name
+          }
         />
       </Box>
       <Box sx={{ width: "100%", flex: 1 }}>
@@ -188,7 +158,7 @@ const ExtendedLocationPicker = React.forwardRef<
             }}
             onClick={handleMapClick}
           >
-            {selected && isDiffLocation(selected, home?.coordinates) && (
+            {selected && (
               <MarkerF
                 icon={{
                   url: mapIcons.homePin,
@@ -206,7 +176,7 @@ const ExtendedLocationPicker = React.forwardRef<
                       <span>Vị trí đã chọn</span>
                       <Button
                         sx={{ width: "100%", textAlign: "center" }}
-                        onClick={handleSetMyLocation}
+                        onClick={handleSetLocation}
                       >
                         Đặt vị trí
                       </Button>
@@ -215,22 +185,37 @@ const ExtendedLocationPicker = React.forwardRef<
                 )}
               </MarkerF>
             )}
-            {home != null && (
+            {homeLocation != null && (
               <MarkerF
                 icon={{
                   url: mapIcons.homeGreen,
                   scaledSize: new google.maps.Size(40, 40),
                 }}
-                position={home.coordinates}
+                position={homeLocation.coordinates}
               >
-                <InfoWindowF position={home.coordinates}>
-                  <Box sx={{ width: 200 }}></Box>
+                <InfoWindowF position={homeLocation.coordinates}>
+                  <Box sx={{ width: 200 }}>Nhà của bạn</Box>
                 </InfoWindowF>
               </MarkerF>
             )}
           </GoogleMap>
         )}
       </Box>
+      <IconButton
+        sx={{
+          position: "absolute",
+          zIndex: 1000,
+          right: 10,
+          top: 126,
+          backgroundColor: "white",
+        }}
+        color="error"
+        onClick={() => onCloseClick && onCloseClick()}
+      >
+        <Tooltip title="close">
+          <CloseOutlined />
+        </Tooltip>
+      </IconButton>
       <Chip
         label={"Locate Me"}
         sx={{
@@ -274,8 +259,8 @@ const ExtendedLocationPicker = React.forwardRef<
             color: "black",
           },
         }}
-        disabled={fetching}
-        onClick={handleSetMyLocation}
+        disabled={fetchLocation.status === RequestStatus.INCHING}
+        onClick={handleSetLocation}
       />
     </Stack>
   );

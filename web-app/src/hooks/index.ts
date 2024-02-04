@@ -7,3 +7,9 @@ export { usePageProgessContext } from "./usePageProgessContext";
 export { useLoading } from "./useLoading";
 export { useFoodSearchContext } from "./useFoodSearchContext";
 export { usePlaceEditContext } from "./usePlaceEditContext";
+export {
+  RequestStatus,
+  type IFetchCallbackFn,
+  type IFetchLocationStates,
+  useFetchLocation,
+} from "./useFetchLocation";

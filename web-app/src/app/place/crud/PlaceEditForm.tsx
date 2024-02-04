@@ -1,9 +1,22 @@
-import { MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import PlaceAvartarAndImages from "./PlaceAvartarAndImages";
-import { useI18nContext, usePlaceEditContext } from "../../../hooks";
+import {
+  useI18nContext,
+  usePlaceEditContext,
+  useToastContext,
+} from "../../../hooks";
 import ExtendedEditor from "../../common/custom/ExtendedEditor";
 import { PlaceType } from "../../../data";
-import ExtendedLocationPicker from "../../common/custom/ExtendedLocationPicker";
+import PlaceLocation from "./PlaceLocation";
+import PlaceCategories from "./PlaceCategories";
 
 export default function PlaceEditForm() {
   const i18nContext = useI18nContext();
@@ -16,9 +29,23 @@ export default function PlaceEditForm() {
     setDescription,
     type,
     setType,
+    isEditable,
     location,
-    setLocation,
   } = editContext;
+
+  const toastContext = useToastContext();
+
+  const handleCreatePlace = () => {
+    if (exposeName === "") {
+      toastContext.error("Vui lòng nhập tên");
+      return;
+    }
+    if (location == null) {
+      toastContext.error("Vui lòng chọn địa điểm");
+      return;
+    }
+    // const datas = {};
+  };
 
   return (
     <Stack width={"100%"} boxSizing={"border-box"} boxShadow={1} gap={2} p={1}>
@@ -39,28 +66,33 @@ export default function PlaceEditForm() {
         onHTMLChange={(html) => setDescription(html)}
       />
 
-      <Select
-        variant="standard"
-        disableUnderline={true}
-        displayEmpty={true}
-        fullWidth
-        value={type}
-        label={lang("l-place-type")}
-        onChange={(event) => setType(+event.target.value as PlaceType)}
-      >
-        <MenuItem value={PlaceType.PERSONAL}>{lang("PERSONAL")}</MenuItem>
-        <MenuItem value={PlaceType.VOLUNTEER}>{lang("VOLUNTEER")}</MenuItem>
-        <MenuItem value={PlaceType.EATERY}>{lang("EATERY")}</MenuItem>
-        <MenuItem value={PlaceType.GROCERY}>{lang("GROCERY")}</MenuItem>
-        <MenuItem value={PlaceType.RESTAURANT}>{lang("RESTAURANT")}</MenuItem>
-        <MenuItem value={PlaceType.SUPERMARKET}>{lang("SUPERMARKET")}</MenuItem>
-      </Select>
+      <Box>
+        <Typography>Trang của bạn là</Typography>
+        <Select
+          variant="standard"
+          disableUnderline={true}
+          displayEmpty={true}
+          fullWidth
+          value={type}
+          label={lang("l-place-type")}
+          onChange={(event) => setType(+event.target.value as PlaceType)}
+        >
+          <MenuItem value={PlaceType.PERSONAL}>{lang("PERSONAL")}</MenuItem>
+          <MenuItem value={PlaceType.VOLUNTEER}>{lang("VOLUNTEER")}</MenuItem>
+          <MenuItem value={PlaceType.EATERY}>{lang("EATERY")}</MenuItem>
+          <MenuItem value={PlaceType.GROCERY}>{lang("GROCERY")}</MenuItem>
+          <MenuItem value={PlaceType.RESTAURANT}>{lang("RESTAURANT")}</MenuItem>
+          <MenuItem value={PlaceType.SUPERMARKET}>
+            {lang("SUPERMARKET")}
+          </MenuItem>
+        </Select>
+      </Box>
 
-      <ExtendedLocationPicker
-        height={500}
-        defaultLocation={location}
-        onSetLocation={(location) => setLocation(location)}
-      />
+      <PlaceLocation />
+      <PlaceCategories />
+      <Button onClick={handleCreatePlace}>
+        {isEditable ? "Cập nhật" : "Tạo trang ngay bây giờ"}
+      </Button>
     </Stack>
   );
 }
