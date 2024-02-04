@@ -9,7 +9,9 @@ import {
 } from "@mui/material";
 import PlaceAvartarAndImages from "./PlaceAvartarAndImages";
 import {
+  useAuthContext,
   useI18nContext,
+  usePageProgessContext,
   usePlaceEditContext,
   useToastContext,
 } from "../../../hooks";
@@ -17,6 +19,8 @@ import ExtendedEditor from "../../common/custom/ExtendedEditor";
 import { PlaceType } from "../../../data";
 import PlaceLocation from "./PlaceLocation";
 import PlaceCategories from "./PlaceCategories";
+import { IPlaceData, userFetcher } from "../../../api";
+import { useNavigate } from "react-router-dom";
 
 export default function PlaceEditForm() {
   const i18nContext = useI18nContext();
@@ -34,8 +38,15 @@ export default function PlaceEditForm() {
   } = editContext;
 
   const toastContext = useToastContext();
+  const authContext = useAuthContext();
+  const auth = authContext.auth;
+  const progressContext = usePageProgessContext();
+
+  const navigate = useNavigate();
 
   const handleCreatePlace = () => {
+    if (auth == null) return;
+
     if (exposeName === "") {
       toastContext.error("Vui lòng nhập tên");
       return;
@@ -44,7 +55,32 @@ export default function PlaceEditForm() {
       toastContext.error("Vui lòng chọn địa điểm");
       return;
     }
-    // const datas = {};
+    const datas: IPlaceData = {
+      categories: editContext.categories,
+      exposeName: editContext.exposeName,
+      images: editContext.images,
+      location: location,
+      type: editContext.type,
+      avartar: editContext.avartar,
+      description: editContext.description,
+    };
+
+    progressContext.start();
+    userFetcher
+      .createPlace(datas, auth)
+      .then((datas) => {
+        const place = datas.data;
+        if (place != null) {
+          navigate(`/place/${place._id}`);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        toastContext.error("Không thể tạo trang vào lúc này");
+      })
+      .finally(() => {
+        progressContext.end();
+      });
   };
 
   return (
@@ -91,7 +127,7 @@ export default function PlaceEditForm() {
       <PlaceLocation />
       <PlaceCategories />
       <Button onClick={handleCreatePlace}>
-        {isEditable ? "Cập nhật" : "Tạo trang ngay bây giờ"}
+        {isEditable ? "Cập nhật ngay bây giờ" : "Tạo trang ngay bây giờ"}
       </Button>
     </Stack>
   );

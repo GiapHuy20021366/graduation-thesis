@@ -2,7 +2,6 @@ import {
   isAllNotEmptyString,
   isEmptyString,
   isLocation,
-  isObjectId,
   isString,
 } from "./data-validate";
 import { ILocation } from "./location";

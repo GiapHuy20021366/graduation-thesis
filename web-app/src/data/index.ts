@@ -65,3 +65,6 @@ export {
   type IPlaceFollower,
   type IUserFollower,
 } from "./user-place-follower";
+export { RequestStatus } from "./request-status";
+export { getAuth } from "./get-auth";
+export { BASE64 } from "./file-util";

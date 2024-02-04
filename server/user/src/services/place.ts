@@ -23,7 +23,10 @@ export const createNewPlace = async (data: IPlaceData, authorId: string) => {
   const coordinates = data.location.coordinates;
   dataToCreate.location.two_array = [coordinates.lng, coordinates.lat];
 
-  const newPlace = new Place(dataToCreate);
+  const newPlace = new Place({
+    ...dataToCreate,
+    author: authorId,
+  });
   await newPlace.save();
 
   const follower = new Follower({

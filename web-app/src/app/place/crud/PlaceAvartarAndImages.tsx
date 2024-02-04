@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   Avatar,
   Box,
@@ -9,8 +9,14 @@ import {
 } from "@mui/material";
 import Carousel from "react-material-ui-carousel";
 import PlaceImageHolder from "./PlaceImageHolder";
-import { usePlaceEditContext } from "../../../hooks";
-import { AddOutlined } from "@mui/icons-material";
+import {
+  useAuthContext,
+  usePlaceEditContext,
+  useSaveImage,
+  useToastContext,
+} from "../../../hooks";
+import { AddOutlined, CloseOutlined, EditOutlined } from "@mui/icons-material";
+import { BASE64 } from "../../../data";
 
 type PlaceAvartarAndImagesProps = BoxProps;
 
@@ -19,34 +25,110 @@ const PlaceAvartarAndImages = React.forwardRef<
   PlaceAvartarAndImagesProps
 >((props, ref) => {
   const editContext = usePlaceEditContext();
-  const { images, setImages, avartar, exposeName } = editContext;
+  const { images, setImages, avartar, setAvartar, exposeName } = editContext;
+  const [index, setIndex] = useState<number>(0);
+
   const inputImageAddRef = useRef<HTMLInputElement>(null);
   const inputAvatarRef = useRef<HTMLInputElement>(null);
+  const inputImageUpdateRef = useRef<HTMLInputElement>(null);
 
-  const handleClickAdd = () => {
-    inputImageAddRef.current?.click();
-  };
+  const authContext = useAuthContext();
+  const auth = authContext.auth;
+  const saveImage = useSaveImage();
+  const toast = useToastContext();
 
   const handleClickAvartar = () => {
     inputAvatarRef.current?.click();
   };
 
-  const handleImageUpdate = (index: number, file: File) => {
-    console.log(index, file);
+  const handleImageUpdate = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (index < 0 || index >= images.length) return;
+
+    const files = event.target.files;
+    if (files == null || files.length === 0) return;
+    const file = files[0];
+
+    if (auth == null) return;
+
+    BASE64.from(file, (result) => {
+      if (typeof result !== "string") return;
+
+      saveImage.doSave(
+        result,
+        {
+          onSuccess: (image) => {
+            const nImages = [...images];
+            nImages[index] = image.url;
+            setImages(nImages);
+          },
+          onError: () => {
+            toast.error("Không thể thực hiện hành động bây giờ");
+          },
+        },
+        auth
+      );
+    });
   };
 
   const handleImageAdd = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event);
+    const files = event.target.files;
+    if (files == null) return;
+    const file = files[0];
+    if (file == null) return;
+
+    if (auth == null) return;
+
+    BASE64.from(file, (result) => {
+      if (typeof result !== "string") return;
+
+      saveImage.doSave(
+        result,
+        {
+          onSuccess: (image) => {
+            const nImages = [...images, image.url];
+            setImages(nImages);
+            setIndex(nImages.length);
+          },
+          onError: () => {
+            toast.error("Không thể thực hiện hành động bây giờ");
+          },
+        },
+        auth
+      );
+    });
   };
 
-  const handleImageRemove = (index: number) => {
+  const handleImageRemove = () => {
     const newImages = images.slice();
     newImages.splice(index, 1);
     setImages(newImages);
+    setIndex(Math.max(0, index - 1));
   };
 
   const handleAvartarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event);
+    if (auth == null) return;
+
+    const files = event.target.files;
+    if (files == null) return;
+    const file = files[0];
+    if (file == null) return;
+
+    BASE64.from(file, (result) => {
+      if (typeof result !== "string") return;
+
+      saveImage.doSave(
+        result,
+        {
+          onSuccess: (image) => {
+            setAvartar(image.url);
+          },
+          onError: () => {
+            toast.error("Không thể thực hiện hành động bây giờ");
+          },
+        },
+        auth
+      );
+    });
   };
 
   return (
@@ -68,24 +150,26 @@ const PlaceAvartarAndImages = React.forwardRef<
           navButtonsAlwaysVisible
           sx={{
             backgroundColor: "white",
+            width: "100%",
+            height: "230px",
           }}
+          index={index}
+          onChange={(now) => setIndex(now ?? 0)}
         >
-          {images.length > 0 &&
-            images.map((url, index) => {
-              return (
-                <PlaceImageHolder
-                  sx={{
-                    width: "100%",
-                    height: "220px",
-                  }}
-                  key={url}
-                  imgSrc={url}
-                  onImageUpdate={(file) => handleImageUpdate(index, file)}
-                  onImageRemove={() => handleImageRemove(index)}
-                />
-              );
-            })}
+          {images.map((url) => {
+            return (
+              <PlaceImageHolder
+                sx={{
+                  width: "100%",
+                }}
+                key={url}
+                imgSrc={url}
+              />
+            );
+          })}
         </Carousel>
+
+        {/* Add */}
         <input
           type="file"
           ref={inputImageAddRef}
@@ -97,18 +181,44 @@ const PlaceAvartarAndImages = React.forwardRef<
           icon={<AddOutlined />}
           sx={{ position: "absolute", bottom: 16, right: 16 }}
           ariaLabel={"Add"}
-          onClick={handleClickAdd}
+          onClick={() => inputImageAddRef.current?.click()}
         />
+
+        <input
+          type="file"
+          ref={inputImageUpdateRef}
+          hidden
+          accept="image/*"
+          onChange={handleImageUpdate}
+        />
+
+        {images.length > 0 && (
+          <>
+            <SpeedDial
+              icon={<EditOutlined />}
+              sx={{ position: "absolute", bottom: 16, right: 76 }}
+              ariaLabel={"Add"}
+              onClick={() => inputImageUpdateRef.current?.click()}
+            />
+
+            <SpeedDial
+              icon={<CloseOutlined />}
+              sx={{ position: "absolute", bottom: 16, right: 136 }}
+              ariaLabel={"Add"}
+              onClick={handleImageRemove}
+            />
+          </>
+        )}
       </Box>
 
-      <input
-        type="file"
-        ref={inputAvatarRef}
-        hidden
-        accept="image/*"
-        onChange={handleAvartarChange}
-      />
       <Stack direction={"row"} gap={1}>
+        <input
+          type="file"
+          ref={inputAvatarRef}
+          hidden
+          accept="image/*"
+          onChange={handleAvartarChange}
+        />
         <Avatar
           sx={{
             width: [90, 120, 150, 180],
@@ -123,7 +233,9 @@ const PlaceAvartarAndImages = React.forwardRef<
         >
           H
         </Avatar>
-        <Typography sx={{ fontWeight: 500, fontSize: "1.3rem", mt: 2 }}>{exposeName}</Typography>
+        <Typography sx={{ fontWeight: 500, fontSize: "1.3rem", mt: 2 }}>
+          {exposeName ? exposeName : "Nhập tên địa điểm của bạn"}
+        </Typography>
       </Stack>
     </Box>
   );

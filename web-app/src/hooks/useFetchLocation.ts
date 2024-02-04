@@ -1,20 +1,15 @@
 import { Dispatch, SetStateAction, useRef, useState } from "react";
-import { GeoCodeMapsData, ICoordinates, ILocation } from "../data";
+import {
+  GeoCodeMapsData,
+  ICoordinates,
+  ILocation,
+  RequestStatus,
+} from "../data";
 import { geocodeMapFindAddess } from "../api";
 
 interface IFetchLocationProps {
   defaultLocation?: ILocation;
 }
-
-export const RequestStatus = {
-  INITIAL: 0,
-  INCHING: 1,
-  SUCCESS: 2,
-  ERROR: -2,
-  REJECT: 3,
-} as const;
-
-export type RequestStatus = (typeof RequestStatus)[keyof typeof RequestStatus];
 
 export interface IFetchCallbackFn {
   onBeforeFetch?: () => any;

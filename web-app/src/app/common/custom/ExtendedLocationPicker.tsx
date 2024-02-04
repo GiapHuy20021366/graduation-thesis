@@ -16,9 +16,14 @@ import {
   useJsApiLoader,
 } from "@react-google-maps/api";
 import { CenterFocusStrongOutlined, CloseOutlined } from "@mui/icons-material";
-import { ICoordinates, ILocation, mapIcons } from "../../../data";
+import {
+  ICoordinates,
+  ILocation,
+  RequestStatus,
+  mapIcons,
+} from "../../../data";
 import { GOOGLE_MAP_API_KEY } from "../../../env";
-import { RequestStatus, useFetchLocation } from "../../../hooks";
+import { useFetchLocation } from "../../../hooks";
 
 type ExtendedLocationPickerProps = StackProps & {
   defaultLocation?: ILocation;

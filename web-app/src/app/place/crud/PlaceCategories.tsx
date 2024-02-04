@@ -19,7 +19,7 @@ const PlaceCategories = React.forwardRef<HTMLDivElement, PlaceCategoriesProps>(
     const { categories, setCategories } = editContext;
 
     const i18nContext = useI18nContext();
-    const lang = i18nContext.of("PlaceCategories");
+    const lang = i18nContext.of("PlaceCategories", "Categories");
 
     const options = Object.values(FoodCategory).map((v) => lang(v));
     const [categoryValue, setCategoryValue] = useState<string>(

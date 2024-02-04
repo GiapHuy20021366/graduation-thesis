@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useRef, useState } from "react";
 import {
   Language,
   LanguageCode,
@@ -36,11 +36,17 @@ export default function I18nContextProvider({
     code: "vi",
     value: {},
   });
+  const dictRef = useRef<{ [key: string]: string }>({});
 
   const switchLanguage = (code: LanguageCode | null): void => {
     getLanguage(code)
       .then((value: Language) => {
         setLanguage(value);
+        Object.values(value.value).forEach((component) =>
+          Object.entries(component).forEach(
+            ([key, val]) => (dictRef.current[key] = val)
+          )
+        );
         localStorage.setItem(i18nKey, value.code);
       })
       .catch((err) => {
@@ -51,7 +57,7 @@ export default function I18nContextProvider({
   const of = (
     ...components: (string | React.ComponentType<any>)[]
   ): I18Resolver => {
-    const keyToLang: { [key: string]: string } = {};
+    const keyToLang: { [key: string]: string } = { ...dictRef.current };
     for (let i = 0; i < components.length; ++i) {
       const component = components[i];
       let componentName: string | null = null;
@@ -72,7 +78,6 @@ export default function I18nContextProvider({
     return (key: string, ...params: any[]): string => {
       const template = keyToLang[key] as string | undefined;
       if (template == null) {
-        // return `<${componentName}>.![${key}]`;
         return key;
       }
 

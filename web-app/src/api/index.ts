@@ -6,6 +6,9 @@ export {
   type UserResponseError,
   userEndpoints,
   userInstance,
+  type IPlaceData,
+  type IPlaceSearchOrder,
+  type IPlaceSearchParams,
 } from "./user";
 
 export {

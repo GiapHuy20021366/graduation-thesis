@@ -12,7 +12,7 @@ interface IPlaceEditContext {
   categories: FoodCategory[];
   location?: ILocation;
   avartar?: string;
-  images: (string | null)[];
+  images: string[];
   type: PlaceType;
   isEditable?: boolean;
 
@@ -21,18 +21,14 @@ interface IPlaceEditContext {
   setCategories: Dispatch<SetStateAction<FoodCategory[]>>;
   setLocation: Dispatch<SetStateAction<ILocation | undefined>>;
   setAvartar: Dispatch<SetStateAction<string | undefined>>;
-  setImages: Dispatch<SetStateAction<(string | null)[]>>;
+  setImages: Dispatch<SetStateAction<string[]>>;
   setType: Dispatch<SetStateAction<PlaceType>>;
 }
 
 const defaultPlaceEditContext: IPlaceEditContext = {
   categories: [],
   exposeName: "",
-  images: [
-    "https://yt3.ggpht.com/VwKxZs8bwpWI7aTtbobE6nV333A-lnO7MyiIPNhtHXIkdPUjtnxUI7TrrvxtcjNIE58oYOJL=s88-c-k-c0x00ffffff-no-rj",
-    "https://yt3.ggpht.com/VwKxZs8bwpWI7aTtbobE6nV333A-lnO7MyiIPNhtHXIkdPUjtnxUI7TrrvxtcjNIE58oYOJL=s88-c-k-c0x00ffffff-no-rj",
-    "https://yt3.ggpht.com/VwKxZs8bwpWI7aTtbobE6nV333A-lnO7MyiIPNhtHXIkdPUjtnxUI7TrrvxtcjNIE58oYOJL=s88-c-k-c0x00ffffff-no-rj",
-  ],
+  images: [],
   type: PlaceType.PERSONAL,
 
   setAvartar: () => {},
@@ -73,7 +69,7 @@ export default function PlaceEditContextProvider({
     dataToEdit.avartar
   );
 
-  const [images, setImages] = useState<(string | null)[]>(dataToEdit.images);
+  const [images, setImages] = useState<string[]>(dataToEdit.images);
   const [type, setType] = useState<PlaceType>(dataToEdit.type);
 
   return (
