@@ -55,3 +55,13 @@ export { type ILocation } from "./location";
 export { UserRole } from "./user-role";
 export { PlaceType } from "./place-type";
 export { type IPlace } from "./place";
+export { type IRating } from "./rating";
+export { type IPlaceAuthorExposed, type IPlaceExposed } from "./place-exposed";
+export {
+  FollowRole,
+  FollowType,
+  type IFollower,
+  type IFollowerBase,
+  type IPlaceFollower,
+  type IUserFollower,
+} from "./user-place-follower";

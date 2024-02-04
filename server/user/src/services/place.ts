@@ -7,6 +7,7 @@ import {
   IPlaceExposed,
   IPlaceFollower,
   IPlaceRating,
+  IRating,
   InternalError,
   OrderState,
   ResourceNotExistedError,
@@ -16,6 +17,7 @@ import {
 import { Follower, Place, PlaceRating } from "../db/model";
 
 export interface IPlaceData extends Omit<IPlace, "author"> {}
+
 export const createNewPlace = async (data: IPlaceData, authorId: string) => {
   const dataToCreate = { ...data, authorId: authorId };
   const coordinates = data.location.coordinates;
@@ -351,6 +353,11 @@ export const ratingPlace = async (
     user: userId,
   });
 
+  const ratingAfter: IRating = {
+    mean: 0,
+    count: 0,
+  };
+
   const total = place.rating.mean * place.rating.count;
   if (score == null || isNaN(score)) {
     if (rating != null) {
@@ -362,6 +369,9 @@ export const ratingPlace = async (
       place.rating.mean = newMean;
       await place.save();
       await rating.deleteOne();
+
+      ratingAfter.mean = newMean;
+      ratingAfter.count = newCount;
     }
   } else {
     if (rating != null) {
@@ -375,6 +385,9 @@ export const ratingPlace = async (
 
       await place.save();
       await rating.save();
+
+      ratingAfter.mean = newMean;
+      ratingAfter.count = place.rating.count;
     } else {
       const newTotal = total + score;
       const newCount = place.rating.count + 1;
@@ -390,10 +403,13 @@ export const ratingPlace = async (
 
       await newRating.save();
       await place.save();
+
+      ratingAfter.mean = newMean;
+      ratingAfter.count = newCount;
     }
   }
   return {
-    isRating: true,
+    ratingAfter,
   };
 };
 

@@ -10,6 +10,12 @@ import {
   IAuthInfo,
   IUserInfo,
   ILocation,
+  PlaceType,
+  IPlaceExposed,
+  FollowType,
+  IPlaceFollower,
+  IRating,
+  OrderState,
 } from "../data";
 
 export const userEndpoints = {
@@ -20,6 +26,15 @@ export const userEndpoints = {
   userNear: "/users/near",
   getInfo: "/info", // :id,
   setLocation: "/location",
+
+  // places
+  createPlace: "/places",
+  updatePlace: "/places/:id",
+  activePlace: "/places/:id/active",
+  followPlace: "/places/:id/follow",
+  ratingPlace: "/places/:id/rating",
+  getPlace: "/places/:id",
+  searchPlace: "/places/search",
 } as const;
 
 export interface UserResponseError
@@ -66,6 +81,32 @@ export interface IGetUserNearParams {
   maxDistance: number;
 }
 
+export interface IPlaceData {
+  exposeName: string;
+  description?: string;
+  categories: string[];
+  location: ILocation;
+  avartar?: string;
+  images: string[];
+  type: PlaceType;
+}
+
+export interface IPlaceSearchOrder {
+  distance?: OrderState;
+  rating?: OrderState;
+}
+
+export interface IPlaceSearchParams {
+  query?: string;
+  author?: string;
+  maxDistance?: number;
+  minRating?: number;
+  order?: IPlaceSearchOrder;
+  currentLocation?: ICoordinates;
+  pagination?: IPagination;
+  types?: PlaceType[];
+}
+
 export interface UserFetcher {
   manualLogin(
     email: string,
@@ -87,6 +128,44 @@ export interface UserFetcher {
     location: ILocation,
     auth: IAuthInfo
   ): Promise<UserResponse<void>>;
+
+  // Place
+  createPlace(
+    data: IPlaceData,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IPlaceExposed>>;
+  getPlace(
+    placeId: string,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IPlaceExposed>>;
+  updatePlace(
+    placeId: string,
+    data: IPlaceData,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IPlaceExposed>>;
+  activePlace(
+    placeId: string,
+    active: boolean,
+    auth: IAuthInfo
+  ): Promise<UserResponse<boolean>>;
+  followPlace(
+    placeId: string,
+    followType: FollowType,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IPlaceFollower>>;
+  unFollowPlace(
+    placeId: string,
+    auth: IAuthInfo
+  ): Promise<UserResponse<{ unfollow: boolean }>>;
+  ratingPlace(
+    placeId: string,
+    auth: IAuthInfo,
+    score?: number
+  ): Promise<UserResponse<IRating>>;
+  searchPlace(
+    searchParams: IPlaceSearchParams,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IPlaceExposed[]>>;
 }
 
 export const userFetcher: UserFetcher = {
@@ -186,6 +265,113 @@ export const userFetcher: UserFetcher = {
     auth: IAuthInfo
   ): Promise<UserResponse<void>> => {
     return userInstance.put(userEndpoints.setLocation, location, {
+      headers: {
+        Authorization: auth.token,
+      },
+    });
+  },
+
+  // place
+  createPlace: (
+    data: IPlaceData,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IPlaceExposed>> => {
+    return userInstance.post(userEndpoints.createPlace, data, {
+      headers: {
+        Authorization: auth.token,
+      },
+    });
+  },
+
+  getPlace: (
+    placeId: string,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IPlaceExposed>> => {
+    return userInstance.get(userEndpoints.getPlace.replace(":id", placeId), {
+      headers: {
+        Authorization: auth.token,
+      },
+    });
+  },
+
+  updatePlace: (
+    placeId: string,
+    data: IPlaceData,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IPlaceExposed>> => {
+    return userInstance.put(
+      userEndpoints.updatePlace.replace(":id", placeId),
+      data,
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
+  },
+  activePlace: (
+    placeId: string,
+    active: boolean,
+    auth: IAuthInfo
+  ): Promise<UserResponse<boolean>> => {
+    return userInstance.get(
+      userEndpoints.activePlace.replace(":id", placeId) +
+        `?active=${active ? "true" : "false"}`,
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
+  },
+  followPlace: (
+    placeId: string,
+    followType: FollowType,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IPlaceFollower>> => {
+    return userInstance.get(
+      userEndpoints.followPlace.replace(":id", placeId) +
+        `?action=follow&type=${followType}`,
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
+  },
+  unFollowPlace: (
+    placeId: string,
+    auth: IAuthInfo
+  ): Promise<UserResponse<{ unfollow: boolean }>> => {
+    return userInstance.get(
+      userEndpoints.followPlace.replace(":id", placeId) + `?action=unfollow`,
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
+  },
+  ratingPlace: (
+    placeId: string,
+    auth: IAuthInfo,
+    score?: number
+  ): Promise<UserResponse<IRating>> => {
+    return userInstance.get(
+      userEndpoints.ratingPlace.replace(":id", placeId) +
+        `?score=${score ?? ""}`,
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
+  },
+  searchPlace: (
+    searchParams: IPlaceSearchParams,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IPlaceExposed[]>> => {
+    return userInstance.post(userEndpoints.searchPlace, searchParams, {
       headers: {
         Authorization: auth.token,
       },

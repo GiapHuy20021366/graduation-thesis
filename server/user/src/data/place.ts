@@ -15,7 +15,7 @@ export interface IPlace {
   location: ILocation;
   avartar?: string;
   images: string[];
-  author: string; // author id
+  author?: string; // author id
   type: PlaceType;
 }
 
@@ -32,7 +32,6 @@ export const toPlace = (value: any): IPlace | undefined => {
   )
     return;
   if (value.images != null && !isAllNotEmptyString(value.images)) return;
-  if (!isObjectId(value.author)) return;
 
   const result: IPlace = {
     exposeName: value.exposeName as string,
