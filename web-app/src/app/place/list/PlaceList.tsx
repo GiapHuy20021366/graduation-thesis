@@ -49,7 +49,14 @@ export default function PlaceList() {
 
   return (
     <Box width={"100%"} boxSizing={"border-box"} boxShadow={1}>
-      <Stack width="100%" direction={"row"} position={"sticky"} top={0}>
+      <Stack
+        width="100%"
+        direction={"row"}
+        position={"sticky"}
+        top={0}
+        sx={{ backgroundColor: "white" }}
+        zIndex={1000}
+      >
         <Tabs
           value={tab}
           onChange={(
@@ -111,7 +118,7 @@ export default function PlaceList() {
       <SpeedDial
         icon={<SearchOutlined />}
         ariaLabel={"search"}
-        sx={{ position: "absolute", bottom: 26, right: 26 }}
+        sx={{ position: "absolute", bottom: 76, right: 26 }}
       />
     </Box>
   );

@@ -52,7 +52,7 @@ interface ISearchRoleParams {
   maxVisible?: number;
 }
 
-export default function UsersArroundPage() {
+export default function UsersAroundPage() {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: GOOGLE_MAP_API_KEY,
@@ -75,7 +75,7 @@ export default function UsersArroundPage() {
   const fetching = useLoading();
   const processContext = usePageProgessContext();
   const i8nContext = useI18nContext();
-  const lang = i8nContext.of(UsersArroundPage);
+  const lang = i8nContext.of(UsersAroundPage);
   const mapRef = useRef<google.maps.Map>();
   const [loadActive, setLoadActive] = useState<boolean>(false);
   const authContext = useAuthContext();

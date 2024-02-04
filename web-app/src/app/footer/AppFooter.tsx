@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import AppFooterExtensions from "./AppFooterExtensions";
+import AppTabs from "./AppTabs";
 
 export default function AppFooter() {
   return (
@@ -13,7 +13,7 @@ export default function AppFooter() {
         boxShadow: 1,
       }}
     >
-      <AppFooterExtensions />
+      <AppTabs sx={{ display: "flex", justifyContent: "center" }} />
     </Box>
   );
 }

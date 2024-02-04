@@ -2,7 +2,7 @@ import { Box, Divider, Stack } from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 import AppHeaderTitle from "./AppHeaderTitle";
 import AppHeaderUntil from "./AppHeaderUtil";
-import AppFooterExtensions from "../footer/AppFooterExtensions";
+import AppTabs from "../footer/AppTabs";
 
 export default function AppHeader() {
   return (
@@ -12,7 +12,7 @@ export default function AppHeader() {
         padding: 0,
         margin: 0,
         boxSizing: "border-box",
-        boxShadow: 1
+        boxShadow: 1,
       }}
     >
       <Grid2
@@ -35,7 +35,7 @@ export default function AppHeader() {
           </Stack>
         </Grid2>
         <Grid2 display={["none", "none", "block"]}>
-          <AppFooterExtensions />
+          <AppTabs sx={{ display: "flex", justifyContent: "center" }} />
         </Grid2>
         <Grid2
           mobile

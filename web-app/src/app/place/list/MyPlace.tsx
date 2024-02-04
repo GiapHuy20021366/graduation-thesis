@@ -27,7 +27,7 @@ const MyPlace = React.forwardRef<HTMLDivElement, MyPlaceProps>((props, ref) => {
       </Stack>
       <SpeedDial
         icon={<AddOutlined />}
-        sx={{ position: "absolute", bottom: 96, right: 26 }}
+        sx={{ position: "absolute", bottom: 136, right: 26 }}
         ariaLabel={"Create"}
         onClick={() => navigate("/place/update")}
       />
