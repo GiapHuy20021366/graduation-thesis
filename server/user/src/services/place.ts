@@ -425,7 +425,7 @@ interface IPlaceInfo extends Omit<IPlaceExposed, "author"> {
 export const getPlaceInfo = async (placeId: string, userId?: string) => {
   const place = await Place.findById(placeId).populate<{
     author: IPlaceAuthorExposed;
-  }>("author");
+  }>("author", "firstName lastName _id email");
   if (place == null) {
     throw new ResourceNotExistedError({
       message: `No place with id ${placeId} found`,

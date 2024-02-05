@@ -1,6 +1,6 @@
 import { Model, Schema, model, ObjectId } from "mongoose";
 import collections from "../collections";
-import { FollowRole, IFollower } from "../../data";
+import { FollowRole, FollowType, IFollower } from "../../data";
 
 export interface IFollowerSchema
   extends Omit<IFollower, "place" | "user" | "subcriber"> {
@@ -37,6 +37,11 @@ const followerSchema = new Schema<
     index: true,
   },
   type: {
+    type: Number,
+    required: true,
+    default: FollowType.SUBCRIBER,
+  },
+  role: {
     type: Number,
     required: true,
     default: FollowRole.USER,

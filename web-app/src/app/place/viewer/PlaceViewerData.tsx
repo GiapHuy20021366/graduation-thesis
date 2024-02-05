@@ -15,6 +15,8 @@ interface PlaceViewerDataProps {
 export default function PlaceViewerData({ data }: PlaceViewerDataProps) {
   const [tab, setTab] = useState<PlaceViewerTab>(0);
 
+  console.log(data);
+
   return (
     <Stack width={"100%"} boxSizing={"border-box"} boxShadow={1} gap={2} p={1}>
       <PlaceViewerHeader place={data} />
