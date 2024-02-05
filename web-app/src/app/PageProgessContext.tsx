@@ -8,11 +8,13 @@ interface IToastContextProviderProps {
 interface IPageProgessContext {
   start: () => void;
   end: () => void;
+  isLoading: boolean;
 }
 
 export const PageProgessContext = createContext<IPageProgessContext>({
   start: () => {},
   end: () => {},
+  isLoading: false,
 });
 
 export default function PageProgessContextProvider({
@@ -43,6 +45,7 @@ export default function PageProgessContextProvider({
       value={{
         start,
         end,
+        isLoading: loading,
       }}
     >
       <Box sx={{ width: "100vw", position: "fixed", top: 0, left: 0 }}>

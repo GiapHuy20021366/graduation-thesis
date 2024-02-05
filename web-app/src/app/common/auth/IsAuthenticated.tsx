@@ -23,7 +23,8 @@ export default function IsAuthenticated({
       return errorElement;
     }
     let url = redirectUrl ?? "/signin";
-    if (withCallback !== false) url += `?redirect=${window.location.pathname}`;
+    if (withCallback !== false)
+      url += `?redirect=${location.pathname + location.search}`;
     return <Navigate to={url} replace />;
   }
   return <>{children}</>;

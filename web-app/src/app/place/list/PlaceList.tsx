@@ -1,6 +1,5 @@
 import { Box, SpeedDial, Stack, Tab, Tabs } from "@mui/material";
-import { useState } from "react";
-import { useI18nContext } from "../../../hooks";
+import { ITabOption, useI18nContext, useTabNavigate } from "../../../hooks";
 import {
   FavoriteOutlined,
   GradeOutlined,
@@ -25,8 +24,32 @@ const PlacePageTab = {
 
 type PlacePageTab = (typeof PlacePageTab)[keyof typeof PlacePageTab];
 
+const tabs: ITabOption[] = [
+  {
+    query: "myplace",
+    value: PlacePageTab.MY_PLACE,
+  },
+  {
+    query: "nearplace",
+    value: PlacePageTab.NEAR_HERE,
+  },
+  {
+    query: "favorite",
+    value: PlacePageTab.FAVORITE,
+  },
+  {
+    query: "subcribed",
+    value: PlacePageTab.SUBCRIBED,
+  },
+  {
+    query: "rating",
+    value: PlacePageTab.RATING,
+  },
+];
+
 export default function PlaceList() {
-  const [tab, setTab] = useState<PlacePageTab>(PlacePageTab.MY_PLACE);
+  const tabNavigate = useTabNavigate({ tabOptions: tabs });
+  const tab = tabNavigate.tab;
 
   const i18nContext = useI18nContext();
   const lang = i18nContext.of(PlaceList);
@@ -47,6 +70,13 @@ export default function PlaceList() {
     //
   };
 
+  const handleTabChange = (
+    _event: React.SyntheticEvent<Element, Event>,
+    value: any
+  ) => {
+    tabNavigate.setTab(value);
+  };
+
   return (
     <Box width={"100%"} boxSizing={"border-box"} boxShadow={1}>
       <Stack
@@ -58,11 +88,8 @@ export default function PlaceList() {
         zIndex={1000}
       >
         <Tabs
-          value={tab}
-          onChange={(
-            _event: React.SyntheticEvent<Element, Event>,
-            value: any
-          ) => setTab(value)}
+          value={tabNavigate.tab}
+          onChange={handleTabChange}
           variant="scrollable"
           scrollButtons={false}
           sx={{

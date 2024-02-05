@@ -12,3 +12,11 @@ export {
   useFetchLocation,
 } from "./useFetchLocation";
 export { type ISaveImageStates, useSaveImage } from "./useSaveImage";
+export {
+  type ITabNavigateOptions,
+  type ITabOption,
+  defaultResolver,
+  toParams,
+  toSearchUrl,
+  useTabNavigate,
+} from "./useTabNavigate";
