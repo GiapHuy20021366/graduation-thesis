@@ -469,6 +469,7 @@ export const getPlaceInfo = async (placeId: string, userId?: string) => {
       user: userId,
       place: placeId,
     });
+
     if (rating) {
       result.userRating = {
         place: placeId,
@@ -476,6 +477,16 @@ export const getPlaceInfo = async (placeId: string, userId?: string) => {
         user: userId,
       };
     }
+
+    const followerCount = await Follower.count({
+      place: placeId,
+      subcriber: {
+        $ne: userId,
+      },
+      role: FollowRole.PLACE,
+    }).exec();
+
+    result.subcribers = followerCount;
   }
   return result;
 };

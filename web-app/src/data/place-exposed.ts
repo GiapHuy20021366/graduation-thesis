@@ -19,4 +19,5 @@ export interface IPlaceExposed extends Omit<IPlace, "author"> {
   updatedAt: Date;
   userRating?: IPlaceRating;
   userFollow?: IPlaceFollower;
+  subcribers?: number;
 }

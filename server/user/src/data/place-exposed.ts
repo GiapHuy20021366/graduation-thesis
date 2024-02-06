@@ -10,4 +10,5 @@ export interface IPlaceAuthorExposed {
 export interface IPlaceExposed extends Omit<IPlaceSchema, "author"> {
   author: string | IPlaceAuthorExposed;
   _id: string;
+  subcribers?: number;
 }

@@ -7,17 +7,7 @@ import React, {
   useState,
 } from "react";
 import { userFetcher } from "../api";
-import { IAuthInfo, ILocation } from "../data";
-
-interface IAccount {
-  id_: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  avatar?: string;
-  titles?: string[];
-  location?: ILocation;
-}
+import { IAccount, IAuthInfo, ILocation } from "../data";
 
 interface IAuthContextProviderProps {
   children: React.ReactNode;
@@ -139,7 +129,7 @@ export default function AuthContextProvider({
         logout,
         setToken,
         auth,
-        updateLocation
+        updateLocation,
       }}
     >
       {children}

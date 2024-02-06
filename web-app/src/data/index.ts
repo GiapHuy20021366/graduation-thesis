@@ -69,3 +69,4 @@ export { RequestStatus } from "./request-status";
 export { getAuth } from "./get-auth";
 export { BASE64 } from "./file-util";
 export { type IPlaceRating } from "./place-rating";
+export { type IAccount } from "./account";

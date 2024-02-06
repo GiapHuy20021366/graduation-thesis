@@ -6,12 +6,24 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import { IPlaceExposed } from "../../../data";
+import { FollowType, IAccount, IPlaceExposed } from "../../../data";
 import { Edit, MoreVert, ReportGmailerrorred } from "@mui/icons-material";
 import { useNavigate } from "react-router";
+import { useAuthContext } from "../../../hooks";
 
 type PlaceButtonContextMenuProps = IconButtonProps & {
   data: IPlaceExposed;
+};
+
+const isPermitEdit = (place: IPlaceExposed, account?: IAccount): boolean => {
+  if (account == null) return false;
+  if (place.userFollow == null) return false;
+  if (
+    place.userFollow.type !== FollowType.ADMIN ||
+    place.userFollow.subcriber !== account.id_
+  )
+    return false;
+  return true;
 };
 
 const PlaceContextMenu = React.forwardRef<
@@ -19,8 +31,12 @@ const PlaceContextMenu = React.forwardRef<
   PlaceButtonContextMenuProps
 >((props, ref) => {
   const { data, ...rest } = props;
-
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const authContext = useAuthContext();
+  const account = authContext.account;
+  const canEdit = isPermitEdit(data, account);
+
   const open = Boolean(anchorEl);
 
   const handleClick = (
@@ -98,12 +114,14 @@ const PlaceContextMenu = React.forwardRef<
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem onClick={navigateToEdit}>
-          <ListItemIcon>
-            <Edit fontSize="small" />
-          </ListItemIcon>
-          Edit
-        </MenuItem>
+        {canEdit && (
+          <MenuItem onClick={navigateToEdit}>
+            <ListItemIcon>
+              <Edit fontSize="small" />
+            </ListItemIcon>
+            Edit
+          </MenuItem>
+        )}
         <MenuItem onClick={handleClose}>
           <ListItemIcon>
             <ReportGmailerrorred fontSize="small" />

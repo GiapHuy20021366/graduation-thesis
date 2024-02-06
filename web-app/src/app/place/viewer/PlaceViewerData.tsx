@@ -4,7 +4,7 @@ import { IPlaceExposed } from "../../../data";
 import PlaceViewerTabs from "./PlaceViewerTabs";
 import { useState } from "react";
 import { PlaceViewerTab } from "./place-viewer-tab";
-import PlaceViewerDescription from "./PlaceViewerDescription";
+import PlaceViewerIntroduction from "./PlaceViewerIntroduction";
 import PlaceViewerSharedFood from "./PlaceViewerSharedFood";
 import PlaceViewerSubcribed from "./PlaceViewerSubcribed";
 
@@ -24,7 +24,9 @@ export default function PlaceViewerData({ data }: PlaceViewerDataProps) {
       <PlaceViewerTabs onTabSet={(tab) => setTab(tab)} />
       {/* Tabs display */}
       <>
-        {tab === PlaceViewerTab.DESCRIPTION && <PlaceViewerDescription />}
+        {tab === PlaceViewerTab.DESCRIPTION && (
+          <PlaceViewerIntroduction data={data} />
+        )}
         {tab === PlaceViewerTab.FOOD && <PlaceViewerSharedFood />}
         {tab === PlaceViewerTab.SUBCRIBED && <PlaceViewerSubcribed />}
       </>

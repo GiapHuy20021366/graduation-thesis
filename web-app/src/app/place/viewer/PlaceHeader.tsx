@@ -11,9 +11,10 @@ import {
 import Carousel from "react-material-ui-carousel";
 import { IPlaceExposed } from "../../../data";
 import PlaceImageHolder from "../crud/PlaceImageHolder";
-import PlaceRating from "./PlaceRating";
 import PlaceButtonContextMenu from "./PlaceButtonContextMenu";
 import { NotificationsActiveOutlined } from "@mui/icons-material";
+import SubcribeChipAction from "./SubcribeChipAction";
+import PlaceViewerRating from "./PlaceViewerRating";
 
 type PlaceViewerHeaderProps = BoxProps & {
   place: IPlaceExposed;
@@ -73,25 +74,31 @@ const PlaceViewerHeader = React.forwardRef<
           }}
           src={place.avartar}
         >
-          H
+          {place.exposeName.charAt(0)}
         </Avatar>
-        <Typography sx={{ fontWeight: 500, fontSize: "1.3rem", mt: 2 }}>
-          {exposeName}
-        </Typography>
-      </Stack>
-
-      <Stack direction={"row"} sx={{ alignItems: "center" }}>
-        <Typography>0 đang theo dõi</Typography>
-        <IconButton color="success">
-          <NotificationsActiveOutlined />
-        </IconButton>
-      </Stack>
-
-      <Stack direction={"row"}>
-        <PlaceRating data={place} />
-        <Tooltip title="Xem thêm">
-          <PlaceButtonContextMenu data={place} />
-        </Tooltip>
+        <Stack gap={1} flex={1}>
+          <Typography sx={{ fontWeight: 500, fontSize: "1.3rem", mt: 2 }}>
+            {exposeName}
+          </Typography>
+          <Stack direction={"row"} sx={{ alignItems: "center" }} ml={-1}>
+            <IconButton color="success">
+              <NotificationsActiveOutlined />
+            </IconButton>
+            <Typography>0 đang theo dõi</Typography>
+            <SubcribeChipAction data={place} sx={{ ml: 2 }} />
+            <Box ml={"auto"}>
+              <Tooltip title="Xem thêm">
+                <PlaceButtonContextMenu
+                  data={place}
+                  sx={{ flex: 1 }}
+                  color="primary"
+                />
+              </Tooltip>
+            </Box>
+          </Stack>
+          {/* Rating */}
+          <PlaceViewerRating data={place} mt={1} ml={-1}/>
+        </Stack>
       </Stack>
     </Box>
   );
