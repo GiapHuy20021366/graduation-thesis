@@ -1,5 +1,5 @@
 import { Stack } from "@mui/material";
-import PlaceViewerHeader from "./PlaceHeader";
+import PlaceViewerHeader from "./PlaceViewerHeader";
 import { IPlaceExposed } from "../../../data";
 import PlaceViewerTabs from "./PlaceViewerTabs";
 import { useState } from "react";

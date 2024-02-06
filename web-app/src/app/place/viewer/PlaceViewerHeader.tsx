@@ -84,7 +84,7 @@ const PlaceViewerHeader = React.forwardRef<
             <IconButton color="success">
               <NotificationsActiveOutlined />
             </IconButton>
-            <Typography>0 đang theo dõi</Typography>
+            <Typography>{place.subcribers ?? 0} đang theo dõi</Typography>
             <SubcribeChipAction data={place} sx={{ ml: 2 }} />
             <Box ml={"auto"}>
               <Tooltip title="Xem thêm">
@@ -97,7 +97,7 @@ const PlaceViewerHeader = React.forwardRef<
             </Box>
           </Stack>
           {/* Rating */}
-          <PlaceViewerRating data={place} mt={1} ml={-1}/>
+          <PlaceViewerRating data={place} mt={1} ml={-1} />
         </Stack>
       </Stack>
     </Box>
