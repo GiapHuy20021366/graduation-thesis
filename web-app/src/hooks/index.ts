@@ -20,3 +20,4 @@ export {
   toSearchUrl,
   useTabNavigate,
 } from "./useTabNavigate";
+export { useDistanceCalculation } from "./useDistanceCalculation";

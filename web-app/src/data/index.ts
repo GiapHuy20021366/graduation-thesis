@@ -53,7 +53,7 @@ export { type IPagination } from "./pagination";
 export { type IUserInfo } from "./user-info";
 export { type ILocation } from "./location";
 export { UserRole } from "./user-role";
-export { PlaceType } from "./place-type";
+export { PlaceType, toPlaceTypeLabel } from "./place-type";
 export { type IPlace } from "./place";
 export { type IRating } from "./rating";
 export { type IPlaceAuthorExposed, type IPlaceExposed } from "./place-exposed";

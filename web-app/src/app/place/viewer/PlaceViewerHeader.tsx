@@ -15,6 +15,7 @@ import PlaceButtonContextMenu from "./PlaceButtonContextMenu";
 import { NotificationsActiveOutlined } from "@mui/icons-material";
 import SubcribeChipAction from "./SubcribeChipAction";
 import PlaceViewerRating from "./PlaceViewerRating";
+import PlaceViewerExposedType from "./PlaceViewerExposedType";
 
 type PlaceViewerHeaderProps = BoxProps & {
   place: IPlaceExposed;
@@ -80,6 +81,9 @@ const PlaceViewerHeader = React.forwardRef<
           <Typography sx={{ fontWeight: 500, fontSize: "1.3rem", mt: 2 }}>
             {exposeName}
           </Typography>
+
+          <PlaceViewerExposedType placeType={place.type} />
+
           <Stack direction={"row"} sx={{ alignItems: "center" }} ml={-1}>
             <IconButton color="success">
               <NotificationsActiveOutlined />

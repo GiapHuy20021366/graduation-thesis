@@ -1,9 +1,11 @@
 import React from "react";
-import { Box, BoxProps } from "@mui/material";
+import { Divider, Stack, StackProps } from "@mui/material";
 import { IPlaceExposed } from "../../../data";
 import PlaceViewerDescription from "./PlaceViewerDescription";
+import PlaceViewerLocation from "./PlaceViewerLocation";
+import PlaceViewerCategories from "./PlaceViewerCategories";
 
-type PlaceViewerIntroductionProps = BoxProps & {
+type PlaceViewerIntroductionProps = StackProps & {
   data: IPlaceExposed;
 };
 
@@ -13,8 +15,9 @@ const PlaceViewerIntroduction = React.forwardRef<
 >((props, ref) => {
   const { data, ...rest } = props;
   return (
-    <Box
+    <Stack
       ref={ref}
+      gap={1}
       {...rest}
       sx={{
         width: "100%",
@@ -22,7 +25,11 @@ const PlaceViewerIntroduction = React.forwardRef<
       }}
     >
       <PlaceViewerDescription data={data} />
-    </Box>
+      <Divider />
+      <PlaceViewerLocation data={data} />
+      <Divider />
+      <PlaceViewerCategories categories={data.categories} />
+    </Stack>
   );
 });
 

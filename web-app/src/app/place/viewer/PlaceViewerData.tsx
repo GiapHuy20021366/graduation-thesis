@@ -18,17 +18,30 @@ export default function PlaceViewerData({ data }: PlaceViewerDataProps) {
   console.log(data);
 
   return (
-    <Stack width={"100%"} boxSizing={"border-box"} boxShadow={1} gap={2} p={1}>
+    <Stack width={"100%"} boxSizing={"border-box"} boxShadow={1} gap={2} px={1}>
       <PlaceViewerHeader place={data} />
 
       <PlaceViewerTabs onTabSet={(tab) => setTab(tab)} />
       {/* Tabs display */}
       <>
-        {tab === PlaceViewerTab.DESCRIPTION && (
-          <PlaceViewerIntroduction data={data} />
-        )}
-        {tab === PlaceViewerTab.FOOD && <PlaceViewerSharedFood />}
-        {tab === PlaceViewerTab.SUBCRIBED && <PlaceViewerSubcribed />}
+        <PlaceViewerIntroduction
+          data={data}
+          sx={{
+            display: tab === PlaceViewerTab.DESCRIPTION ? "flex" : "none",
+          }}
+        />
+
+        <PlaceViewerSharedFood
+          sx={{
+            display: tab === PlaceViewerTab.FOOD ? "block" : "none",
+          }}
+        />
+
+        <PlaceViewerSubcribed
+          sx={{
+            display: tab === PlaceViewerTab.SUBCRIBED ? "block" : "none",
+          }}
+        />
       </>
     </Stack>
   );
