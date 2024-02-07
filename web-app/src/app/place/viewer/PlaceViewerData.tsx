@@ -41,6 +41,8 @@ export default function PlaceViewerData({ data }: PlaceViewerDataProps) {
           sx={{
             display: tab === PlaceViewerTab.SUBCRIBED ? "block" : "none",
           }}
+          active={tab === PlaceViewerTab.SUBCRIBED}
+          place={data}
         />
       </>
     </Stack>
