@@ -1,11 +1,17 @@
-import { Badge, IconButton, Stack, SxProps, Theme, Tooltip } from "@mui/material";
+import {
+  IconButton,
+  Stack,
+  SxProps,
+  Theme,
+  Tooltip,
+} from "@mui/material";
 import SideBarOpener from "../common/menu-side/SideBarOpener";
 import {
-  NotificationsOutlined,
   RoomOutlined,
   SearchOutlined,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router";
+import NotificationProvider from "./utils/notification/NotificationProvider";
 
 export default function AppHeaderUntil() {
   const navigate = useNavigate();
@@ -27,22 +33,7 @@ export default function AppHeaderUntil() {
     >
       <SideBarOpener />
       <Tooltip title={"Notification"}>
-        <IconButton
-          sx={{
-            color: "black",
-          }}
-        >
-          <Badge
-            badgeContent={4}
-            anchorOrigin={{
-              vertical: "top",
-              horizontal: "right",
-            }}
-            color="secondary"
-          >
-            <NotificationsOutlined sx={iconStyle} />
-          </Badge>
-        </IconButton>
+        <NotificationProvider />
       </Tooltip>
       <Tooltip title={"Location"}>
         <IconButton
