@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Box, BoxProps, Tab, Tabs } from "@mui/material";
 import {
   HomeOutlined,
@@ -6,7 +6,8 @@ import {
   PeopleAltOutlined,
   PlaceOutlined,
 } from "@mui/icons-material";
-import { useLocation, useNavigate } from "react-router";
+import { Location } from "react-router";
+import { ITabOption, useTabNavigate } from "../../hooks";
 
 const AppTab = {
   HOME: 0,
@@ -19,7 +20,27 @@ type AppTab = (typeof AppTab)[keyof typeof AppTab];
 
 type NearPlaceProps = BoxProps;
 
-const toAppTab = (pathname: string): AppTab => {
+const appTabs: ITabOption[] = [
+  {
+    value: AppTab.HOME,
+    url: "/home",
+  },
+  {
+    url: "/around/food",
+    value: AppTab.FOOD_AROUND,
+  },
+  {
+    url: "/around/users",
+    value: AppTab.PEOPLE_AROUND,
+  },
+  {
+    url: "/place",
+    value: AppTab.PLACE,
+  },
+];
+
+const appTabResolver = (location: Location<any>): number => {
+  const pathname = location.pathname;
   if (pathname.includes("/around/users")) return AppTab.PEOPLE_AROUND;
   if (pathname.includes("/around/food")) return AppTab.FOOD_AROUND;
   if (pathname.includes("/place")) return AppTab.PLACE;
@@ -28,14 +49,10 @@ const toAppTab = (pathname: string): AppTab => {
 
 const AppTabs = React.forwardRef<HTMLDivElement, NearPlaceProps>(
   (props, ref) => {
-    const [value, setValue] = React.useState<AppTab>(0);
-    const navigate = useNavigate();
-
-    const location = useLocation();
-    useEffect(() => {
-      const tab = toAppTab(location.pathname);
-      setValue(tab);
-    }, [location]);
+    const tabNavigate = useTabNavigate({
+      tabOptions: appTabs,
+      resolver: appTabResolver,
+    });
 
     return (
       <Box
@@ -47,7 +64,7 @@ const AppTabs = React.forwardRef<HTMLDivElement, NearPlaceProps>(
         }}
       >
         <Tabs
-          value={value}
+          value={tabNavigate.tab}
           variant="scrollable"
           scrollButtons
           allowScrollButtonsMobile
@@ -56,25 +73,25 @@ const AppTabs = React.forwardRef<HTMLDivElement, NearPlaceProps>(
             icon={<HomeOutlined />}
             aria-label="Home"
             label="Home"
-            onClick={() => navigate("/home")}
+            onClick={() => tabNavigate.setTab(AppTab.HOME)}
           />
           <Tab
             icon={<FoodBankOutlined />}
             aria-label="Food around"
             label="Food"
-            onClick={() => navigate("/around/food")}
+            onClick={() => tabNavigate.setTab(AppTab.FOOD_AROUND)}
           />
           <Tab
             icon={<PeopleAltOutlined />}
             aria-label="People"
             label="People"
-            onClick={() => navigate("/around/users")}
+            onClick={() => tabNavigate.setTab(AppTab.PEOPLE_AROUND)}
           />
           <Tab
             icon={<PlaceOutlined />}
             aria-label="Place"
             label="Place"
-            onClick={() => navigate("/place")}
+            onClick={() => tabNavigate.setTab(AppTab.PLACE)}
           />
         </Tabs>
       </Box>

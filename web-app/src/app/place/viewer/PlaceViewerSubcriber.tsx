@@ -34,7 +34,9 @@ const PlaceViewerSubciber = React.forwardRef<
       }}
       onClick={handleNavigateClick}
     >
-      <Avatar>{data.subcriber.firstName[0]}</Avatar>
+      <Avatar src={data.subcriber.avartar}>
+        {data.subcriber.firstName[0]}
+      </Avatar>
       <Stack>
         <Typography sx={{ fontWeight: 450 }}>
           {data.subcriber.firstName} {data.subcriber.lastName}

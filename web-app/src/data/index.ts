@@ -71,3 +71,9 @@ export { BASE64 } from "./file-util";
 export { type IPlaceRating } from "./place-rating";
 export { type IAccount } from "./account";
 export { type IPlaceFollowerExposed } from "./place-follower-exposed";
+export {
+  type IPlaceFoodExposed,
+  type IPlaceFoodExposedAuthor,
+  type IPlaceFoodExposedFood,
+  type IPlaceFoodExposedPlace,
+} from "./place-food-exposed";
