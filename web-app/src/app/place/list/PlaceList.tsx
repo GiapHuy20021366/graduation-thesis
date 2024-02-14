@@ -13,6 +13,7 @@ import NearPlace from "./NearPlace";
 import FavoritePlace from "./FavoritePlace";
 import SubcribedPlace from "./SubcribePlace";
 import RatingPlace from "./RatingPlace";
+import { useNavigate } from "react-router";
 
 const PlacePageTab = {
   MY_PLACE: 0,
@@ -50,6 +51,7 @@ const tabs: ITabOption[] = [
 export default function PlaceList() {
   const tabNavigate = useTabNavigate({ tabOptions: tabs });
   const tab = tabNavigate.tab;
+  const navigate = useNavigate();
 
   const i18nContext = useI18nContext();
   const lang = i18nContext.of(PlaceList);
@@ -146,6 +148,7 @@ export default function PlaceList() {
         icon={<SearchOutlined />}
         ariaLabel={"search"}
         sx={{ position: "absolute", bottom: 76, right: 26 }}
+        onClick={() => navigate("/place/search")}
       />
     </Box>
   );
