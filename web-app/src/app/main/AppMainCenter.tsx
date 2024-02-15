@@ -15,7 +15,7 @@ import Place from "../place/Place";
 
 export default function AppMainCenter() {
   return (
-    <Grid2 mobile={12} tablet={9} laptop={8} desktop={6}>
+    <Grid2 mobile={12} tablet={9} laptop={8} desktop={6} height="100%">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/home/*" element={<Home />} />

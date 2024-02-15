@@ -290,8 +290,7 @@ export default function UsersAroundPage() {
       direction={"column"}
       gap={1}
       width={"100%"}
-      height={["80vh", "90vh", "90vh", "95vh"]}
-      maxHeight={"100%"}
+      height={"100%"}
       boxSizing={"border-box"}
       padding={0}
     >

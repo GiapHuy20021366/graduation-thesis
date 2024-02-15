@@ -1,8 +1,5 @@
 import {
-  ArrowDownward,
-  ArrowUpward,
   History,
-  ImportExport,
   SearchOutlined,
   TuneOutlined,
 } from "@mui/icons-material";
@@ -42,17 +39,7 @@ import { IFoodSearchContext } from "./FoodSearchContext";
 import FoodItemSkeleton from "./FoodItemSkeleton";
 import { IFoodSearchHistorySimple } from "../../../api/food";
 import OutSearchResult from "../../common/OutSearchResult";
-
-interface IOrderIconProps {
-  order?: OrderState;
-}
-
-function OrderIcon({ order }: IOrderIconProps) {
-  if (order === OrderState.INCREASE) return <ArrowUpward />;
-  if (order === OrderState.DECREASE) return <ArrowDownward />;
-  if (order === OrderState.NONE) return <ImportExport />;
-  return <></>;
-}
+import OrderIcon from "../../common/custom/OrderIcon";
 
 const SearchTab = {
   RELATED: 0,

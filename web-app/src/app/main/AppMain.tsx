@@ -17,10 +17,11 @@ export default function AppMain() {
         overflowY: "auto",
         overflowX: "hidden",
         flex: 1,
+        height: "100%",
       }}
       ref={contentContext.mainRef}
     >
-      <Grid2 container spacing={1}>
+      <Grid2 container spacing={1} height="100%">
         <AppMainLeft />
         <AppMainCenter />
         <AppMainRight />

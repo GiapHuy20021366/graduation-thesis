@@ -29,10 +29,6 @@ const ToggleChip = React.forwardRef<HTMLDivElement, IToggleChipProps>(
     const sx: SxProps<Theme> | undefined = !active
       ? {
           ...props.sx,
-          ":hover": {
-            backgroundColor: alpha("#A020F0", 0.8) + "!important",
-            color: "white !important",
-          },
         }
       : {
           ...props.sx,

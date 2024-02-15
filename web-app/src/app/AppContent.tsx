@@ -11,7 +11,7 @@ export default function AppContent() {
     <AppContentContextProvider>
       <Stack
         direction={"column"}
-        height={"100vh"}
+        height={"100svh"}
         m="0px -8px"
         p={0}
         sx={{

@@ -222,7 +222,7 @@ export default function FoodSearchFilter({
         <Stack
           sx={{
             width: ["80vw", "50vw", "40vw", "30vw"],
-            height: "100vh",
+            height: "100svh",
             padding: "4px",
             boxSizing: "border-box",
           }}
