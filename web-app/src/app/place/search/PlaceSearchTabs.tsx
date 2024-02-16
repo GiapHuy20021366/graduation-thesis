@@ -20,7 +20,6 @@ const PlaceSearchTabs = React.forwardRef<HTMLDivElement, PlaceSearchTabsProps>(
       setTab,
       order,
       setOrder,
-      setIsEnd,
       doSearchRelative,
       doSearchDistance,
       doSearchRating,
@@ -37,38 +36,37 @@ const PlaceSearchTabs = React.forwardRef<HTMLDivElement, PlaceSearchTabsProps>(
     const onTabRelativeClick = () => {
       // do search relative
       if (tab !== placeSearchTabs.RALATIVE) {
-        setIsEnd(false);
-        doSearchRelative();
+        doSearchRelative({
+          refresh: true,
+        });
       }
     };
 
     const onTabDistanceClick = () => {
       // do search distance
-      setIsEnd(false);
       if (tab === placeSearchTabs.DISTANCE) {
         const nextOrder = toNextOrderState(order?.distance ?? OrderState.NONE);
         setOrder({
           ...order,
           distance: nextOrder,
         });
-        doSearchDistance(false, nextOrder);
+        doSearchDistance(nextOrder, { refresh: true });
       } else {
-        doSearchDistance(false, order?.distance);
+        doSearchDistance(order?.distance, { refresh: true });
       }
     };
 
     const onTabRatingClick = () => {
       // do search rating
-      setIsEnd(false);
       if (tab === placeSearchTabs.RATING) {
         const nextOrder = toNextOrderState(order?.rating ?? OrderState.NONE);
         setOrder({
           ...order,
           rating: nextOrder,
         });
-        doSearchRating(false, nextOrder);
+        doSearchRating(nextOrder, { refresh: true });
       } else {
-        doSearchRating(false, order?.rating);
+        doSearchRating(order?.rating, { refresh: true });
       }
     };
 

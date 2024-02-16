@@ -77,3 +77,9 @@ export {
   type IPlaceFoodExposedFood,
   type IPlaceFoodExposedPlace,
 } from "./place-food-exposed";
+export {
+  type ILocalStorage,
+  type ILocalStorageMeta,
+  loadFromLocalStorage,
+  saveToLocalStorage,
+} from "./util-local-storage";

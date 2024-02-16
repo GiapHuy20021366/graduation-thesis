@@ -7,14 +7,29 @@ import React, {
   useState,
 } from "react";
 import {
-  IPagination,
   IPlaceExposed,
   OrderState,
   PlaceType,
+  saveToLocalStorage,
 } from "../../../data";
-import { IPlaceSearchOrder } from "../../../api";
-import { useAppContentContext } from "../../../hooks";
+import { IPlaceSearchOrder, IPlaceSearchParams } from "../../../api";
+import {
+  useAppContentContext,
+  useAuthContext,
+  useDistanceCalculation,
+} from "../../../hooks";
 import { placeSearchTabs } from "./place-search-tab";
+
+interface IPlaceSearchContextSnapshotData {
+  query?: string;
+  maxDistance?: number;
+  minRating?: number;
+  order?: IPlaceSearchOrder;
+  types?: PlaceType[];
+  tab: number;
+  scrollTop?: number;
+  data: IPlaceExposed[];
+}
 
 interface IPlaceSearchContextProviderProps {
   children?: React.ReactNode;
@@ -31,21 +46,28 @@ export interface IPlaceSearchContext {
   setTab: Dispatch<SetStateAction<number>>;
 
   setQuery: Dispatch<SetStateAction<string | undefined>>;
-  setMaxDistance: Dispatch<SetStateAction<number | undefined>>;
+  setMaxDistance: Dispatch<SetStateAction<number>>;
   setMinRating: Dispatch<SetStateAction<number | undefined>>;
   setOrder: Dispatch<SetStateAction<IPlaceSearchOrder | undefined>>;
   setTypes: Dispatch<SetStateAction<PlaceType[]>>;
 
   data: IPlaceExposed[];
-  doSearchRelative: (update?: boolean) => void;
-  doSearchDistance: (update?: boolean, order?: OrderState) => void;
-  doSearchRating: (update?: boolean, order?: OrderState) => void;
-  doSearchQuery: (query?: string) => void;
-  doSearchFilter: (filter: any) => void;
+  doSearchRelative: (options?: IFetchOptions) => void;
+  doSearchDistance: (order?: OrderState, options?: IFetchOptions) => void;
+  doSearchRating: (order?: OrderState, options?: IFetchOptions) => void;
+  doSearchQuery: (query?: string, options?: IFetchOptions) => void;
+  doSearchFilter: (filter: any, options?: IFetchOptions) => void;
+  doSaveLocalStorage: () => void;
 
   isEnd: boolean;
   setIsEnd: Dispatch<SetStateAction<boolean>>;
   isFetching: boolean;
+}
+
+interface IFetchOptions {
+  update?: boolean; // Push or clear
+  refresh?: boolean; // refresh isEnd status
+  force?: boolean; // Force fetch if there already a fetching
 }
 
 export const PlaceSearchContext = createContext<IPlaceSearchContext>({
@@ -75,6 +97,8 @@ export const PlaceSearchContext = createContext<IPlaceSearchContext>({
   doSearchFilter: () => {},
   doSearchQuery: () => {},
 
+  doSaveLocalStorage: () => {},
+
   isEnd: false,
   setIsEnd: () => {},
   isFetching: false,
@@ -84,7 +108,7 @@ export default function PlaceSearchContextProvider({
   children,
 }: IPlaceSearchContextProviderProps) {
   const [query, setQuery] = useState<string>();
-  const [maxDistance, setMaxDistance] = useState<number>();
+  const [maxDistance, setMaxDistance] = useState<number>(-1);
   const [minRating, setMinRating] = useState<number>();
   const [order, setOrder] = useState<IPlaceSearchOrder>();
   const [types, setTypes] = useState<PlaceType[]>([
@@ -102,62 +126,138 @@ export default function PlaceSearchContextProvider({
   const [isFetching, setIsFetching] = useState<boolean>(false);
 
   const appContentContext = useAppContentContext();
+  const authContext = useAuthContext();
+  const auth = authContext.auth;
+  const distances = useDistanceCalculation();
 
-  const doSearchRelative = useCallback(
-    (update?: boolean) => {
-      if (!update) {
-        setData([]);
+  const doSearchAll = useCallback(
+    (params: IPlaceSearchParams, options?: IFetchOptions) => {
+      if (auth == null) return;
+      if (isFetching && !options?.force) return;
+
+      if (isEnd && !options?.refresh) {
+        return;
+      } else {
+        setIsEnd(false);
       }
-      const pagination: IPagination = {
-        skip: update ? data.length : 0,
+
+      const pagination = {
+        skip: 0,
         limit: 24,
       };
-      const orderToSearch = null;
-      console.log(pagination, orderToSearch);
+
+      if (!options?.update) {
+        setData([]);
+      } else {
+        pagination.skip = data.length;
+      }
+
+      params.pagination = pagination;
+
+      console.log(params);
+
+      setTimeout(() => {
+        const newData: IPlaceExposed[] = [
+          {
+            _id: "1",
+            active: true,
+            author: {
+              _id: "0",
+              email: "0",
+              firstName: "H",
+              lastName: "G",
+            },
+            categories: [],
+            createdAt: new Date(),
+            exposeName: "HUY",
+            images: [],
+            location: {
+              name: "0",
+              coordinates: {
+                lat: 100,
+                lng: 16,
+              },
+            },
+            rating: {
+              count: 0,
+              mean: 0,
+            },
+            type: PlaceType.PERSONAL,
+            updatedAt: new Date(),
+          },
+        ];
+        if (newData.length < pagination.limit) {
+          setIsEnd(true);
+        }
+        setData(newData);
+
+        setIsFetching(false);
+      }, 500);
     },
-    [data.length]
+    [auth, data.length, isEnd, isFetching]
+  );
+
+  const doSearchRelative = useCallback(
+    (options?: IFetchOptions) => {
+      doSearchAll(
+        {
+          query: query,
+          currentLocation: distances.currentLocation?.coordinates,
+          maxDistance: maxDistance,
+          types: types,
+        },
+        options
+      );
+    },
+    [distances.currentLocation, doSearchAll, maxDistance, query, types]
   );
 
   const doSearchDistance = useCallback(
-    (update?: boolean, order?: OrderState) => {
-      if (!update) {
-        setData([]);
-      }
-      const pagination: IPagination = {
-        skip: update ? data.length : 0,
-        limit: 24,
-      };
-      const orderToSearch = { distance: order };
-      console.log(pagination, orderToSearch);
+    (order?: OrderState, options?: IFetchOptions) => {
+      doSearchAll(
+        {
+          query: query,
+          currentLocation: distances.currentLocation?.coordinates,
+          maxDistance: maxDistance,
+          types: types,
+          order: {
+            distance: order,
+          },
+        },
+        options
+      );
     },
-    [data.length]
+    [distances.currentLocation, doSearchAll, maxDistance, query, types]
   );
 
   const doSearchRating = useCallback(
-    (update?: boolean, order?: OrderState) => {
-      if (!update) {
-        setData([]);
-      }
-      const pagination: IPagination = {
-        skip: update ? data.length : 0,
-        limit: 24,
-      };
-      const orderToSearch = { rating: order };
-      console.log(pagination, orderToSearch);
+    (order?: OrderState, options?: IFetchOptions) => {
+      doSearchAll(
+        {
+          query: query,
+          currentLocation: distances.currentLocation?.coordinates,
+          maxDistance: maxDistance,
+          types: types,
+          order: {
+            distance: order,
+          },
+        },
+        options
+      );
     },
-    [data.length]
+    [distances.currentLocation, doSearchAll, maxDistance, query, types]
   );
 
   const doSearchMore = useCallback(() => {
     switch (tab) {
       case placeSearchTabs.RALATIVE: {
-        return doSearchRelative(true);
+        return doSearchRelative({ update: true });
       }
       case placeSearchTabs.DISTANCE: {
-        return doSearchDistance(true, order?.distance);
+        return doSearchDistance(order?.distance, { update: true });
       }
       case placeSearchTabs.RATING: {
-        return doSearchRating(true, order?.rating);
+        return doSearchRating(order?.rating, { update: true });
       }
     }
   }, [doSearchDistance, doSearchRating, doSearchRelative, order, tab]);
@@ -185,14 +285,99 @@ export default function PlaceSearchContextProvider({
     };
   }, [appContentContext.mainRef, doSearchMore, isEnd]);
 
-  const doSearchQuery = (query?: string) => {
-    //
-    console.log(query);
-  };
+  const doSearchQuery = useCallback(
+    (query?: string, options?: IFetchOptions) => {
+      let _order: undefined | IPlaceSearchOrder = undefined;
+      switch (tab) {
+        case placeSearchTabs.RALATIVE: {
+          break;
+        }
+        case placeSearchTabs.DISTANCE: {
+          _order = {
+            distance: order?.distance,
+          };
+          break;
+        }
+        case placeSearchTabs.RATING: {
+          _order = {
+            rating: order?.rating,
+          };
+          break;
+        }
+      }
+      doSearchAll(
+        {
+          query: query,
+          currentLocation: distances.currentLocation?.coordinates,
+          maxDistance: maxDistance,
+          types: types,
+          order: _order,
+        },
+        options
+      );
+    },
+    [distances.currentLocation, doSearchAll, maxDistance, order, tab, types]
+  );
 
-  const doSearchFilter = (filter: any) => {
-    //
-    console.log(filter);
+  const doSearchFilter = useCallback(
+    (filter: any, options?: IFetchOptions) => {
+      let _order: undefined | IPlaceSearchOrder = undefined;
+      switch (tab) {
+        case placeSearchTabs.RALATIVE: {
+          break;
+        }
+        case placeSearchTabs.DISTANCE: {
+          _order = {
+            distance: order?.distance,
+          };
+          break;
+        }
+        case placeSearchTabs.RATING: {
+          _order = {
+            rating: order?.rating,
+          };
+          break;
+        }
+      }
+      doSearchAll(
+        {
+          query: query,
+          currentLocation: distances.currentLocation?.coordinates,
+          maxDistance: maxDistance,
+          types: types,
+          order: _order,
+          ...filter,
+        },
+        options
+      );
+    },
+    [
+      distances.currentLocation,
+      doSearchAll,
+      maxDistance,
+      order,
+      query,
+      tab,
+      types,
+    ]
+  );
+
+  const doSaveLocalStorage = () => {
+    const snapshot: IPlaceSearchContextSnapshotData = {
+      data: data,
+      tab: tab,
+      maxDistance: maxDistance,
+      minRating: minRating,
+      order: order,
+      query: query,
+      scrollTop: appContentContext.mainRef?.current?.scrollTop,
+      types: types,
+    };
+    saveToLocalStorage(
+      "PLACE_SEARCH_STATE",
+      authContext.account?.id_,
+      snapshot
+    );
   };
 
   return (
@@ -222,6 +407,8 @@ export default function PlaceSearchContextProvider({
         doSearchRating,
         doSearchQuery,
         doSearchFilter,
+
+        doSaveLocalStorage,
       }}
     >
       {children}

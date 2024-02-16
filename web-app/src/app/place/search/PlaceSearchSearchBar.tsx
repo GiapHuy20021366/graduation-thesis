@@ -23,7 +23,7 @@ const PlaceSearchSearchBar = React.forwardRef<
 >((props, ref) => {
   const [options, setOptions] = useState<string[]>([]);
   const searchContext = usePlaceSearchContext();
-  const { query, setQuery, doSearchQuery, doSearchFilter } = searchContext;
+  const { query, setQuery, doSearchQuery } = searchContext;
   const [openFilter, setOpenFilter] = useState<boolean>(false);
 
   const i18nContext = useI18nContext();
@@ -50,22 +50,18 @@ const PlaceSearchSearchBar = React.forwardRef<
   ): void => {
     if (value) {
       setQuery(value);
-      doSearchQuery(value);
+      doSearchQuery(value, { refresh: true });
     }
   };
 
   const onButtonSearchClick = () => {
-    //
+    doSearchQuery(query, { refresh: true });
   };
 
   // Focus on first time
   useEffect(() => {
     searchInputRef.current?.focus();
   }, []);
-
-  const onFilterApply = (value: any) => {
-    doSearchFilter(value);
-  };
 
   return (
     <Stack
@@ -80,7 +76,6 @@ const PlaceSearchSearchBar = React.forwardRef<
         freeSolo
         fullWidth
         options={options}
-        filterOptions={(options) => options}
         inputValue={query}
         value={query}
         onInputChange={handleSearchInputChange}
@@ -148,7 +143,6 @@ const PlaceSearchSearchBar = React.forwardRef<
       <PlaceSearchFilter
         openFilter={openFilter}
         onCloseFilter={() => setOpenFilter(false)}
-        onApply={onFilterApply}
       />
     </Stack>
   );

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   BoxProps,
@@ -27,6 +27,11 @@ const PlaceSearchFilter = React.forwardRef<
   const lang = i18nContext.of(PlaceSearchFilter);
 
   const searchContext = usePlaceSearchContext();
+  const {
+    doSearchFilter,
+    setTypes: setSearchContextTypes,
+    setMaxDistance: setSearchContextMaxDistance,
+  } = searchContext;
 
   const { openFilter, onCloseFilter, onApply, ...rest } = props;
 
@@ -36,10 +41,25 @@ const PlaceSearchFilter = React.forwardRef<
   );
 
   const handleApply = () => {
-    onApply && onApply({});
+    const filterParams = {
+      maxDistance,
+      types,
+    };
+
+    setSearchContextTypes(filterParams.types);
+    setSearchContextMaxDistance(filterParams.maxDistance);
+
+    doSearchFilter(filterParams, { refresh: true });
+    onApply && onApply(filterParams);
     onCloseFilter();
   };
   const handleReset = () => {};
+
+  useEffect(() => {
+    setMaxDistance(searchContext.maxDistance ?? -1);
+    setTypes(searchContext.types ?? []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openFilter]);
 
   return (
     <Box ref={ref} {...rest}>

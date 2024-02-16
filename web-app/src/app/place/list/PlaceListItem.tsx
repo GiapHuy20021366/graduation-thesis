@@ -1,29 +1,27 @@
 import React from "react";
 import { Stack, StackProps } from "@mui/material";
 import { IPlaceExposed } from "../../../data";
-import { useDistanceCalculation } from "../../../hooks";
 
-type PlaceSearchItemProps = StackProps & {
+type PlaceListItemProps = StackProps & {
   data: IPlaceExposed;
 };
 
-const PlaceSearchItem = React.forwardRef<HTMLDivElement, PlaceSearchItemProps>(
+const PlaceListItem = React.forwardRef<HTMLDivElement, PlaceListItemProps>(
   (props, ref) => {
-    const { data, ...rest } = props;
-
+    
     return (
       <Stack
         ref={ref}
-        {...rest}
+        {...props}
         sx={{
           width: "100%",
           ...(props.sx ?? {}),
         }}
       >
-        {JSON.stringify(data)}
+        Near Place
       </Stack>
     );
   }
 );
 
-export default PlaceSearchItem;
+export default PlaceListItem;

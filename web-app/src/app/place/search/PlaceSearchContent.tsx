@@ -1,17 +1,32 @@
+import React from "react";
+import { Stack, StackProps } from "@mui/material";
 import { usePlaceSearchContext } from "../../../hooks";
-import PlaceSearchTabDistance from "./PlaceSearchTabDistance";
-import PlaceSearchTabRating from "./PlaceSearchTabRating";
-import PlaceSearchTabRelative from "./PlaceSearchTabRelative";
-import { placeSearchTabs } from "./place-search-tab";
+import PlaceSearchItem from "./PlaceSearchItem";
 
-export default function PlaceSearchContent() {
+type PlaceSearchContentProps = StackProps;
+
+const PlaceSearchContent = React.forwardRef<
+  HTMLDivElement,
+  PlaceSearchContentProps
+>((props, ref) => {
   const searchContext = usePlaceSearchContext();
-  const { tab } = searchContext;
+  const { data } = searchContext;
+
   return (
-    <>
-      <PlaceSearchTabRelative active={tab === placeSearchTabs.RALATIVE} />
-      <PlaceSearchTabDistance active={tab === placeSearchTabs.DISTANCE} />
-      <PlaceSearchTabRating active={tab === placeSearchTabs.RATING} />
-    </>
+    <Stack
+      ref={ref}
+      {...props}
+      sx={{
+        width: "100%",
+        gap: 1,
+        ...(props.sx ?? {}),
+      }}
+    >
+      {data.map((place, index) => {
+        return <PlaceSearchItem data={place} key={index} />;
+      })}
+    </Stack>
   );
-}
+});
+
+export default PlaceSearchContent;
