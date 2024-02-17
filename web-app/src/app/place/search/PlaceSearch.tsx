@@ -1,7 +1,8 @@
-import { Stack, Typography } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import PlaceSearchContent from "./PlaceSearchContent";
 import PlaceSearchHeader from "./PlaceSearchHeader";
 import { usePlaceSearchContext } from "../../../hooks";
+import PlaceSearchItemHolder from "./PlaceSearchItemHolder";
 
 export default function PlaceSearch() {
   const searchContext = usePlaceSearchContext();
@@ -17,8 +18,12 @@ export default function PlaceSearch() {
         }}
       />
       <PlaceSearchContent />
-      {isEnd && <Typography>End</Typography>}
-      {isFetching && <Typography>Fetching</Typography>}
+      {isFetching && <PlaceSearchItemHolder />}
+      {isEnd && (
+        <Box textAlign={"center"} mt={2}>
+          Đã hết
+        </Box>
+      )}
     </Stack>
   );
 }

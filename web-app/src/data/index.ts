@@ -83,3 +83,7 @@ export {
   loadFromLocalStorage,
   saveToLocalStorage,
 } from "./util-local-storage";
+export {
+  type IPlaceExposedCooked,
+  toPlaceExposedCooked,
+} from "./place-exposed-cooked";

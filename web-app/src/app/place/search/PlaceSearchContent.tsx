@@ -10,7 +10,7 @@ const PlaceSearchContent = React.forwardRef<
   PlaceSearchContentProps
 >((props, ref) => {
   const searchContext = usePlaceSearchContext();
-  const { data } = searchContext;
+  const { data, doSaveLocalStorage } = searchContext;
 
   return (
     <Stack
@@ -23,7 +23,14 @@ const PlaceSearchContent = React.forwardRef<
       }}
     >
       {data.map((place, index) => {
-        return <PlaceSearchItem data={place} key={index} />;
+        return (
+          <PlaceSearchItem
+            data={place}
+            key={index}
+            boxShadow={1}
+            onBeforeNavigate={() => doSaveLocalStorage()}
+          />
+        );
       })}
     </Stack>
   );

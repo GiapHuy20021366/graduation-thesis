@@ -4,19 +4,24 @@ import React, {
   createContext,
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import {
   IPlaceExposed,
+  IPlaceExposedCooked,
   OrderState,
   PlaceType,
+  loadFromLocalStorage,
   saveToLocalStorage,
+  toPlaceExposedCooked,
 } from "../../../data";
 import { IPlaceSearchOrder, IPlaceSearchParams } from "../../../api";
 import {
   useAppContentContext,
   useAuthContext,
   useDistanceCalculation,
+  usePageProgessContext,
 } from "../../../hooks";
 import { placeSearchTabs } from "./place-search-tab";
 
@@ -28,7 +33,7 @@ interface IPlaceSearchContextSnapshotData {
   types?: PlaceType[];
   tab: number;
   scrollTop?: number;
-  data: IPlaceExposed[];
+  data: IPlaceExposedCooked[];
 }
 
 interface IPlaceSearchContextProviderProps {
@@ -51,7 +56,7 @@ export interface IPlaceSearchContext {
   setOrder: Dispatch<SetStateAction<IPlaceSearchOrder | undefined>>;
   setTypes: Dispatch<SetStateAction<PlaceType[]>>;
 
-  data: IPlaceExposed[];
+  data: IPlaceExposedCooked[];
   doSearchRelative: (options?: IFetchOptions) => void;
   doSearchDistance: (order?: OrderState, options?: IFetchOptions) => void;
   doSearchRating: (order?: OrderState, options?: IFetchOptions) => void;
@@ -121,14 +126,47 @@ export default function PlaceSearchContextProvider({
   ]);
   const [tab, setTab] = useState<number>(0);
 
-  const [data, setData] = useState<IPlaceExposed[]>([]);
+  const [data, setData] = useState<IPlaceExposedCooked[]>([]);
   const [isEnd, setIsEnd] = useState<boolean>(false);
   const [isFetching, setIsFetching] = useState<boolean>(false);
 
   const appContentContext = useAppContentContext();
   const authContext = useAuthContext();
   const auth = authContext.auth;
+  const account = authContext.account;
   const distances = useDistanceCalculation();
+  const progessContext = usePageProgessContext();
+
+  // Recover at begining or fetch at begining
+  const dirtyRef = useRef<boolean>(false);
+
+  const doSaveLocalStorage = useCallback(() => {
+    const snapshot: IPlaceSearchContextSnapshotData = {
+      data: data,
+      tab: tab,
+      maxDistance: maxDistance,
+      minRating: minRating,
+      order: order,
+      query: query,
+      scrollTop: appContentContext.mainRef?.current?.scrollTop,
+      types: types,
+    };
+    saveToLocalStorage(
+      "place.search.state",
+      authContext.account?.id_,
+      snapshot
+    );
+  }, [
+    appContentContext.mainRef,
+    authContext.account,
+    data,
+    maxDistance,
+    minRating,
+    order,
+    query,
+    tab,
+    types,
+  ]);
 
   const doSearchAll = useCallback(
     (params: IPlaceSearchParams, options?: IFetchOptions) => {
@@ -156,45 +194,65 @@ export default function PlaceSearchContextProvider({
 
       console.log(params);
 
+      setIsFetching(true);
+      progessContext.start();
       setTimeout(() => {
-        const newData: IPlaceExposed[] = [
-          {
-            _id: "1",
-            active: true,
-            author: {
-              _id: "0",
-              email: "0",
-              firstName: "H",
-              lastName: "G",
-            },
-            categories: [],
-            createdAt: new Date(),
-            exposeName: "HUY",
-            images: [],
-            location: {
-              name: "0",
-              coordinates: {
-                lat: 100,
-                lng: 16,
+        const newData: IPlaceExposed[] = [];
+        for (let i = 0; i < 24; ++i) {
+          newData.push(
+            toPlaceExposedCooked(
+              {
+                _id: "1",
+                active: true,
+                author: {
+                  _id: "0",
+                  email: "0",
+                  firstName: "H",
+                  lastName: "G",
+                },
+                categories: [],
+                createdAt: new Date(),
+                exposeName: "HUY",
+                images: [],
+                location: {
+                  name: "0",
+                  coordinates: {
+                    lat: 100,
+                    lng: 16,
+                  },
+                },
+                rating: {
+                  count: 0,
+                  mean: 0,
+                },
+                type: PlaceType.PERSONAL,
+                updatedAt: new Date(),
               },
-            },
-            rating: {
-              count: 0,
-              mean: 0,
-            },
-            type: PlaceType.PERSONAL,
-            updatedAt: new Date(),
-          },
-        ];
+              {
+                currentCoordinates: distances.currentLocation?.coordinates,
+                homeCoordinates: account?.location?.coordinates,
+              }
+            )
+          );
+        }
         if (newData.length < pagination.limit) {
           setIsEnd(true);
         }
         setData(newData);
 
         setIsFetching(false);
-      }, 500);
+        progessContext.end();
+      }, 1000);
     },
-    [auth, data.length, isEnd, isFetching]
+    [
+      account?.location,
+      auth,
+      data.length,
+      distances.currentLocation,
+      isEnd,
+      isFetching,
+      progessContext,
+    ]
   );
 
   const doSearchRelative = useCallback(
@@ -209,7 +267,13 @@ export default function PlaceSearchContextProvider({
         options
       );
     },
-    [distances.currentLocation, doSearchAll, maxDistance, query, types]
+    [
+      distances.currentLocation?.coordinates,
+      doSearchAll,
+      maxDistance,
+      query,
+      types,
+    ]
   );
 
   const doSearchDistance = useCallback(
@@ -261,29 +325,6 @@ export default function PlaceSearchContextProvider({
       }
     }
   }, [doSearchDistance, doSearchRating, doSearchRelative, order, tab]);
-
-  useEffect(() => {
-    const main = appContentContext.mainRef?.current;
-    let listener: any;
-
-    if (main != null) {
-      listener = (event: Event) => {
-        const element = event.target as HTMLDivElement;
-        const isAtBottom =
-          element.scrollTop + element.clientHeight === element.scrollHeight;
-
-        if (isAtBottom && !isEnd) {
-          doSearchMore();
-        }
-      };
-      main.addEventListener("scroll", listener);
-    }
-    return () => {
-      if (main != null && listener != null) {
-        main.removeEventListener("scroll", listener);
-      }
-    };
-  }, [appContentContext.mainRef, doSearchMore, isEnd]);
 
   const doSearchQuery = useCallback(
     (query?: string, options?: IFetchOptions) => {
@@ -362,23 +403,72 @@ export default function PlaceSearchContextProvider({
     ]
   );
 
-  const doSaveLocalStorage = () => {
-    const snapshot: IPlaceSearchContextSnapshotData = {
-      data: data,
-      tab: tab,
-      maxDistance: maxDistance,
-      minRating: minRating,
-      order: order,
-      query: query,
-      scrollTop: appContentContext.mainRef?.current?.scrollTop,
-      types: types,
+  useEffect(() => {
+    const main = appContentContext.mainRef?.current;
+    let listener: any;
+
+    if (main != null) {
+      listener = (event: Event) => {
+        const element = event.target as HTMLDivElement;
+        const isAtBottom =
+          element.scrollTop + element.clientHeight === element.scrollHeight;
+
+        if (isAtBottom && !isEnd) {
+          doSearchMore();
+        }
+      };
+      main.addEventListener("scroll", listener);
+    }
+    return () => {
+      if (main != null && listener != null) {
+        main.removeEventListener("scroll", listener);
+      }
     };
-    saveToLocalStorage(
-      "PLACE_SEARCH_STATE",
-      authContext.account?.id_,
-      snapshot
-    );
-  };
+  }, [appContentContext.mainRef, doSearchMore, isEnd]);
+
+  // Recover result
+  useEffect(() => {
+    if (account == null) return;
+    if (!dirtyRef.current) {
+      // At begining
+      const snapshot = loadFromLocalStorage<IPlaceSearchContextSnapshotData>(
+        "place.search.state",
+        1 * 24 * 60 * 60 * 1000,
+        account.id_
+      );
+      if (snapshot) {
+        setQuery(snapshot.query);
+        setMaxDistance(snapshot.maxDistance ?? -1);
+        setMinRating(snapshot.minRating);
+        setOrder(snapshot.order);
+        setTypes(snapshot.types ?? []);
+        setTab(snapshot.tab);
+        setData(snapshot.data);
+        const mainRef = appContentContext.mainRef?.current;
+        if (mainRef) {
+          setTimeout(() => {
+            mainRef.scrollTop = snapshot.scrollTop ?? 0;
+          }, 300);
+        }
+      } else {
+        doSearchAll({
+          query: query,
+          currentLocation: distances.currentLocation?.coordinates,
+          maxDistance: maxDistance,
+          types: types,
+        });
+      }
+      dirtyRef.current = true;
+    }
+  }, [
+    account,
+    appContentContext.mainRef,
+    distances.currentLocation?.coordinates,
+    doSearchAll,
+    maxDistance,
+    query,
+    types,
+  ]);
 
   return (
     <PlaceSearchContext.Provider
