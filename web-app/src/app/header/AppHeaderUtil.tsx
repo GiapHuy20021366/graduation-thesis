@@ -1,15 +1,6 @@
-import {
-  IconButton,
-  Stack,
-  SxProps,
-  Theme,
-  Tooltip,
-} from "@mui/material";
+import { IconButton, Stack, SxProps, Theme, Tooltip } from "@mui/material";
 import SideBarOpener from "../common/menu-side/SideBarOpener";
-import {
-  RoomOutlined,
-  SearchOutlined,
-} from "@mui/icons-material";
+import { RoomOutlined, SearchOutlined } from "@mui/icons-material";
 import { useNavigate } from "react-router";
 import NotificationProvider from "./utils/notification/NotificationProvider";
 
@@ -32,9 +23,7 @@ export default function AppHeaderUntil() {
       }}
     >
       <SideBarOpener />
-      <Tooltip title={"Notification"}>
-        <NotificationProvider />
-      </Tooltip>
+      <Tooltip title={"Notification"} children={<NotificationProvider />} />
       <Tooltip title={"Location"}>
         <IconButton
           sx={{

@@ -37,17 +37,17 @@ const PlaceViewerExposedType = React.forwardRef<
       {[placeType].map((type) => {
         switch (type) {
           case PlaceType.PERSONAL:
-            return <Person color="info" />;
+            return <Person color="info" key={"person"} />;
           case PlaceType.VOLUNTEER:
-            return <VolunteerActivism color="info" />;
+            return <VolunteerActivism color="info" key={"volunteer"} />;
           case PlaceType.EATERY:
-            return <Storefront color="info" />;
+            return <Storefront color="info" key={"eatery"} />;
           case PlaceType.RESTAURANT:
-            return <Restaurant color="info" />;
+            return <Restaurant color="info" key={"restaurant"} />;
           case PlaceType.SUPERMARKET:
-            return <LocalGroceryStore color="info" />;
+            return <LocalGroceryStore color="info" key={"supermarket"} />;
           case PlaceType.GROCERY:
-            return <LocalConvenienceStore color="info" />;
+            return <LocalConvenienceStore color="info" key={"grocery"} />;
           default:
             return <></>;
         }

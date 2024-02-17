@@ -134,8 +134,8 @@ export default function PlaceList() {
       </Stack>
 
       {/* Tab contents */}
-      <MyPlace display={tab === PlacePageTab.MY_PLACE ? "block" : "none"} />
-      <NearPlace display={tab === PlacePageTab.NEAR_HERE ? "block" : "none"} />
+      <MyPlace active={tab === PlacePageTab.MY_PLACE} />
+      <NearPlace active={tab === PlacePageTab.NEAR_HERE} />
       <FavoritePlace
         display={tab === PlacePageTab.FAVORITE ? "block" : "none"}
       />
