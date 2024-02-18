@@ -18,20 +18,20 @@ import {
   toPlaceExposedCooked,
 } from "../../../data";
 import PlaceSearchItemHolder from "../search/PlaceSearchItemHolder";
-import PlaceSearchItem from "../search/PlaceSearchItem";
+import RatedPlaceItem from "./RatedPlaceItem";
 
-interface IFavoritePlaceSnapshotData {
+interface IRatedPlaceSnapshotData {
   data: IPlaceExposedCooked[];
   scrollTop?: number;
 }
 
-const FAVORITE_PLACE_STORAGE_KEY = "place.list.favorite.place";
+const RATED_PLACE_STORAGE_KEY = "place.list.rated.place";
 
-type FavoritePlaceProps = StackProps & {
+type RatedPlaceProps = StackProps & {
   active?: boolean;
 };
 
-const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
+const RatedPlace = React.forwardRef<HTMLDivElement, RatedPlaceProps>(
   (props, ref) => {
     const navigate = useNavigate();
     const { active, ...rest } = props;
@@ -52,12 +52,12 @@ const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
     const dirtyRef = useRef<boolean>(false);
 
     const doSaveLocalStorage = () => {
-      const snapshot: IFavoritePlaceSnapshotData = {
+      const snapshot: IRatedPlaceSnapshotData = {
         data: data,
         scrollTop: appContentContext.mainRef?.current?.scrollTop,
       };
       saveToLocalStorage(
-        FAVORITE_PLACE_STORAGE_KEY,
+        RATED_PLACE_STORAGE_KEY,
         authContext.account?.id_,
         snapshot
       );
@@ -104,6 +104,12 @@ const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
                 rating: {
                   count: 0,
                   mean: 0,
+                },
+                userRating: {
+                  place: "0",
+                  score: 4,
+                  time: Date.now() - Math.floor(Math.random() * 10000000),
+                  user: "0",
                 },
                 type: PlaceType.PERSONAL,
                 updatedAt: new Date(),
@@ -162,8 +168,8 @@ const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
       if (!active) return;
       if (!dirtyRef.current) {
         // At begining
-        const snapshot = loadFromLocalStorage<IFavoritePlaceSnapshotData>(
-          FAVORITE_PLACE_STORAGE_KEY,
+        const snapshot = loadFromLocalStorage<IRatedPlaceSnapshotData>(
+          RATED_PLACE_STORAGE_KEY,
           1 * 24 * 60 * 60 * 1000,
           account.id_
         );
@@ -194,7 +200,7 @@ const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
       >
         {data.map((place, index) => {
           return (
-            <PlaceSearchItem
+            <RatedPlaceItem
               data={place}
               key={index}
               onBeforeNavigate={handleBeforeNavigate}
@@ -219,4 +225,4 @@ const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
   }
 );
 
-export default FavoritePlace;
+export default RatedPlace;

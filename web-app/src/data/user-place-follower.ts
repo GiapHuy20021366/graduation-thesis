@@ -16,6 +16,7 @@ export interface IFollowerBase {
   subcriber: string;
   type: FollowType;
   role: FollowRole; // is subcriber user or place ?
+  time: string | number;
 }
 
 export interface IPlaceFollower extends IFollowerBase {
@@ -27,3 +28,17 @@ export interface IUserFollower extends IFollowerBase {
 }
 
 export type IFollower = IPlaceFollower | IUserFollower;
+
+export const toFollowTypeLabel = (type?: FollowType): string | undefined => {
+  switch (type) {
+    case FollowType.ADMIN:
+      return "ADMIN";
+    case FollowType.SUB_ADMIN:
+      return "ADMIN";
+    case FollowType.SUBCRIBER:
+      return "SUBCRIBER";
+    case FollowType.MEMBER:
+      return "MEMBER";
+  }
+  return;
+};

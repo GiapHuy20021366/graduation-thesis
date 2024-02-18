@@ -17,8 +17,8 @@ import {
   saveToLocalStorage,
   toPlaceExposedCooked,
 } from "../../../data";
-import PlaceListItemMine from "./PlaceListItemMine";
 import PlaceSearchItemHolder from "../search/PlaceSearchItemHolder";
+import PlaceSearchItem from "../search/PlaceSearchItem";
 
 interface INearPlaceSnapshotData {
   data: IPlaceExposedCooked[];
@@ -195,7 +195,7 @@ const NearPlace = React.forwardRef<HTMLDivElement, NearPlaceProps>(
       >
         {data.map((place, index) => {
           return (
-            <PlaceListItemMine
+            <PlaceSearchItem
               data={place}
               key={index}
               onBeforeNavigate={handleBeforeNavigate}

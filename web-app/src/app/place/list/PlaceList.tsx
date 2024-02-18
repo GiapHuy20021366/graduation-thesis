@@ -11,8 +11,8 @@ import {
 import MyPlace from "./MyPlace";
 import NearPlace from "./NearPlace";
 import FavoritePlace from "./FavoritePlace";
-import SubcribedPlace from "./SubcribePlace";
-import RatingPlace from "./RatingPlace";
+import SubcribedPlace from "./SubcribedPlace";
+import RatingPlace from "./RatedPlace";
 import { useNavigate } from "react-router";
 
 const PlacePageTab = {
@@ -136,13 +136,9 @@ export default function PlaceList() {
       {/* Tab contents */}
       <MyPlace active={tab === PlacePageTab.MY_PLACE} />
       <NearPlace active={tab === PlacePageTab.NEAR_HERE} />
-      <FavoritePlace
-        display={tab === PlacePageTab.FAVORITE ? "block" : "none"}
-      />
-      <SubcribedPlace
-        display={tab === PlacePageTab.SUBCRIBED ? "block" : "none"}
-      />
-      <RatingPlace display={tab === PlacePageTab.RATING ? "block" : "none"} />
+      <FavoritePlace active={tab === PlacePageTab.FAVORITE} />
+      <SubcribedPlace active={tab === PlacePageTab.SUBCRIBED} />
+      <RatingPlace active={tab === PlacePageTab.RATING} />
 
       <SpeedDial
         icon={<SearchOutlined />}

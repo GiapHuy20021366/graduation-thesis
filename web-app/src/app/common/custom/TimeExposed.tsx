@@ -6,15 +6,26 @@ const toPad = (num: number): string => {
 
 interface ITimeExposedProps {
   time?: number | string | Date;
+  date?: boolean;
+  hour?: boolean;
 }
 
-export default function TimeExposed({ time }: ITimeExposedProps) {
+export default function TimeExposed({ time, date, hour }: ITimeExposedProps) {
   const timeInfo = toTimeInfo(time ?? new Date());
   return (
     <>
-      {toPad(timeInfo.day)}/{toPad(timeInfo.month)}/{toPad(timeInfo.year)}{" "}
-      {toPad(timeInfo.hours)}:{toPad(timeInfo.minutes)}:
-      {toPad(timeInfo.seconds)}
+      {date !== false && (
+        <>
+          {toPad(timeInfo.day)}/{toPad(timeInfo.month)}/{toPad(timeInfo.year)}
+        </>
+      )}
+      {hour !== false && (
+        <>
+          {" "}
+          {toPad(timeInfo.hours)}:{toPad(timeInfo.minutes)}:
+          {toPad(timeInfo.seconds)}
+        </>
+      )}
     </>
   );
 }

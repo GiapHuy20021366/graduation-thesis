@@ -9,6 +9,7 @@ import {
   usePageProgessContext,
 } from "../../../hooks";
 import {
+  FollowRole,
   IPagination,
   IPlaceExposed,
   IPlaceExposedCooked,
@@ -18,20 +19,20 @@ import {
   toPlaceExposedCooked,
 } from "../../../data";
 import PlaceSearchItemHolder from "../search/PlaceSearchItemHolder";
-import PlaceSearchItem from "../search/PlaceSearchItem";
+import SubcribedItem from "./SubcribedPlaceItem";
 
-interface IFavoritePlaceSnapshotData {
+interface ISubcribedPlaceSnapshotData {
   data: IPlaceExposedCooked[];
   scrollTop?: number;
 }
 
-const FAVORITE_PLACE_STORAGE_KEY = "place.list.favorite.place";
+const SUBCRIBED_PLACE_STORAGE_KEY = "place.list.subcribed.place";
 
-type FavoritePlaceProps = StackProps & {
+type SubcribedPlaceProps = StackProps & {
   active?: boolean;
 };
 
-const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
+const SubcribedPlace = React.forwardRef<HTMLDivElement, SubcribedPlaceProps>(
   (props, ref) => {
     const navigate = useNavigate();
     const { active, ...rest } = props;
@@ -52,12 +53,12 @@ const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
     const dirtyRef = useRef<boolean>(false);
 
     const doSaveLocalStorage = () => {
-      const snapshot: IFavoritePlaceSnapshotData = {
+      const snapshot: ISubcribedPlaceSnapshotData = {
         data: data,
         scrollTop: appContentContext.mainRef?.current?.scrollTop,
       };
       saveToLocalStorage(
-        FAVORITE_PLACE_STORAGE_KEY,
+        SUBCRIBED_PLACE_STORAGE_KEY,
         authContext.account?.id_,
         snapshot
       );
@@ -107,6 +108,13 @@ const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
                 },
                 type: PlaceType.PERSONAL,
                 updatedAt: new Date(),
+                userFollow: {
+                  time: Date.now() - Math.floor(Math.random() * 10000000),
+                  place: "abc",
+                  role: FollowRole.PLACE,
+                  type: Math.pow(2, Math.floor(Math.random() * 3.9)),
+                  subcriber: "0",
+                },
               },
               {
                 currentCoordinates: distances.currentLocation?.coordinates,
@@ -162,8 +170,8 @@ const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
       if (!active) return;
       if (!dirtyRef.current) {
         // At begining
-        const snapshot = loadFromLocalStorage<IFavoritePlaceSnapshotData>(
-          FAVORITE_PLACE_STORAGE_KEY,
+        const snapshot = loadFromLocalStorage<ISubcribedPlaceSnapshotData>(
+          SUBCRIBED_PLACE_STORAGE_KEY,
           1 * 24 * 60 * 60 * 1000,
           account.id_
         );
@@ -194,7 +202,7 @@ const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
       >
         {data.map((place, index) => {
           return (
-            <PlaceSearchItem
+            <SubcribedItem
               data={place}
               key={index}
               onBeforeNavigate={handleBeforeNavigate}
@@ -219,4 +227,4 @@ const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
   }
 );
 
-export default FavoritePlace;
+export default SubcribedPlace;

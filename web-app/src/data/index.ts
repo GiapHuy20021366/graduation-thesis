@@ -64,6 +64,7 @@ export {
   type IFollowerBase,
   type IPlaceFollower,
   type IUserFollower,
+  toFollowTypeLabel,
 } from "./user-place-follower";
 export { RequestStatus } from "./request-status";
 export { getAuth } from "./get-auth";
