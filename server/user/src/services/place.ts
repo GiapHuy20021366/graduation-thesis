@@ -12,6 +12,7 @@ import {
   IRating,
   InternalError,
   OrderState,
+  PlaceType,
   ResourceNotExistedError,
   UnauthorizationError,
   toDistance,
@@ -561,7 +562,9 @@ export const getPlacesByUserAndFollowTypes = async (
 
 export const getPlacesNear = async (
   coordinates: ICoordinates,
-  excepts: string[],
+  maxDistance?: number,
+  types?: PlaceType[],
+  exceptAuthors?: string[],
   pagination?: IPagination
 ): Promise<IPlaceExposed[]> => {
   const places = await Place.find({
@@ -572,9 +575,13 @@ export const getPlacesNear = async (
           coordinates: [coordinates.lng, coordinates.lat],
         },
       },
+      $maxDistance: maxDistance ?? Number.MAX_SAFE_INTEGER,
     },
     author: {
-      $nin: excepts,
+      $nin: exceptAuthors ?? [],
+    },
+    type: {
+      $in: types ?? Object.values(PlaceType),
     },
   })
     .sort({ distance: OrderState.INCREASE })
