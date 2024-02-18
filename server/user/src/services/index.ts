@@ -24,4 +24,9 @@ export {
   ratingPlace,
   searchPlaces,
   getPlaceInfo,
+  getPlacesByUser,
+  getPlacesByUserAndFollowTypes,
+  getPlacesNear,
+  getPlacesRankByFavorite,
+  getPlacesRatedByUser,
 } from "./place";

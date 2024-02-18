@@ -2,6 +2,8 @@ import { IPlaceSearchParams } from "~/data/place-search-params";
 import {
   FollowRole,
   FollowType,
+  ICoordinates,
+  IPagination,
   IPlace,
   IPlaceAuthorExposed,
   IPlaceExposed,
@@ -417,8 +419,8 @@ export const ratingPlace = async (
 };
 
 interface IPlaceInfo extends Omit<IPlaceExposed, "author"> {
-  userRating?: IPlaceRating;
-  userFollow?: IPlaceFollower;
+  userRating?: IPlaceRating & { time: number | string };
+  userFollow?: IPlaceFollower & { time: number | string };
   author: string | IPlaceAuthorExposed;
 }
 
@@ -462,6 +464,7 @@ export const getPlaceInfo = async (placeId: string, userId?: string) => {
         role: FollowRole.PLACE,
         subcriber: userId,
         type: follower.type,
+        time: follower.updatedAt.getTime(),
       };
     }
 
@@ -475,6 +478,7 @@ export const getPlaceInfo = async (placeId: string, userId?: string) => {
         place: placeId,
         score: rating.score,
         user: userId,
+        time: rating.updatedAt.getTime(),
       };
     }
 
@@ -489,4 +493,197 @@ export const getPlaceInfo = async (placeId: string, userId?: string) => {
     result.subcribers = followerCount;
   }
   return result;
+};
+
+export const getPlacesByUser = async (
+  user: string,
+  pagination?: IPagination
+) => {
+  return getPlacesByUserAndFollowTypes(
+    user,
+    [FollowType.ADMIN, FollowType.SUB_ADMIN],
+    pagination
+  );
+};
+
+export const getPlacesByUserAndFollowTypes = async (
+  user: string,
+  types: FollowType[],
+  pagination?: IPagination
+): Promise<IPlaceInfo[]> => {
+  const followers = await Follower.find({
+    subcriber: user,
+    role: FollowRole.PLACE,
+    type: {
+      $in: types,
+    },
+  })
+    .populate<{ place: IPlaceExposed; subcriber: string }>("place")
+    .sort({
+      createdAt: OrderState.DECREASE,
+    })
+    .skip(pagination?.skip ?? 0)
+    .limit(pagination?.limit ?? 24)
+    .exec();
+
+  if (followers == null) {
+    throw new InternalError();
+  }
+
+  return followers
+    .filter((f) => f.place != null)
+    .map((follower): IPlaceInfo => {
+      return {
+        _id: follower.place._id,
+        active: follower.place.active,
+        author: follower.place.author,
+        categories: follower.place.categories,
+        createdAt: follower.place.createdAt,
+        exposeName: follower.place.exposeName,
+        images: follower.place.images,
+        location: follower.place.location,
+        rating: follower.place.rating,
+        type: follower.place.type,
+        updatedAt: follower.place.updatedAt,
+        avartar: follower.place.avartar,
+        description: follower.place.description,
+        subcribers: follower.place.subcribers,
+        userFollow: {
+          place: follower.place._id,
+          role: follower.role,
+          subcriber: follower.subcriber,
+          time: follower.updatedAt.getTime(),
+          type: follower.type,
+        },
+      };
+    });
+};
+
+export const getPlacesNear = async (
+  coordinates: ICoordinates,
+  excepts: string[],
+  pagination?: IPagination
+): Promise<IPlaceExposed[]> => {
+  const places = await Place.find({
+    "location.two_array": {
+      $nearSphere: {
+        $geometry: {
+          type: "Point",
+          coordinates: [coordinates.lng, coordinates.lat],
+        },
+      },
+    },
+    author: {
+      $nin: excepts,
+    },
+  })
+    .sort({ distance: OrderState.INCREASE })
+    .skip(pagination?.skip ?? 0)
+    .limit(pagination?.limit ?? 24)
+    .exec();
+
+  if (places == null) throw new InternalError();
+
+  return places.map(
+    (place): IPlaceInfo => ({
+      _id: place._id.toString(),
+      active: place.active,
+      author: place.author.toString(),
+      categories: place.categories,
+      createdAt: place.createdAt,
+      exposeName: place.exposeName,
+      images: place.images,
+      location: place.location,
+      rating: place.rating,
+      type: place.type,
+      updatedAt: place.updatedAt,
+      avartar: place.avartar,
+      description: place.description,
+    })
+  );
+};
+
+export const getPlacesRankByFavorite = async (
+  pagination?: IPagination
+): Promise<IPlaceExposed[]> => {
+  const places = await Place.aggregate([
+    {
+      $addFields: {
+        weightedRating: { $multiply: ["$rating.mean", "$rating.count"] },
+      },
+    },
+    {
+      $sort: { weightedRating: -1, "rating.count": -1, "rating.mean": -1 },
+    },
+    {
+      $skip: pagination?.skip ?? 0,
+    },
+    {
+      $limit: pagination?.limit ?? 24,
+    },
+  ]).exec();
+  if (places == null) throw new InternalError();
+  return places.map(
+    (place): IPlaceInfo => ({
+      _id: place._id.toString(),
+      active: place.active,
+      author: place.author.toString(),
+      categories: place.categories,
+      createdAt: place.createdAt,
+      exposeName: place.exposeName,
+      images: place.images,
+      location: place.location,
+      rating: place.rating,
+      type: place.type,
+      updatedAt: place.updatedAt,
+      avartar: place.avartar,
+      description: place.description,
+    })
+  );
+};
+
+export const getPlacesRatedByUser = async (
+  user: string,
+  pagination?: IPagination
+): Promise<IPlaceInfo[]> => {
+  const ratings = await PlaceRating.find({
+    user: user,
+  })
+    .populate<{ place: IPlaceExposed }>("place")
+    .sort({
+      updatedAt: OrderState.DECREASE,
+    })
+    .skip(pagination?.skip ?? 0)
+    .limit(pagination?.limit ?? 24)
+    .exec();
+  if (ratings == null) {
+    throw new InternalError();
+  }
+
+  return ratings
+    .filter((r) => r.place != null)
+    .map((rating): IPlaceInfo => {
+      const place = rating.place;
+      return {
+        _id: place._id,
+        active: place.active,
+        author: place.author,
+        categories: place.categories,
+        createdAt: place.createdAt,
+        exposeName: place.exposeName,
+        images: place.images,
+        location: place.location,
+        rating: place.rating,
+        type: place.type,
+        updatedAt: place.updatedAt,
+        avartar: place.avartar,
+        description: place.description,
+        userRating: {
+          place: place._id,
+          score: rating.score,
+          time: rating.updatedAt.getTime(),
+          user: rating.user.toString(),
+        },
+      };
+    });
 };
