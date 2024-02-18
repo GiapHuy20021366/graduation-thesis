@@ -13,8 +13,8 @@ import {
   IPlaceExposed,
   IPlaceExposedCooked,
   PlaceType,
-  loadFromLocalStorage,
-  saveToLocalStorage,
+  loadFromSessionStorage,
+  saveToSessionStorage,
   toPlaceExposedCooked,
 } from "../../../data";
 import PlaceSearchItemHolder from "../search/PlaceSearchItemHolder";
@@ -51,20 +51,19 @@ const NearPlace = React.forwardRef<HTMLDivElement, NearPlaceProps>(
     // Recover at begining or fetch at begining
     const dirtyRef = useRef<boolean>(false);
 
-    const doSaveLocalStorage = () => {
+    const doSaveStorage = () => {
       const snapshot: INearPlaceSnapshotData = {
         data: data,
         scrollTop: appContentContext.mainRef?.current?.scrollTop,
       };
-      saveToLocalStorage(
-        MY_PLACE_STORAGE_KEY,
-        authContext.account?.id_,
-        snapshot
-      );
+      saveToSessionStorage(snapshot, {
+        key: MY_PLACE_STORAGE_KEY,
+        account: authContext.account?.id_,
+      });
     };
 
     const handleBeforeNavigate = () => {
-      doSaveLocalStorage();
+      doSaveStorage();
     };
 
     const doSearch = useCallback(() => {
@@ -163,11 +162,11 @@ const NearPlace = React.forwardRef<HTMLDivElement, NearPlaceProps>(
       if (!active) return;
       if (!dirtyRef.current) {
         // At begining
-        const snapshot = loadFromLocalStorage<INearPlaceSnapshotData>(
-          MY_PLACE_STORAGE_KEY,
-          1 * 24 * 60 * 60 * 1000,
-          account.id_
-        );
+        const snapshot = loadFromSessionStorage<INearPlaceSnapshotData>({
+          key: MY_PLACE_STORAGE_KEY,
+          maxDuration: 1 * 24 * 60 * 60 * 1000,
+          account: account.id_,
+        });
         if (snapshot) {
           setData(snapshot.data);
           const mainRef = appContentContext.mainRef?.current;

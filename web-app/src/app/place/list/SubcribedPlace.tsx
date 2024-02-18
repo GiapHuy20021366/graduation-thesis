@@ -14,8 +14,8 @@ import {
   IPlaceExposed,
   IPlaceExposedCooked,
   PlaceType,
-  loadFromLocalStorage,
-  saveToLocalStorage,
+  loadFromSessionStorage,
+  saveToSessionStorage,
   toPlaceExposedCooked,
 } from "../../../data";
 import PlaceSearchItemHolder from "../search/PlaceSearchItemHolder";
@@ -52,20 +52,19 @@ const SubcribedPlace = React.forwardRef<HTMLDivElement, SubcribedPlaceProps>(
     // Recover at begining or fetch at begining
     const dirtyRef = useRef<boolean>(false);
 
-    const doSaveLocalStorage = () => {
+    const doSaveStorage = () => {
       const snapshot: ISubcribedPlaceSnapshotData = {
         data: data,
         scrollTop: appContentContext.mainRef?.current?.scrollTop,
       };
-      saveToLocalStorage(
-        SUBCRIBED_PLACE_STORAGE_KEY,
-        authContext.account?.id_,
-        snapshot
-      );
+      saveToSessionStorage(snapshot, {
+        key: SUBCRIBED_PLACE_STORAGE_KEY,
+        account: authContext.account?.id_,
+      });
     };
 
     const handleBeforeNavigate = () => {
-      doSaveLocalStorage();
+      doSaveStorage();
     };
 
     const doSearch = useCallback(() => {
@@ -170,11 +169,11 @@ const SubcribedPlace = React.forwardRef<HTMLDivElement, SubcribedPlaceProps>(
       if (!active) return;
       if (!dirtyRef.current) {
         // At begining
-        const snapshot = loadFromLocalStorage<ISubcribedPlaceSnapshotData>(
-          SUBCRIBED_PLACE_STORAGE_KEY,
-          1 * 24 * 60 * 60 * 1000,
-          account.id_
-        );
+        const snapshot = loadFromSessionStorage<ISubcribedPlaceSnapshotData>({
+          key: SUBCRIBED_PLACE_STORAGE_KEY,
+          maxDuration: 1 * 24 * 60 * 60 * 100,
+          account: account.id_,
+        });
         if (snapshot) {
           setData(snapshot.data);
           const mainRef = appContentContext.mainRef?.current;

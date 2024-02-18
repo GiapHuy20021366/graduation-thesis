@@ -79,11 +79,15 @@ export {
   type IPlaceFoodExposedPlace,
 } from "./place-food-exposed";
 export {
-  type ILocalStorage,
-  type ILocalStorageMeta,
   loadFromLocalStorage,
   saveToLocalStorage,
-} from "./util-local-storage";
+  loadFromSessionStorage,
+  saveToSessionStorage,
+  type IStorage,
+  type IStorageLoadOptions,
+  type IStorageMeta,
+  type IStorageSaveOptions,
+} from "./util-storage";
 export {
   type IPlaceExposedCooked,
   toPlaceExposedCooked,

@@ -13,8 +13,8 @@ import {
   IPlaceExposed,
   IPlaceExposedCooked,
   PlaceType,
-  loadFromLocalStorage,
-  saveToLocalStorage,
+  loadFromSessionStorage,
+  saveToSessionStorage,
   toPlaceExposedCooked,
 } from "../../../data";
 import PlaceSearchItemHolder from "../search/PlaceSearchItemHolder";
@@ -51,20 +51,19 @@ const RatedPlace = React.forwardRef<HTMLDivElement, RatedPlaceProps>(
     // Recover at begining or fetch at begining
     const dirtyRef = useRef<boolean>(false);
 
-    const doSaveLocalStorage = () => {
+    const doSaveStorage = () => {
       const snapshot: IRatedPlaceSnapshotData = {
         data: data,
         scrollTop: appContentContext.mainRef?.current?.scrollTop,
       };
-      saveToLocalStorage(
-        RATED_PLACE_STORAGE_KEY,
-        authContext.account?.id_,
-        snapshot
-      );
+      saveToSessionStorage(snapshot, {
+        key: RATED_PLACE_STORAGE_KEY,
+        account: authContext.account?.id_,
+      });
     };
 
     const handleBeforeNavigate = () => {
-      doSaveLocalStorage();
+      doSaveStorage();
     };
 
     const doSearch = useCallback(() => {
@@ -168,11 +167,11 @@ const RatedPlace = React.forwardRef<HTMLDivElement, RatedPlaceProps>(
       if (!active) return;
       if (!dirtyRef.current) {
         // At begining
-        const snapshot = loadFromLocalStorage<IRatedPlaceSnapshotData>(
-          RATED_PLACE_STORAGE_KEY,
-          1 * 24 * 60 * 60 * 1000,
-          account.id_
-        );
+        const snapshot = loadFromSessionStorage<IRatedPlaceSnapshotData>({
+          key: RATED_PLACE_STORAGE_KEY,
+          account: account.id_,
+          maxDuration: 1 * 24 * 60 * 60 * 1000,
+        });
         if (snapshot) {
           setData(snapshot.data);
           const mainRef = appContentContext.mainRef?.current;

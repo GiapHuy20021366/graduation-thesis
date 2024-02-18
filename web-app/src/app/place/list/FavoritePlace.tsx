@@ -13,8 +13,8 @@ import {
   IPlaceExposed,
   IPlaceExposedCooked,
   PlaceType,
-  loadFromLocalStorage,
-  saveToLocalStorage,
+  loadFromSessionStorage,
+  saveToSessionStorage,
   toPlaceExposedCooked,
 } from "../../../data";
 import PlaceSearchItemHolder from "../search/PlaceSearchItemHolder";
@@ -51,20 +51,19 @@ const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
     // Recover at begining or fetch at begining
     const dirtyRef = useRef<boolean>(false);
 
-    const doSaveLocalStorage = () => {
+    const doSaveStorage = () => {
       const snapshot: IFavoritePlaceSnapshotData = {
         data: data,
         scrollTop: appContentContext.mainRef?.current?.scrollTop,
       };
-      saveToLocalStorage(
-        FAVORITE_PLACE_STORAGE_KEY,
-        authContext.account?.id_,
-        snapshot
-      );
+      saveToSessionStorage(snapshot, {
+        key: FAVORITE_PLACE_STORAGE_KEY,
+        account: authContext.account?.id_,
+      });
     };
 
     const handleBeforeNavigate = () => {
-      doSaveLocalStorage();
+      doSaveStorage();
     };
 
     const doSearch = useCallback(() => {
@@ -162,11 +161,11 @@ const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
       if (!active) return;
       if (!dirtyRef.current) {
         // At begining
-        const snapshot = loadFromLocalStorage<IFavoritePlaceSnapshotData>(
-          FAVORITE_PLACE_STORAGE_KEY,
-          1 * 24 * 60 * 60 * 1000,
-          account.id_
-        );
+        const snapshot = loadFromSessionStorage<IFavoritePlaceSnapshotData>({
+          key: FAVORITE_PLACE_STORAGE_KEY,
+          maxDuration: 1 * 24 * 60 * 60 * 1000,
+          account: account.id_,
+        });
         if (snapshot) {
           setData(snapshot.data);
           const mainRef = appContentContext.mainRef?.current;

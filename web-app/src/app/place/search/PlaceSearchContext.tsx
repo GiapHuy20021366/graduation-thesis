@@ -62,7 +62,7 @@ export interface IPlaceSearchContext {
   doSearchRating: (order?: OrderState, options?: IFetchOptions) => void;
   doSearchQuery: (query?: string, options?: IFetchOptions) => void;
   doSearchFilter: (filter: any, options?: IFetchOptions) => void;
-  doSaveLocalStorage: () => void;
+  doSaveStorage: () => void;
 
   isEnd: boolean;
   setIsEnd: Dispatch<SetStateAction<boolean>>;
@@ -102,7 +102,7 @@ export const PlaceSearchContext = createContext<IPlaceSearchContext>({
   doSearchFilter: () => {},
   doSearchQuery: () => {},
 
-  doSaveLocalStorage: () => {},
+  doSaveStorage: () => {},
 
   isEnd: false,
   setIsEnd: () => {},
@@ -140,7 +140,7 @@ export default function PlaceSearchContextProvider({
   // Recover at begining or fetch at begining
   const dirtyRef = useRef<boolean>(false);
 
-  const doSaveLocalStorage = useCallback(() => {
+  const doSaveStorage = useCallback(() => {
     const snapshot: IPlaceSearchContextSnapshotData = {
       data: data,
       tab: tab,
@@ -498,7 +498,7 @@ export default function PlaceSearchContextProvider({
         doSearchQuery,
         doSearchFilter,
 
-        doSaveLocalStorage,
+        doSaveStorage,
       }}
     >
       {children}
