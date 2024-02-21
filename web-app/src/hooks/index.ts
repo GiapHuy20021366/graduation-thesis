@@ -22,3 +22,4 @@ export {
 } from "./useTabNavigate";
 export { useDistanceCalculation } from "./useDistanceCalculation";
 export { usePlaceSearchContext } from "./usePlaceSearchContext";
+export { useSocketContext } from "./useSocketContext";

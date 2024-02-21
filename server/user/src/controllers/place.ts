@@ -13,6 +13,7 @@ import {
 import {
   AuthLike,
   FollowType,
+  IPagination,
   IPlaceSearchParams,
   InvalidDataError,
   isAllNotEmptyString,
@@ -254,4 +255,18 @@ export const getPlaceInfo = async (
   getPlaceInfoService(id, auth._id)
     .then((data) => res.status(200).json(toResponseSuccessData(data)))
     .catch(next);
+};
+
+interface IGetPlacesParams {
+  followTypes?: FollowType[];
+  pagination?: IPagination;
+  user?: string;
+}
+
+export const getPlacesByUserAndFollowTypes = async (
+  req: Request<{}, {}, IGetPlacesParams, {}>,
+  res: Response,
+  next: NextFunction
+) => {
+
 };

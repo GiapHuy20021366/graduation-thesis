@@ -45,6 +45,7 @@ export const initUserRouters = (app: Express): void => {
   userRouter.post("/places/search", tokenParser, searchPlaces);
   userRouter.get("/places/:id/rating", tokenParser, searchPlaces);
   userRouter.get("/places/:id", tokenParser, getPlaceInfo);
+  userRouter.get("/places/:userId/", tokenParser, getPlaceInfo);
 
   userRouter.use(errorHandler);
   app.use("/", userRouter);

@@ -8,20 +8,23 @@ import React, {
   useState,
 } from "react";
 import {
-  IPlaceExposed,
   IPlaceExposedCooked,
   OrderState,
   PlaceType,
   loadFromLocalStorage,
-  saveToLocalStorage,
+  saveToSessionStorage,
   toPlaceExposedCooked,
 } from "../../../data";
-import { IPlaceSearchOrder, IPlaceSearchParams } from "../../../api";
+import {
+  IPlaceSearchOrder,
+  IPlaceSearchParams,
+  userFetcher,
+} from "../../../api";
 import {
   useAppContentContext,
   useAuthContext,
   useDistanceCalculation,
-  usePageProgessContext,
+  useToastContext,
 } from "../../../hooks";
 import { placeSearchTabs } from "./place-search-tab";
 
@@ -109,6 +112,8 @@ export const PlaceSearchContext = createContext<IPlaceSearchContext>({
   isFetching: false,
 });
 
+const PLACE_SEARCH_KEY = "place.search.context.state";
+
 export default function PlaceSearchContextProvider({
   children,
 }: IPlaceSearchContextProviderProps) {
@@ -135,7 +140,8 @@ export default function PlaceSearchContextProvider({
   const auth = authContext.auth;
   const account = authContext.account;
   const distances = useDistanceCalculation();
-  const progessContext = usePageProgessContext();
+  // const progessContext = usePageProgessContext();
+  const toastContext = useToastContext();
 
   // Recover at begining or fetch at begining
   const dirtyRef = useRef<boolean>(false);
@@ -151,11 +157,10 @@ export default function PlaceSearchContextProvider({
       scrollTop: appContentContext.mainRef?.current?.scrollTop,
       types: types,
     };
-    saveToLocalStorage(
-      "place.search.state",
-      authContext.account?.id_,
-      snapshot
-    );
+    saveToSessionStorage(snapshot, {
+      key: PLACE_SEARCH_KEY,
+      account: authContext.account?.id_,
+    });
   }, [
     appContentContext.mainRef,
     authContext.account,
@@ -195,63 +200,44 @@ export default function PlaceSearchContextProvider({
       console.log(params);
 
       setIsFetching(true);
-      progessContext.start();
-      setTimeout(() => {
-        const newData: IPlaceExposed[] = [];
-        for (let i = 0; i < 24; ++i) {
-          newData.push(
-            toPlaceExposedCooked(
-              {
-                _id: "1",
-                active: true,
-                author: {
-                  _id: "0",
-                  email: "0",
-                  firstName: "H",
-                  lastName: "G",
-                },
-                categories: [],
-                createdAt: new Date(),
-                exposeName: "HUY",
-                images: [],
-                location: {
-                  name: "0",
-                  coordinates: {
-                    lat: 100,
-                    lng: 16,
-                  },
-                },
-                rating: {
-                  count: 0,
-                  mean: 0,
-                },
-                type: PlaceType.PERSONAL,
-                updatedAt: new Date(),
-              },
-              {
-                currentCoordinates: distances.currentLocation?.coordinates,
-                homeCoordinates: account?.location?.coordinates,
+      // progessContext.start();
+      userFetcher
+        .searchPlace(params, auth)
+        .then((res) => {
+          const data = res.data;
+          if (data) {
+            setTimeout(() => {
+              const cookedData = data.map((d) =>
+                toPlaceExposedCooked(d, {
+                  currentCoordinates: distances.currentLocation?.coordinates,
+                  homeCoordinates: account?.location?.coordinates,
+                })
+              );
+              setData(cookedData);
+              if (data.length < pagination.limit) {
+                setIsEnd(true);
               }
-            )
-          );
-        }
-        if (newData.length < pagination.limit) {
-          setIsEnd(true);
-        }
-        setData(newData);
-
-        setIsFetching(false);
-        progessContext.end();
-      }, 1000);
+              setIsFetching(false);
+            }, 500);
+          }
+        })
+        .catch(() => {
+          toastContext.error("Có lỗi xảy ra, vui lòng thử lại");
+          setIsFetching(false);
+        })
+        .finally(() => {
+          // setIsFetching(false);
+          // progessContext.end();
+        });
     },
     [
       account?.location,
       auth,
-      data.length,
+      data,
       distances.currentLocation,
       isEnd,
       isFetching,
-      progessContext,
+      toastContext,
     ]
   );
 
@@ -431,11 +417,11 @@ export default function PlaceSearchContextProvider({
     if (account == null) return;
     if (!dirtyRef.current) {
       // At begining
-      const snapshot = loadFromLocalStorage<IPlaceSearchContextSnapshotData>(
-        "place.search.state",
-        1 * 24 * 60 * 60 * 1000,
-        account.id_
-      );
+      const snapshot = loadFromLocalStorage<IPlaceSearchContextSnapshotData>({
+        key: PLACE_SEARCH_KEY,
+        account: account.id_,
+        maxDuration: 1 * 24 * 60 * 60 * 1000,
+      });
       if (snapshot) {
         setQuery(snapshot.query);
         setMaxDistance(snapshot.maxDistance ?? -1);

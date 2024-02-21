@@ -8,3 +8,4 @@ export const PROXY_URL = env.VITE_PROXY_URL as string;
 export const USER_PATH = env.VITE_USER_PATH as string;
 export const MESSAGE_PATH = env.VITE_MESSAGE_PATH as string;
 export const FOOD_PATH = env.VITE_FOOD_PATH as string;
+export const VITE_MESSAGE_SOCKET_URL = env.VITE_MESSAGE_SOCKET_URL as string;

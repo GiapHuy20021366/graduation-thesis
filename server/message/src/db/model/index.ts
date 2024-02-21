@@ -1,1 +1,5 @@
-export { User, IGoogleOAuthInfo, IUser } from "./user";
+export { Conversation, IConversationSchema } from "./conversation";
+export {
+  ConversationMessage,
+  IConversationMessageSchema,
+} from "./conversation-message";

@@ -66,8 +66,14 @@ export default function PlaceEditForm() {
     };
 
     progressContext.start();
-    userFetcher
-      .createPlace(datas, auth)
+    const meta = editContext.meta;
+    if (isEditable && (!meta || !meta._id)) {
+      return;
+    }
+    const promise = isEditable
+      ? userFetcher.updatePlace(meta!._id, datas, auth)
+      : userFetcher.createPlace(datas, auth);
+    promise
       .then((datas) => {
         const place = datas.data;
         if (place != null) {
@@ -76,7 +82,9 @@ export default function PlaceEditForm() {
       })
       .catch((err) => {
         console.log(err);
-        toastContext.error("Không thể tạo trang vào lúc này");
+        toastContext.error(
+          `Không thể ${isEditable ? "cập nhật" : "tạo"} trang vào lúc này`
+        );
       })
       .finally(() => {
         progressContext.end();

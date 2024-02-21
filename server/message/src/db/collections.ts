@@ -1,3 +1,4 @@
 export default {
-    user: "users"
+    conversation: "conversations",
+    conversationMessage: "conversation-messages"
 }

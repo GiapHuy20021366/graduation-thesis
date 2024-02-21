@@ -4,7 +4,12 @@ import React, {
   createContext,
   useState,
 } from "react";
-import { FoodCategory, ILocation, IPlace, PlaceType } from "../../../data";
+import {
+  FoodCategory,
+  ILocation,
+  IPlaceExposed,
+  PlaceType,
+} from "../../../data";
 
 interface IPlaceEditContext {
   exposeName: string;
@@ -15,6 +20,7 @@ interface IPlaceEditContext {
   images: string[];
   type: PlaceType;
   isEditable?: boolean;
+  meta?: IPlaceExposed;
 
   setExposeName: Dispatch<SetStateAction<string>>;
   setDescription: Dispatch<SetStateAction<string | undefined>>;
@@ -46,7 +52,7 @@ export const PlaceEditContext = createContext<IPlaceEditContext>(
 
 interface IPlaceEditContextProviderProps {
   children?: React.ReactNode;
-  preData?: IPlace;
+  preData?: IPlaceExposed;
 }
 
 export default function PlaceEditContextProvider({
@@ -91,6 +97,8 @@ export default function PlaceEditContextProvider({
         setImages,
         setLocation,
         setType,
+
+        meta: preData,
       }}
     >
       {children}

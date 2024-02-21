@@ -26,6 +26,7 @@ export const NODE_MAILER_CONFIG_PORT = +(process.env.NODE_MAILER_CONFIG_PORT || 
 export const NODE_MAILER_SENDER = process.env.NODE_MAILER_SENDER as string;
 
 export const WEB_APP_HOST = process.env.WEB_APP_HOST as string;
+export const GATEWAY_HOST = process.env.GATEWAY_HOST as string;
 
 
 // other configs
