@@ -1,38 +1,70 @@
 import { Server, Socket } from "socket.io";
-import { ISocketAuth } from "./socket-auth";
-import { GATEWAY_HOST, WEB_APP_HOST } from "../config";
+import { joinConversation, outAllConversations } from "./conversation";
+import { verifyToken } from "../utils";
+import { AuthLike } from "../data";
+
+const socketOnKey = {
+  CONVERSATION_JOIN: "conversation-join",
+  CONVERSATION_LEAVE: "conversation-leave",
+  CONVERSATION_SEND_MESSAGE: "conversation-send-message",
+} as const;
+
+const socketEmitKey = {} as const;
 
 let socketServer: Server | null = null;
 const userIdToSockets: Record<string, Socket[]> = {};
-const socketIdToAuths: Record<string, ISocketAuth> = {};
+const socketIdToAuth: Record<string, AuthLike> = {};
 
-export const addClient = (user: string, client: Socket) => {
+export const onClientConnected = (auth: AuthLike, client: Socket) => {
+  const user = auth._id;
   if (userIdToSockets[user] == null) {
     userIdToSockets[user] = [client];
   }
   userIdToSockets[user].push(client);
+  socketIdToAuth[client.id] = auth;
 };
 
-export const authClient = (client: Socket, auth: ISocketAuth) => {
-  socketIdToAuths[client.id] = auth;
+export const onClientDisconnected = (auth: AuthLike, client: Socket) => {
+  const user = auth._id;
+  const sockets = userIdToSockets[user];
+  if (sockets != null) {
+    const index = sockets.indexOf(client);
+    if (index !== -1) {
+      sockets.splice(index, 1);
+    }
+  }
+  if (socketIdToAuth[client.id] != null) {
+    delete socketIdToAuth[client.id];
+  }
 };
 
 const initSocketListener = (socketServer: Server) => {
-  // init listener
   socketServer.on("connection", (socket: Socket) => {
-    console.log("A user connected");
+    // Verified
+    const authorization = socket.request.headers.authorization;
+    if (authorization == null) return;
+    const verified = verifyToken(authorization);
+    if (verified == null || typeof verified === "string") return;
 
-    // Bắt sự kiện khi client gửi tin nhắn
-    socket.on("message", (message: string) => {
-      console.log(`Received message: ${message}`);
+    onClientConnected(verified as AuthLike, socket);
 
-      // Gửi tin nhắn đến tất cả các client
-      socketServer.emit("message", `Server: ${message}`);
+    // join a conversation
+    socket.on(socketOnKey.CONVERSATION_JOIN, (conversationId: string) => {
+      joinConversation(socket, conversationId, {
+        socketServer,
+        userIdToSockets,
+        socketIdToAuth,
+      });
     });
 
-    // Bắt sự kiện khi người dùng ngắt kết nối
+    // disconnected
     socket.on("disconnect", () => {
-      console.log("User disconnected");
+      outAllConversations(socket, {
+        socketServer,
+        userIdToSockets,
+        socketIdToAuth,
+      });
+      onClientDisconnected(verified as AuthLike, socket);
     });
   });
 };

@@ -1,5 +1,5 @@
 declare namespace Express {
-    export interface Request {
-        customProperty?: string;
-    }
+  export interface Request {
+    authContext: AuthLike;
+  }
 }

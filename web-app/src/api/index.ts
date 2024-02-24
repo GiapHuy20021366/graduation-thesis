@@ -1,11 +1,11 @@
 export {
   userFetcher,
+  userEndpoints,
+  userInstance,
   type IGetUserNearParams,
   type UserFetcher,
   type UserResponse,
   type UserResponseError,
-  userEndpoints,
-  userInstance,
   type IPlaceData,
   type IPlaceSearchOrder,
   type IPlaceSearchParams,
@@ -13,11 +13,11 @@ export {
 
 export {
   foodFetcher,
+  foodEndpoints,
+  foodInstance,
   type FoodFetcher,
   type FoodResponse,
   type FoodResponseError,
-  foodEndpoints,
-  foodInstance,
   type IFoodSeachOrder,
   type IFoodSearchParams,
   type IFoodSearchPrice,
@@ -25,3 +25,12 @@ export {
 } from "./food";
 
 export { geocodeMapFindAddess } from "./map";
+
+export {
+  messageEndpoints,
+  messageFetcher,
+  messageInstance,
+  type MessageFetcher,
+  type MessageResponse,
+  type MessageResponseError,
+} from "./message";

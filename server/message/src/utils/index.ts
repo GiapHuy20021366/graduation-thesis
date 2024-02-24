@@ -1,1 +1,2 @@
-export { sendMail, renderHtmlFromTemplate } from "./mailer"
+export { sendMail, renderHtmlFromTemplate } from "./mailer";
+export { verifyToken } from "./jwt";
