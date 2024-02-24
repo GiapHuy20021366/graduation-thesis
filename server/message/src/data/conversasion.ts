@@ -1,6 +1,6 @@
 export interface IConversationParticipantMeta {
   id: string;
-  joinTime: string;
+  joinTime: Date;
   addedBy?: string;
 }
 

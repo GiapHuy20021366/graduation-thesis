@@ -1,7 +1,15 @@
 export {
-    ManualAccountInfo,
-    mailTemplates,
-    sendActiveManualAccount,
-    sendNewAccountCreated,
-    NewAccountInfo
+  ManualAccountInfo,
+  mailTemplates,
+  sendActiveManualAccount,
+  sendNewAccountCreated,
+  NewAccountInfo,
 } from "./account";
+
+export {
+  createConversation,
+  getConversation,
+  getConversations,
+  newConversationMessage,
+  getMessages,
+} from "./conversation";
