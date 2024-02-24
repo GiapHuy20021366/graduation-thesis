@@ -12,53 +12,59 @@ import ToastContextProvider from "./ToastContext";
 import PageProgessContextProvider from "./PageProgessContext";
 import "react-toastify/dist/ReactToastify.css";
 import SocketContextProvider from "./SocketContext";
+import AppCacheContextProvider from "./AppCacheContext";
 
 function App() {
   return (
-    <I18nContextProvider>
-      <PageProgessContextProvider>
+    <ToastContextProvider>
+      <I18nContextProvider>
         <AuthContextProvider>
-          <ToastContextProvider>
-            <SocketContextProvider>
-              <BrowserRouter>
-                <Routes>
-                  <Route
-                    path="/*"
-                    element={
-                      <IsAuthenticated>
-                        <AppContent />
-                      </IsAuthenticated>
-                    }
-                  />
-                  <Route
-                    path="/signin"
-                    element={
-                      <IsNotAuthenticated>
-                        <SignIn />
-                      </IsNotAuthenticated>
-                    }
-                  />
+          <PageProgessContextProvider>
+            <AppCacheContextProvider>
+              <SocketContextProvider>
+                <BrowserRouter>
+                  <Routes>
+                    <Route
+                      path="/*"
+                      element={
+                        <IsAuthenticated>
+                          <AppContent />
+                        </IsAuthenticated>
+                      }
+                    />
+                    <Route
+                      path="/signin"
+                      element={
+                        <IsNotAuthenticated>
+                          <SignIn />
+                        </IsNotAuthenticated>
+                      }
+                    />
 
-                  <Route
-                    path="/signup"
-                    element={
-                      <IsNotAuthenticated>
-                        <SignUp />
-                      </IsNotAuthenticated>
-                    }
-                  />
+                    <Route
+                      path="/signup"
+                      element={
+                        <IsNotAuthenticated>
+                          <SignUp />
+                        </IsNotAuthenticated>
+                      }
+                    />
 
-                  <Route path="/verify/*" element={<Verify />} />
+                    <Route path="/verify/*" element={<Verify />} />
 
-                  <Route path="/error/page-wrong" element={<PageNotFound />} />
-                  <Route path="*" element={<PageNotFound />} />
-                </Routes>
-              </BrowserRouter>
-            </SocketContextProvider>
-          </ToastContextProvider>
+                    <Route
+                      path="/error/page-wrong"
+                      element={<PageNotFound />}
+                    />
+                    <Route path="*" element={<PageNotFound />} />
+                  </Routes>
+                </BrowserRouter>
+              </SocketContextProvider>
+            </AppCacheContextProvider>
+          </PageProgessContextProvider>
         </AuthContextProvider>
-      </PageProgessContextProvider>
-    </I18nContextProvider>
+      </I18nContextProvider>
+    </ToastContextProvider>
   );
 }
 

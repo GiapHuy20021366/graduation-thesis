@@ -92,3 +92,21 @@ export {
   type IPlaceExposedCooked,
   toPlaceExposedCooked,
 } from "./place-exposed-cooked";
+export {
+  type IConversation,
+  type IConversationParticipantMeta,
+} from "./conversation";
+export { type IConversationExposed } from "./conversation-exposed";
+export {
+  ConversationMessageContextType,
+  ConversationMessageType,
+  type IConversationMessage,
+  type IConversationMessageContext,
+  type IConversationMessageReaction,
+} from "./conversation-message";
+export { type IConversationMessageExposed } from "./conversation-message-exposed";
+export {
+  type IConversationCooked,
+  type IConversationParticipant,
+} from "./conversation-cooked";
+export { type IConversationMessageCooked } from "./conversation-message-cooked";

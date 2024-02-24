@@ -3,7 +3,7 @@ import UsersAroundPage from "./users/UsersAroundPage";
 import PageNotFound from "../common/PageNotFound";
 import FoodAroundPage from "./food/FoodAroundPage";
 
-export default function Arround() {
+export default function Around() {
   return (
     <Routes>
       <Route path="/" element={<UsersAroundPage />} />
