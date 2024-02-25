@@ -1,5 +1,7 @@
 import {
+  IConversationExposed,
   IConversationMessage,
+  IConversationMessageExposed,
   IPagination,
   InternalError,
   ResourceNotExistedError,
@@ -8,13 +10,11 @@ import {
 import {
   Conversation,
   ConversationMessage,
-  IConversationMessageSchema,
-  IConversationSchema,
 } from "../db/model";
 
 export const createConversation = async (
   participants: string[]
-): Promise<IConversationSchema> => {
+): Promise<IConversationExposed> => {
   const conversation = await Conversation.findOne({
     participants: { $all: participants, $elemMatch: { $exists: true } },
   });
@@ -28,6 +28,7 @@ export const createConversation = async (
     });
     await newConversation.save();
     return {
+      _id: newConversation._id.toString(),
       createdAt: newConversation.createdAt,
       meta: newConversation.meta,
       participants: newConversation.participants,
@@ -39,6 +40,7 @@ export const createConversation = async (
       meta: conversation.meta,
       participants: conversation.participants,
       updatedAt: conversation.updatedAt,
+      _id: conversation._id.toString(),
     };
   }
 };
@@ -46,7 +48,7 @@ export const createConversation = async (
 export const getConversation = async (
   conversationId: string,
   userId: string
-): Promise<IConversationSchema> => {
+): Promise<IConversationExposed> => {
   const conversation = await Conversation.findById(conversationId);
   if (conversation == null) {
     throw new ResourceNotExistedError({
@@ -61,6 +63,7 @@ export const getConversation = async (
     throw new UnauthorizationError();
   }
   return {
+    _id: conversation._id.toString(),
     createdAt: conversation.createdAt,
     meta: conversation.meta,
     participants: conversation.participants,
@@ -71,7 +74,7 @@ export const getConversation = async (
 export const getConversations = async (
   userId: string,
   pagination?: IPagination
-): Promise<IConversationSchema[]> => {
+): Promise<IConversationExposed[]> => {
   const conversations = await Conversation.aggregate([
     {
       $match: {
@@ -125,6 +128,7 @@ export const getConversations = async (
     throw new InternalError();
   }
   return conversations.map((conversation) => ({
+    _id: conversation._id.toString(),
     createdAt: conversation.createdAt,
     meta: conversation.meta,
     participants: conversation.participants,
@@ -134,7 +138,7 @@ export const getConversations = async (
 
 export const newConversationMessage = async (
   conversasionMessage: IConversationMessage
-): Promise<IConversationMessageSchema> => {
+): Promise<IConversationMessageExposed> => {
   const message = new ConversationMessage(conversasionMessage);
   await message.save();
   return {
@@ -142,6 +146,7 @@ export const newConversationMessage = async (
     createdAt: message.createdAt,
     updatedAt: message.updatedAt,
     conversation: message.conversation,
+    _id: message._id.toString(),
   };
 };
 
@@ -149,7 +154,7 @@ export const getMessages = async (
   conversationId: string,
   from: number,
   to: Number
-): Promise<IConversationMessageSchema[]> => {
+): Promise<IConversationMessageExposed[]> => {
   const messages = await ConversationMessage.find({
     conversation: conversationId,
     createdAt: {
@@ -159,6 +164,7 @@ export const getMessages = async (
   }).exec();
 
   return messages.map((message) => ({
+    _id: message._id.toString(),
     conversation: message.conversation,
     createdAt: message.createdAt,
     sender: message.sender,

@@ -1,10 +1,18 @@
+import { useParams } from "react-router-dom";
+import PageNotFound from "../../common/PageNotFound";
+
 interface IConversationViewerIdProps {
-  id: string;
+  id?: string;
 }
 
 export default function ConversationViewerId({
   id,
 }: IConversationViewerIdProps) {
-  console.log(id);
-  return <>{id}</>;
+  const params = useParams();
+  const conversationId = id ?? params.id;
+  if (conversationId == null) {
+    return <PageNotFound />;
+  }
+
+  return <>{conversationId}</>;
 }

@@ -13,6 +13,7 @@ import PageProgessContextProvider from "./PageProgessContext";
 import "react-toastify/dist/ReactToastify.css";
 import SocketContextProvider from "./SocketContext";
 import AppCacheContextProvider from "./AppCacheContext";
+import ConversationContextProvider from "./ConversationContext";
 
 function App() {
   return (
@@ -28,7 +29,9 @@ function App() {
                       path="/*"
                       element={
                         <IsAuthenticated>
-                          <AppContent />
+                          <ConversationContextProvider>
+                            <AppContent />
+                          </ConversationContextProvider>
                         </IsAuthenticated>
                       }
                     />

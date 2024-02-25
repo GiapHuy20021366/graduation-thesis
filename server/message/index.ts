@@ -1,5 +1,5 @@
 import express, { Express } from "express";
-import { GATEWAY_HOST, PORT, consoleLogger } from "./src/config";
+import { PORT, consoleLogger } from "./src/config";
 import { connectDB } from "./src/db";
 import { initUserRouters } from "./src/route";
 import { publishMessage, subscribeMessage } from "./src/broker";
@@ -11,11 +11,7 @@ const app: Express = express();
 const httpServer = http.createServer(app);
 connectDB();
 
-app.use(
-  cors({
-    origin: GATEWAY_HOST,
-  })
-);
+app.use(cors());
 
 app.use(express.json());
 app.use(express.static("public"));

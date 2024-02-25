@@ -1,6 +1,7 @@
-import React, { createContext, useEffect } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import {
   IConversationCooked,
+  IConversationExposed,
   IConversationMessage,
   IConversationMessageCooked,
   IConversationMessageExposed,
@@ -31,8 +32,20 @@ const ConversationViewerEmitKey = {
   CONVERSATION_SEND_MESSAGE: "conversation-send-message",
 } as const;
 
+const ConversationViewerOnKey = {
+  CONVERSATION_META: "conversation-meta", // when this client was added to an conversation
+  CONVERSATION_NEW_MESSAGE: (conversationId: string) =>
+    `Conversation@${conversationId}-new-message`, // when a message send,
+  CONVERSATION_MESSAGE_ERROR: (conversationId: string) =>
+    `Conversation@${conversationId}-message-error`, // when a message sent is error
+} as const;
+
 const toConversationRoom = (conversationId: string) => {
   return `Conversation@${conversationId}`;
+};
+
+const toMessageUuid = (conversationId: string) => {
+  return toConversationRoom(conversationId) + "@" + String(Date.now());
 };
 
 export default function ConversationViewerContextProvider({
@@ -40,43 +53,85 @@ export default function ConversationViewerContextProvider({
   conversation,
 }: IConversationViewerContextProviderProps) {
   const socketContext = useSocketContext();
-  const messages = conversation.messages ?? [];
   const conversationId = conversation._id;
+  const [messages, setMessages] = useState<IConversationMessageCooked[]>(
+    conversation.messages ?? []
+  );
+  const [sendings, setSendings] = useState<IConversationMessage[]>([]);
+  const [errors, setErrors] = useState<string[]>([]);
 
   useEffect(() => {
     const socket = socketContext.socket;
     if (socket == null) return;
-    const room = toConversationRoom(conversationId);
+
+    const onConversationMeta = (conversation: IConversationExposed) => {
+      console.log(conversation);
+    };
 
     const onConversationNewMessage = (
+      uuid: string,
       message: IConversationMessageExposed
     ) => {
-      console.log(message);
+      console.log(uuid, message);
+    };
+
+    const onConversationMessageError = (uuid: string) => {
+      console.log(uuid);
+      const _errors = errors.slice();
+      _errors.push(uuid);
+      setErrors(_errors);
     };
 
     socket.on(
-      `Conversation@${conversationId}-new-message`,
+      ConversationViewerOnKey.CONVERSATION_NEW_MESSAGE(conversationId),
       onConversationNewMessage
     );
 
+    socket.on(ConversationViewerOnKey.CONVERSATION_META, onConversationMeta);
+
+    socket.on(
+      ConversationViewerOnKey.CONVERSATION_MESSAGE_ERROR(conversationId),
+      onConversationMessageError
+    );
+
     // join room
-    socket.emit(ConversationViewerEmitKey.CONVERSATION_JOIN, room);
+    socket.emit(ConversationViewerEmitKey.CONVERSATION_JOIN, conversationId);
 
     return () => {
+      socket.emit(ConversationViewerEmitKey.CONVERSATION_LEAVE, conversationId);
+
       socket.removeListener(
-        `Conversation@${conversationId}-new-message`,
+        ConversationViewerOnKey.CONVERSATION_NEW_MESSAGE(conversationId),
         onConversationNewMessage
       );
-      socket.emit(ConversationViewerEmitKey.CONVERSATION_LEAVE, room);
+
+      socket.removeListener(
+        ConversationViewerOnKey.CONVERSATION_META,
+        onConversationMeta
+      );
+
+      socket.removeListener(
+        ConversationViewerOnKey.CONVERSATION_MESSAGE_ERROR(conversationId),
+        onConversationMessageError
+      );
     };
-  }, [conversationId, socketContext.socket]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketContext.socket]);
 
   const loadMessages = (from: number, to: number) => {
     console.log(from, to);
   };
 
   const sendMessage = (message: IConversationMessage) => {
-    console.log(message);
+    const socket = socketContext.socket;
+    if (socket) {
+      socket.emit(
+        ConversationViewerEmitKey.CONVERSATION_SEND_MESSAGE,
+        conversationId,
+        toMessageUuid(conversationId),
+        message
+      );
+    }
   };
 
   return (

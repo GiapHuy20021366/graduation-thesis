@@ -5,7 +5,14 @@ import {
   IConversationMessageCooked,
   IConversationMessageExposed,
 } from "../data";
-import { useSocketContext, useUserResolver } from "../hooks";
+import {
+  useAuthContext,
+  useSocketContext,
+  useToastContext,
+  useUserResolver,
+} from "../hooks";
+import { messageFetcher } from "../api";
+import { useNavigate } from "react-router";
 
 interface IConversationContextProviderProps {
   children?: React.ReactNode;
@@ -46,7 +53,8 @@ export const ConversationContext = createContext<IConversationContext>({
 });
 
 const ConversationOnKey = {
-  CONVERSATION_INIT_TRIGGER: "conversation-init-trigger", // trigger when a user message into a chat room and current user is not listen this chat room
+  CONVERSATION_META: "conversation-meta",
+  CONVERSATION_NEW_MESSAGE: "conversation-new-message",
 } as const;
 
 export default function ConversationContextProvider({
@@ -55,12 +63,17 @@ export default function ConversationContextProvider({
   const socketContext = useSocketContext();
   const conversationsRef = useRef<Record<string, IConversationCooked>>({});
   const userResolver = useUserResolver();
+  const authContext = useAuthContext();
+  const auth = authContext.auth;
+  const toastContext = useToastContext();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const socket = socketContext.socket;
     if (socket == null) return;
 
-    const conversationInitTriggerListener = (meta: IConversationExposed) => {
+    const onConversationMeta = (meta: IConversationExposed) => {
+      console.log("New meta on global context", meta);
       const conversations = conversationsRef.current;
       const conversation = conversations[meta._id];
       if (conversation == null) {
@@ -78,15 +91,28 @@ export default function ConversationContextProvider({
       }
     };
 
+    const onConversationNewMessage = (
+      _uuid: string,
+      message: IConversationMessageExposed
+    ) => {
+      console.log("New message on global context", _uuid, message);
+    };
+
+    socket.on(ConversationOnKey.CONVERSATION_META, onConversationMeta);
+
     socket.on(
-      ConversationOnKey.CONVERSATION_INIT_TRIGGER,
-      conversationInitTriggerListener
+      ConversationOnKey.CONVERSATION_NEW_MESSAGE,
+      onConversationNewMessage
     );
 
     return () => {
       socket.removeListener(
-        ConversationOnKey.CONVERSATION_INIT_TRIGGER,
-        conversationInitTriggerListener
+        ConversationOnKey.CONVERSATION_META,
+        onConversationMeta
+      );
+      socket.removeListener(
+        ConversationOnKey.CONVERSATION_NEW_MESSAGE,
+        onConversationNewMessage
       );
     };
   }, [socketContext.socket, userResolver]);
@@ -117,10 +143,36 @@ export default function ConversationContextProvider({
   };
 
   const doBeginConversationWith = (user: string) => {
-    console.log(user);
-    // Call API to get or create a conversation with this user
-    // Push this conversation to conversations meta
-    // Open this conversation
+    if (auth == null) {
+      return;
+    }
+    messageFetcher
+      .createConversation(user, auth)
+      .then((res) => {
+        const conversation = res.data;
+        if (conversation != null) {
+          const conversations = conversationsRef.current;
+          if (conversations[conversation._id] == null) {
+            userResolver.getAll(conversation.participants, (users) => {
+              conversations[conversation._id] = {
+                ...conversation,
+                participants: users.map((user) => ({
+                  _id: user.id_,
+                  firstName: user.firstName,
+                  lastName: user.lastName,
+                  avartar: user.avartar,
+                })),
+              };
+              navigate("/conversation/" + conversation._id);
+            });
+          } else {
+            navigate("/conversation/" + conversation._id);
+          }
+        }
+      })
+      .catch(() => {
+        toastContext.error("Không thể nhắn tin vào lúc này");
+      });
   };
 
   const doOpenConversation = (conversation: string) => {

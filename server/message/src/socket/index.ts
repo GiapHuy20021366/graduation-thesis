@@ -1,7 +1,13 @@
 import { Server, Socket } from "socket.io";
-import { joinConversation, outAllConversations } from "./conversation";
+import {
+  joinConversation,
+  leaveConversation,
+  leaveAllConversations,
+  sendMessageToConversation,
+} from "./conversation";
 import { verifyToken } from "../utils";
-import { AuthLike } from "../data";
+import { AuthLike, IConversationMessage } from "../data";
+import { consoleLogger } from "../config";
 
 const socketOnKey = {
   CONVERSATION_JOIN: "conversation-join",
@@ -9,14 +15,22 @@ const socketOnKey = {
   CONVERSATION_SEND_MESSAGE: "conversation-send-message",
 } as const;
 
-const socketEmitKey = {} as const;
-
 let socketServer: Server | null = null;
 const userIdToSockets: Record<string, Socket[]> = {};
 const socketIdToAuth: Record<string, AuthLike> = {};
 
 export const onClientConnected = (auth: AuthLike, client: Socket) => {
   const user = auth._id;
+
+  consoleLogger.info(
+    "[SOCKET] [CONNECTED]",
+    "A user with id",
+    auth._id,
+    "and email",
+    auth.email,
+    "connected"
+  );
+
   if (userIdToSockets[user] == null) {
     userIdToSockets[user] = [client];
   }
@@ -26,6 +40,14 @@ export const onClientConnected = (auth: AuthLike, client: Socket) => {
 
 export const onClientDisconnected = (auth: AuthLike, client: Socket) => {
   const user = auth._id;
+  consoleLogger.info(
+    "[SOCKET] [DISCONNECTED]",
+    "A user with id",
+    auth._id,
+    "and email",
+    auth.email,
+    "disconnected"
+  );
   const sockets = userIdToSockets[user];
   if (sockets != null) {
     const index = sockets.indexOf(client);
@@ -45,8 +67,9 @@ const initSocketListener = (socketServer: Server) => {
     if (authorization == null) return;
     const verified = verifyToken(authorization);
     if (verified == null || typeof verified === "string") return;
+    const auth = verified.data as AuthLike;
 
-    onClientConnected(verified as AuthLike, socket);
+    onClientConnected(auth, socket);
 
     // join a conversation
     socket.on(socketOnKey.CONVERSATION_JOIN, (conversationId: string) => {
@@ -57,14 +80,35 @@ const initSocketListener = (socketServer: Server) => {
       });
     });
 
-    // disconnected
-    socket.on("disconnect", () => {
-      outAllConversations(socket, {
+    // send a message
+    socket.on(
+      socketOnKey.CONVERSATION_SEND_MESSAGE,
+      (conversationId: string, uuid: string, message: IConversationMessage) => {
+        sendMessageToConversation(socket, conversationId, uuid, message, {
+          socketServer,
+          userIdToSockets,
+          socketIdToAuth,
+        });
+      }
+    );
+
+    // leave a conversation
+    socket.on(socketOnKey.CONVERSATION_LEAVE, (conversationId: string) => {
+      leaveConversation(socket, conversationId, {
         socketServer,
         userIdToSockets,
         socketIdToAuth,
       });
-      onClientDisconnected(verified as AuthLike, socket);
+    });
+
+    // disconnected
+    socket.on("disconnect", () => {
+      leaveAllConversations(socket, {
+        socketServer,
+        userIdToSockets,
+        socketIdToAuth,
+      });
+      onClientDisconnected(auth, socket);
     });
   });
 };

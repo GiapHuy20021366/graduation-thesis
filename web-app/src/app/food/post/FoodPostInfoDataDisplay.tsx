@@ -8,6 +8,7 @@ import {
 import {
   useAppContentContext,
   useAuthContext,
+  useConversationContext,
   useI18nContext,
 } from "../../../hooks";
 import { useEffect, useState } from "react";
@@ -55,6 +56,8 @@ export default function FoodPostInfoDataDisplay({
   const appContentContext = useAppContentContext();
   const navigate = useNavigate();
   const authContext = useAuthContext();
+  const conversationContext = useConversationContext();
+
   const [liked, setLiked] = useState<boolean>(data.liked ?? false);
   const [author, setAuthor] = useState<IUserInfo>();
 
@@ -158,7 +161,13 @@ export default function FoodPostInfoDataDisplay({
             <IconButton color="info">
               <Share />
             </IconButton>
-            <IconButton color="success">
+            <IconButton
+              color="success"
+              onClick={() => {
+                console.log("Clicked");
+                conversationContext.doBeginConversationWith(data.user._id);
+              }}
+            >
               <MapsUgcOutlined />
             </IconButton>
           </Stack>

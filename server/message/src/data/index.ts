@@ -6,7 +6,7 @@ export {
   IConversationMessage,
   IConversationMessageContext,
   IConversationMessageReaction,
-} from "./conservation-message";
+} from "./conversation-message";
 export { ICoordinates, Ilocation } from "./location";
 export { InternalError, InternalErrorInfo } from "./internal-error";
 export { InvalidDataError, InvalidDataErrorInfo } from "./invalid-data-error";
@@ -45,3 +45,5 @@ export {
   isObjectId,
   isString,
 } from "./data-validate";
+export { IConversationExposed } from "./conversation-exposed";
+export { IConversationMessageExposed } from "./conversation-message-exposed";
