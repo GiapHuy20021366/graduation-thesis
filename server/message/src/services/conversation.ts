@@ -7,10 +7,7 @@ import {
   ResourceNotExistedError,
   UnauthorizationError,
 } from "../data";
-import {
-  Conversation,
-  ConversationMessage,
-} from "../db/model";
+import { Conversation, ConversationMessage } from "../db/model";
 
 export const createConversation = async (
   participants: string[]
@@ -82,6 +79,8 @@ export const getConversations = async (
           $in: [userId],
         },
       },
+    },
+    {
       $lookup: {
         from: "Message",
         let: { conversationId: "$_id" },

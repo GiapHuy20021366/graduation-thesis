@@ -6,10 +6,14 @@ import {
   IConversationMessageCooked,
   IConversationMessageExposed,
 } from "../../../data";
-import { useSocketContext } from "../../../hooks";
+import {
+  useAuthContext,
+  useSocketContext,
+  useUserResolver,
+} from "../../../hooks";
 
 interface IConversationViewerContextProviderProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   conversation: IConversationCooked;
 }
 
@@ -17,6 +21,7 @@ interface IConversationViewerContext {
   messages: IConversationMessageCooked[];
   loadMessages: (from: number, to: number) => void;
   sendMessage: (message: IConversationMessage) => void;
+  conversation: IConversationCooked;
 }
 
 export const ConversationViewerContext =
@@ -24,6 +29,7 @@ export const ConversationViewerContext =
     messages: [],
     loadMessages: () => {},
     sendMessage: () => {},
+    conversation: {} as IConversationCooked,
   });
 
 const ConversationViewerEmitKey = {
@@ -57,8 +63,12 @@ export default function ConversationViewerContextProvider({
   const [messages, setMessages] = useState<IConversationMessageCooked[]>(
     conversation.messages ?? []
   );
-  const [sendings, setSendings] = useState<IConversationMessage[]>([]);
+  const [sendings, setSendings] = useState<IConversationMessageExposed[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
+
+  const userResolver = useUserResolver();
+  const authContext = useAuthContext();
+  const { account } = authContext;
 
   useEffect(() => {
     const socket = socketContext.socket;
@@ -72,7 +82,30 @@ export default function ConversationViewerContextProvider({
       uuid: string,
       message: IConversationMessageExposed
     ) => {
-      console.log(uuid, message);
+      const userDict = userResolver.getDict();
+      const _sendings = sendings.slice();
+      const index = _sendings.findIndex((msg) => msg._id === uuid);
+      if (index !== -1) {
+        _sendings.splice(index, 1);
+        setSendings(_sendings);
+      }
+      const senderInfo = userDict[message.sender];
+      const _messages = messages.slice();
+      const msgIndex = _messages.findIndex((msg) => msg._id === message._id);
+      if (msgIndex === -1) {
+        console.log(uuid, message);
+        _messages.push({
+          ...message,
+          sender: senderInfo && {
+            _id: senderInfo.id_,
+            firstName: senderInfo.firstName,
+            lastName: senderInfo.lastName,
+            avartar: senderInfo.avartar,
+          },
+        });
+        console.log("New messages", _messages);
+        setMessages(_messages);
+      }
     };
 
     const onConversationMessageError = (uuid: string) => {
@@ -94,12 +127,7 @@ export default function ConversationViewerContextProvider({
       onConversationMessageError
     );
 
-    // join room
-    socket.emit(ConversationViewerEmitKey.CONVERSATION_JOIN, conversationId);
-
     return () => {
-      socket.emit(ConversationViewerEmitKey.CONVERSATION_LEAVE, conversationId);
-
       socket.removeListener(
         ConversationViewerOnKey.CONVERSATION_NEW_MESSAGE(conversationId),
         onConversationNewMessage
@@ -115,8 +143,14 @@ export default function ConversationViewerContextProvider({
         onConversationMessageError
       );
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketContext.socket]);
+  }, [
+    conversationId,
+    errors,
+    messages,
+    sendings,
+    socketContext.socket,
+    userResolver,
+  ]);
 
   const loadMessages = (from: number, to: number) => {
     console.log(from, to);
@@ -124,19 +158,40 @@ export default function ConversationViewerContextProvider({
 
   const sendMessage = (message: IConversationMessage) => {
     const socket = socketContext.socket;
-    if (socket) {
+    if (socket && account) {
+      const uuid = toMessageUuid(conversationId);
+      setSendings([
+        ...sendings,
+        {
+          ...message,
+          _id: uuid,
+          createdAt: new Date(),
+          udpatedAt: new Date(),
+          sender: account.id_,
+        },
+      ]);
       socket.emit(
         ConversationViewerEmitKey.CONVERSATION_SEND_MESSAGE,
         conversationId,
-        toMessageUuid(conversationId),
+        uuid,
         message
       );
     }
   };
 
+  useEffect(() => {
+    // join room
+    const socket = socketContext.socket;
+    if (socket == null) return;
+    socket.emit(ConversationViewerEmitKey.CONVERSATION_JOIN, conversationId);
+    return () => {
+      socket.emit(ConversationViewerEmitKey.CONVERSATION_LEAVE, conversationId);
+    };
+  }, [conversationId, socketContext.socket]);
+
   return (
     <ConversationViewerContext.Provider
-      value={{ messages, loadMessages, sendMessage }}
+      value={{ messages, loadMessages, sendMessage, conversation }}
     >
       {children}
     </ConversationViewerContext.Provider>

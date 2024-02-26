@@ -42,6 +42,11 @@ interface IConversationContext {
    */
   doOpenConversation: (conversation: string) => void;
 
+  doLoadConversation: (
+    conversation: string,
+    fn?: (conversation: IConversationCooked | undefined) => void
+  ) => void;
+
   doLoadConversations?: () => void;
 }
 
@@ -50,12 +55,19 @@ export const ConversationContext = createContext<IConversationContext>({
   doPushMessage: () => {},
   doBeginConversationWith: () => {},
   doOpenConversation: () => {},
+  doLoadConversation: () => {},
 });
 
 const ConversationOnKey = {
   CONVERSATION_META: "conversation-meta",
   CONVERSATION_NEW_MESSAGE: "conversation-new-message",
 } as const;
+
+const newDefaultParticipant = () => ({
+  _id: "0",
+  firstName: "Người",
+  lastName: "Dùng",
+});
 
 export default function ConversationContextProvider({
   children,
@@ -67,6 +79,61 @@ export default function ConversationContextProvider({
   const auth = authContext.auth;
   const toastContext = useToastContext();
   const navigate = useNavigate();
+  const dirtyRef = useRef<boolean>(true);
+
+  const refreshRefMeta = () => {
+    const meta = JSON.parse(JSON.stringify(conversationsRef.current));
+    conversationsRef.current = { ...meta };
+  };
+
+  useEffect(() => {
+    if (!dirtyRef.current) return;
+    if (auth != null) {
+      dirtyRef.current = false;
+      messageFetcher
+        .getConversations({ skip: 0, limit: 24 }, auth)
+        .then((res) => {
+          const conversations = res.data;
+          if (conversations && conversations.length > 0) {
+            const participants: string[] = [];
+            conversations.forEach((conversation) => {
+              conversation.participants.forEach((participant) => {
+                if (!participants.includes(participant)) {
+                  participants.push(participant);
+                }
+              });
+            });
+            const currentConversations = conversationsRef.current;
+            userResolver.getAll(participants, () => {
+              const userDict = userResolver.getDict();
+              conversations.forEach((conversation) => {
+                if (currentConversations[conversation._id] != null) return;
+
+                const users = conversation.participants;
+
+                currentConversations[conversation._id] = {
+                  ...conversation,
+                  participants: users.map((user) => {
+                    const cacheUser = userDict[user];
+                    if (cacheUser) {
+                      return {
+                        _id: cacheUser.id_,
+                        firstName: cacheUser.firstName,
+                        lastName: cacheUser.lastName,
+                        avartar: cacheUser.avartar,
+                      };
+                    } else {
+                      return newDefaultParticipant();
+                    }
+                  }),
+                };
+              });
+              refreshRefMeta();
+            });
+          }
+        });
+    }
+  }, [auth, userResolver]);
 
   useEffect(() => {
     const socket = socketContext.socket;
@@ -87,6 +154,7 @@ export default function ConversationContextProvider({
               avartar: user.avartar,
             })),
           };
+          refreshRefMeta();
         });
       }
     };
@@ -163,10 +231,15 @@ export default function ConversationContextProvider({
                   avartar: user.avartar,
                 })),
               };
-              navigate("/conversation/" + conversation._id);
+              refreshRefMeta();
+              // navigate("/conversation/" + conversation._id);
+              console.log("current", conversationsRef.current);
+              navigate("/conversation");
             });
           } else {
-            navigate("/conversation/" + conversation._id);
+            // navigate("/conversation/" + conversation._id);
+            console.log("current", conversationsRef.current);
+            navigate("/conversation");
           }
         }
       })
@@ -181,6 +254,48 @@ export default function ConversationContextProvider({
     // if not a conversation found in conversations, do nothing
   };
 
+  const doLoadConversation = (
+    conversation: string,
+    fn?: (conversation: IConversationCooked | undefined) => void
+  ) => {
+    if (auth == null) {
+      fn && fn(undefined);
+      return;
+    }
+    const currentConversations = conversationsRef.current;
+    const loadedConversation = currentConversations[conversation];
+    if (loadedConversation != null) {
+      fn && fn(loadedConversation);
+    } else {
+      messageFetcher.getConversation(conversation, auth).then((res) => {
+        const resConversation = res.data;
+        if (resConversation) {
+          const users = resConversation.participants;
+          userResolver.getAll(resConversation.participants, () => {
+            const userDict = userResolver.getDict();
+            currentConversations[conversation] = {
+              ...resConversation,
+              participants: users.map((userId) => {
+                const user = userDict[userId];
+                if (user) {
+                  return {
+                    _id: user.id_,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    avartar: user.avartar,
+                  };
+                } else return newDefaultParticipant();
+              }),
+            };
+            refreshRefMeta();
+          });
+        } else {
+          fn && fn(undefined);
+        }
+      });
+    }
+  };
+
   return (
     <ConversationContext.Provider
       value={{
@@ -188,6 +303,7 @@ export default function ConversationContextProvider({
         doPushMessage,
         doBeginConversationWith,
         doOpenConversation,
+        doLoadConversation,
       }}
     >
       {children}

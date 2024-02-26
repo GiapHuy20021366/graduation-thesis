@@ -52,7 +52,7 @@ export const joinConversation = (
       roomIdToConversationMeta[conversationId] = data;
 
       client.join(conversationRoom);
-      if (conversationRoom == null) {
+      if (conversationRooms == null) {
         socketIdToConversationRooms[client.id] = [conversationRoom];
       } else {
         socketIdToConversationRooms[client.id].push(conversationRoom);

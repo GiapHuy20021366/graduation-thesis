@@ -6,6 +6,9 @@ import { useAppCacheContext } from "./useAppCacheContext";
 interface IUserResolverState {
   get: (userId: string, fn?: (user: IUserInfo) => void) => void;
   getAll: (userIds: string[], fn?: (users: IUserInfo[]) => void) => void;
+  getAsynch: (userId: string) => IUserInfo | undefined;
+  getAllAsynch: (userIds: string[]) => IUserInfo[];
+  getDict: () => Record<string, IUserInfo>;
 }
 
 const USER_CACHE = "USERS";
@@ -82,5 +85,25 @@ export const useUserResolver = (): IUserResolverState => {
       }
     }
   };
-  return { get, getAll };
+
+  const getAsynch = (userId: string): IUserInfo | undefined => {
+    const usersDict = getOrCreate<Record<string, IUserInfo>>(USER_CACHE, {});
+    return usersDict[userId];
+  };
+
+  const getAllAsynch = (userIds: string[]): IUserInfo[] => {
+    const usersDict = getOrCreate<Record<string, IUserInfo>>(USER_CACHE, {});
+    const result: IUserInfo[] = [];
+    userIds.forEach((userId) => {
+      const user = usersDict[userId];
+      if (user != null) result.push(user);
+    });
+    return result;
+  };
+
+  const getDict = (): Record<string, IUserInfo> => {
+    return getOrCreate<Record<string, IUserInfo>>(USER_CACHE, {});
+  };
+
+  return { get, getAll, getAllAsynch, getAsynch, getDict };
 };

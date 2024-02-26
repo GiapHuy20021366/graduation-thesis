@@ -26,3 +26,4 @@ export { useSocketContext } from "./useSocketContext";
 export { useAppCacheContext } from "./useAppCacheContext";
 export { useConversationContext } from "./useConversationContext";
 export { useUserResolver } from "./useUserResolver";
+export { useConversationViewerContext } from "./useConversationViewerContext";
