@@ -19,13 +19,14 @@ import {
 } from "../data";
 
 export const userEndpoints = {
-  signin: "/login",
-  signup: "/register",
-  refeshToken: "/token/refresh",
-  activeManual: "/active",
-  userNear: "/users/near",
-  getInfo: "/info", // :id,
-  setLocation: "/location",
+  // users
+  signin: "/users/login",
+  signup: "/users/register",
+  refeshToken: "/users/token/refresh",
+  activeManual: "/users/active",
+  findUsersAround: "/users/around",
+  getUserInfo: "/users/:id",
+  setUserLocation: "/users/:id/location",
 
   // places
   createPlace: "/places",
@@ -125,6 +126,7 @@ export interface UserFetcher {
   ): Promise<UserResponse<IUserInfo[]>>;
   getUserInfo(id: string, auth: IAuthInfo): Promise<UserResponse<IUserInfo>>;
   setLocation(
+    userId: string,
     location: ILocation,
     auth: IAuthInfo
   ): Promise<UserResponse<void>>;
@@ -254,21 +256,26 @@ export const userFetcher: UserFetcher = {
     id: string,
     auth: IAuthInfo
   ): Promise<UserResponse<IUserInfo>> => {
-    return userInstance.get(`${userEndpoints.getInfo}/${id}`, {
+    return userInstance.get(userEndpoints.getUserInfo.replace(":id", id), {
       headers: {
         Authorization: auth.token,
       },
     });
   },
   setLocation: (
+    userId: string,
     location: ILocation,
     auth: IAuthInfo
   ): Promise<UserResponse<void>> => {
-    return userInstance.put(userEndpoints.setLocation, location, {
-      headers: {
-        Authorization: auth.token,
-      },
-    });
+    return userInstance.put(
+      userEndpoints.setUserLocation.replace(":id", userId),
+      location,
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
   },
 
   // place

@@ -1,6 +1,8 @@
 import { ICoordinates } from "./coordinates";
 import { ILocation } from "./location";
 import { IPagination } from "./pagination";
+import { PlaceType } from "./place-type";
+import { FollowType } from "./user-place-follower";
 
 export const isObjectId = (value: any): value is string => {
   return typeof value === "string" && value.length === 24;
@@ -62,4 +64,20 @@ export const isNotEmptyStringArray = (value: any): value is unknown[] => {
 export const isPagination = (value: any): value is IPagination => {
   if (typeof value !== "object") return false;
   return isNumber(value.skip) && isNumber(value.limit);
+};
+
+export const isPlaceType = (value: any): value is PlaceType => {
+  return Object.values(PlaceType).includes(value);
+};
+
+export const isArrayPlaceTypes = (value: any): value is PlaceType[] => {
+  return Array.isArray(value) && value.every((v) => isPlaceType(v));
+};
+
+export const isFollowType = (value: any): value is FollowType => {
+  return Object.values(FollowType).includes(value);
+};
+
+export const isArrayFollowTypes = (value: any): value is FollowType[] => {
+  return Array.isArray(value) && value.every((v) => isFollowType(v));
 };

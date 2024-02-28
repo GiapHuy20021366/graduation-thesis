@@ -25,7 +25,7 @@ export {
   searchPlaces,
   getPlaceInfo,
   getPlacesByUser,
-  getPlacesByUserAndFollowTypes,
+  getPlacesByUserFollow,
   getPlacesNear,
   getPlacesRankByFavorite,
   getPlacesRatedByUser,

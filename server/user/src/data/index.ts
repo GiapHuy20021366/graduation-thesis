@@ -51,6 +51,10 @@ export {
   isObjectId,
   isString,
   isPagination,
+  isArrayFollowTypes,
+  isArrayPlaceTypes,
+  isFollowType,
+  isPlaceType,
 } from "./data-validate";
 export { IPagination } from "./pagination";
 export { ILocation } from "./location";

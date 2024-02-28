@@ -120,7 +120,7 @@ export default function LocationPage() {
     };
 
     userFetcher
-      .setLocation(newLocation, auth)
+      .setLocation(authContext.account!.id_, newLocation, auth)
       .then(() => {
         setHome(newLocation);
         authContext.updateLocation(newLocation);
@@ -218,8 +218,7 @@ export default function LocationPage() {
                 position={home.coordinates}
               >
                 <InfoWindowF position={home.coordinates}>
-                  <Box sx={{ width: 200 }}>
-                  </Box>
+                  <Box sx={{ width: 200 }}></Box>
                 </InfoWindowF>
               </MarkerF>
             )}

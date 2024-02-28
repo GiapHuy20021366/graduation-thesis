@@ -19,34 +19,69 @@ import {
   followPlace,
   searchPlaces,
   getPlaceInfo,
+  getPlacesByUserFollow,
 } from "../controllers";
 
-const userRouter = express.Router();
+const initUserRouter = (app: Express) => {
+  const userRouter = express.Router();
 
-export const initUserRouters = (app: Express): void => {
+  // Register an user account
   userRouter.post("/register", checkRegistBodyAndParams, registAccount);
 
+  // Login an user
   userRouter.post("/login", checkLoginBodyAndParams, loginAccount);
 
+  // Active user account
   userRouter.get("/active", activeManualAccount);
 
+  // Refresh token session
   userRouter.get("/token/refresh", tokenParser, refreshToken);
 
-  userRouter.put("/location", tokenParser, setUserLocation);
+  // Set user location
+  userRouter.put("/:id/location", tokenParser, setUserLocation);
 
-  userRouter.post("/search/location", tokenParser, searchUsersAround);
+  // Get information of an user
+  userRouter.get("/:id", tokenParser, getBasicUserInfo);
 
-  userRouter.get("/info/:id", tokenParser, getBasicUserInfo);
-
-  userRouter.post("/places", tokenParser, createNewPlace);
-  userRouter.put("/places/:id", tokenParser, updatePlace);
-  userRouter.get("/places/:id/active", tokenParser, activePlace);
-  userRouter.get("/places/:id/follow", tokenParser, followPlace);
-  userRouter.post("/places/search", tokenParser, searchPlaces);
-  userRouter.get("/places/:id/rating", tokenParser, searchPlaces);
-  userRouter.get("/places/:id", tokenParser, getPlaceInfo);
-  userRouter.get("/places/:userId/", tokenParser, getPlaceInfo);
+  // Find users around a position
+  userRouter.post("/around", tokenParser, searchUsersAround);
 
   userRouter.use(errorHandler);
-  app.use("/", userRouter);
+  app.use("/users", userRouter);
+};
+
+const initPlaceRouter = (app: Express) => {
+  const placeRouter = express.Router();
+
+  // Create a new place
+  placeRouter.post("/register", tokenParser, createNewPlace);
+
+  // Update information of a place
+  placeRouter.put("/:id", tokenParser, updatePlace);
+
+  // Active a place
+  placeRouter.get("/:id/active", tokenParser, activePlace);
+
+  // Follow a place
+  placeRouter.get("/:id/follow", tokenParser, followPlace);
+
+  // Search places by information
+  placeRouter.post("/search", tokenParser, searchPlaces);
+
+  // Rating a place
+  placeRouter.get("/:id/rating", tokenParser, searchPlaces);
+
+  // Get information of a place
+  placeRouter.get("/:id", tokenParser, getPlaceInfo);
+
+  // Get places by follow util
+  placeRouter.post("/follow/search", tokenParser, getPlacesByUserFollow);
+
+  placeRouter.use(errorHandler);
+  app.use("/places", placeRouter);
+};
+
+export const initRouters = (app: Express): void => {
+  initUserRouter(app);
+  initPlaceRouter(app);
 };

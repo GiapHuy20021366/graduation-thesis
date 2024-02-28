@@ -1,7 +1,7 @@
 import express, { Express } from "express";
 import { PORT } from "./src/config";
 import { connectDB } from "./src/db";
-import { initUserRouters } from "./src/route";
+import { initRouters } from "./src/route";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { consoleLogger } from "./src/config";
@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 
 // init endpoints
-initUserRouters(app);
+initRouters(app);
 
 app.listen(PORT, () => {
   consoleLogger.info(`User sevice is Listening to Port ${PORT}`)

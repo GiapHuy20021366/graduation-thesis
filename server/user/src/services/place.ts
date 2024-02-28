@@ -500,25 +500,35 @@ export const getPlacesByUser = async (
   user: string,
   pagination?: IPagination
 ) => {
-  return getPlacesByUserAndFollowTypes(
+  return getPlacesByUserFollow(
     user,
     [FollowType.ADMIN, FollowType.SUB_ADMIN],
+    undefined,
     pagination
   );
 };
 
-export const getPlacesByUserAndFollowTypes = async (
+export const getPlacesByUserFollow = async (
   user: string,
-  types: FollowType[],
+  followTypes?: FollowType[],
+  placeTypes?: PlaceType[],
   pagination?: IPagination
 ): Promise<IPlaceInfo[]> => {
-  const followers = await Follower.find({
+  const options: any = {
     subcriber: user,
     role: FollowRole.PLACE,
-    type: {
-      $in: types,
-    },
-  })
+  };
+  if (placeTypes != null) {
+    options["place.type"] = {
+      $in: placeTypes,
+    };
+  }
+  if (followTypes != null) {
+    options["type"] = {
+      $in: followTypes,
+    };
+  }
+  const followers = await Follower.find(options)
     .populate<{ place: IPlaceExposed; subcriber: string }>("place")
     .sort({
       createdAt: OrderState.DECREASE,

@@ -9,6 +9,7 @@ import {
   searchPlaces as searchPlacesService,
   ratingPlace as ratingPlaceService,
   getPlaceInfo as getPlaceInfoService,
+  getPlacesByUserFollow as getPlacesByUserFollowService,
 } from "../services";
 import {
   AuthLike,
@@ -16,10 +17,14 @@ import {
   IPagination,
   IPlaceSearchParams,
   InvalidDataError,
+  PlaceType,
   isAllNotEmptyString,
+  isArrayFollowTypes,
+  isArrayPlaceTypes,
   isLocation,
   isNotEmptyString,
   isObjectId,
+  isPagination,
   isString,
   throwErrorIfInvalidFormat,
   toPlace,
@@ -261,12 +266,46 @@ interface IGetPlacesParams {
   followTypes?: FollowType[];
   pagination?: IPagination;
   user?: string;
+  placeTypes?: PlaceType[];
 }
 
-export const getPlacesByUserAndFollowTypes = async (
+export const getPlacesByUserFollow = async (
   req: Request<{}, {}, IGetPlacesParams, {}>,
   res: Response,
   next: NextFunction
 ) => {
+  const { followTypes, pagination, placeTypes, user } = req.body;
 
+  if (!isObjectId(user)) {
+    return next(
+      new InvalidDataError({
+        message: "Invalid user id",
+        data: {
+          target: "id",
+          reason: "invalid",
+        },
+      })
+    );
+  }
+
+  const params = {
+    followTypes: isArrayFollowTypes(followTypes) ? followTypes : undefined,
+    user: user,
+    placeTypes: isArrayPlaceTypes(placeTypes) ? placeTypes : undefined,
+    pagination: isPagination(pagination)
+      ? pagination
+      : {
+          skip: 0,
+          limit: 24,
+        },
+  };
+
+  getPlacesByUserFollowService(
+    params.user,
+    params.followTypes,
+    params.placeTypes,
+    params.pagination
+  )
+    .then((data) => res.status(200).json(toResponseSuccessData(data)))
+    .catch(next);
 };
