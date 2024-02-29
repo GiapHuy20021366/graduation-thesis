@@ -570,7 +570,7 @@ export const getPlacesByUserFollow = async (
     });
 };
 
-export const getPlacesNear = async (
+export const getPlacesAround = async (
   coordinates: ICoordinates,
   maxDistance?: number,
   types?: PlaceType[],

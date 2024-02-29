@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Box, SpeedDial, Stack, StackProps } from "@mui/material";
+import { Box, Button, SpeedDial, Stack, StackProps, Typography } from "@mui/material";
 import { AddOutlined } from "@mui/icons-material";
 import { useNavigate } from "react-router";
 import {
@@ -9,17 +9,14 @@ import {
   usePageProgessContext,
 } from "../../../hooks";
 import {
-  FollowRole,
   IPagination,
-  IPlaceExposed,
   IPlaceExposedCooked,
-  PlaceType,
   loadFromSessionStorage,
   saveToSessionStorage,
   toPlaceExposedCooked,
 } from "../../../data";
-import PlaceSearchItemHolder from "../search/PlaceSearchItemHolder";
 import SubcribedItem from "./SubcribedPlaceItem";
+import { userFetcher } from "../../../api";
 
 interface ISubcribedPlaceSnapshotData {
   data: IPlaceExposedCooked[];
@@ -48,6 +45,7 @@ const SubcribedPlace = React.forwardRef<HTMLDivElement, SubcribedPlaceProps>(
 
     const [isFetching, setIsFetching] = useState<boolean>(false);
     const [isEnd, setIsEnd] = useState<boolean>(false);
+    const [isError, setIsError] = useState<boolean>(false);
 
     // Recover at begining or fetch at begining
     const dirtyRef = useRef<boolean>(false);
@@ -74,70 +72,52 @@ const SubcribedPlace = React.forwardRef<HTMLDivElement, SubcribedPlaceProps>(
         skip: data.length,
         limit: 24,
       };
-      setIsFetching(true);
-      progessContext.start();
-      setTimeout(() => {
-        const newData: IPlaceExposed[] = [];
-        for (let i = 0; i < 24; ++i) {
-          newData.push(
-            toPlaceExposedCooked(
-              {
-                _id: "65c23fe0e1108a5e08d91acb",
-                active: true,
-                author: {
-                  _id: "0",
-                  email: "0",
-                  firstName: "H",
-                  lastName: "G",
-                },
-                categories: [],
-                createdAt: new Date(),
-                exposeName: "HUY",
-                images: [],
-                location: {
-                  name: "0",
-                  coordinates: {
-                    lat: 100,
-                    lng: 16,
-                  },
-                },
-                rating: {
-                  count: 0,
-                  mean: 0,
-                },
-                type: PlaceType.PERSONAL,
-                updatedAt: new Date(),
-                userFollow: {
-                  time: Date.now() - Math.floor(Math.random() * 10000000),
-                  place: "abc",
-                  role: FollowRole.PLACE,
-                  type: Math.pow(2, Math.floor(Math.random() * 3.9)),
-                  subcriber: "0",
-                },
-              },
-              {
-                currentCoordinates: distances.currentLocation?.coordinates,
-                homeCoordinates: account?.location?.coordinates,
-              }
-            )
-          );
-        }
-        if (newData.length < pagination.limit) {
-          setIsEnd(true);
-        }
-        setData(newData);
 
-        setIsFetching(false);
-        progessContext.end();
-      }, 1000);
+      progessContext.start();
+      setIsFetching(true);
+      setIsError(false);
+      setIsEnd(false);
+
+      userFetcher
+        .getPlacesByFollow(
+          authContext.account!.id_,
+          { pagination: pagination },
+          auth
+        )
+        .then((res) => {
+          const places = res.data;
+          if (places != null) {
+            if (places.length < pagination.limit) {
+              setIsEnd(true);
+            }
+            const _newPlaces = data.slice();
+            places.forEach((place) => {
+              _newPlaces.push(
+                toPlaceExposedCooked(place, {
+                  currentCoordinates: distances.currentLocation?.coordinates,
+                  homeCoordinates: account?.location?.coordinates,
+                })
+              );
+            });
+            setData(_newPlaces);
+          }
+        })
+        .catch(() => {
+          setIsError(true);
+        })
+        .finally(() => {
+          progessContext.end();
+          setIsFetching(false);
+        });
     }, [
-      account?.location,
       auth,
-      data.length,
-      distances.currentLocation,
       isFetching,
-      progessContext,
       active,
+      data,
+      progessContext,
+      authContext.account,
+      distances.currentLocation,
+      account?.location,
     ]);
 
     useEffect(() => {
@@ -175,7 +155,11 @@ const SubcribedPlace = React.forwardRef<HTMLDivElement, SubcribedPlaceProps>(
           account: account.id_,
         });
         if (snapshot) {
-          setData(snapshot.data);
+          const snapshotData = snapshot.data;
+          if (snapshotData.length < 24) {
+            setIsEnd(true);
+          }
+          setData(snapshotData);
           const mainRef = appContentContext.mainRef?.current;
           if (mainRef) {
             setTimeout(() => {
@@ -215,10 +199,16 @@ const SubcribedPlace = React.forwardRef<HTMLDivElement, SubcribedPlaceProps>(
           ariaLabel={"Create"}
           onClick={() => navigate("/place/update")}
         />
-        {isFetching && <PlaceSearchItemHolder />}
-        {isEnd && (
+        {isEnd && !isError && (
           <Box textAlign={"center"} mt={2}>
-            Đã hết
+            <Typography>Bạn đã tìm kiếm hết</Typography>
+            <Button onClick={() => doSearch()}>Tìm kiếm thêm</Button>
+          </Box>
+        )}
+        {isError && (
+          <Box textAlign={"center"} mt={2}>
+            <Typography>Có lỗi xảy ra</Typography>
+            <Button onClick={() => doSearch()}>Thử lại</Button>
           </Box>
         )}
       </Stack>

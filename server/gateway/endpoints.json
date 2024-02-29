@@ -6,9 +6,9 @@
         "domain": "",
         "token": {
             "exclude": [
-                "/register",
-                "/login",
-                "/active"
+                "/users/register",
+                "/users/login",
+                "/users/active"
             ]
         }
     },

@@ -29,13 +29,16 @@ export const userEndpoints = {
   setUserLocation: "/users/:id/location",
 
   // places
-  createPlace: "/places",
+  createPlace: "/",
   updatePlace: "/places/:id",
   activePlace: "/places/:id/active",
   followPlace: "/places/:id/follow",
+  searchPlace: "/places/search",
   ratingPlace: "/places/:id/rating",
   getPlace: "/places/:id",
-  searchPlace: "/places/search",
+  getPlaceByFollow: "/places/follow/users/:userId",
+  getRankPlaceByFavorite: "/places/rank/favorite",
+  getRatedPlaces: "/places/rating/users/:userId",
 } as const;
 
 export interface UserResponseError
@@ -108,6 +111,12 @@ export interface IPlaceSearchParams {
   types?: PlaceType[];
 }
 
+export interface IGetPlacesByFollowParams {
+  followTypes?: FollowType[];
+  pagination?: IPagination;
+  placeTypes?: PlaceType[];
+}
+
 export interface UserFetcher {
   manualLogin(
     email: string,
@@ -166,6 +175,20 @@ export interface UserFetcher {
   ): Promise<UserResponse<IRating>>;
   searchPlace(
     searchParams: IPlaceSearchParams,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IPlaceExposed[]>>;
+  getPlacesByFollow(
+    user: string,
+    params: IGetPlacesByFollowParams,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IPlaceExposed[]>>;
+  getRankPlaceByFavorite(
+    pagination: IPagination,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IPlaceExposed[]>>;
+  getRatedPlace(
+    user: string,
+    pagination: IPagination,
     auth: IAuthInfo
   ): Promise<UserResponse<IPlaceExposed[]>>;
 }
@@ -383,6 +406,58 @@ export const userFetcher: UserFetcher = {
         Authorization: auth.token,
       },
     });
+  },
+  getPlacesByFollow: (
+    user: string,
+    params: IGetPlacesByFollowParams,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IPlaceExposed[]>> => {
+    return userInstance.post(
+      userEndpoints.getPlaceByFollow.replace(":userId", user),
+      params,
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
+  },
+  getRankPlaceByFavorite: (
+    pagination: IPagination,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IPlaceExposed[]>> => {
+    const params = new URLSearchParams();
+    params.set("skip", String(pagination.skip));
+    params.set("limit", String(pagination.limit));
+
+    return userInstance.get(
+      userEndpoints.getRankPlaceByFavorite + "?" + params.toString(),
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
+  },
+  getRatedPlace: (
+    user: string,
+    pagination: IPagination,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IPlaceExposed[]>> => {
+    const params = new URLSearchParams();
+    params.set("skip", String(pagination.skip));
+    params.set("limit", String(pagination.limit));
+
+    return userInstance.get(
+      userEndpoints.getRatedPlaces.replace(":userId", user) +
+        "?" +
+        params.toString(),
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
   },
 };
 

@@ -21,4 +21,7 @@ export {
   ratingPlace,
   searchPlaces,
   updatePlace,
+  getPlacesByUserFollow,
+  getRankFavoritePlaces,
+  getRatedPlaces,
 } from "./place";

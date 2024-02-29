@@ -1,5 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Box, SpeedDial, Stack, StackProps } from "@mui/material";
+import {
+  Box,
+  Button,
+  SpeedDial,
+  Stack,
+  StackProps,
+  Typography,
+} from "@mui/material";
 import { AddOutlined } from "@mui/icons-material";
 import { useNavigate } from "react-router";
 import {
@@ -10,15 +17,14 @@ import {
 } from "../../../hooks";
 import {
   IPagination,
-  IPlaceExposed,
   IPlaceExposedCooked,
-  PlaceType,
   loadFromSessionStorage,
   saveToSessionStorage,
   toPlaceExposedCooked,
 } from "../../../data";
 import PlaceSearchItemHolder from "../search/PlaceSearchItemHolder";
 import RatedPlaceItem from "./RatedPlaceItem";
+import { userFetcher } from "../../../api";
 
 interface IRatedPlaceSnapshotData {
   data: IPlaceExposedCooked[];
@@ -47,6 +53,7 @@ const RatedPlace = React.forwardRef<HTMLDivElement, RatedPlaceProps>(
 
     const [isFetching, setIsFetching] = useState<boolean>(false);
     const [isEnd, setIsEnd] = useState<boolean>(false);
+    const [isError, setIsError] = useState<boolean>(false);
 
     // Recover at begining or fetch at begining
     const dirtyRef = useRef<boolean>(false);
@@ -73,69 +80,48 @@ const RatedPlace = React.forwardRef<HTMLDivElement, RatedPlaceProps>(
         skip: data.length,
         limit: 24,
       };
-      setIsFetching(true);
-      progessContext.start();
-      setTimeout(() => {
-        const newData: IPlaceExposed[] = [];
-        for (let i = 0; i < 24; ++i) {
-          newData.push(
-            toPlaceExposedCooked(
-              {
-                _id: "65c23fe0e1108a5e08d91acb",
-                active: true,
-                author: {
-                  _id: "0",
-                  email: "0",
-                  firstName: "H",
-                  lastName: "G",
-                },
-                categories: [],
-                createdAt: new Date(),
-                exposeName: "HUY",
-                images: [],
-                location: {
-                  name: "0",
-                  coordinates: {
-                    lat: 100,
-                    lng: 16,
-                  },
-                },
-                rating: {
-                  count: 0,
-                  mean: 0,
-                },
-                userRating: {
-                  place: "0",
-                  score: 4,
-                  time: Date.now() - Math.floor(Math.random() * 10000000),
-                  user: "0",
-                },
-                type: PlaceType.PERSONAL,
-                updatedAt: new Date(),
-              },
-              {
-                currentCoordinates: distances.currentLocation?.coordinates,
-                homeCoordinates: account?.location?.coordinates,
-              }
-            )
-          );
-        }
-        if (newData.length < pagination.limit) {
-          setIsEnd(true);
-        }
-        setData(newData);
 
-        setIsFetching(false);
-        progessContext.end();
-      }, 1000);
+      progessContext.start();
+      setIsFetching(true);
+      setIsError(false);
+      setIsEnd(false);
+
+      userFetcher
+        .getRatedPlace(authContext.account!.id_, pagination, auth)
+        .then((res) => {
+          const places = res.data;
+          if (places != null) {
+            if (places.length < pagination.limit) {
+              setIsEnd(true);
+            }
+            const _newPlaces = data.slice();
+            places.forEach((place) => {
+              _newPlaces.push(
+                toPlaceExposedCooked(place, {
+                  currentCoordinates: distances.currentLocation?.coordinates,
+                  homeCoordinates: account?.location?.coordinates,
+                })
+              );
+            });
+            setData(_newPlaces);
+          }
+        })
+        .catch(() => {
+          setIsError(true);
+        })
+        .finally(() => {
+          progessContext.end();
+          setIsFetching(false);
+        });
     }, [
-      account?.location,
       auth,
-      data.length,
-      distances.currentLocation,
       isFetching,
-      progessContext,
       active,
+      data,
+      progessContext,
+      authContext.account,
+      distances.currentLocation,
+      account?.location,
     ]);
 
     useEffect(() => {
@@ -173,7 +159,11 @@ const RatedPlace = React.forwardRef<HTMLDivElement, RatedPlaceProps>(
           maxDuration: 1 * 24 * 60 * 60 * 1000,
         });
         if (snapshot) {
-          setData(snapshot.data);
+          const snapshotData = snapshot.data;
+          if (snapshotData.length < 24) {
+            setIsEnd(true);
+          }
+          setData(snapshotData);
           const mainRef = appContentContext.mainRef?.current;
           if (mainRef) {
             setTimeout(() => {
@@ -214,9 +204,16 @@ const RatedPlace = React.forwardRef<HTMLDivElement, RatedPlaceProps>(
           onClick={() => navigate("/place/update")}
         />
         {isFetching && <PlaceSearchItemHolder />}
-        {isEnd && (
+        {isEnd && !isError && (
           <Box textAlign={"center"} mt={2}>
-            Đã hết
+            <Typography>Bạn đã tìm kiếm hết</Typography>
+            <Button onClick={() => doSearch()}>Tìm kiếm thêm</Button>
+          </Box>
+        )}
+        {isError && (
+          <Box textAlign={"center"} mt={2}>
+            <Typography>Có lỗi xảy ra</Typography>
+            <Button onClick={() => doSearch()}>Thử lại</Button>
           </Box>
         )}
       </Stack>

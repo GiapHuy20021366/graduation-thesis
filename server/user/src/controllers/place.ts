@@ -10,6 +10,8 @@ import {
   ratingPlace as ratingPlaceService,
   getPlaceInfo as getPlaceInfoService,
   getPlacesByUserFollow as getPlacesByUserFollowService,
+  getPlacesRankByFavorite,
+  getPlacesRatedByUser,
 } from "../services";
 import {
   AuthLike,
@@ -265,16 +267,16 @@ export const getPlaceInfo = async (
 interface IGetPlacesParams {
   followTypes?: FollowType[];
   pagination?: IPagination;
-  user?: string;
   placeTypes?: PlaceType[];
 }
 
 export const getPlacesByUserFollow = async (
-  req: Request<{}, {}, IGetPlacesParams, {}>,
+  req: Request<{ userId?: string }, {}, IGetPlacesParams, {}>,
   res: Response,
   next: NextFunction
 ) => {
-  const { followTypes, pagination, placeTypes, user } = req.body;
+  const { followTypes, pagination, placeTypes } = req.body;
+  const user = req.params.userId;
 
   if (!isObjectId(user)) {
     return next(
@@ -306,6 +308,50 @@ export const getPlacesByUserFollow = async (
     params.placeTypes,
     params.pagination
   )
+    .then((data) => res.status(200).json(toResponseSuccessData(data)))
+    .catch(next);
+};
+
+export const getRankFavoritePlaces = async (
+  req: Request<{}, {}, {}, { skip?: string; limit?: string }>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { skip, limit } = req.query;
+  const pagination: IPagination = {
+    skip: skip && !isNaN(+skip) ? +skip : 0,
+    limit: limit && !isNaN(+limit) ? +limit : 0,
+  };
+  getPlacesRankByFavorite(pagination)
+    .then((data) => res.status(200).json(toResponseSuccessData(data)))
+    .catch(next);
+};
+
+export const getRatedPlaces = async (
+  req: Request<{ userId?: string }, {}, {}, { skip?: string; limit?: string }>,
+  res: Response,
+  next: NextFunction
+) => {
+  const userId = req.params.userId;
+  if (!isObjectId(userId)) {
+    return next(
+      new InvalidDataError({
+        message: "Invalid userId",
+        data: {
+          target: "id",
+          reason: "invalid",
+        },
+      })
+    );
+  }
+
+  const { skip, limit } = req.query;
+  const pagination: IPagination = {
+    skip: skip && !isNaN(+skip) ? +skip : 0,
+    limit: limit && !isNaN(+limit) ? +limit : 0,
+  };
+
+  getPlacesRatedByUser(userId, pagination)
     .then((data) => res.status(200).json(toResponseSuccessData(data)))
     .catch(next);
 };

@@ -1,4 +1,4 @@
-import { Box, SpeedDial, Stack, Tab, Tabs } from "@mui/material";
+import { SpeedDial, Stack, Tab, Tabs } from "@mui/material";
 import { ITabOption, useI18nContext, useTabNavigate } from "../../../hooks";
 import {
   FavoriteOutlined,
@@ -80,7 +80,12 @@ export default function PlaceList() {
   };
 
   return (
-    <Box width={"100%"} boxSizing={"border-box"} boxShadow={1}>
+    <Stack
+      width={"100%"}
+      boxSizing={"border-box"}
+      boxShadow={1}
+      height={"100%"}
+    >
       <Stack
         width="100%"
         direction={"row"}
@@ -134,7 +139,12 @@ export default function PlaceList() {
       </Stack>
 
       {/* Tab contents */}
-      <MyPlace active={tab === PlacePageTab.MY_PLACE} />
+      <MyPlace
+        active={tab === PlacePageTab.MY_PLACE}
+        sx={{
+          minHeight: "100%",
+        }}
+      />
       <NearPlace active={tab === PlacePageTab.NEAR_HERE} />
       <FavoritePlace active={tab === PlacePageTab.FAVORITE} />
       <SubcribedPlace active={tab === PlacePageTab.SUBCRIBED} />
@@ -146,6 +156,6 @@ export default function PlaceList() {
         sx={{ position: "absolute", bottom: 76, right: 26 }}
         onClick={() => navigate("/place/search")}
       />
-    </Box>
+    </Stack>
   );
 }

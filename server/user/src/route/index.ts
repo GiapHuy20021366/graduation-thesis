@@ -20,6 +20,9 @@ import {
   searchPlaces,
   getPlaceInfo,
   getPlacesByUserFollow,
+  getRankFavoritePlaces,
+  getRatedPlaces,
+  ratingPlace,
 } from "../controllers";
 
 const initUserRouter = (app: Express) => {
@@ -54,7 +57,7 @@ const initPlaceRouter = (app: Express) => {
   const placeRouter = express.Router();
 
   // Create a new place
-  placeRouter.post("/register", tokenParser, createNewPlace);
+  placeRouter.post("/", tokenParser, createNewPlace);
 
   // Update information of a place
   placeRouter.put("/:id", tokenParser, updatePlace);
@@ -69,13 +72,19 @@ const initPlaceRouter = (app: Express) => {
   placeRouter.post("/search", tokenParser, searchPlaces);
 
   // Rating a place
-  placeRouter.get("/:id/rating", tokenParser, searchPlaces);
+  placeRouter.get("/:id/rating", tokenParser, ratingPlace);
 
   // Get information of a place
   placeRouter.get("/:id", tokenParser, getPlaceInfo);
 
   // Get places by follow util
-  placeRouter.post("/follow/search", tokenParser, getPlacesByUserFollow);
+  placeRouter.post("/follow/users/:userId", tokenParser, getPlacesByUserFollow);
+
+  // Get rank favorite place
+  placeRouter.get("/rank/favorite", tokenParser, getRankFavoritePlaces);
+
+  // Get place rated by an user
+  placeRouter.get("/rating/users/:userId", tokenParser, getRatedPlaces);
 
   placeRouter.use(errorHandler);
   app.use("/places", placeRouter);

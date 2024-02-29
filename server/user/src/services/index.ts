@@ -26,7 +26,7 @@ export {
   getPlaceInfo,
   getPlacesByUser,
   getPlacesByUserFollow,
-  getPlacesNear,
+  getPlacesAround,
   getPlacesRankByFavorite,
   getPlacesRatedByUser,
 } from "./place";
