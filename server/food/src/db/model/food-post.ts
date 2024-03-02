@@ -21,15 +21,13 @@ const foodPostSchema = new Schema<
   IFoodPostMethods
 >({
   user: {
-    _id: {
-      type: String,
-      required: true,
-      index: true,
-    },
-    exposeName: {
-      type: String,
-      required: true,
-    },
+    type: String,
+    require: true,
+    index: true,
+  },
+  place: {
+    type: String,
+    index: true,
   },
   images: {
     type: [String],

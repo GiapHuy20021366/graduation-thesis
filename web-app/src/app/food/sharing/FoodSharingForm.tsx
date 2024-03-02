@@ -17,7 +17,6 @@ import { useState } from "react";
 import {
   foodFetcher,
   FoodResponse,
-  FoodResponseError,
   IFoodUploadResponseData,
 } from "../../../api";
 import {
@@ -43,6 +42,7 @@ import FoodCategoryPicker from "./FoodCategoryPicker";
 import FoodMapPicker from "./FoodMapPicker";
 import FoodSharingNavigator from "./FoodSharingNavigator";
 import FoodPrice from "./FoodPrice";
+import FoodPlacePicker from "./FoodPlacePicker";
 
 const FormPage = {
   PAGE_FIRST: 0,
@@ -140,14 +140,8 @@ export default function FoodSharingForm() {
 
       promise
         .then((data) => navigate(`/food/${data.data?._id}`, { replace: true }))
-        .catch((error) => {
-          const data = error?.data;
-          if (data != null) {
-            const foodErr = error as FoodResponseError;
-            toast.error(foodErr.message);
-          } else {
-            toast.error("Server not response");
-          }
+        .catch(() => {
+          toast.error("Không thể chia sẻ thực phẩm vào lúc này");
         })
         .finally(() => {
           callingApi.deactive();
@@ -350,6 +344,8 @@ export default function FoodSharingForm() {
 
       {activeStep === FormPage.PAGE_SECOND && (
         <Stack spacing={2}>
+          <FoodPlacePicker />
+
           <FoodCategoryPicker
             categories={categories}
             onPicked={handleCategoryPicked}

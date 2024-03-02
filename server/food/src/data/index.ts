@@ -20,7 +20,7 @@ export { IImage } from "./image";
 export { ImageRourceType, imageResourceTypes } from "./image-source-type";
 export { IImageExposed } from "./image-exposed";
 export { ICoordinates } from "./coordinates";
-export { IFoodPost, IFoodPostLocation, IFoodPostUser } from "./food-post";
+export { IFoodPost, IFoodPostLocation } from "./food-post";
 export {
   isObjectId,
   isAllObjectId,
@@ -42,7 +42,14 @@ export {
   toNotFoundError,
 } from "./to-error";
 
-export { RpcAction } from "./rpc-action";
+export {
+  RpcAction,
+  IRpcGetDictUserPayload,
+  IRpcGetInfoPayLoad,
+  IRpcGetUserByIdPayload,
+  IRpcGetDictPlacePayload,
+  IRpcGetPlaceByIdPayload,
+} from "./rpc-action";
 export { RpcQueueName } from "./rpc-queue-name";
 export { RpcSource } from "./rpc-source";
 export {

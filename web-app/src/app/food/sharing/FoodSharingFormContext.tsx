@@ -27,6 +27,7 @@ interface IFoodSharingFormContext {
   quantity: number;
   title: string;
   description: string;
+  place?: string;
 
   setImages: Dispatch<SetStateAction<(IImageExposed | null)[]>>;
   setCategories: Dispatch<SetStateAction<FoodCategory[]>>;
@@ -38,6 +39,7 @@ interface IFoodSharingFormContext {
   setQuantity: Dispatch<SetStateAction<number>>;
   setTitle: Dispatch<SetStateAction<string>>;
   setDescription: Dispatch<SetStateAction<string>>;
+  setPlace: Dispatch<SetStateAction<string | undefined>>;
 
   editDataRef?: React.MutableRefObject<IFoodPostData | undefined>;
 }
@@ -68,6 +70,7 @@ const defaultSharingContext: IFoodSharingFormContext = {
   setQuantity: () => {},
   setTitle: () => {},
   setDescription: () => {},
+  setPlace: () => {},
 };
 
 export const FoodSharingFormContext = createContext<IFoodSharingFormContext>(
@@ -126,6 +129,7 @@ export default function FoodSharingFormContextProvider({
   const [description, setDescription] = useState<string>(
     defaultData.description
   );
+  const [place, setPlace] = useState<string | undefined>();
 
   const setLocationName = (name: string) => {
     setLocation({
@@ -182,6 +186,8 @@ export default function FoodSharingFormContextProvider({
         setCoordinates,
         description,
         setDescription,
+        place,
+        setPlace,
 
         editDataRef,
       }}

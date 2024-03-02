@@ -8,7 +8,14 @@ export { loginAccountByManual } from "./login";
 
 export { refreshToken } from "./token";
 
-export { rpcGetUserInfo } from "./rpc";
+export {
+  rpcGetUserInfo,
+  RPCGetUserInfoReturn,
+  rpcGetUserById,
+  rpcGetDictPlaceByListId,
+  rpcGetDictUserByListId,
+  rpcGetPlaceById,
+} from "./rpc";
 
 export { setUserLocation } from "./location";
 

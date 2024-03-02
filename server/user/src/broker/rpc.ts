@@ -2,8 +2,8 @@ import { ConsumeMessage } from "amqplib";
 import { v4 as uuid4 } from "uuid";
 import { USER_SERVICE_RPC_QUEUE, RPC_REQUEST_TIME_OUT } from "../config";
 import { getChannel } from "./channel";
-import { RpcAction, RpcQueueName, RpcRequest, RpcResponse } from "../data";
-import { rpcGetUserInfo } from "../services";
+import { RpcQueueName, RpcRequest } from "../data";
+import consum from "./rpc-consumer";
 
 export const RPCObserver = async () => {
   const channel = await getChannel();
@@ -17,23 +17,7 @@ export const RPCObserver = async () => {
       if (msg != null) {
         const request = JSON.parse(msg.content.toString()) as RpcRequest;
 
-        const response: RpcResponse = {};
-        switch (request.action) {
-          case RpcAction.USER_RPC_GET_INFO: {
-            const userRequest = request as RpcRequest<{ _id: string }>;
-            try {
-              response.data = await rpcGetUserInfo(userRequest.payload._id);
-            } catch (error) {
-              response.err = {
-                code: 500,
-                reason: "unknown",
-                target: "unknown"
-              }
-            }
-
-            break;
-          }
-        }
+        const response = await consum(request);
 
         channel.sendToQueue(
           msg.properties.replyTo,
@@ -99,8 +83,10 @@ const requestData = async (
   }
 };
 
-export const RPCRequest = async (RPCQueueName: RpcQueueName, requestPayload: RpcRequest) => {
+export const RPCRequest = async (
+  RPCQueueName: RpcQueueName,
+  requestPayload: RpcRequest
+) => {
   const uuid = uuid4();
   return await requestData(RPCQueueName, requestPayload, uuid);
 };
-

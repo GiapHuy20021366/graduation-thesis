@@ -3,11 +3,13 @@ import {
   IFoodPost,
   IFoodPostLocation,
   IFoodSearchParams,
+  IRpcGetInfoPayLoad,
   InternalError,
   OrderState,
   ResourceNotExistedError,
   RpcAction,
   RpcQueueName,
+  RpcRequest,
   RpcSource,
   toDistance,
 } from "../data";
@@ -32,13 +34,17 @@ interface IRpcUserInfo {
 export const postFood = async (
   data: IPostFoodData
 ): Promise<IPostFoodReturn> => {
-  const rpcUser = await RPCRequest<IRpcUserInfo>(RpcQueueName.RPC_USER, {
+  const rpcRequest: RpcRequest<IRpcGetInfoPayLoad> = {
     source: RpcSource.FOOD,
     action: RpcAction.USER_RPC_GET_INFO,
     payload: {
       _id: data.user,
     },
-  });
+  };
+  const rpcUser = await RPCRequest<IRpcUserInfo>(
+    RpcQueueName.RPC_USER,
+    rpcRequest
+  );
   if (rpcUser == null) {
     throw new InternalError({
       data: {
