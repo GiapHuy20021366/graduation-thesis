@@ -12,6 +12,7 @@ import {
   getPlacesByUserFollow as getPlacesByUserFollowService,
   getPlacesRankByFavorite,
   getPlacesRatedByUser,
+  getPlaceFollowers as getPlaceFollowersService,
 } from "../services";
 import {
   AuthLike,
@@ -21,6 +22,7 @@ import {
   InvalidDataError,
   PlaceType,
   isAllNotEmptyString,
+  isAllObjectId,
   isArrayFollowTypes,
   isArrayPlaceTypes,
   isLocation,
@@ -352,6 +354,55 @@ export const getRatedPlaces = async (
   };
 
   getPlacesRatedByUser(userId, pagination)
+    .then((data) => res.status(200).json(toResponseSuccessData(data)))
+    .catch(next);
+};
+
+interface IGetPlaceFollowersParams {
+  include?: string[]; // include users
+  exclude?: string[]; // exclude users
+  followTypes?: FollowType[];
+  pagination?: IPagination;
+}
+
+export const getPlaceFollowers = (
+  req: Request<{ id: string }, {}, IGetPlaceFollowersParams, {}>,
+  res: Response,
+  next: NextFunction
+) => {
+  const placeId = req.params.id;
+  if (!isObjectId(placeId)) {
+    return next(
+      new InvalidDataError({
+        message: "Invalid id",
+        data: {
+          reason: "invalid",
+          target: "id",
+        },
+      })
+    );
+  }
+  const body = req.body;
+  const { exclude, include, pagination, followTypes } = body;
+
+  const _pagination: IPagination = isPagination(pagination)
+    ? pagination
+    : {
+        skip: 0,
+        limit: 24,
+      };
+  const _include = isAllObjectId(include) ? include : undefined;
+  const _exclude = isAllObjectId(exclude) ? exclude : undefined;
+  const _followTypes = isArrayFollowTypes(followTypes)
+    ? followTypes
+    : undefined;
+
+  getPlaceFollowersService(placeId, {
+    exclude: _exclude,
+    followTypes: _followTypes,
+    include: _include,
+    pagination: _pagination,
+  })
     .then((data) => res.status(200).json(toResponseSuccessData(data)))
     .catch(next);
 };

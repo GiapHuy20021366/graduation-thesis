@@ -29,4 +29,6 @@ export {
   getPlacesAround,
   getPlacesRankByFavorite,
   getPlacesRatedByUser,
+  IGetPlaceFollowersParams,
+  getPlaceFollowers,
 } from "./place";

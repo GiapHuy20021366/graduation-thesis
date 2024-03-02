@@ -8,7 +8,7 @@ export const isObjectId = (value: any): value is string => {
   return typeof value === "string" && value.length === 24;
 };
 
-export const isAllObjectId = (value: any): value is string => {
+export const isAllObjectId = (value: any): value is string[] => {
   if (!Array.isArray(value)) return false;
   return value.every((v) => isObjectId(v));
 };

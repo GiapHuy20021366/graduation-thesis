@@ -16,6 +16,7 @@ import {
   IPlaceFollower,
   IRating,
   OrderState,
+  IPlaceFollowerExposed,
 } from "../data";
 
 export const userEndpoints = {
@@ -39,6 +40,7 @@ export const userEndpoints = {
   getPlaceByFollow: "/places/follow/users/:userId",
   getRankPlaceByFavorite: "/places/rank/favorite",
   getRatedPlaces: "/places/rating/users/:userId",
+  getPlaceFollowers: "/places/:id/follow/users",
 } as const;
 
 export interface UserResponseError
@@ -117,6 +119,13 @@ export interface IGetPlacesByFollowParams {
   placeTypes?: PlaceType[];
 }
 
+export interface IGetPlaceFollowersParams {
+  include?: string[]; // include users
+  exclude?: string[]; // exclude users
+  followTypes?: FollowType[];
+  pagination?: IPagination;
+}
+
 export interface UserFetcher {
   manualLogin(
     email: string,
@@ -191,6 +200,11 @@ export interface UserFetcher {
     pagination: IPagination,
     auth: IAuthInfo
   ): Promise<UserResponse<IPlaceExposed[]>>;
+  getPlaceFollowers(
+    place: string,
+    params: IGetPlaceFollowersParams,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IPlaceFollowerExposed[]>>;
 }
 
 export const userFetcher: UserFetcher = {
@@ -452,6 +466,21 @@ export const userFetcher: UserFetcher = {
       userEndpoints.getRatedPlaces.replace(":userId", user) +
         "?" +
         params.toString(),
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
+  },
+  getPlaceFollowers: (
+    place: string,
+    params: IGetPlaceFollowersParams,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IPlaceFollowerExposed[]>> => {
+    return userInstance.post(
+      userEndpoints.getPlaceFollowers.replace(":id", place),
+      params,
       {
         headers: {
           Authorization: auth.token,

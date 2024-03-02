@@ -23,6 +23,7 @@ import {
   getRankFavoritePlaces,
   getRatedPlaces,
   ratingPlace,
+  getPlaceFollowers,
 } from "../controllers";
 
 const initUserRouter = (app: Express) => {
@@ -79,6 +80,9 @@ const initPlaceRouter = (app: Express) => {
 
   // Get places by follow util
   placeRouter.post("/follow/users/:userId", tokenParser, getPlacesByUserFollow);
+
+  // Get user follow a page
+  placeRouter.post("/:id/follow/users", tokenParser, getPlaceFollowers);
 
   // Get rank favorite place
   placeRouter.get("/rank/favorite", tokenParser, getRankFavoritePlaces);

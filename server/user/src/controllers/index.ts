@@ -24,4 +24,5 @@ export {
   getPlacesByUserFollow,
   getRankFavoritePlaces,
   getRatedPlaces,
+  getPlaceFollowers,
 } from "./place";

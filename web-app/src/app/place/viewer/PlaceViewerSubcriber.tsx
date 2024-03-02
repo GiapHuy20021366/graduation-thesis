@@ -5,22 +5,25 @@ import { useNavigate } from "react-router";
 
 type PlaceViewerSubciberProps = StackProps & {
   data: IPlaceFollowerExposed;
+  onBeforeNavigate?: () => void;
 };
 
 const PlaceViewerSubciber = React.forwardRef<
   HTMLDivElement,
   PlaceViewerSubciberProps
 >((props, ref) => {
-  const { data, ...rest } = props;
+  const { data, onBeforeNavigate, ...rest } = props;
   const navigate = useNavigate();
-  const times = toTimeInfo(data.time);
+  const times = toTimeInfo(data.updatedAt);
 
   const handleNavigateClick = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
     props.onClick && props.onClick(event);
+    onBeforeNavigate && onBeforeNavigate();
     navigate("/user/" + data.subcriber._id);
   };
+
   return (
     <Stack
       ref={ref}

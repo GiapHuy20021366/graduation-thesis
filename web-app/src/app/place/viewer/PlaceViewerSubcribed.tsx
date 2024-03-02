@@ -1,37 +1,41 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Box, Button, Divider, Stack, StackProps } from "@mui/material";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  FollowType,
+  Box,
+  Button,
+  Divider,
+  Stack,
+  StackProps,
+  Typography,
+} from "@mui/material";
+import {
+  IPagination,
   IPlaceExposed,
   IPlaceFollowerExposed,
+  loadFromSessionStorage,
+  saveToSessionStorage,
 } from "../../../data";
 import {
   useAppContentContext,
   useAuthContext,
+  useLoader,
   usePageProgessContext,
 } from "../../../hooks";
 import PlaceViewerSubciber from "./PlaceViewerSubcriber";
 import PlaceViewerSubciberHolder from "./PlaceViewerSubcriberHolder";
+import { userFetcher } from "../../../api";
 
 type PlaceViewerSubcribedProps = StackProps & {
   place: IPlaceExposed;
   active: boolean;
 };
 
-const sample: IPlaceFollowerExposed = {
-  _id: "0123456789",
-  subcriber: {
-    _id: "0123456789",
-    firstName: "Giap",
-    lastName: "Huy",
-  },
-  time: Date.now(),
-  type: Math.pow(2, Math.floor(Math.random() * 4)),
-};
+interface IPlaceViewerSubcribedSnapshotData {
+  data: IPlaceFollowerExposed[];
+  scrollTop?: number;
+}
 
-const genSample = (type: FollowType): IPlaceFollowerExposed => {
-  return { ...sample, type };
-};
+const PLACE_VIEWER_SUBCRIBED = (placeId: string) =>
+  `place.viewer@${placeId}.subcribed`;
 
 const PlaceViewerSubcribed = React.forwardRef<
   HTMLDivElement,
@@ -39,35 +43,71 @@ const PlaceViewerSubcribed = React.forwardRef<
 >((props, ref) => {
   const { place, active, ...rest } = props;
 
-  const [end, setEnd] = useState<boolean>(false);
-  const [followers, setFollowers] = useState<IPlaceFollowerExposed[]>([sample]);
+  const [followers, setFollowers] = useState<IPlaceFollowerExposed[]>([]);
 
   const progessContext = usePageProgessContext();
   const authContext = useAuthContext();
-  const auth = authContext.auth;
-  const appContextContext = useAppContentContext();
+  const { auth, account } = authContext;
+  const appContentContext = useAppContentContext();
 
-  const doSearchMore = useCallback(() => {
-    const skip = followers.length;
-    console.log(skip, place._id, auth);
+  const loader = useLoader();
 
-    if (progessContext.isLoading) return;
+  // Recover at begining or fetch at begining
+  const dirtyRef = useRef<boolean>(false);
+
+  const doSaveStorage = () => {
+    const snapshot: IPlaceViewerSubcribedSnapshotData = {
+      data: followers,
+      scrollTop: appContentContext.mainRef?.current?.scrollTop,
+    };
+    saveToSessionStorage(snapshot, {
+      key: PLACE_VIEWER_SUBCRIBED(place._id),
+      account: authContext.account?.id_,
+    });
+  };
+
+  const handleBeforeNavigate = () => {
+    doSaveStorage();
+  };
+
+  const doSearch = useCallback(() => {
+    if (auth == null) return;
+    if (loader.isFetching || !active) return;
+
+    const pagination: IPagination = {
+      skip: followers.length,
+      limit: 24,
+    };
+
     progessContext.start();
-    setTimeout(() => {
-      const nFollowers = [...followers];
-      nFollowers.push(
-        genSample(Math.pow(2, Math.floor(Math.random() * 4))),
-        genSample(Math.pow(2, Math.floor(Math.random() * 4))),
-        genSample(Math.pow(2, Math.floor(Math.random() * 4)))
-      );
-      setFollowers(nFollowers);
-      setEnd(true);
-      progessContext.end();
-    }, 1000);
-  }, [auth, followers, place._id, progessContext]);
+    loader.setIsFetching(true);
+    loader.setIsError(false);
+    loader.setIsEnd(false);
+
+    userFetcher
+      .getPlaceFollowers(place._id, { pagination: pagination }, auth)
+      .then((res) => {
+        const data = res.data;
+        if (data != null) {
+          if (data.length < pagination.limit) {
+            loader.setIsEnd(true);
+          }
+          const _newData = followers.slice();
+          _newData.push(...data);
+          setFollowers(_newData);
+        }
+      })
+      .catch(() => {
+        loader.setIsError(true);
+      })
+      .finally(() => {
+        loader.setIsFetching(false);
+        progessContext.end();
+      });
+  }, [active, auth, followers, loader, place._id, progessContext]);
 
   useEffect(() => {
-    const main = appContextContext.mainRef?.current;
+    const main = appContentContext.mainRef?.current;
     let listener: any;
 
     if (main != null) {
@@ -76,8 +116,8 @@ const PlaceViewerSubcribed = React.forwardRef<
         const isAtBottom =
           element.scrollTop + element.clientHeight === element.scrollHeight;
 
-        if (isAtBottom && active && !end) {
-          doSearchMore();
+        if (isAtBottom && !loader.isEnd) {
+          doSearch();
         }
       };
       main.addEventListener("scroll", listener);
@@ -87,7 +127,38 @@ const PlaceViewerSubcribed = React.forwardRef<
         main.removeEventListener("scroll", listener);
       }
     };
-  }, [appContextContext.mainRef, active, doSearchMore, end]);
+  }, [appContentContext.mainRef, doSearch, loader.isEnd]);
+
+  // Recover result
+  useEffect(() => {
+    if (account == null) return;
+    if (!active) return;
+    if (!dirtyRef.current) {
+      dirtyRef.current = true;
+      // At begining
+      const snapshot =
+        loadFromSessionStorage<IPlaceViewerSubcribedSnapshotData>({
+          key: PLACE_VIEWER_SUBCRIBED(place._id),
+          maxDuration: 1 * 24 * 60 * 60 * 1000,
+          account: account.id_,
+        });
+      if (snapshot) {
+        const snapshotData = snapshot.data;
+        setFollowers(snapshotData);
+        if (snapshotData.length < 24) {
+          loader.setIsEnd(true);
+        }
+        const mainRef = appContentContext.mainRef?.current;
+        if (mainRef) {
+          setTimeout(() => {
+            mainRef.scrollTop = snapshot.scrollTop ?? 0;
+          }, 300);
+        }
+      } else {
+        doSearch();
+      }
+    }
+  }, [account, active, appContentContext.mainRef, doSearch, loader, place._id]);
 
   return (
     <Stack
@@ -97,31 +168,36 @@ const PlaceViewerSubcribed = React.forwardRef<
       sx={{
         width: "100%",
         ...(props.sx ?? {}),
+        display: active ? "flex" : "none",
       }}
     >
       {followers.map((follower, index) => {
         return (
           <>
-            <PlaceViewerSubciber py={1} data={follower} key={index} />
+            <PlaceViewerSubciber
+              py={1}
+              data={follower}
+              key={index}
+              onBeforeNavigate={handleBeforeNavigate}
+            />
             <Divider variant="middle" />
           </>
         );
       })}
 
-      {end && (
+      {loader.isFetching && <PlaceViewerSubciberHolder />}
+
+      {loader.isEnd && !loader.isError && (
         <Box textAlign={"center"} mt={2}>
-          Đã hết
+          <Typography>Bạn đã tìm kiếm hết</Typography>
+          <Button onClick={() => doSearch()}>Tìm kiếm thêm</Button>
         </Box>
       )}
-
-      {progessContext.isLoading && <PlaceViewerSubciberHolder />}
-
-      {!progessContext.isLoading && !end && (
-        <Stack alignItems={"center"} mt={2}>
-          <Button sx={{ width: "fit-content" }} onClick={() => doSearchMore()}>
-            Tìm kiếm thêm
-          </Button>
-        </Stack>
+      {loader.isError && (
+        <Box textAlign={"center"} mt={2}>
+          <Typography>Có lỗi xảy ra</Typography>
+          <Button onClick={() => doSearch()}>Thử lại</Button>
+        </Box>
       )}
     </Stack>
   );

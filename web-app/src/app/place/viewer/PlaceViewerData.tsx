@@ -21,7 +21,15 @@ export default function PlaceViewerData({ data }: PlaceViewerDataProps) {
     <Stack width={"100%"} boxSizing={"border-box"} boxShadow={1} gap={2} px={1}>
       <PlaceViewerHeader place={data} />
 
-      <PlaceViewerTabs onTabSet={(tab) => setTab(tab)} />
+      <PlaceViewerTabs
+        onTabSet={(tab) => setTab(tab)}
+        sx={{
+          position: "sticky",
+          top: 1,
+          zIndex: 1000,
+          backgroundColor: "white",
+        }}
+      />
       {/* Tabs display */}
       <>
         <PlaceViewerIntroduction

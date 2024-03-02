@@ -85,3 +85,8 @@ export {
   toInvalidFormatError,
   toNotFoundError,
 } from "./to-error";
+export {
+  IPlaceFollowerExposed,
+  IPlaceFollowerExposedPlace,
+  IPlaceFollowerExposedSubcriber,
+} from "./place-follower-exposed";

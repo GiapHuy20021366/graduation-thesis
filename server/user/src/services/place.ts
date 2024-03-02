@@ -8,6 +8,7 @@ import {
   IPlaceAuthorExposed,
   IPlaceExposed,
   IPlaceFollower,
+  IPlaceFollowerExposed,
   IPlaceRating,
   IRating,
   InternalError,
@@ -17,7 +18,7 @@ import {
   UnauthorizationError,
   toDistance,
 } from "../data";
-import { Follower, Place, PlaceRating } from "../db/model";
+import { Follower, Place, PlaceRating, UserDocument } from "../db/model";
 
 export interface IPlaceData extends Omit<IPlace, "author"> {}
 
@@ -703,4 +704,71 @@ export const getPlacesRatedByUser = async (
         },
       };
     });
+};
+
+export interface IGetPlaceFollowersParams {
+  include?: string[]; // include users
+  exclude?: string[]; // exclude users
+  followTypes?: FollowType[];
+  pagination?: IPagination;
+}
+
+export const getPlaceFollowers = async (
+  place: string,
+  params: IGetPlaceFollowersParams
+): Promise<IPlaceFollowerExposed[]> => {
+  const options: any = {};
+  options.role = FollowRole.PLACE;
+  options.place = place;
+
+  const { exclude, followTypes, include, pagination } = params;
+
+  const subciberOption: any = {};
+  if (exclude && exclude.length > 0) {
+    subciberOption.$nin = exclude;
+  }
+  if (include && include.length > 0) {
+    subciberOption.$in = include;
+  }
+  if (Object.keys(subciberOption).length > 0) {
+    options["subcriber"] = subciberOption;
+  }
+  if (followTypes && followTypes.length > 0) {
+    options.type = {
+      $in: followTypes,
+    };
+  }
+
+  const followers = await Follower.find(options)
+    .populate<{
+      subcriber: UserDocument;
+      place: string;
+    }>("subcriber")
+    .sort({
+      updatedAt: OrderState.DECREASE,
+    })
+    .skip(pagination?.skip ?? 0)
+    .limit(pagination?.limit ?? 24)
+    .exec();
+
+  if (followers == null) {
+    throw new InternalError();
+  }
+  return followers.map((follower): IPlaceFollowerExposed => {
+    const subcriber = follower.subcriber;
+    return {
+      _id: follower._id.toString(),
+      createdAt: follower.createdAt,
+      updatedAt: follower.updatedAt,
+      place: follower.place,
+      role: follower.role,
+      subcriber: {
+        _id: subcriber._id,
+        firstName: subcriber.firstName,
+        lastName: subcriber.lastName,
+        avartar: subcriber.avatar,
+      },
+      type: follower.type,
+    };
+  });
 };
