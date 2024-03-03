@@ -17,15 +17,15 @@ export const initUserRouters = (app: Express): void => {
     return res.send("Hello from food service");
   });
 
-  foodRouter.post("/images/upload", tokenParser, uploadImages);
+  foodRouter.post("/images", tokenParser, uploadImages);
 
-  foodRouter.post("/foods/upload", tokenParser, postFood);
-  foodRouter.put("/foods/upload", tokenParser, updateFoodPost);
+  foodRouter.post("/foods", tokenParser, postFood);
+  foodRouter.put("/foods/:id", tokenParser, updateFoodPost);
 
   foodRouter.post("/foods/search", tokenParser, searchFoodPost);
   foodRouter.post("/foods/search/history", tokenParser, searchHistory);
   foodRouter.get("/foods/:id", tokenParser, findFoodPost);
-  foodRouter.put("/foods/like/:id", tokenParser, likeOrUnlikeFoodPost);
+  foodRouter.put("/foods/:id/like", tokenParser, likeOrUnlikeFoodPost);
 
   foodRouter.use(errorHandler);
   app.use("/", foodRouter);

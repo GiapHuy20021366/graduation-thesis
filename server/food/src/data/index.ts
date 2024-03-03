@@ -81,3 +81,11 @@ export {
 } from "./history-search-params";
 export { IFoodUserLike } from "./food-user-like";
 export { toDistance } from "./to-distance";
+export {
+  IFoodPostExposed,
+  IFoodPostExposedPlace,
+  IFoodPostExposedUser,
+} from "./food-post-exposed";
+export { PlaceType } from "./place-type";
+
+export { ILocation } from "./location";

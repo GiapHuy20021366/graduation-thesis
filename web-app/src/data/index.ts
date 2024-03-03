@@ -25,11 +25,6 @@ export {
   type IFoodUpLoadLocation,
 } from "./food-upload-data";
 export {
-  type IFoodSearchInfo,
-  type IFoodPostUser,
-  fakeOneFoodSearch,
-} from "./food-search-info";
-export {
   type GeoCodeMapsAddress,
   type GeoCodeMapsData,
 } from "./geocode-maps-address";
@@ -45,7 +40,6 @@ export {
   toLeftTime,
 } from "./date-util";
 export { toDistance } from "./location-util";
-export { type IFoodPostData } from "./food-post";
 export { OrderState, toNextOrderState } from "./order-state";
 export { ItemAddedBy } from "./item-added-by";
 export { ItemAvailable } from "./item-available";
@@ -110,3 +104,17 @@ export {
   type IConversationParticipant,
 } from "./conversation-cooked";
 export { type IConversationMessageCooked } from "./conversation-message-cooked";
+export {
+  type IFoodPostExposedWithLike,
+  type IFoodPostExposed,
+  type IFoodPostExposedPlace,
+  type IFoodPostExposedUser,
+} from "./food-post-exposed";
+export {
+  type IFoodSeachOrder,
+  type IFoodSearchDistance,
+  type IFoodSearchParams,
+  type IFoodSearchPlace,
+  type IFoodSearchPrice,
+  type IFoodSearchUser,
+} from "./food-search-params";

@@ -1,51 +1,38 @@
-import { RPCRequest } from "../broker";
 import {
   IFoodPost,
+  IFoodPostExposed,
+  IFoodPostExposedPlace,
+  IFoodPostExposedUser,
   IFoodPostLocation,
   IFoodSearchParams,
-  IRpcGetInfoPayLoad,
   InternalError,
   OrderState,
   ResourceNotExistedError,
-  RpcAction,
-  RpcQueueName,
-  RpcRequest,
-  RpcSource,
   toDistance,
 } from "../data";
-import { FoodPost, FoodPostDocument, FoodUserLike } from "../db/model";
+import { FoodPost, IFoodPostSchema, FoodUserLike } from "../db/model";
+import { IPlaceIdAndType, Id, rpcGetPlace, rpcGetUser } from "./rpc";
 
-interface IPostFoodData extends Omit<IFoodPost, "user"> {
-  user: string;
+export interface IPostFoodData extends Omit<IFoodPost, "place"> {
+  place?: string;
 }
 
-interface IPostFoodReturn {
+export interface IPostFoodResponse {
   _id: string;
   createdAt: Date;
   updatedAt: Date;
-}
-
-interface IRpcUserInfo {
-  _id: string;
-  firstName: string;
-  lastName: string;
+  active: boolean;
 }
 
 export const postFood = async (
   data: IPostFoodData
-): Promise<IPostFoodReturn> => {
-  const rpcRequest: RpcRequest<IRpcGetInfoPayLoad> = {
-    source: RpcSource.FOOD,
-    action: RpcAction.USER_RPC_GET_INFO,
-    payload: {
-      _id: data.user,
-    },
-  };
-  const rpcUser = await RPCRequest<IRpcUserInfo>(
-    RpcQueueName.RPC_USER,
-    rpcRequest
-  );
-  if (rpcUser == null) {
+): Promise<IPostFoodResponse> => {
+  // Check user and place existed
+  const [user, place] = await Promise.all([
+    rpcGetUser<Id>(data.user, "_id"),
+    rpcGetPlace<IPlaceIdAndType>(data.place, "_id type"),
+  ]);
+  if (user == null) {
     throw new InternalError({
       data: {
         target: "rpc-user",
@@ -53,7 +40,7 @@ export const postFood = async (
       },
     });
   }
-  if (rpcUser.data == null) {
+  if (data.place != null && place == null) {
     throw new InternalError({
       data: {
         target: "rpc-user",
@@ -61,32 +48,34 @@ export const postFood = async (
       },
     });
   }
-  const user = rpcUser.data;
+
   const { lat, lng } = data.location.coordinates;
   const locationWith2D: IFoodPostLocation = {
     ...data.location,
     two_array: [lng, lat],
   };
+
   const foodPost = new FoodPost({
     ...data,
     location: locationWith2D,
-    user: {
-      _id: user._id,
-      exposeName: user.firstName + " " + user.lastName,
-    },
+    user: data.user,
+    place: place,
   });
+
   await foodPost.save();
+
   return {
-    _id: foodPost._id,
+    _id: foodPost._id.toString(),
     createdAt: foodPost.createdAt,
     updatedAt: foodPost.updatedAt,
+    active: foodPost.active,
   };
 };
 
 export const updateFoodPost = async (
-  data: IPostFoodData,
-  foodId: string
-): Promise<IPostFoodReturn> => {
+  foodId: string,
+  data: IPostFoodData
+): Promise<IPostFoodResponse> => {
   const foodPost = await FoodPost.findById(foodId);
   if (foodPost == null) {
     throw new ResourceNotExistedError({
@@ -97,6 +86,26 @@ export const updateFoodPost = async (
       },
     });
   }
+
+  // Update place if it different
+  if (data.place != foodPost.place?._id) {
+    if (foodPost.place != null && data.place == null) {
+      foodPost.place = undefined;
+    } else {
+      const rpcPlace = await rpcGetPlace<IPlaceIdAndType>(foodPost.place?._id);
+      if (rpcPlace == null) {
+        throw new InternalError({
+          data: {
+            target: "rpc-user",
+            reason: "unknown",
+          },
+        });
+      } else {
+        foodPost.place = rpcPlace;
+      }
+    }
+  }
+
   foodPost.updatedAt = new Date();
   foodPost.isEdited = true;
   foodPost.title = data.title;
@@ -110,20 +119,21 @@ export const updateFoodPost = async (
 
   await foodPost.save();
   return {
-    _id: foodPost._id,
+    _id: foodPost._id.toString(),
     createdAt: foodPost.createdAt,
     updatedAt: foodPost.updatedAt,
+    active: foodPost.active,
   };
 };
 
-interface IFoodPostReturn extends FoodPostDocument {
+interface IFoodPostExposedWithLike extends IFoodPostExposed {
   liked?: boolean;
 }
 
 export const findFoodPostById = async (
   id: string,
   userId?: string
-): Promise<IFoodPostReturn> => {
+): Promise<IFoodPostExposedWithLike> => {
   const foodPost = await FoodPost.findById(id);
   if (foodPost == null) {
     throw new ResourceNotExistedError({
@@ -134,9 +144,43 @@ export const findFoodPostById = async (
       },
     });
   }
-  const result: IFoodPostReturn = {
-    ...foodPost._doc,
+  const result: IFoodPostExposedWithLike = {
+    _id: foodPost._id.toString(),
+    active: foodPost.active,
+    categories: foodPost.categories,
+    createdAt: foodPost.createdAt,
+    description: foodPost.description,
+    duration: foodPost.duration,
+    images: foodPost.images,
+    isEdited: foodPost.isEdited,
+    likeCount: foodPost.likeCount,
+    location: foodPost.location,
+    price: foodPost.price,
+    quantity: foodPost.quantity,
+    title: foodPost.title,
+    updatedAt: foodPost.updatedAt,
+    user: foodPost.user,
+    place: foodPost.place?._id,
   };
+
+  const [user, place] = await Promise.all([
+    rpcGetUser<IFoodPostExposedUser>(
+      foodPost.user,
+      "_id firstName lastName avartar location"
+    ),
+    rpcGetPlace<IFoodPostExposedPlace>(
+      foodPost.place?._id,
+      "_id exposeName avartar type location"
+    ),
+  ]);
+
+  if (user != null) {
+    result.user = user;
+  }
+  if (place != null) {
+    result.place = place;
+  }
+
   if (userId) {
     const liked = await FoodUserLike.findOne({
       user: userId,
@@ -150,7 +194,7 @@ export const findFoodPostById = async (
 
 export const searchFood = async (
   params: IFoodSearchParams
-): Promise<FoodPostDocument[]> => {
+): Promise<IFoodPostSchema[]> => {
   const {
     currentLocation,
     maxDistance,

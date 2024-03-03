@@ -1,22 +1,21 @@
-import { Model, Schema, model, Document } from "mongoose";
+import { Model, Schema, model } from "mongoose";
 import collections from "../collections";
 import { IImage, IFoodPost } from "../../data";
 
-export interface FoodPostDocument extends IFoodPost, Document {
+export interface IFoodPostSchema extends IFoodPost {
   isEdited: boolean;
   createdAt: Date;
   updatedAt: Date;
   likeCount: number;
-  _doc: any;
+  active: boolean;
 }
 
 interface IFoodPostMethods {}
 
-interface IFoodPostModel
-  extends Model<FoodPostDocument, {}, IFoodPostMethods> {}
+interface IFoodPostModel extends Model<IFoodPostSchema, {}, IFoodPostMethods> {}
 
 const foodPostSchema = new Schema<
-  FoodPostDocument,
+  IFoodPostSchema,
   IFoodPostModel,
   IFoodPostMethods
 >({
@@ -26,8 +25,13 @@ const foodPostSchema = new Schema<
     index: true,
   },
   place: {
-    type: String,
-    index: true,
+    _id: {
+      type: String,
+      index: true,
+    },
+    type: {
+      type: Number,
+    },
   },
   images: {
     type: [String],
@@ -63,7 +67,6 @@ const foodPostSchema = new Schema<
   },
   description: {
     type: String,
-    // required: true
   },
   quantity: {
     type: Number,
@@ -95,6 +98,10 @@ const foodPostSchema = new Schema<
     type: Number,
     default: 0,
   },
+  active: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 // Statics
@@ -105,7 +112,7 @@ export interface FoodPostMappings {
   images: IImage[];
 }
 
-export const FoodPost = model<FoodPostDocument, IFoodPostModel>(
+export const FoodPost = model<IFoodPostSchema, IFoodPostModel>(
   "FoodPost",
   foodPostSchema,
   collections.foodPost

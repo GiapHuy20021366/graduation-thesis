@@ -8,23 +8,19 @@ import {
   IImageExposed,
   IAuthInfo,
   IFoodUploadData,
-  IFoodSearchInfo,
-  IFoodPostData,
-  OrderState,
-  FoodCategory,
-  ItemAddedBy,
-  ItemAvailable,
-  IPagination,
-  ICoordinates,
+  IFoodPostExposed,
+  IFoodPostExposedWithLike,
+  IFoodSearchParams,
 } from "../data";
 
 export const foodEndpoints = {
   uploadImages: "/images/upload",
-  uploadFood: "/foods/upload",
-  findFoodPost: "/foods",
+  uploadFood: "/foods",
+  updateFood: "/foods/:id",
+  findFoodPost: "/foods/:id",
   searchFood: "/foods/search",
   searchHistory: "/foods/search/history",
-  likeFood: "/foods/like",
+  likeFood: "/foods/:id/like",
 } as const;
 
 export interface FoodResponseError
@@ -48,32 +44,7 @@ export interface IFoodUploadResponseData {
   _id: string;
   createdAt: Date;
   updatedAt: Date;
-}
-
-export interface IFoodSearchPrice {
-  min: number;
-  max: number;
   active: boolean;
-}
-
-export interface IFoodSeachOrder {
-  orderDistance: OrderState;
-  orderNew: OrderState;
-  orderPrice: OrderState;
-  orderQuantity: OrderState;
-}
-export interface IFoodSearchParams {
-  order: IFoodSeachOrder;
-  maxDistance: number;
-  query: string;
-  categories: FoodCategory[];
-  maxDuration: number;
-  price: IFoodSearchPrice;
-  minQuantity: number;
-  addedBy: ItemAddedBy;
-  available: ItemAvailable;
-  pagination?: IPagination;
-  currentLocation?: ICoordinates;
 }
 
 export interface IFoodSearchHistoryParams {
@@ -97,17 +68,18 @@ export interface FoodFetcher {
     auth: IAuthInfo
   ): Promise<FoodResponse<IFoodUploadResponseData>>;
   updateFood(
-    data: IFoodPostData,
+    id: string,
+    data: IFoodUploadData,
     auth: IAuthInfo
   ): Promise<FoodResponse<IFoodUploadResponseData>>;
   searchFood(
     data: IFoodSearchParams,
     auth: IAuthInfo
-  ): Promise<FoodResponse<IFoodSearchInfo[]>>;
+  ): Promise<FoodResponse<IFoodPostExposed[]>>;
   findFoodPost(
     id: string,
     auth: IAuthInfo
-  ): Promise<FoodResponse<IFoodPostData>>;
+  ): Promise<FoodResponse<IFoodPostExposedWithLike>>;
   searchHistory(
     params: IFoodSearchHistoryParams,
     auth: IAuthInfo
@@ -148,10 +120,11 @@ export const foodFetcher: FoodFetcher = {
     });
   },
   updateFood: async (
-    data: IFoodPostData,
+    id: string,
+    data: IFoodUploadData,
     auth: IAuthInfo
   ): Promise<FoodResponse<IFoodUploadResponseData>> => {
-    return foodInstance.put(foodEndpoints.uploadFood, data, {
+    return foodInstance.put(foodEndpoints.updateFood.replace(":id", id), data, {
       headers: {
         Authorization: auth.token,
       },
@@ -160,7 +133,7 @@ export const foodFetcher: FoodFetcher = {
   searchFood: async (
     params: IFoodSearchParams,
     auth: IAuthInfo
-  ): Promise<FoodResponse<IFoodSearchInfo[]>> => {
+  ): Promise<FoodResponse<IFoodPostExposed[]>> => {
     return foodInstance.post(foodEndpoints.searchFood, params, {
       headers: {
         Authorization: auth.token,
@@ -170,8 +143,8 @@ export const foodFetcher: FoodFetcher = {
   findFoodPost: async (
     id: string,
     auth: IAuthInfo
-  ): Promise<FoodResponse<IFoodPostData>> => {
-    return foodInstance.get(`${foodEndpoints.findFoodPost}/${id}`, {
+  ): Promise<FoodResponse<IFoodPostExposedWithLike>> => {
+    return foodInstance.get(foodEndpoints.findFoodPost.replace(":id", id), {
       headers: {
         Authorization: auth.token,
       },
@@ -193,7 +166,7 @@ export const foodFetcher: FoodFetcher = {
     auth: IAuthInfo
   ): Promise<FoodResponse<void>> => {
     return foodInstance.put(
-      foodEndpoints.likeFood + "/" + foodId,
+      foodEndpoints.likeFood.replace(":id", foodId),
       {
         action: action ?? "LIKE",
       },

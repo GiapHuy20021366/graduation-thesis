@@ -80,6 +80,7 @@ export default function FoodSharingForm() {
     setTitle,
     description,
     editDataRef,
+    place,
   } = formContext;
 
   const [hover, setHover] = useState<number>(-1);
@@ -127,6 +128,7 @@ export default function FoodSharingForm() {
       quantity: quantity,
       title: title,
       location: location,
+      place: place,
     };
     if (auth) {
       callingApi.active();
@@ -136,7 +138,7 @@ export default function FoodSharingForm() {
       const promise: Promise<FoodResponse<IFoodUploadResponseData>> =
         editData == null
           ? foodFetcher.uploadFood(foodUploadData, auth)
-          : foodFetcher.updateFood({ ...editData, ...foodUploadData }, auth);
+          : foodFetcher.updateFood(editData._id, foodUploadData, auth);
 
       promise
         .then((data) => navigate(`/food/${data.data?._id}`, { replace: true }))

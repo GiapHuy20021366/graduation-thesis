@@ -1,14 +1,18 @@
-import { ICoordinates } from "./coordinates";
+import { ILocation } from "./location";
+import { PlaceType } from "./place-type";
 
-export interface IFoodPostLocation {
-  name: string;
-  coordinates: ICoordinates;
+export interface IFoodPostLocation extends ILocation {
   two_array?: number[];
+}
+
+export interface IFoodPostPlace {
+  _id: string;
+  type: PlaceType;
 }
 
 export interface IFoodPost {
   user: string;
-  place?: string;
+  place?: IFoodPostPlace;
   images: string[];
   title: string;
   location: IFoodPostLocation;

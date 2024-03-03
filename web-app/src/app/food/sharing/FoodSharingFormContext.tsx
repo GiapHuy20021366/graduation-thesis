@@ -9,13 +9,13 @@ import React, {
 import {
   FoodCategory,
   ICoordinates,
-  IFoodPostData,
   IFoodUpLoadLocation,
   IImageExposed,
   QuantityType,
   convertDateToString,
   toNextMidnight,
   toQuantityLevel,
+  IFoodPostExposedWithLike,
 } from "../../../data";
 
 interface IFoodSharingFormContext {
@@ -41,7 +41,7 @@ interface IFoodSharingFormContext {
   setDescription: Dispatch<SetStateAction<string>>;
   setPlace: Dispatch<SetStateAction<string | undefined>>;
 
-  editDataRef?: React.MutableRefObject<IFoodPostData | undefined>;
+  editDataRef?: React.MutableRefObject<IFoodPostExposedWithLike | undefined>;
 }
 
 const defaultSharingContext: IFoodSharingFormContext = {
@@ -94,7 +94,7 @@ const toImageExposeds = (
 
 interface IFoodSharingFormContextProviderProps {
   children?: React.ReactNode;
-  preData?: IFoodPostData;
+  preData?: IFoodPostExposedWithLike;
 }
 
 export default function FoodSharingFormContextProvider({
@@ -129,7 +129,9 @@ export default function FoodSharingFormContextProvider({
   const [description, setDescription] = useState<string>(
     defaultData.description
   );
-  const [place, setPlace] = useState<string | undefined>();
+  const [place, setPlace] = useState<string | undefined>(
+    typeof preData?.place === "string" ? preData?.place : preData?.place?._id
+  );
 
   const setLocationName = (name: string) => {
     setLocation({

@@ -5,6 +5,7 @@ import {
   InvalidDataError,
   isAllNotEmptyString,
   isLocation,
+  isNotEmptyString,
   isNumber,
   isObjectId,
   throwErrorIfInvalidFormat,
@@ -18,6 +19,8 @@ import {
   searchFood as searchFoodService,
   saveSearchHistory,
   userLikeOrUnlikeFoodPost,
+  IPostFoodData,
+  updateFoodPost as updateFoodPostService,
 } from "../services";
 
 interface IPostFoodBody {
@@ -27,11 +30,17 @@ interface IPostFoodBody {
   categories?: string[];
   description?: string;
   quantity?: number;
-  duration?: number;
+  duration?: Date; // number | string
   price?: number;
+  place?: string;
 }
 
-const validatePostFoodBody = (data: IPostFoodBody): void => {
+interface IPostFoodExtend extends IPostFoodBody {
+  user?: string;
+  place?: string;
+}
+
+const validatePostFoodBody = (data: IPostFoodExtend): data is IPostFoodData => {
   const {
     images,
     categories,
@@ -41,9 +50,11 @@ const validatePostFoodBody = (data: IPostFoodBody): void => {
     quantity,
     title,
     price,
+    place,
+    user,
   } = data;
 
-  // throw if not found
+  throwErrorIfNotFound("user", user);
   throwErrorIfNotFound("images", images);
   throwErrorIfNotFound("title", title);
   throwErrorIfNotFound("location", location);
@@ -54,27 +65,18 @@ const validatePostFoodBody = (data: IPostFoodBody): void => {
   throwErrorIfNotFound("price", price);
 
   // check data format
+  throwErrorIfInvalidFormat("user", user, [isObjectId]);
+  if (place != null) {
+    throwErrorIfInvalidFormat("place", place, [isObjectId]);
+  }
+  throwErrorIfInvalidFormat("title", title, [isNotEmptyString]);
   throwErrorIfInvalidFormat("images", images, [isAllNotEmptyString]);
-
   throwErrorIfInvalidFormat("categories", categories, [isAllNotEmptyString]);
-
-  // throwErrorIfInvalidFormat(
-  // 	"description",
-  // 	description,
-  // 	[isNotEmptyString]
-  // );
-
   throwErrorIfInvalidFormat("duration", duration, [isNumber]);
-
   throwErrorIfInvalidFormat("location", location, [isLocation]);
-
   throwErrorIfInvalidFormat("quantity", quantity, [isNumber]);
 
-  // throwErrorIfInvalidFormat(
-  // 	"title",
-  // 	title,
-  // 	[isNotEmptyString]
-  // );
+  return true;
 };
 
 export const postFood = async (
@@ -82,35 +84,20 @@ export const postFood = async (
   res: Response,
   next: NextFunction
 ) => {
+  const auth = req.authContext as AuthLike;
+  const valData: IPostFoodExtend = {
+    ...req.body,
+    user: auth._id,
+  };
   try {
-    validatePostFoodBody(req.body);
+    if (validatePostFoodBody(valData)) {
+      postFoodService(valData)
+        .then((data) => res.status(200).json(toResponseSuccessData(data)))
+        .catch(next);
+    }
   } catch (error) {
     return next(error);
   }
-  const auth = req.authContext as AuthLike;
-  const {
-    images,
-    title,
-    location,
-    categories,
-    description,
-    quantity,
-    duration,
-    price,
-  } = req.body;
-  postFoodService({
-    user: auth._id,
-    images: images!,
-    title: title!,
-    location: location!,
-    categories: categories!,
-    description: description!,
-    quantity: quantity!,
-    duration: new Date(duration!),
-    price: price!,
-  })
-    .then((data) => res.status(200).json(toResponseSuccessData(data)))
-    .catch(next);
 };
 
 interface IUpdateFoodPostBody extends IPostFoodBody {
@@ -121,47 +108,33 @@ export const updateFoodPost = async (
   res: Response,
   next: NextFunction
 ) => {
+  const id = req.body._id;
+  const auth = req.authContext as AuthLike;
+
+  if (!isObjectId(id)) {
+    return next(
+      new InvalidDataError({
+        message: `Invalid _id: ${req.body._id}`,
+        data: {
+          target: "_id",
+          reason: "invalid",
+        },
+      })
+    );
+  }
+  const valData: IPostFoodExtend = {
+    ...req.body,
+    user: auth._id,
+  };
   try {
-    validatePostFoodBody(req.body);
-    if (!isObjectId(req.body._id)) {
-      return next(
-        new InvalidDataError({
-          message: `Invalid _id: ${req.body._id}`,
-          data: {
-            target: "_id",
-            reason: "invalid",
-          },
-        })
-      );
+    if (validatePostFoodBody(valData)) {
+      updateFoodPostService(id, valData)
+        .then((data) => res.status(200).json(toResponseSuccessData(data)))
+        .catch(next);
     }
   } catch (error) {
     return next(error);
   }
-  const auth = req.authContext as AuthLike;
-  const {
-    _id,
-    images,
-    title,
-    location,
-    categories,
-    description,
-    quantity,
-    duration,
-    price,
-  } = req.body;
-  postFoodService({
-    user: auth._id,
-    images: images!,
-    title: title!,
-    location: location!,
-    categories: categories!,
-    description: description!,
-    quantity: quantity!,
-    duration: new Date(duration!),
-    price: price!,
-  })
-    .then((data) => res.status(200).json(toResponseSuccessData(data)))
-    .catch(next);
 };
 
 export const findFoodPost = async (
@@ -170,17 +143,6 @@ export const findFoodPost = async (
   next: NextFunction
 ) => {
   const id = req.params.id;
-  if (id == null || id.length === 0) {
-    return next(
-      new InvalidDataError({
-        message: "Invalid food id",
-        data: {
-          target: "id",
-          reason: "invalid",
-        },
-      })
-    );
-  }
 
   if (!isObjectId(id)) {
     return next(
@@ -211,17 +173,6 @@ export const searchFoodPost = async (
   next: NextFunction
 ) => {
   const params = req.body;
-  // const query = params.query;
-  // if (typeof query !== "string" || !query) {
-  //   return next(
-  //     new InvalidDataError({
-  //       data: {
-  //         target: "query",
-  //         reason: "no-query-found",
-  //       },
-  //     })
-  //   );
-  // }
   const auth = req.authContext as AuthLike;
   const paramsToSerach = toFoodSearchParams(params);
   saveSearchHistory(auth._id, paramsToSerach);
