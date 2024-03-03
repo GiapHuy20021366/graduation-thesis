@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import {
-  IFoodPostData,
-  IUserInfo,
+  IFoodPostExposedWithLike,
   toDistance,
   toQuantityType,
 } from "../../../data";
@@ -11,7 +10,7 @@ import {
   useConversationContext,
   useI18nContext,
 } from "../../../hooks";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import FullWidthBox from "../../common/custom/FullWidthBox";
 import Carousel from "react-material-ui-carousel";
 import {
@@ -22,7 +21,6 @@ import {
   Divider,
   IconButton,
   Rating,
-  Skeleton,
   Stack,
   Typography,
 } from "@mui/material";
@@ -35,13 +33,35 @@ import {
   TimelapseOutlined,
 } from "@mui/icons-material";
 import { deepOrange } from "@mui/material/colors";
-import { foodFetcher, userFetcher } from "../../../api";
+import { foodFetcher } from "../../../api";
 import CountDown from "../../common/util/CountDown";
 import FoodPostButtonWithMenu from "./FoodPostButtonWithMenu";
+import { RichTextReadOnly } from "mui-tiptap";
+import StarterKit from "@tiptap/starter-kit";
 
 interface IFoodPostInfoDataDisplayProps {
-  data: IFoodPostData;
+  data: IFoodPostExposedWithLike;
 }
+
+const toUserId = (post: IFoodPostExposedWithLike): string => {
+  const user = post.user;
+  return typeof user === "string" ? user : user._id;
+};
+
+const toLikeCount = (
+  post: IFoodPostExposedWithLike,
+  liked: boolean
+): number => {
+  if (!post.liked && liked) return post.likeCount + 1;
+  if (post.liked && !liked) return post.likeCount - 1;
+  return post.likeCount;
+};
+
+const toUserExposedName = (post: IFoodPostExposedWithLike): string => {
+  const user = post.user;
+  if (typeof user == "string") return "SYSTEM_USER";
+  return user.firstName + " " + user.lastName;
+};
 
 export default function FoodPostInfoDataDisplay({
   data,
@@ -59,18 +79,7 @@ export default function FoodPostInfoDataDisplay({
   const conversationContext = useConversationContext();
 
   const [liked, setLiked] = useState<boolean>(data.liked ?? false);
-  const [author, setAuthor] = useState<IUserInfo>();
-
-  useEffect(() => {
-    if (authContext.auth == null) return;
-
-    userFetcher.getUserInfo(data.user._id, authContext.auth).then((data) => {
-      const datas = data.data;
-      if (datas != null) {
-        setAuthor(datas);
-      }
-    });
-  }, [authContext.auth, data.user._id]);
+  const { user } = data;
 
   const handleLikeOrUnlike = () => {
     if (authContext.auth == null) return;
@@ -81,12 +90,8 @@ export default function FoodPostInfoDataDisplay({
       });
   };
 
-  const likeCount =
-    liked == data.liked
-      ? data.likeCount ?? 0
-      : !data.liked && liked
-      ? (data.likeCount ?? 0) + 1
-      : (data.likeCount ?? 0) - 1;
+  const userId = toUserId(data);
+  const userExposedName = toUserExposedName(data);
 
   return (
     <FullWidthBox>
@@ -148,7 +153,7 @@ export default function FoodPostInfoDataDisplay({
               }}
             >
               <Badge
-                badgeContent={<span>{likeCount}</span>}
+                badgeContent={<span>{toLikeCount(data, liked)}</span>}
                 anchorOrigin={{
                   vertical: "top",
                   horizontal: "right",
@@ -165,7 +170,7 @@ export default function FoodPostInfoDataDisplay({
               color="success"
               onClick={() => {
                 console.log("Clicked");
-                conversationContext.doBeginConversationWith(data.user._id);
+                conversationContext.doBeginConversationWith(userId);
               }}
             >
               <MapsUgcOutlined />
@@ -226,22 +231,22 @@ export default function FoodPostInfoDataDisplay({
       <Stack sx={{ backgroundColor: "white" }} my={2} p={1} direction={"row"}>
         <Stack direction={"row"} alignItems={"center"} gap={2} width={"100%"}>
           <Avatar
-            alt={data.user.exposeName}
+            alt={userExposedName}
             sx={{ bgcolor: deepOrange[500], cursor: "pointer" }}
             onClick={() => {
-              navigate(`/profile/${data.user._id}`);
+              navigate(`/profile/${userId}`);
             }}
           >
-            {data.user.exposeName ? data.user.exposeName[0] : "U"}
+            {userExposedName[0]}
           </Avatar>
           <Stack direction={"column"} flex={1}>
-            <Typography>{data.user.exposeName}</Typography>
-            {author == null && <Skeleton variant="text" sx={{ flex: 1 }} />}
-            {author != null && (
+            <Typography>{userExposedName}</Typography>
+
+            {typeof user === "object" && (
               <Typography>
-                {author.location?.name
+                {user.location?.name
                   ? toDistance(
-                      author.location?.coordinates,
+                      user.location?.coordinates,
                       appContentContext.currentLocation
                     ) + "km"
                   : lang("Không địa chỉ")}
@@ -249,10 +254,9 @@ export default function FoodPostInfoDataDisplay({
             )}
             <Stack direction={"row"} width={"100%"}>
               <LocationOnOutlined color="info" />
-              {author == null && <Skeleton variant="text" sx={{ flex: 1 }} />}
-              {author != null && (
+              {typeof user === "object" && (
                 <Typography>
-                  {author.location?.name ?? lang("Không địa chỉ")}
+                  {user.location?.name ?? lang("Không địa chỉ")}
                 </Typography>
               )}
             </Stack>
@@ -264,7 +268,11 @@ export default function FoodPostInfoDataDisplay({
         <Box component={"h4"}>{lang("description")}</Box>
         <Divider />
         {data.description ? (
-          <Box>{data.description}</Box>
+          <RichTextReadOnly
+            extensions={[StarterKit]}
+            spell-check={false}
+            content={data.description}
+          />
         ) : (
           <Typography>{lang("no-description")}</Typography>
         )}

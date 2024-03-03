@@ -3,9 +3,9 @@ import { useParams } from "react-router";
 import { useAuthContext, useLoading } from "../../../hooks";
 import { useEffect, useState } from "react";
 import { foodFetcher } from "../../../api";
-import { IFoodPostData } from "../../../data";
 import FoodPostInfoDataDisplay from "./FoodPostInfoDataDisplay";
 import FoodPostInfoReplacer from "./FoodPostInfoReplacer";
+import { IFoodPostExposedWithLike } from "../../../data";
 
 interface IFoodPostInfoProps {
   foodId?: string;
@@ -15,7 +15,7 @@ export default function FoodPostInfo({ foodId }: IFoodPostInfoProps) {
   const params = useParams();
   const authContext = useAuthContext();
   const loading = useLoading();
-  const [data, setData] = useState<IFoodPostData>();
+  const [data, setData] = useState<IFoodPostExposedWithLike>();
   const [found, setFound] = useState<boolean>(true);
 
   const fetchingFood = (id: string) => {
@@ -43,7 +43,7 @@ export default function FoodPostInfo({ foodId }: IFoodPostInfoProps) {
     if (foodPostId != null) {
       fetchingFood(foodPostId);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

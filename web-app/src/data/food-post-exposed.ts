@@ -22,6 +22,7 @@ export interface IFoodPostExposed extends Omit<IFoodUploadData, "place"> {
   _id: string;
   user: string | IFoodPostExposedUser;
   place?: string | IFoodPostExposedPlace;
+  likeCount: number;
 }
 
 export interface IFoodPostExposedWithLike extends IFoodPostExposed {

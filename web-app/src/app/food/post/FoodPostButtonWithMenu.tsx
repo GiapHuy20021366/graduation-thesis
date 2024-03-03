@@ -5,11 +5,11 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import { Edit, MoreVert, ReportGmailerrorred } from "@mui/icons-material";
 import { ListItemIcon } from "@mui/material";
-import { IFoodPostData } from "../../../data";
 import { useNavigate } from "react-router";
+import { IFoodPostExposed } from "../../../data";
 
 interface IFoodPostButtonWithMenuProps {
-  data?: IFoodPostData;
+  data?: IFoodPostExposed;
 }
 
 export default function FoodPostButtonWithMenu({
