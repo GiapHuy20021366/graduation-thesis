@@ -24,30 +24,39 @@ const foodSeachHistorySchema = new Schema<
     index: true,
   },
   params: {
-    order: {
-      orderDistance: Number,
-      orderNew: Number,
-      orderPrice: Number,
-      orderQuantity: Number,
+    user: {
+      include: Schema.Types.Mixed,
+      exclude: Schema.Types.Mixed,
     },
-    maxDistance: Number,
+    place: {
+      include: Schema.Types.Mixed,
+      exclude: Schema.Types.Mixed,
+    },
     query: {
       type: String,
       index: "text",
     },
-    categories: [String],
+    distance: {
+      max: Number,
+      current: {
+        lat: Number,
+        lng: Number,
+      },
+    },
+    category: Schema.Types.Mixed,
     maxDuration: Number,
     price: {
-      active: Boolean,
       min: Number,
       max: Number,
     },
     minQuantity: Number,
-    addedBy: String,
+    addedBy: Schema.Types.Mixed,
     available: String,
-    currentLocation: {
-      lat: Number,
-      lng: Number,
+    order: {
+      distance: Number,
+      time: Number,
+      price: Number,
+      quantity: Number,
     },
   },
   createdAt: {

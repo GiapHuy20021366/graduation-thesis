@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import {
-  IFoodSearchInfo,
+  IFoodPostExposed,
   toDistance,
   toQuantityType,
   toTimeInfo,
@@ -25,7 +25,7 @@ import {
 } from "@mui/icons-material";
 
 interface IFoodSearchItemProps {
-  item: IFoodSearchInfo;
+  item: IFoodPostExposed;
   onBeforeNavigate?: () => void;
 }
 
@@ -64,6 +64,15 @@ export default function FoodSearchItem({
     }
     navigate(`/food/${item._id}`);
   };
+
+  console.log(item);
+
+  const exposedUser =
+    typeof item.user === "string"
+      ? "H"
+      : item.user.firstName + " " + item.user.lastName;
+
+  const userId = typeof item.user === "string" ? item.user : item.user._id;
 
   return (
     <Stack
@@ -146,16 +155,16 @@ export default function FoodSearchItem({
           }}
         >
           <Avatar
-            alt={item.user.exposeName}
+            alt={exposedUser}
             sx={{ bgcolor: deepOrange[500], cursor: "pointer" }}
             onClick={() => {
-              navigate(`/profile/${item.user._id}`);
+              navigate(`/profile/${userId}`);
             }}
           >
-            {item.user.exposeName ? item.user.exposeName[0] : "U"}
+            {exposedUser[0]}
           </Avatar>
           <Box component="h5" width={"fit-content"} mt={1} mb={0}>
-            {item.user.exposeName}
+            {exposedUser}
           </Box>
         </Stack>
         <Divider orientation="vertical" flexItem />

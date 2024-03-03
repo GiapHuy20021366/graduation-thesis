@@ -2,6 +2,7 @@ import { History, SearchOutlined, TuneOutlined } from "@mui/icons-material";
 import {
   Autocomplete,
   Box,
+  Button,
   Divider,
   IconButton,
   InputAdornment,
@@ -13,6 +14,7 @@ import {
   Tabs,
   TextField,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -20,6 +22,8 @@ import {
   IFoodPostExposed,
   IFoodSeachOrder,
   IFoodSearchParams,
+  loadFromSessionStorage,
+  saveToSessionStorage,
   toNextOrderState,
 } from "../../../data";
 import FoodSearchItem from "./FoodSearchItem";
@@ -29,7 +33,7 @@ import {
   useAuthContext,
   useFoodSearchContext,
   useI18nContext,
-  useLoading,
+  useLoader,
 } from "../../../hooks";
 import { IFoodSearchContext } from "./FoodSearchContext";
 import FoodItemSkeleton from "./FoodItemSkeleton";
@@ -38,7 +42,6 @@ import {
   IFoodSearchHistorySimple,
   foodFetcher,
 } from "../../../api/food";
-import OutSearchResult from "../../common/OutSearchResult";
 import OrderIcon from "../../common/custom/OrderIcon";
 
 const SearchTab = {
@@ -111,18 +114,26 @@ const toSearchParams = (
 };
 
 type IFoodSearchHistoryAndKey = IFoodSearchHistorySimple & {
-  key: number;
+  key: number | string;
 };
+
+interface IFoodSearchBodySnapshotData {
+  tab: SearchTab;
+  foods: IFoodPostExposed[];
+  scrollTop?: number;
+}
+
+const FOOD_SEARCH_BODY_STORAGE_KEY = "food.search.body";
 
 export default function FoodSearchBody() {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [result, setResult] = useState<IFoodPostExposed[]>([]);
+  const [foods, setFoods] = useState<IFoodPostExposed[]>([]);
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [options, setOptions] = useState<IFoodSearchHistoryAndKey[]>([]);
   const [tab, setTab] = useState<SearchTab>(SearchTab.RELATED);
   const i18nContext = useI18nContext();
   const lang = i18nContext.of(FoodSearchBody);
-  const [isOut, setIsOut] = useState<boolean>(false);
+  const loader = useLoader();
 
   const searchContext = useFoodSearchContext();
   const {
@@ -143,14 +154,25 @@ export default function FoodSearchBody() {
   } = order;
 
   const authContext = useAuthContext();
-  const auth = authContext.auth;
-
-  const searching = useLoading();
+  const { auth, account } = authContext;
   const appContentContext = useAppContentContext();
+  const dirtyRef = useRef<boolean>(true);
 
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+
+  const doSaveStorage = useCallback(() => {
+    const snapshot: IFoodSearchBodySnapshotData = {
+      foods,
+      tab,
+      scrollTop: appContentContext.mainRef?.current?.scrollTop,
+    };
+    saveToSessionStorage(snapshot, {
+      key: FOOD_SEARCH_BODY_STORAGE_KEY,
+      account: account?.id_,
+    });
+  }, [account?.id_, appContentContext.mainRef, foods, tab]);
 
   const handleInputChange = (
     _event: React.SyntheticEvent<Element, Event>,
@@ -171,44 +193,64 @@ export default function FoodSearchBody() {
       foodFetcher.searchHistory(params, authContext.auth).then((data) => {
         const datas = data.data;
         if (datas && datas.length > 0) {
-          setOptions(datas.map((data, index) => ({ ...data, key: index })));
+          const _options: IFoodSearchHistoryAndKey[] = [];
+          if (query && query.length > 0) {
+            _options.push({
+              key: 0,
+              query: query ?? "",
+              userId: "0",
+            });
+          }
+          _options.push(
+            ...datas.map((data, index) => ({
+              ...data,
+              key: index + 1,
+            }))
+          );
+          setOptions(_options);
         }
       });
     }
   }, [authContext.account, authContext.auth, query]);
 
-  const searchFood = (params: IFoodSearchParams) => {
-    if (auth == null) return;
-    if (!params.query) return;
-    if (searching.isActice) return;
+  const searchFood = useCallback(
+    (params: IFoodSearchParams) => {
+      if (auth == null) return;
+      if (loader.isFetching) return;
 
-    setIsOut(false);
+      loader.setIsEnd(false);
+      loader.setIsError(false);
+      loader.setIsFetching(true);
 
-    searching.active();
-    setResult([]);
-    foodFetcher
-      .searchFood(params, auth)
-      .then((data) => {
-        setTimeout(() => {
+      setFoods([]);
+      foodFetcher
+        .searchFood(params, auth)
+        .then((data) => {
           const datas = data.data;
-          if (datas == null || datas.length === 0) {
-            setIsOut(true);
-          } else {
-            setResult(datas);
+          if (datas != null) {
+            if (datas.length < 24) {
+              loader.setIsEnd(true);
+            }
+            setFoods(datas);
           }
-          searching.deactive();
-        }, 200);
-      })
-      .catch(() => {
-        searching.deactive();
-      });
-  };
+        })
+        .catch(() => {
+          loader.setIsError(true);
+        })
+        .finally(() => {
+          loader.setIsFetching(false);
+          doSaveStorage();
+          searchContext.doSaveStorage();
+        });
+    },
+    [auth, doSaveStorage, loader, searchContext]
+  );
 
-  const doSearch = () => {
+  const doSearch = useCallback(() => {
     searchFood(
       toSearchParams(searchContext, appContentContext.currentLocation)
     );
-  };
+  }, [appContentContext.currentLocation, searchContext, searchFood]);
 
   const handleSearchQueryChange = (
     _event: React.SyntheticEvent<Element, Event>,
@@ -332,50 +374,50 @@ export default function FoodSearchBody() {
     searchFood(searchParams);
   };
 
-  const tryDoSearchMore = () => {
-    setIsOut(false);
-    doSearchMore();
-  };
-
   const doSearchMore = useCallback(() => {
-    if (isOut) return;
     if (auth == null) return;
-    if (!searchContext.query) return;
-    if (searching.isActice) return;
+    if (loader.isFetching) return;
+
     const params = toSearchParams(
       searchContext,
       appContentContext.currentLocation
     );
     params.pagination = {
-      skip: result.length,
+      skip: foods.length,
       limit: 24,
     };
 
-    searching.active();
+    loader.setIsEnd(false);
+    loader.setIsError(false);
+    loader.setIsFetching(true);
+
     foodFetcher
       .searchFood(params, auth)
       .then((data) => {
-        setTimeout(() => {
-          const datas = data.data ?? [];
-          if (datas.length === 0) {
-            setIsOut(true);
-          } else {
-            const newData = [...result, ...datas];
-            setResult(newData);
+        const datas = data.data;
+        if (datas != null) {
+          if (datas.length < 24) {
+            loader.setIsEnd(true);
           }
-          searching.deactive();
-        }, 1000);
+          const newData = [...foods, ...datas];
+          setFoods(newData);
+        }
       })
       .catch(() => {
-        searching.deactive();
+        loader.setIsError(true);
+      })
+      .finally(() => {
+        loader.setIsFetching(false);
+        doSaveStorage();
+        searchContext.doSaveStorage();
       });
   }, [
-    appContentContext.currentLocation,
     auth,
-    isOut,
-    result,
+    loader,
     searchContext,
-    searching,
+    appContentContext.currentLocation,
+    foods,
+    doSaveStorage,
   ]);
 
   useEffect(() => {
@@ -387,7 +429,7 @@ export default function FoodSearchBody() {
         const isAtBottom =
           element.scrollTop + element.clientHeight === element.scrollHeight;
 
-        if (isAtBottom) {
+        if (isAtBottom && !loader.isEnd) {
           doSearchMore();
         }
       };
@@ -396,61 +438,34 @@ export default function FoodSearchBody() {
     return () => {
       mainRef && mainRef.removeEventListener("scroll", listener!);
     };
-  }, [appContentContext.mainRef, doSearchMore]);
-
-  const backup = () => {
-    const mainCur = appContentContext.mainRef?.current;
-    const scroll = {
-      scrollX: mainCur?.scrollLeft ?? 0,
-      scrollY: mainCur?.scrollTop ?? 0,
-    };
-    const save = JSON.stringify({
-      ...searchContext,
-      scroll,
-      result,
-      tab,
-    });
-    localStorage.setItem("food.search.state", save);
-    console.log("save", save);
-  };
-
-  const restore = () => {
-    try {
-      const saved = localStorage.getItem("food.search.state");
-      if (!saved) return;
-      const meta = JSON.parse(saved);
-      console.log(meta);
-      if (meta != null) {
-        searchContext.setAddedBy(meta.addedBy);
-        searchContext.setAvailable(meta.available);
-        searchContext.setCategories(meta.categories);
-        searchContext.setMaxDistance(meta.maxDistance);
-        searchContext.setMaxDuration(meta.maxDuration);
-        searchContext.setMinQuantity(meta.minQuantity);
-        searchContext.setOrderDistance(meta.order.orderDistance);
-        searchContext.setOrderNew(meta.order.orderNew);
-        searchContext.setOrderQuantity(meta.order.orderQuantity);
-        searchContext.setOrderPrice(meta.order.orderPrice);
-        searchContext.setPrice(meta.price);
-        searchContext.setQuery(meta.query);
-        setResult(meta.result);
-        setTab(meta.tab);
-        const mainCur = appContentContext.mainRef?.current;
-        if (mainCur) {
-          setTimeout(() => {
-            mainCur.scrollTo(meta.scroll.scrollX, meta.scroll.scrollY);
-          }, 200);
-        }
-      }
-    } catch (error) {
-      // DO nothing
-    }
-  };
+  }, [appContentContext.mainRef, doSearchMore, loader.isEnd]);
 
   useEffect(() => {
-    restore();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (account == null) return;
+    if (dirtyRef.current) {
+      dirtyRef.current = false;
+      const snapshot = loadFromSessionStorage<IFoodSearchBodySnapshotData>({
+        key: FOOD_SEARCH_BODY_STORAGE_KEY,
+        maxDuration: 1 * 24 * 60 * 60 * 1000,
+        account: account.id_,
+      });
+      if (snapshot) {
+        setTab(snapshot.tab);
+        setFoods(snapshot.foods);
+        if (foods.length < 24) {
+          loader.setIsEnd(true);
+        }
+        setTimeout(() => {
+          const main = appContentContext.mainRef?.current;
+          if (main && snapshot.scrollTop) {
+            main.scrollTop = snapshot.scrollTop ?? 0;
+          }
+        }, 500);
+      } else {
+        doSearch();
+      }
+    }
+  }, [account, appContentContext.mainRef, doSearch, foods.length, loader]);
 
   return (
     <Box width={"100%"} boxSizing={"border-box"}>
@@ -596,26 +611,31 @@ export default function FoodSearchBody() {
             minHeight: "80vh",
           }}
         >
-          {result.map((food, index) => {
+          {foods.map((food, index) => {
             return (
               <FoodSearchItem
                 item={food}
                 key={index}
-                onBeforeNavigate={() => backup()}
+                onBeforeNavigate={() => doSaveStorage()}
               />
             );
           })}
-          {searching.isActice && (
+          {loader.isFetching && (
             <>
               <FoodItemSkeleton />
             </>
           )}
-          {isOut && (
-            <OutSearchResult
-              textLabel={lang("Bạn đã tìm kiếm hết")}
-              chipLabel={lang("Thử lại")}
-              onTryClick={() => tryDoSearchMore()}
-            />
+          {loader.isEnd && !loader.isError && (
+            <Box textAlign={"center"} mt={2}>
+              <Typography>Bạn đã tìm kiếm hết</Typography>
+              <Button onClick={() => doSearchMore()}>Tìm kiếm thêm</Button>
+            </Box>
+          )}
+          {!loader.isFetching && loader.isError && (
+            <Box textAlign={"center"} mt={2}>
+              <Typography>Có lỗi xảy ra</Typography>
+              <Button onClick={() => doSearchMore()}>Thử lại</Button>
+            </Box>
           )}
         </Stack>
       </Stack>

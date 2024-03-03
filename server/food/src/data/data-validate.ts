@@ -23,7 +23,7 @@ export const isEmptyString = (value: any): value is string => {
 };
 
 export const isNotEmptyString = (value: any): value is string => {
-  return !isEmptyString(value);
+  return isString(value) && value.length > 0;
 };
 
 export const isAllNotEmptyString = (value: any): value is string[] => {

@@ -11,7 +11,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ToggleChipGroup from "../../common/custom/ToggleChipGroup";
 import ToggleChip from "../../common/custom/ToggleChip";
 import {
@@ -20,6 +20,8 @@ import {
   ItemAddedBy,
   ItemAvailable,
   PlaceType,
+  loadFromSessionStorage,
+  saveToSessionStorage,
   toQuantityType,
 } from "../../../data";
 import CategoryPiece from "../sharing/CategoryPiece";
@@ -47,14 +49,56 @@ export interface IFilterParams {
   price?: IFoodSearchPrice;
 }
 
+interface IFoodSearchFilterSnapshotData {
+  addedBy: ItemAddedBy;
+  available: ItemAvailable;
+  maxDistance?: number;
+  categories?: FoodCategory[];
+  minQuantity?: number;
+  maxDuration?: number;
+  priceOption?: string;
+  priceRange?: IFoodSearchPrice;
+}
+
+const FOOD_SEARCH_FILTER_STORAGE_KEY = "food.search.filter";
+
+const toItemAddedBy = (value?: PlaceType[]): ItemAddedBy => {
+  if (value == null) return ItemAddedBy.ALL;
+  if (value.includes(PlaceType.PERSONAL)) return ItemAddedBy.PERSONAL;
+  if (value.includes(PlaceType.VOLUNTEER)) return ItemAddedBy.VOLUNTEER;
+  return ItemAddedBy.PLACE;
+};
+
+const toPlaceTypes = (addedBy: ItemAddedBy): PlaceType[] | undefined => {
+  switch (addedBy) {
+    case ItemAddedBy.ALL: {
+      return;
+    }
+    case ItemAddedBy.PERSONAL: {
+      return [PlaceType.PERSONAL];
+    }
+    case ItemAddedBy.VOLUNTEER: {
+      return [PlaceType.VOLUNTEER];
+    }
+    case ItemAddedBy.PLACE: {
+      return [
+        PlaceType.EATERY,
+        PlaceType.GROCERY,
+        PlaceType.RESTAURANT,
+        PlaceType.SUPERMARKET,
+      ];
+    }
+  }
+};
+
 export default function FoodSearchFilter({
   isActive,
   onClose,
   onApply,
 }: IFoodSearchCondition) {
   const searchContext = useFoodSearchContext();
-  const [addedBy, setAddedBy] = useState<PlaceType[] | undefined>(
-    searchContext.addedBy
+  const [addedBy, setAddedBy] = useState<ItemAddedBy>(
+    toItemAddedBy(searchContext.addedBy)
   );
   const [available, setAvailable] = useState<ItemAvailable>(
     searchContext.available
@@ -91,8 +135,10 @@ export default function FoodSearchFilter({
     "DayValues"
   );
 
+  const dirtyRef = useRef<boolean>(true);
+
   const handleReset = () => {
-    setAddedBy(undefined);
+    setAddedBy(ItemAddedBy.ALL);
     setAvailable(ItemAvailable.AVAILABLE_ONLY);
     setMaxDistance(undefined);
     setCategories(undefined);
@@ -109,16 +155,16 @@ export default function FoodSearchFilter({
       max: priceOption === PriceOptions.FREE ? 0 : priceRange?.max,
     };
     const params: IFilterParams = {
-      addedBy: addedBy,
+      addedBy: toPlaceTypes(addedBy),
       available: available,
       maxDistance: maxDistance,
       maxDuration: maxDuration,
-      categories: categoryActive ? categories : [],
+      categories: categoryActive ? categories : undefined,
       minQuantity: minQuantity,
       price: price,
     };
     onApply(params);
-    backup();
+    doSaveStorage();
   };
 
   const handleCategoryPicked = (category: FoodCategory | null): void => {
@@ -172,51 +218,47 @@ export default function FoodSearchFilter({
     });
   };
 
-  const backup = () => {
-    localStorage.setItem(
-      "food.search.state.filter",
-      JSON.stringify({
-        addedBy,
-        available,
-        maxDistance,
-        categories,
-        categoryActive,
-        minQuantity,
-        quantityHover,
-        maxDuration,
-        priceOption,
-        priceRange,
-      })
-    );
-  };
-
-  const restore = () => {
-    const saved = localStorage.getItem("food.search.state.filter");
-    if (saved) {
-      try {
-        const meta = JSON.parse(saved);
-        if (meta) {
-          setAddedBy(meta.addedBy);
-          setAvailable(meta.available);
-          setMaxDistance(meta.maxDistance);
-          setCategories(meta.categories);
-          setCategoryActive(meta.categoryActive);
-          setMinQuantity(meta.minQuantity);
-          setQuantityHover(meta.quantityHover);
-          setMaxDuration(meta.maxDuration);
-          setPriceOption(meta.priceOption);
-          setPriceRange(meta.priceRange);
-        }
-      } catch (error) {
-        // DO nothing
-      }
-    }
+  const doSaveStorage = () => {
+    const snapshot: IFoodSearchFilterSnapshotData = {
+      addedBy,
+      available,
+      categories,
+      maxDistance,
+      maxDuration,
+      minQuantity,
+      priceOption,
+      priceRange,
+    };
+    saveToSessionStorage(snapshot, {
+      key: FOOD_SEARCH_FILTER_STORAGE_KEY,
+    });
   };
 
   useEffect(() => {
-    restore();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (dirtyRef.current) {
+      dirtyRef.current = false;
+      const snapshot = loadFromSessionStorage<IFoodSearchFilterSnapshotData>({
+        key: FOOD_SEARCH_FILTER_STORAGE_KEY,
+        maxDuration: 1 * 24 * 60 * 60 * 1000,
+      });
+      if (snapshot) {
+        setAddedBy(snapshot.addedBy);
+        setAvailable(snapshot.available);
+        setMaxDistance(snapshot.maxDistance);
+        setCategories(snapshot.categories);
+        setMinQuantity(snapshot.minQuantity);
+        setMaxDuration(snapshot.maxDuration);
+        setPriceOption(snapshot.priceOption);
+        setPriceRange(snapshot.priceRange);
+      }
+    }
   }, []);
+
+  const onItemAddedByChange = (value: string) => {
+    setAddedBy(value as ItemAddedBy);
+    const placeTypes = toPlaceTypes(value as ItemAddedBy);
+    searchContext.setAddedBy(placeTypes);
+  };
 
   return (
     <Container>
@@ -256,13 +298,17 @@ export default function FoodSearchFilter({
                 {lang("item-added-by")}:
               </Typography>
               <ToggleChipGroup
-                value={addedBy}
-                onValueChange={(value) => setAddedBy(value)}
+                value={addedBy ?? ItemAddedBy.ALL}
+                onValueChange={(value) => onItemAddedByChange(value)}
                 exclusive
                 sx={{
                   display: "flex",
                   flexDirection: "row",
                   gap: 1,
+                  overflowY: "auto",
+                  "::-webkit-scrollbar": {
+                    display: "none",
+                  },
                 }}
               >
                 <ToggleChip
@@ -279,6 +325,11 @@ export default function FoodSearchFilter({
                   variant="outlined"
                   label={lang("l-volunteer")}
                   value={ItemAddedBy.VOLUNTEER}
+                />
+                <ToggleChip
+                  variant="outlined"
+                  label={lang("l-place")}
+                  value={ItemAddedBy.PLACE}
                 />
               </ToggleChipGroup>
             </Box>
@@ -320,8 +371,10 @@ export default function FoodSearchFilter({
                 {lang("max-distance")}:
               </Typography>
               <ToggleChipGroup
-                value={maxDistance}
-                onValueChange={(value) => setMaxDistance(value)}
+                value={maxDistance ?? -1}
+                onValueChange={(value) =>
+                  setMaxDistance(value === -1 ? undefined : value)
+                }
                 sx={{
                   display: "flex",
                   flexDirection: "row",
@@ -353,8 +406,10 @@ export default function FoodSearchFilter({
                 {lang("max-duration")}:
               </Typography>
               <ToggleChipGroup
-                value={maxDuration}
-                onValueChange={(value) => setMaxDuration(value)}
+                value={maxDuration ?? -1}
+                onValueChange={(value) =>
+                  setMaxDuration(value === -1 ? undefined : value)
+                }
                 sx={{
                   display: "flex",
                   flexDirection: "row",

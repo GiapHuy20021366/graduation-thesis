@@ -220,8 +220,8 @@ const toFoodSearchCommonOptions = (
   }
 
   if (addedBy != null) {
-    if (typeof addedBy === "string") {
-      if (addedBy !== PlaceType.PERSONAL) {
+    if (typeof addedBy === "number") {
+      if (addedBy === PlaceType.PERSONAL) {
         options["place.type"] = null;
       } else {
         options["place.type"] = addedBy;
@@ -252,7 +252,7 @@ const toFoodSearchCommonOptions = (
         break;
       case "AVAILABLE_ONLY":
         options["duration"] = {
-          $gt: Date.now(),
+          $gte: Date.now(),
         };
         break;
       case "JUST_GONE":
@@ -405,10 +405,16 @@ export const searchFood = async (
     meta
   ).sort(sort);
 
+  // console.log(params, {
+  //   ...options,
+  //   ...commonOptions,
+  // });
+
   // Pagination
   queryBuilder.skip(pagination?.skip ?? 0).limit(pagination?.limit ?? 24);
 
   const posts = await queryBuilder.exec();
+
   if (posts == null) throw new InternalError();
 
   const result: IFoodPostExposed[] = posts.map((post) => ({
@@ -430,46 +436,45 @@ export const searchFood = async (
     place: post.place?._id,
   }));
 
-  if (populate != null) {
-    const requireUser = populate.user !== false;
-    const requirePlace = populate.place !== false;
+  // Populate result
+  const requireUser = populate?.user !== false;
+  const requirePlace = populate?.place !== false;
 
-    const users: string[] = [];
-    const places: string[] = [];
-    posts.forEach((post) => {
-      const user = post.user;
-      const place = post.place?._id;
-      requireUser && !users.includes(user) && users.push(user);
-      requirePlace && place && !places.includes(place) && places.push(place);
+  const users: string[] = [];
+  const places: string[] = [];
+  posts.forEach((post) => {
+    const user = post.user;
+    const place = post.place?._id;
+    requireUser && !users.includes(user) && users.push(user);
+    requirePlace && place && !places.includes(place) && places.push(place);
+  });
+
+  const [userDict, placeDict] = await Promise.all([
+    rpcGetDictUser<Record<string, IFoodPostExposedUser>>(
+      users,
+      "_id firstName lastName avartar location"
+    ),
+    rpcGetDictPlace<Record<string, IFoodPostExposedPlace>>(
+      places,
+      "_id exposeName avartar type location"
+    ),
+  ]);
+
+  if (requireUser || requireUser) {
+    result.forEach((post) => {
+      if (userDict != null) {
+        const user = userDict[post.user as string];
+        if (user) {
+          post.user = user;
+        }
+      }
+      if (placeDict != null && post.place != null) {
+        const place = placeDict[post.place as string];
+        if (place) {
+          post.place = place;
+        }
+      }
     });
-
-    const [userDict, placeDict] = await Promise.all([
-      rpcGetDictUser<Record<string, IFoodPostExposedUser>>(
-        users,
-        "_id firstName lastName avartar location"
-      ),
-      rpcGetDictPlace<Record<string, IFoodPostExposedPlace>>(
-        places,
-        "_id exposeName avartar type location"
-      ),
-    ]);
-
-    if (requireUser || requireUser) {
-      result.forEach((post) => {
-        if (userDict != null) {
-          const user = userDict[post.user as string];
-          if (user) {
-            post.user = user;
-          }
-        }
-        if (placeDict != null && post.place != null) {
-          const place = placeDict[post.place as string];
-          if (place) {
-            post.place = place;
-          }
-        }
-      });
-    }
   }
 
   return result;

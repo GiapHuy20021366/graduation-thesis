@@ -76,7 +76,7 @@ export const toFoodSearchParams = (value: any): IFoodSearchParams => {
   result.place = toIncludeAndExclude(result.place);
 
   const query = value.query;
-  if (typeof query === "string" || query.trim().length > 0) {
+  if (typeof query === "string" && query.trim().length > 0) {
     result.query = query;
   }
 
