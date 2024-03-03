@@ -1,4 +1,4 @@
-import { RPCRequest } from "~/broker";
+import { RPCRequest } from "../broker";
 import {
   IRpcGetDictPlacePayload,
   IRpcGetDictUserPayload,

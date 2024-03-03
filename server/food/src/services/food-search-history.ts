@@ -26,7 +26,9 @@ export const getQueryHistoryByUserId = async (
   if (result == null) {
     throw new InternalError();
   }
-  return result.map((history) => history.params.query);
+  return result
+    .filter((history) => history.params.query != null)
+    .map((history) => history.params.query!);
 };
 
 interface ISearchOnQueryRecord {
@@ -77,10 +79,12 @@ export const searchHistory = async (
     throw new InternalError();
   }
 
-  return result.map((history) => ({
-    userId: history.userId,
-    query: history.params.query,
-  }));
+  return result
+    .filter((history) => history.params.query != null)
+    .map((history) => ({
+      userId: history.userId,
+      query: history.params.query!,
+    }));
 };
 
 export const saveSearchHistory = (

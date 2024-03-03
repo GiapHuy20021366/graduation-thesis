@@ -1,5 +1,4 @@
-import { isAllObjectId, isNotEmptyString } from "./data-validate";
-import { toPagination } from "./food-search-params";
+import { isAllObjectId, isNotEmptyString, isNumber } from "./data-validate";
 import { IPagination } from "./pagination";
 
 export interface IHistorySearchParams {
@@ -19,6 +18,22 @@ export const toHistorySearchParams = (value: any): IHistorySearchParams => {
   const users = value.users;
   if (isAllObjectId(users)) result.users = users as string[];
 
-  result.pagination = toPagination(value.pagination);
+  result.pagination = {
+    skip: 0,
+    limit: 24,
+  };
+  const pagination = value.pagination;
+  if (typeof pagination === "object") {
+    result;
+    const skip = pagination.skip;
+    const limit = pagination.limit;
+    if (isNumber(skip)) {
+      result.pagination.skip = skip;
+    }
+    if (isNumber(limit)) {
+      result.pagination.limit = limit;
+    }
+  }
+
   return result;
 };
