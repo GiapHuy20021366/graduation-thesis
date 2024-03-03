@@ -12,9 +12,15 @@ import {
   DialogActions,
   DialogTitle,
 } from "@mui/material";
-import { FollowType, IAccount, IPlaceExposed } from "../../../data";
-import { useAuthContext } from "../../../hooks";
+import {
+  FollowType,
+  IAccount,
+  IPlaceExposed,
+  IPlaceFoodExposedAuthor,
+} from "../../../data";
+import { useAuthContext, useToastContext } from "../../../hooks";
 import { DoneOutlined } from "@mui/icons-material";
+import { userFetcher } from "../../../api";
 
 type SubcribeChipActionProps = ChipProps & {
   data: IPlaceExposed;
@@ -24,6 +30,8 @@ type SubcribeChipActionProps = ChipProps & {
   unSubcribedIcon?:
     | ReactElement<any, string | JSXElementConstructor<any>>
     | undefined;
+  onFollowed?: () => void;
+  onUnFollowed?: () => void;
 };
 
 const isSubcribed = (place: IPlaceExposed, account?: IAccount): boolean => {
@@ -33,29 +41,53 @@ const isSubcribed = (place: IPlaceExposed, account?: IAccount): boolean => {
   return true;
 };
 
+const toUserId = (value: string | IPlaceFoodExposedAuthor): string => {
+  return typeof value === "string" ? value : value._id;
+};
+
 const isPermitSubcribe = (
   place: IPlaceExposed,
   account?: IAccount
 ): boolean => {
   if (account == null) return false;
-  if (place.userFollow == null) return false;
-  return (
-    place.userFollow.subcriber === account.id_ &&
-    place.userFollow.type !== FollowType.ADMIN
-  );
+  const authorId = toUserId(place.author);
+  if (authorId === account.id_) {
+    return false;
+  }
+  if (place.userFollow != null) {
+    return (
+      place.userFollow.subcriber === account.id_ &&
+      place.userFollow.type !== FollowType.ADMIN
+    );
+  }
+  return true;
+};
+
+const toSubcribed = (data: IPlaceExposed): boolean => {
+  const follow = data.userFollow;
+  if (follow == null) return false;
+  return true;
 };
 
 const SubcribeChipAction = React.forwardRef<
   HTMLDivElement,
   SubcribeChipActionProps
 >((props, ref) => {
-  const { data, subcribedIcon, unSubcribedIcon, ...rest } = props;
+  const {
+    data,
+    subcribedIcon,
+    unSubcribedIcon,
+    onFollowed,
+    onUnFollowed,
+    ...rest
+  } = props;
 
-  const [subcribed, setSubcribed] = useState<boolean>();
+  const [subcribed, setSubcribed] = useState<boolean>(toSubcribed(data));
   const [openConfirm, setOpenConfirm] = useState<boolean>(false);
 
   const authContext = useAuthContext();
-  const account = authContext.account;
+  const { account, auth } = authContext;
+  const toastContext = useToastContext();
 
   const canSubcribe = isPermitSubcribe(data, account);
 
@@ -68,11 +100,29 @@ const SubcribeChipAction = React.forwardRef<
   }, [account, data, subcribed]);
 
   const followPlace = () => {
-    console.log("Follow");
+    if (auth == null) return;
+    userFetcher
+      .followPlace(data._id, FollowType.SUBCRIBER, auth)
+      .then(() => {
+        setSubcribed(true);
+        onFollowed && onFollowed();
+      })
+      .catch(() => {
+        toastContext.error("Không thể theo dõi vào lúc này");
+      });
   };
 
   const unfollowPlace = () => {
-    console.log("Unfollow");
+    if (auth == null) return;
+    userFetcher
+      .unFollowPlace(data._id, auth)
+      .then(() => {
+        setSubcribed(false);
+        onUnFollowed && onUnFollowed();
+      })
+      .catch(() => {
+        toastContext.error("Không thể hủy theo dõi vào lúc này");
+      });
   };
 
   const handleChipClick = (

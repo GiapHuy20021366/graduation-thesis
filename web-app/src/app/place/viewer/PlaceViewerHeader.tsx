@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Avatar,
   Box,
@@ -27,6 +27,11 @@ const PlaceViewerHeader = React.forwardRef<
 >((props, ref) => {
   const { place, ...rest } = props;
   const { images, exposeName } = place;
+
+  const [subribedCount, setSubcribedCount] = useState<number>(
+    place.subcribers ?? 0
+  );
+
   return (
     <Box
       ref={ref}
@@ -88,8 +93,15 @@ const PlaceViewerHeader = React.forwardRef<
             <IconButton color="success">
               <NotificationsActiveOutlined />
             </IconButton>
-            <Typography>{place.subcribers ?? 0} đang theo dõi</Typography>
-            <SubcribeChipAction data={place} sx={{ ml: 2 }} />
+            <Typography>{subribedCount} đang theo dõi</Typography>
+            <SubcribeChipAction
+              onFollowed={() => setSubcribedCount(subribedCount + 1)}
+              onUnFollowed={() =>
+                setSubcribedCount(Math.max(subribedCount - 1, 0))
+              }
+              data={place}
+              sx={{ ml: 2 }}
+            />
             <Box ml={"auto"}>
               <Tooltip title="Xem thêm">
                 <PlaceButtonContextMenu
