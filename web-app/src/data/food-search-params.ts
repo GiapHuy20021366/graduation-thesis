@@ -24,25 +24,33 @@ export interface IFoodSearchDistance {
 }
 
 export interface IFoodSearchUser {
-  include?: string | string[];
-  exclude?: string | string[];
+  include?: string[];
+  exclude?: string[];
 }
 
 export interface IFoodSearchPlace {
-  include?: string | string[];
-  exclude?: string | string[];
-  type?: PlaceType | PlaceType[];
+  include?: string[];
+  exclude?: string[];
+}
+
+export interface IFoodSearchPopulate {
+  user?: boolean;
+  place?: boolean;
 }
 
 export interface IFoodSearchParams {
+  user?: IFoodSearchUser;
+  place?: IFoodSearchPlace;
   query?: string;
-  order?: IFoodSeachOrder;
   distance?: IFoodSearchDistance;
-  categories?: FoodCategory[];
+  category?: FoodCategory[];
   maxDuration?: number; // time left
   price?: IFoodSearchPrice;
   minQuantity?: number;
-  addedBy?: PlaceType;
+  addedBy?: PlaceType[];
   available?: ItemAvailable;
+  active?: boolean;
+  order?: IFoodSeachOrder;
   pagination?: IPagination;
+  populate?: IFoodSearchPopulate;
 }

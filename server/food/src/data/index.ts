@@ -34,6 +34,10 @@ export {
   isCoordinates,
   isLocation,
   isNotEmptyStringArray,
+  isArrayPlaceTypes,
+  isItemAvailable,
+  isPagination,
+  isPlaceType,
 } from "./data-validate";
 export {
   throwErrorIfInvalidFormat,
@@ -61,14 +65,13 @@ export {
   IFoodSeachOrder,
   IFoodSearchParams,
   IFoodSearchPrice,
+  IFoodSearchDistance,
+  IFoodSearchPlace,
+  IFoodSearchPopulate,
+  IFoodSearchUser,
+  IIncludeAndExclude,
   toFoodSearchParams,
-  toAddedBy,
-  toAvailable,
-  toPagination,
-  toValidCategories,
-  toValidOrder,
-  toValidPrice,
-  toValidSearchNumber,
+  toIncludeAndExclude,
 } from "./food-search-params";
 export { ItemAddedBy } from "./item-added-by";
 export { ItemAvailable } from "./item-available";

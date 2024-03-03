@@ -1,5 +1,8 @@
 import { RPCRequest } from "~/broker";
 import {
+  IRpcGetDictPlacePayload,
+  IRpcGetDictUserPayload,
+  IRpcGetPlaceByIdPayload,
   IRpcGetUserByIdPayload,
   PlaceType,
   RpcAction,
@@ -40,11 +43,47 @@ export const rpcGetPlace = async <T>(
   select?: string | string[]
 ): Promise<T | null> => {
   if (place == null) return null;
-  const rpcPlaceRequest: RpcRequest<IRpcGetUserByIdPayload> = {
+  const rpcPlaceRequest: RpcRequest<IRpcGetPlaceByIdPayload> = {
     source: RpcSource.FOOD,
     action: RpcAction.USER_RPC_GET_PLACE_BY_ID,
     payload: {
       _id: place,
+      select: select,
+    },
+  };
+  const response = await RPCRequest<T>(RpcQueueName.RPC_USER, rpcPlaceRequest);
+  if (response == null || response.data == null) return null;
+  return response.data;
+};
+
+export const rpcGetDictPlace = async <T>(
+  places?: string[],
+  select?: string | string[]
+): Promise<T | null> => {
+  if (places == null || places.length === 0) return null;
+  const rpcPlaceRequest: RpcRequest<IRpcGetDictPlacePayload> = {
+    source: RpcSource.FOOD,
+    action: RpcAction.USER_RPC_GET_DICT_PLACE_BY_LIST_ID,
+    payload: {
+      _ids: places,
+      select: select,
+    },
+  };
+  const response = await RPCRequest<T>(RpcQueueName.RPC_USER, rpcPlaceRequest);
+  if (response == null || response.data == null) return null;
+  return response.data;
+};
+
+export const rpcGetDictUser = async <T>(
+  users?: string[],
+  select?: string | string[]
+): Promise<T | null> => {
+  if (users == null || users.length === 0) return null;
+  const rpcPlaceRequest: RpcRequest<IRpcGetDictUserPayload> = {
+    source: RpcSource.FOOD,
+    action: RpcAction.USER_RPC_GET_DICT_USER_BY_LIST_ID,
+    payload: {
+      _ids: users,
       select: select,
     },
   };

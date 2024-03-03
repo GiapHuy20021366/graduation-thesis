@@ -18,9 +18,6 @@ export {
   type FoodFetcher,
   type FoodResponse,
   type FoodResponseError,
-  type IFoodSeachOrder,
-  type IFoodSearchParams,
-  type IFoodSearchPrice,
   type IFoodUploadResponseData,
 } from "./food";
 

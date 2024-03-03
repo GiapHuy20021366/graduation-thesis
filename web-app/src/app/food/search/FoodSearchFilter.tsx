@@ -16,13 +16,14 @@ import ToggleChipGroup from "../../common/custom/ToggleChipGroup";
 import ToggleChip from "../../common/custom/ToggleChip";
 import {
   FoodCategory,
+  IFoodSearchPrice,
   ItemAddedBy,
   ItemAvailable,
+  PlaceType,
   toQuantityType,
 } from "../../../data";
 import CategoryPiece from "../sharing/CategoryPiece";
 import { useFoodSearchContext, useI18nContext } from "../../../hooks";
-import { IFoodSearchPrice } from "../../../api";
 
 const PriceOptions = {
   FREE: "FREE",
@@ -36,19 +37,14 @@ interface IFoodSearchCondition {
   onApply: (params: IFilterParams) => void;
 }
 
-interface PriceRange {
-  min: number;
-  max: number;
-}
-
 export interface IFilterParams {
-  addedBy: ItemAddedBy;
+  addedBy?: PlaceType[];
   available: ItemAvailable;
-  maxDistance: number;
-  maxDuration: number;
-  categories: FoodCategory[];
-  minQuantity: number;
-  price: IFoodSearchPrice;
+  maxDistance?: number;
+  maxDuration?: number;
+  categories?: FoodCategory[];
+  minQuantity?: number;
+  price?: IFoodSearchPrice;
 }
 
 export default function FoodSearchFilter({
@@ -57,32 +53,34 @@ export default function FoodSearchFilter({
   onApply,
 }: IFoodSearchCondition) {
   const searchContext = useFoodSearchContext();
-  const [addedBy, setAddedBy] = useState<ItemAddedBy>(searchContext.addedBy);
+  const [addedBy, setAddedBy] = useState<PlaceType[] | undefined>(
+    searchContext.addedBy
+  );
   const [available, setAvailable] = useState<ItemAvailable>(
     searchContext.available
   );
-  const [maxDistance, setMaxDistance] = useState<number>(
+  const [maxDistance, setMaxDistance] = useState<number | undefined>(
     searchContext.maxDistance
   );
-  const [categories, setCategories] = useState<FoodCategory[]>(
+  const [categories, setCategories] = useState<FoodCategory[] | undefined>(
     searchContext.categories
   );
   const [categoryActive, setCategoryActive] = useState<boolean>(
-    searchContext.categories.length !== 0
+    searchContext.categories?.length === 0
   );
-  const [minQuantity, setMinQuantity] = useState<number>(
+  const [minQuantity, setMinQuantity] = useState<number | undefined>(
     searchContext.minQuantity
   );
   const [quantityHover, setQuantityHover] = useState<number>(-1);
-  const [maxDuration, setMaxDuration] = useState<number>(
+  const [maxDuration, setMaxDuration] = useState<number | undefined>(
     searchContext.maxDuration
   );
-  const [priceOption, setPriceOption] = useState<string>(
-    searchContext.price.active ? PriceOptions.CUSTOM : PriceOptions.ALL
+  const [priceOption, setPriceOption] = useState<string | undefined>(
+    searchContext.price ? PriceOptions.CUSTOM : PriceOptions.ALL
   );
-  const [priceRange, setPriceRange] = useState<PriceRange>({
-    min: searchContext.price.min,
-    max: searchContext.price.max,
+  const [priceRange, setPriceRange] = useState<IFoodSearchPrice | undefined>({
+    min: searchContext?.price?.min,
+    max: searchContext?.price?.max,
   });
 
   const i18nContext = useI18nContext();
@@ -94,22 +92,21 @@ export default function FoodSearchFilter({
   );
 
   const handleReset = () => {
-    setAddedBy(ItemAddedBy.ALL);
+    setAddedBy(undefined);
     setAvailable(ItemAvailable.AVAILABLE_ONLY);
-    setMaxDistance(-1);
-    setCategories([]);
+    setMaxDistance(undefined);
+    setCategories(undefined);
     setCategoryActive(false);
-    setMinQuantity(1);
+    setMinQuantity(undefined);
     setQuantityHover(-1);
     setPriceOption(PriceOptions.ALL);
-    setMaxDuration(-1);
+    setMaxDuration(undefined);
   };
 
   const handleApply = () => {
     const price: IFoodSearchPrice = {
-      active: priceOption !== PriceOptions.ALL,
-      min: priceOption === PriceOptions.FREE ? 0 : priceRange.min,
-      max: priceOption === PriceOptions.FREE ? 0 : priceRange.max,
+      min: priceOption === PriceOptions.FREE ? 0 : priceRange?.min,
+      max: priceOption === PriceOptions.FREE ? 0 : priceRange?.max,
     };
     const params: IFilterParams = {
       addedBy: addedBy,
@@ -125,30 +122,35 @@ export default function FoodSearchFilter({
   };
 
   const handleCategoryPicked = (category: FoodCategory | null): void => {
-    console.log(category);
-    if (category && !categories.includes(category)) {
-      const newCategories = categories.slice();
-      newCategories.push(category);
-      setCategories(newCategories);
+    if (category) {
+      if (categories == null) {
+        setCategories([category]);
+      } else {
+        const newCategories = categories.slice();
+        newCategories.push(category);
+        setCategories(newCategories);
+      }
     }
   };
 
   const handleCategoryRemoved = (index: number): void => {
-    if (index > -1 && index < categories.length) {
-      const newCategories = categories.slice();
-      newCategories.splice(index, 1);
-      setCategories(newCategories);
+    if (categories != null) {
+      if (index > -1 && index < categories.length) {
+        const newCategories = categories.slice();
+        newCategories.splice(index, 1);
+        setCategories(newCategories);
+      }
     }
   };
 
-  const toQuantityLang = (quantity: number, hover: number) => {
+  const toQuantityLang = (hover: number, quantity?: number) => {
     if (hover < 0) {
       return quantity ? lang(toQuantityType(quantity)) : lang("l-all");
     }
     return lang(toQuantityType(hover));
   };
 
-  const onPriceRangeClick = (value: PriceRange): void => {
+  const onPriceRangeClick = (value: IFoodSearchPrice): void => {
     setPriceRange(value);
   };
 
@@ -440,15 +442,16 @@ export default function FoodSearchFilter({
                     overflowY: "auto",
                   }}
                 >
-                  {categories.map((category, index) => {
-                    return (
-                      <CategoryPiece
-                        text={lang(category)}
-                        onRemove={() => handleCategoryRemoved(index)}
-                        key={index}
-                      />
-                    );
-                  })}
+                  {categories &&
+                    categories.map((category, index) => {
+                      return (
+                        <CategoryPiece
+                          text={lang(category)}
+                          onRemove={() => handleCategoryRemoved(index)}
+                          key={index}
+                        />
+                      );
+                    })}
                 </Stack>
               </Stack>
             </Box>
@@ -468,7 +471,7 @@ export default function FoodSearchFilter({
                   }}
                 />
                 <Box sx={{ ml: 2 }}>
-                  {toQuantityLang(minQuantity, quantityHover)}
+                  {toQuantityLang(quantityHover, minQuantity)}
                 </Box>
               </Stack>
             </Box>
@@ -517,7 +520,7 @@ export default function FoodSearchFilter({
                   >
                     <TextField
                       type="number"
-                      value={priceRange.min}
+                      value={priceRange?.min}
                       label={lang("l-min")}
                       inputProps={{
                         min: 0,
@@ -527,7 +530,7 @@ export default function FoodSearchFilter({
                     />
                     <TextField
                       type="number"
-                      value={priceRange.max}
+                      value={priceRange?.max}
                       label={lang("l-max")}
                       inputProps={{
                         min: 0,

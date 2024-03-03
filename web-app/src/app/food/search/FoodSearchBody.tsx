@@ -1,8 +1,4 @@
-import {
-  History,
-  SearchOutlined,
-  TuneOutlined,
-} from "@mui/icons-material";
+import { History, SearchOutlined, TuneOutlined } from "@mui/icons-material";
 import {
   Autocomplete,
   Box,
@@ -21,12 +17,12 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ICoordinates,
-  IFoodSearchInfo,
-  OrderState,
+  IFoodPostExposed,
+  IFoodSeachOrder,
+  IFoodSearchParams,
   toNextOrderState,
 } from "../../../data";
 import FoodSearchItem from "./FoodSearchItem";
-import { IFoodSeachOrder, IFoodSearchParams, foodFetcher } from "../../../api";
 import FoodSearchFilter, { IFilterParams } from "./FoodSearchFilter";
 import {
   useAppContentContext,
@@ -37,7 +33,11 @@ import {
 } from "../../../hooks";
 import { IFoodSearchContext } from "./FoodSearchContext";
 import FoodItemSkeleton from "./FoodItemSkeleton";
-import { IFoodSearchHistorySimple } from "../../../api/food";
+import {
+  IFoodSearchHistoryParams,
+  IFoodSearchHistorySimple,
+  foodFetcher,
+} from "../../../api/food";
 import OutSearchResult from "../../common/OutSearchResult";
 import OrderIcon from "../../common/custom/OrderIcon";
 
@@ -55,26 +55,21 @@ const toOrder = (
   tab: SearchTab,
   searchContext: IFoodSearchContext
 ): IFoodSeachOrder => {
-  const result: IFoodSeachOrder = {
-    orderDistance: OrderState.NONE,
-    orderPrice: OrderState.NONE,
-    orderNew: OrderState.NONE,
-    orderQuantity: OrderState.NONE,
-  };
+  const result: IFoodSeachOrder = {};
   switch (tab) {
     case SearchTab.RELATED:
       break;
     case SearchTab.PRICE:
-      result.orderPrice = searchContext.order.orderPrice;
+      result.price = searchContext.order?.price;
       break;
     case SearchTab.DISTANCE:
-      result.orderDistance = searchContext.order.orderDistance;
+      result.distance = searchContext.order?.distance;
       break;
     case SearchTab.QUANTITY:
-      result.orderQuantity = searchContext.order.orderQuantity;
+      result.quantity = searchContext.order?.quantity;
       break;
     case SearchTab.TIME:
-      result.orderNew = searchContext.order.orderNew;
+      result.time = searchContext.order?.time;
       break;
   }
   return result;
@@ -82,20 +77,37 @@ const toOrder = (
 
 const toSearchParams = (
   context: IFoodSearchContext,
-  location?: ICoordinates
+  location?: ICoordinates,
+  order?: IFoodSeachOrder
 ): IFoodSearchParams => {
-  return {
-    categories: context.categories,
-    maxDistance: context.maxDistance,
-    maxDuration: context.maxDuration,
-    minQuantity: context.minQuantity,
-    order: context.order,
-    price: context.price,
-    query: context.query,
-    addedBy: context.addedBy,
-    available: context.available,
-    currentLocation: location,
-  };
+  const result: IFoodSearchParams = {};
+
+  result.category = context.categories;
+  result.maxDuration = context.maxDuration;
+  result.minQuantity = context.minQuantity;
+  result.addedBy = context.addedBy;
+  result.available = context.available;
+
+  if (context.query && context.query.trim().length > 0) {
+    result.query = context.query;
+  }
+
+  if (context.maxDistance != null && location) {
+    result.distance = {
+      max: context.maxDistance,
+      current: location,
+    };
+  }
+
+  result.order = order;
+
+  if (context.price != null) {
+    result.price = {
+      min: context.price.min,
+      max: context.price.max,
+    };
+  }
+  return result;
 };
 
 type IFoodSearchHistoryAndKey = IFoodSearchHistorySimple & {
@@ -104,7 +116,7 @@ type IFoodSearchHistoryAndKey = IFoodSearchHistorySimple & {
 
 export default function FoodSearchBody() {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [result, setResult] = useState<IFoodSearchInfo[]>([]);
+  const [result, setResult] = useState<IFoodPostExposed[]>([]);
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [options, setOptions] = useState<IFoodSearchHistoryAndKey[]>([]);
   const [tab, setTab] = useState<SearchTab>(SearchTab.RELATED);
@@ -123,7 +135,12 @@ export default function FoodSearchBody() {
     order,
   } = searchContext;
 
-  const { orderDistance, orderNew, orderPrice, orderQuantity } = order;
+  const {
+    distance: orderDistance,
+    time: orderNew,
+    price: orderPrice,
+    quantity: orderQuantity,
+  } = order;
 
   const authContext = useAuthContext();
   const auth = authContext.auth;
@@ -143,11 +160,11 @@ export default function FoodSearchBody() {
   };
 
   useEffect(() => {
-    const params: any = {};
-    if (query.trim() === "" && authContext.account != null) {
+    const params: IFoodSearchHistoryParams = {};
+    if (query && query.trim() === "" && authContext.account != null) {
       params["users"] = [authContext.account.id_];
     }
-    if (query.trim() !== "") {
+    if (query && query.trim() !== "") {
       params["query"] = query.trim();
     }
     if (authContext.auth != null) {
@@ -211,16 +228,9 @@ export default function FoodSearchBody() {
 
   const onTabRelativeClick = () => {
     if (tab === SearchTab.RELATED) return;
-    const order: IFoodSeachOrder = {
-      orderDistance: OrderState.NONE,
-      orderNew: OrderState.NONE,
-      orderPrice: OrderState.NONE,
-      orderQuantity: OrderState.NONE,
-    };
     const searchParams: IFoodSearchParams = toSearchParams(
       {
         ...searchContext,
-        order,
       },
       appContentContext.currentLocation
     );
@@ -232,17 +242,12 @@ export default function FoodSearchBody() {
       tab === SearchTab.TIME ? toNextOrderState(orderNew) : orderNew;
     setOrderNew(newOrder);
     const order: IFoodSeachOrder = {
-      orderDistance: OrderState.NONE,
-      orderNew: newOrder,
-      orderPrice: OrderState.NONE,
-      orderQuantity: OrderState.NONE,
+      time: newOrder,
     };
     const searchParams: IFoodSearchParams = toSearchParams(
-      {
-        ...searchContext,
-        order,
-      },
-      appContentContext.currentLocation
+      searchContext,
+      appContentContext.currentLocation,
+      order
     );
     searchFood(searchParams);
   };
@@ -254,17 +259,12 @@ export default function FoodSearchBody() {
         : orderDistance;
     setOrderDistance(distanceOrder);
     const order: IFoodSeachOrder = {
-      orderDistance: distanceOrder,
-      orderNew: OrderState.NONE,
-      orderPrice: OrderState.NONE,
-      orderQuantity: OrderState.NONE,
+      distance: distanceOrder,
     };
     const searchParams: IFoodSearchParams = toSearchParams(
-      {
-        ...searchContext,
-        order,
-      },
-      appContentContext.currentLocation
+      searchContext,
+      appContentContext.currentLocation,
+      order
     );
     searchFood(searchParams);
   };
@@ -274,17 +274,12 @@ export default function FoodSearchBody() {
       tab === SearchTab.PRICE ? toNextOrderState(orderPrice) : orderPrice;
     setOrderPrice(priceOrder);
     const order: IFoodSeachOrder = {
-      orderDistance: OrderState.NONE,
-      orderNew: OrderState.NONE,
-      orderPrice: priceOrder,
-      orderQuantity: OrderState.NONE,
+      price: priceOrder,
     };
     const searchParams: IFoodSearchParams = toSearchParams(
-      {
-        ...searchContext,
-        order,
-      },
-      appContentContext.currentLocation
+      searchContext,
+      appContentContext.currentLocation,
+      order
     );
     searchFood(searchParams);
   };
@@ -296,23 +291,21 @@ export default function FoodSearchBody() {
         : orderQuantity;
     setOrderQuantity(quantityOrder);
     const order: IFoodSeachOrder = {
-      orderDistance: OrderState.NONE,
-      orderNew: OrderState.NONE,
-      orderPrice: OrderState.NONE,
-      orderQuantity: quantityOrder,
+      quantity: quantityOrder,
     };
     const searchParams: IFoodSearchParams = toSearchParams(
-      {
-        ...searchContext,
-        order,
-      },
-      appContentContext.currentLocation
+      searchContext,
+      appContentContext.currentLocation,
+      order
     );
     searchFood(searchParams);
   };
 
   const onApplyFilter = (params: IFilterParams): void => {
     setOpenFilter(false);
+    const currentLocation = appContentContext.currentLocation;
+    if (currentLocation == null && params.maxDistance != null) return;
+
     searchContext.setAddedBy(params.addedBy);
     searchContext.setAvailable(params.available);
     searchContext.setMaxDistance(params.maxDistance);
@@ -328,7 +321,13 @@ export default function FoodSearchBody() {
       order,
       query,
       ...params,
-      currentLocation: appContentContext.currentLocation,
+      distance:
+        params.maxDistance != null
+          ? {
+              max: params.maxDistance,
+              current: currentLocation!,
+            }
+          : undefined,
     };
     searchFood(searchParams);
   };

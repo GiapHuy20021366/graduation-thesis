@@ -1,5 +1,7 @@
 import { ICoordinates } from "./coordinates";
+import { ItemAvailable } from "./item-available";
 import { ILocation } from "./location";
+import { OrderState } from "./order-state";
 import { IPagination } from "./pagination";
 import { PlaceType } from "./place-type";
 
@@ -71,4 +73,12 @@ export const isPlaceType = (value: any): value is PlaceType => {
 
 export const isArrayPlaceTypes = (value: any): value is PlaceType[] => {
   return Array.isArray(value) && value.every((v) => isPlaceType(v));
+};
+
+export const isItemAvailable = (value: any): value is ItemAvailable => {
+  return Object.values(ItemAvailable).includes(value);
+};
+
+export const isOrderState = (value: any): value is OrderState => {
+  return Object.values(OrderState).includes(value);
 };

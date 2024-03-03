@@ -15,3 +15,12 @@ export {
   saveSearchHistory,
   searchHistory,
 } from "./food-search-history";
+
+export {
+  IPlaceIdAndType,
+  Id,
+  rpcGetDictPlace,
+  rpcGetDictUser,
+  rpcGetPlace,
+  rpcGetUser,
+} from "./rpc";

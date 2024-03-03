@@ -6,12 +6,19 @@ import {
   IFoodPostLocation,
   IFoodSearchParams,
   InternalError,
-  OrderState,
+  PlaceType,
   ResourceNotExistedError,
-  toDistance,
+  isArrayPlaceTypes,
 } from "../data";
-import { FoodPost, IFoodPostSchema, FoodUserLike } from "../db/model";
-import { IPlaceIdAndType, Id, rpcGetPlace, rpcGetUser } from "./rpc";
+import { FoodPost, FoodUserLike } from "../db/model";
+import {
+  IPlaceIdAndType,
+  Id,
+  rpcGetDictPlace,
+  rpcGetDictUser,
+  rpcGetPlace,
+  rpcGetUser,
+} from "./rpc";
 
 export interface IPostFoodData extends Omit<IFoodPost, "place"> {
   place?: string;
@@ -192,49 +199,54 @@ export const findFoodPostById = async (
   return result;
 };
 
-export const searchFood = async (
+const toFoodSearchCommonOptions = (
   params: IFoodSearchParams
-): Promise<IFoodPostSchema[]> => {
+): Record<string, any> => {
+  const options: Record<string, any> = {};
   const {
-    currentLocation,
-    maxDistance,
-    categories,
+    active,
+    addedBy,
     available,
-    minQuantity,
+    category,
     maxDuration,
+    minQuantity,
+    place,
     price,
-    pagination,
-    order,
+    user,
   } = params;
-  const options: any = {};
-  const meta: any = {};
-  const sort: any = {};
 
-  if (params.query.length > 0) {
-    options["$text"] = {
-      $search: params.query,
-    };
+  if (active != null) {
+    options.active = active;
   }
 
-  // max distance on location
-  if (currentLocation) {
-    const maxDis =
-      maxDistance != undefined ? maxDistance : Number.MAX_SAFE_INTEGER;
-    options["location.two_array"] = {
-      $geoWithin: {
-        $center: [[currentLocation.lng, currentLocation.lat], maxDis],
-      },
-    };
-  }
-  // categories
-  if (categories) {
-    options["categories"] = {
-      $in: categories,
-    };
+  if (addedBy != null) {
+    if (typeof addedBy === "string") {
+      if (addedBy !== PlaceType.PERSONAL) {
+        options["place.type"] = null;
+      } else {
+        options["place.type"] = addedBy;
+      }
+    } else if (isArrayPlaceTypes(addedBy)) {
+      const isPersonalIncluded = addedBy.includes(PlaceType.PERSONAL);
+      const types: PlaceType[] = [];
+      addedBy.forEach((type) => {
+        if (type !== PlaceType.PERSONAL) {
+          types.push(type);
+        }
+      });
+      if (isPersonalIncluded) {
+        options["place.type"] = {
+          $or: [null, { $in: types }],
+        };
+      } else {
+        options["place.type"] = {
+          $in: addedBy,
+        };
+      }
+    }
   }
 
-  // Available
-  if (available) {
+  if (available != null) {
     switch (available) {
       case "ALL":
         break;
@@ -251,41 +263,132 @@ export const searchFood = async (
     }
   }
 
-  // Quantity
-  if (minQuantity) {
-    options["quantity"] = {
-      $gte: minQuantity,
-    };
+  if (category != null) {
+    if (typeof category === "string") {
+      options["categories"] = {
+        $in: [category],
+      };
+    } else {
+      options["categories"] = {
+        $in: category,
+      };
+    }
   }
 
-  // Max duration
-  if (maxDuration) {
+  if (maxDuration != null) {
     options["duration"] = {
       $gte: Date.now() + maxDuration * 24 * 60 * 60 * 1000, // days to miliseconds
     };
   }
 
-  if (price && price.active) {
-    options["price"] = {
-      $gte: price.min,
-      $lte: price.max,
+  if (minQuantity != null) {
+    options["quantity"] = {
+      $gte: minQuantity,
+    };
+  }
+
+  if (price != null) {
+    const priceOption: any = {};
+    if (price.min != null) {
+      priceOption.$gte = price.min;
+    }
+    if (price.max != null) {
+      priceOption.$lte = price.max;
+    }
+    if (Object.keys(priceOption).length > 0) {
+      options["price"] = priceOption;
+    }
+  }
+
+  if (place != null) {
+    const include = place.include;
+    const placeIdOption: any = {};
+
+    if (typeof include === "string") {
+      placeIdOption.$eq = include;
+    } else if (Array.isArray(include)) {
+      placeIdOption.$in = include;
+    }
+
+    const exclude = place.exclude;
+    if (typeof exclude === "string") {
+      placeIdOption.$neq = exclude;
+    } else if (Array.isArray(exclude)) {
+      placeIdOption.$nin = exclude;
+    }
+
+    if (Object.keys(placeIdOption).length > 0) {
+      options["place._id"] = placeIdOption;
+    }
+  }
+
+  if (user != null) {
+    const include = user.include;
+    const userOption: any = {};
+
+    if (typeof include === "string") {
+      userOption.$eq = include;
+    } else if (Array.isArray(include)) {
+      userOption.$in = include;
+    }
+
+    const exclude = user.exclude;
+    if (typeof exclude === "string") {
+      userOption.$neq = exclude;
+    } else if (Array.isArray(exclude)) {
+      userOption.$nin = exclude;
+    }
+
+    if (Object.keys(userOption).length > 0) {
+      options["user"] = userOption;
+    }
+  }
+
+  return options;
+};
+
+export const searchFood = async (
+  params: IFoodSearchParams
+): Promise<IFoodPostExposed[]> => {
+  const commonOptions = toFoodSearchCommonOptions(params);
+  const { distance, order, pagination, populate, query } = params;
+  const options: any = {};
+  const meta: any = {};
+  const sort: any = {};
+
+  if (query && query.length > 0) {
+    options["$text"] = {
+      $search: query,
+    };
+  }
+
+  // max distance on location
+  if (distance != null) {
+    const { max, current } = distance;
+    options["location.two_array"] = {
+      $geoWithin: {
+        $center: [[current.lng, current.lat], max],
+      },
     };
   }
 
   if (order) {
-    if (order.orderNew) {
-      sort["createdAt"] = order.orderNew;
+    if (order.distance) {
+      sort["location.two_array"] = order.distance;
     }
-    if (order.orderPrice) {
-      sort["price"] = order.orderPrice;
+    if (order.time) {
+      sort["createdAt"] = order.time;
     }
-    if (order.orderQuantity) {
-      sort["quantity"] = order.orderQuantity;
+    if (order.price) {
+      sort["price"] = order.price;
+    }
+    if (order.quantity) {
+      sort["quantity"] = order.quantity;
     }
   }
 
   // score final
-  if (params.query.length > 0) {
+  if (query && query.length > 0) {
     sort["score"] = {
       $meta: "textScore",
     };
@@ -294,30 +397,81 @@ export const searchFood = async (
     };
   }
 
-  const query = FoodPost.find(options, meta).sort(sort);
+  const queryBuilder = FoodPost.find(
+    {
+      ...options,
+      ...commonOptions,
+    },
+    meta
+  ).sort(sort);
 
   // Pagination
-  if (pagination) {
-    query.skip(pagination.skip).limit(pagination.limit);
-  }
+  queryBuilder.skip(pagination?.skip ?? 0).limit(pagination?.limit ?? 24);
 
-  const result = await query.exec();
-  if (result == null) throw new InternalError();
+  const posts = await queryBuilder.exec();
+  if (posts == null) throw new InternalError();
 
-  // Sort follow location
-  if (order) {
-    if (currentLocation && order.orderDistance) {
-      result.sort((f1, f2) => {
-        const pos1 = f1.location.coordinates;
-        const pos2 = f2.location.coordinates;
-        const delta =
-          toDistance(pos1, currentLocation) - toDistance(pos2, currentLocation);
-        if (order.orderDistance === OrderState.INCREASE) return delta;
-        return -delta;
+  const result: IFoodPostExposed[] = posts.map((post) => ({
+    _id: post._id.toString(),
+    active: post.active,
+    categories: post.categories,
+    createdAt: post.createdAt,
+    description: post.description,
+    duration: post.duration,
+    images: post.images,
+    isEdited: post.isEdited,
+    likeCount: post.likeCount,
+    location: post.location,
+    price: post.price,
+    quantity: post.quantity,
+    title: post.title,
+    updatedAt: post.updatedAt,
+    user: post.user,
+    place: post.place?._id,
+  }));
+
+  if (populate != null) {
+    const requireUser = populate.user !== false;
+    const requirePlace = populate.place !== false;
+
+    const users: string[] = [];
+    const places: string[] = [];
+    posts.forEach((post) => {
+      const user = post.user;
+      const place = post.place?._id;
+      requireUser && !users.includes(user) && users.push(user);
+      requirePlace && place && !places.includes(place) && places.push(place);
+    });
+
+    const [userDict, placeDict] = await Promise.all([
+      rpcGetDictUser<Record<string, IFoodPostExposedUser>>(
+        users,
+        "_id firstName lastName avartar location"
+      ),
+      rpcGetDictPlace<Record<string, IFoodPostExposedPlace>>(
+        places,
+        "_id exposeName avartar type location"
+      ),
+    ]);
+
+    if (requireUser || requireUser) {
+      result.forEach((post) => {
+        if (userDict != null) {
+          const user = userDict[post.user as string];
+          if (user) {
+            post.user = user;
+          }
+        }
+        if (placeDict != null && post.place != null) {
+          const place = placeDict[post.place as string];
+          if (place) {
+            post.place = place;
+          }
+        }
       });
-      sort["location.two_array"] = order.orderDistance;
     }
   }
+
   return result;
 };
 

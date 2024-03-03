@@ -163,20 +163,16 @@ export const findFoodPost = async (
     .catch(next);
 };
 
-interface IFoodSearchBody extends Omit<IFoodSearchParams, "query"> {
-  query?: string;
-}
-
 export const searchFoodPost = async (
-  req: Request<{}, {}, IFoodSearchBody, {}>,
+  req: Request<{}, {}, IFoodSearchParams, {}>,
   res: Response,
   next: NextFunction
 ) => {
   const params = req.body;
   const auth = req.authContext as AuthLike;
-  const paramsToSerach = toFoodSearchParams(params);
-  saveSearchHistory(auth._id, paramsToSerach);
-  searchFoodService(paramsToSerach)
+  const paramsToSearch = toFoodSearchParams(params);
+  saveSearchHistory(auth._id, paramsToSearch);
+  searchFoodService(paramsToSearch)
     .then((data) => res.status(200).json(toResponseSuccessData(data)))
     .catch(next);
 };
