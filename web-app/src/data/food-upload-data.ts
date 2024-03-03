@@ -15,4 +15,5 @@ export interface IFoodUploadData {
   quantity: number;
   duration: number;
   price: number;
+  place?: string;
 }
