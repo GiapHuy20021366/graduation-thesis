@@ -416,7 +416,7 @@ export const ratingPlace = async (
     }
   }
   return {
-    ratingAfter,
+    ...ratingAfter,
   };
 };
 

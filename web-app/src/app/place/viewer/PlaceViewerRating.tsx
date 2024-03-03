@@ -8,8 +8,9 @@ import {
   Typography,
 } from "@mui/material";
 import { IPlaceExposed, IRating } from "../../../data";
-import { useAuthContext } from "../../../hooks";
+import { useAuthContext, useToastContext } from "../../../hooks";
 import { Star } from "@mui/icons-material";
+import { userFetcher } from "../../../api";
 
 type PlaceViewerRatingProps = StackProps & {
   data: IPlaceExposed;
@@ -38,12 +39,15 @@ const PlaceViewerRating = React.forwardRef<
 >((props, ref) => {
   const { data, ...rest } = props;
 
-  const [rating, setRating] = useState<number | null>(0);
+  const [rating, setRating] = useState<number | null>(
+    data.userRating?.score ?? null
+  );
   const [hover, setHover] = useState<number>(-1);
   const [ratingExpose, setRatingExpose] = useState<IRating>(data.rating);
 
   const authContext = useAuthContext();
-  const account = authContext.account;
+  const { account, auth } = authContext;
+  const toastContext = useToastContext();
 
   useEffect(() => {
     if (rating == null) {
@@ -56,37 +60,20 @@ const PlaceViewerRating = React.forwardRef<
   }, [account, data, rating]);
 
   const ratingPlace = (score: number | null) => {
-    let total = data.rating.count * data.rating.mean;
-    let count = data.rating.count;
-
-    const userRating = data.userRating;
-    if (userRating && account) {
-      if (userRating?.user === account?.id_) {
-        // user has ratinged
-        total -= userRating.score;
-        count -= 1;
-        if (score != null) {
-          total += score;
-          count += 1;
+    if (auth == null) return;
+    userFetcher
+      .ratingPlace(data._id, auth, score ?? undefined)
+      .then((res) => {
+        const resRating = res.data;
+        if (resRating) {
+          setRating(score);
+          setRatingExpose(resRating);
         }
-      }
-    } else {
-      // user has not ratinged
-      if (score != null) {
-        total += score;
-        count += 1;
-      }
-    }
-
-    setRatingExpose({
-      mean: total / Math.max(1, count),
-      count: count,
-    });
-
-    setRating(score);
+      })
+      .catch(() => {
+        toastContext.error("Không thể đánh giá vào lúc này");
+      });
   };
-
-  console.log(ratingExpose);
 
   return (
     <Stack
@@ -142,7 +129,7 @@ const PlaceViewerRating = React.forwardRef<
       </Box>
       <Stack>
         <Typography>
-          {ratingExpose.count} lượt, đánh giá {ratingExpose.mean}/5.0
+          {ratingExpose.count} lượt, đánh giá {ratingExpose.mean.toFixed(1)}/5.0
         </Typography>
         <Box
           sx={{

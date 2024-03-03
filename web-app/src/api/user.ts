@@ -180,7 +180,7 @@ export interface UserFetcher {
   ratingPlace(
     placeId: string,
     auth: IAuthInfo,
-    score?: number
+    score?: number | null
   ): Promise<UserResponse<IRating>>;
   searchPlace(
     searchParams: IPlaceSearchParams,
@@ -399,7 +399,7 @@ export const userFetcher: UserFetcher = {
   ratingPlace: (
     placeId: string,
     auth: IAuthInfo,
-    score?: number
+    score?: number | null
   ): Promise<UserResponse<IRating>> => {
     return userInstance.get(
       userEndpoints.ratingPlace.replace(":id", placeId) +
