@@ -24,6 +24,7 @@ import {
   getRatedPlaces,
   ratingPlace,
   getPlaceFollowers,
+  searchUser,
 } from "../controllers";
 
 const initUserRouter = (app: Express) => {
@@ -46,6 +47,9 @@ const initUserRouter = (app: Express) => {
 
   // Get information of an user
   userRouter.get("/:id", tokenParser, getBasicUserInfo);
+
+  // Search user
+  userRouter.post("/search", tokenParser, searchUser);
 
   // Find users around a position
   userRouter.post("/around", tokenParser, searchUsersAround);

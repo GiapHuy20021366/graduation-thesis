@@ -2,16 +2,19 @@ import { NextFunction, Request, Response } from "express";
 import {
   ICoordinates,
   IPagination,
+  IUserSearchParams,
   InvalidDataError,
   isCoordinates,
   isLocation,
   isNumber,
   isObjectId,
   toResponseSuccessData,
+  toUserSearchParams,
 } from "../data";
 import {
   searchUsersAround as searchUsersAroundService,
   getBasicUserInfo as getBasicUserInfoService,
+  searchUser as searchUserService,
 } from "../services";
 
 interface ISearchUsersAroundParams {
@@ -77,5 +80,17 @@ export const getBasicUserInfo = (
   }
   getBasicUserInfoService(id!)
     .then((data) => res.status(200).json(toResponseSuccessData(data)))
+    .catch(next);
+};
+
+export const searchUser = async (
+  req: Request<{}, {}, IUserSearchParams, {}>,
+  res: Response,
+  next: NextFunction
+) => {
+  const params = req.body;
+  const paramsToSearch = toUserSearchParams(params);
+  searchUserService(paramsToSearch)
+    .then((data) => res.send(toResponseSuccessData(data)))
     .catch(next);
 };

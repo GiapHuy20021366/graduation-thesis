@@ -120,3 +120,8 @@ export {
 } from "./food-search-params";
 export { toPlaceTypes } from "./to-place-types";
 export { toItemAddedBy } from "./to-item-added-by";
+export {
+  type IUserSearchDistance,
+  type IUserSearchOrder,
+  type IUserSearchParams,
+} from "./user-search-params";

@@ -17,6 +17,7 @@ import {
   IRating,
   OrderState,
   IPlaceFollowerExposed,
+  IUserSearchParams,
 } from "../data";
 
 export const userEndpoints = {
@@ -28,6 +29,7 @@ export const userEndpoints = {
   findUsersAround: "/users/around",
   getUserInfo: "/users/:id",
   setUserLocation: "/users/:id/location",
+  searchUser: "/users/search",
 
   // places
   createPlace: "/",
@@ -149,6 +151,10 @@ export interface UserFetcher {
     location: ILocation,
     auth: IAuthInfo
   ): Promise<UserResponse<void>>;
+  searchUser(
+    params: IUserSearchParams,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IUserInfo[]>>;
 
   // Place
   createPlace(
@@ -314,6 +320,16 @@ export const userFetcher: UserFetcher = {
         },
       }
     );
+  },
+  searchUser: (
+    params: IUserSearchParams,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IUserInfo[]>> => {
+    return userInstance.post(userEndpoints.searchUser, params, {
+      headers: {
+        Authorization: auth.token,
+      },
+    });
   },
 
   // place

@@ -3,6 +3,7 @@ import {
   ICoordinates,
   ILocation,
   IPagination,
+  IUserSearchParams,
   InternalError,
   ResourceNotExistedError,
 } from "../data";
@@ -44,7 +45,7 @@ export const searchUsersAround = async (params: {
   }
   const result: SearchedUser[] = [];
   users.forEach((user) => {
-    if (user.location != null) {
+    if (user.location != null && user.location.name) {
       result.push({
         id_: user._id.toString(),
         avartar: user.avatar,
@@ -78,4 +79,62 @@ export const getBasicUserInfo = async (id: string) => {
     lastName: user.lastName,
     location: user.location,
   };
+};
+
+export const searchUser = async (
+  params: IUserSearchParams
+): Promise<SearchedUser[]> => {
+  const { distance, order, pagination, query } = params;
+
+  const options: any = {};
+  const orderOptions: any = {};
+
+  if (distance) {
+    const { current, max } = distance;
+    options["location.two_array"] = {
+      $geoWithin: {
+        $centerSphere: [[current.lng, current.lat], max / 6378.1],
+      },
+    };
+  }
+
+  if (query) {
+    const regex = new RegExp(query, "i");
+    options.$or = [
+      { firstName: { $regex: regex } },
+      { lastName: { $regex: regex } },
+    ];
+  }
+
+  if (order) {
+    const { distance, time } = order;
+    if (distance) {
+      orderOptions.distance = distance;
+    }
+    if (time) {
+      orderOptions.createdAt = time;
+    }
+  }
+
+  const users = await User.find(options)
+    .sort(orderOptions)
+    .skip(pagination?.skip ?? 0)
+    .limit(pagination?.limit ?? 24);
+
+  if (users == null) {
+    throw new InternalError();
+  }
+
+  return users
+    .filter((user) => user.location && user.location.name)
+    .map(
+      (user): SearchedUser => ({
+        id_: user._id,
+        avartar: user.avatar,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        location: user.location!,
+      })
+    );
 };

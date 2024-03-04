@@ -19,7 +19,7 @@ export {
 
 export { setUserLocation } from "./location";
 
-export { searchUsersAround, getBasicUserInfo } from "./user";
+export { searchUsersAround, getBasicUserInfo, searchUser } from "./user";
 
 export {
   createNewPlace,

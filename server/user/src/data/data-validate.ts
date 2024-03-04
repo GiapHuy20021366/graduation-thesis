@@ -1,5 +1,6 @@
 import { ICoordinates } from "./coordinates";
 import { ILocation } from "./location";
+import { OrderState } from "./order-state";
 import { IPagination } from "./pagination";
 import { PlaceType } from "./place-type";
 import { FollowType } from "./user-place-follower";
@@ -80,4 +81,8 @@ export const isFollowType = (value: any): value is FollowType => {
 
 export const isArrayFollowTypes = (value: any): value is FollowType[] => {
   return Array.isArray(value) && value.every((v) => isFollowType(v));
+};
+
+export const isOrderState = (value: any): value is OrderState => {
+  return Object.values(OrderState).includes(value);
 };
