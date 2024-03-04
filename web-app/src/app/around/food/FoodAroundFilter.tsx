@@ -11,17 +11,22 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ToggleChipGroup from "../../common/custom/ToggleChipGroup";
 import ToggleChip from "../../common/custom/ToggleChip";
 import {
   FoodCategory,
+  IFoodSearchPrice,
   ItemAddedBy,
   ItemAvailable,
+  PlaceType,
+  loadFromSessionStorage,
+  saveToSessionStorage,
+  toItemAddedBy,
+  toPlaceTypes,
   toQuantityType,
 } from "../../../data";
 import { useFoodSearchContext, useI18nContext } from "../../../hooks";
-import { IFoodSearchPrice } from "../../../api";
 import CategoryPiece from "../../food/sharing/CategoryPiece";
 import { CloseOutlined } from "@mui/icons-material";
 
@@ -31,57 +36,67 @@ const PriceOptions = {
   CUSTOM: "CUSTOM",
 } as const;
 
+export interface IFilterParams {
+  addedBy?: PlaceType[];
+  available: ItemAvailable;
+  maxDistance?: number;
+  maxDuration?: number;
+  categories?: FoodCategory[];
+  minQuantity?: number;
+  price?: IFoodSearchPrice;
+}
+
 interface IFoodSearchCondition {
   onApply?: (params: IFilterParams) => void;
   onCloseClick?: () => void;
 }
 
-interface PriceRange {
-  min: number;
-  max: number;
-}
-
-export interface IFilterParams {
+interface IFoodAroundFilterSnapshotData {
   addedBy: ItemAddedBy;
   available: ItemAvailable;
-  maxDistance: number;
-  maxDuration: number;
-  categories: FoodCategory[];
-  minQuantity: number;
-  price: IFoodSearchPrice;
+  maxDistance?: number;
+  categories?: FoodCategory[];
+  minQuantity?: number;
+  maxDuration?: number;
+  priceOption?: string;
+  priceRange?: IFoodSearchPrice;
 }
+
+const FOOD_AROUND_FILTER_STORAGE_KEY = "food.around.filter";
 
 export default function FoodAroundFilter({
   onApply,
   onCloseClick,
 }: IFoodSearchCondition) {
   const searchContext = useFoodSearchContext();
-  const [addedBy, setAddedBy] = useState<ItemAddedBy>(searchContext.addedBy);
+  const [addedBy, setAddedBy] = useState<ItemAddedBy>(
+    toItemAddedBy(searchContext.addedBy)
+  );
   const [available, setAvailable] = useState<ItemAvailable>(
     searchContext.available
   );
-  const [maxDistance, setMaxDistance] = useState<number>(
+  const [maxDistance, setMaxDistance] = useState<number | undefined>(
     searchContext.maxDistance
   );
-  const [categories, setCategories] = useState<FoodCategory[]>(
+  const [categories, setCategories] = useState<FoodCategory[] | undefined>(
     searchContext.categories
   );
   const [categoryActive, setCategoryActive] = useState<boolean>(
-    searchContext.categories.length !== 0
+    searchContext.categories?.length === 0
   );
-  const [minQuantity, setMinQuantity] = useState<number>(
+  const [minQuantity, setMinQuantity] = useState<number | undefined>(
     searchContext.minQuantity
   );
   const [quantityHover, setQuantityHover] = useState<number>(-1);
-  const [maxDuration, setMaxDuration] = useState<number>(
+  const [maxDuration, setMaxDuration] = useState<number | undefined>(
     searchContext.maxDuration
   );
-  const [priceOption, setPriceOption] = useState<string>(
-    searchContext.price.active ? PriceOptions.CUSTOM : PriceOptions.ALL
+  const [priceOption, setPriceOption] = useState<string | undefined>(
+    searchContext.price ? PriceOptions.CUSTOM : PriceOptions.ALL
   );
-  const [priceRange, setPriceRange] = useState<PriceRange>({
-    min: searchContext.price.min,
-    max: searchContext.price.max,
+  const [priceRange, setPriceRange] = useState<IFoodSearchPrice | undefined>({
+    min: searchContext?.price?.min,
+    max: searchContext?.price?.max,
   });
 
   const i18nContext = useI18nContext();
@@ -92,62 +107,68 @@ export default function FoodAroundFilter({
     "DayValues"
   );
 
+  const dirtyRef = useRef<boolean>(true);
+
   const handleReset = () => {
     setAddedBy(ItemAddedBy.ALL);
     setAvailable(ItemAvailable.AVAILABLE_ONLY);
-    setMaxDistance(-1);
-    setCategories([]);
+    setMaxDistance(undefined);
+    setCategories(undefined);
     setCategoryActive(false);
-    setMinQuantity(1);
+    setMinQuantity(undefined);
     setQuantityHover(-1);
     setPriceOption(PriceOptions.ALL);
-    setMaxDuration(-1);
+    setMaxDuration(undefined);
   };
 
   const handleApply = () => {
     const price: IFoodSearchPrice = {
-      active: priceOption !== PriceOptions.ALL,
-      min: priceOption === PriceOptions.FREE ? 0 : priceRange.min,
-      max: priceOption === PriceOptions.FREE ? 0 : priceRange.max,
+      min: priceOption === PriceOptions.FREE ? 0 : priceRange?.min,
+      max: priceOption === PriceOptions.FREE ? 0 : priceRange?.max,
     };
     const params: IFilterParams = {
-      addedBy: addedBy,
+      addedBy: toPlaceTypes(addedBy),
       available: available,
       maxDistance: maxDistance,
       maxDuration: maxDuration,
-      categories: categoryActive ? categories : [],
+      categories: categoryActive ? categories : undefined,
       minQuantity: minQuantity,
       price: price,
     };
     onApply && onApply(params);
-    backup();
+    doSaveStorage();
   };
 
   const handleCategoryPicked = (category: FoodCategory | null): void => {
-    console.log(category);
-    if (category && !categories.includes(category)) {
-      const newCategories = categories.slice();
-      newCategories.push(category);
-      setCategories(newCategories);
+    if (category) {
+      if (categories == null) {
+        setCategories([category]);
+      } else {
+        const newCategories = categories.slice();
+        newCategories.push(category);
+        setCategories(newCategories);
+      }
     }
   };
 
   const handleCategoryRemoved = (index: number): void => {
-    if (index > -1 && index < categories.length) {
-      const newCategories = categories.slice();
-      newCategories.splice(index, 1);
-      setCategories(newCategories);
+    if (categories != null) {
+      if (index > -1 && index < categories.length) {
+        const newCategories = categories.slice();
+        newCategories.splice(index, 1);
+        setCategories(newCategories);
+      }
     }
   };
 
-  const toQuantityLang = (quantity: number, hover: number) => {
+  const toQuantityLang = (hover: number, quantity?: number) => {
     if (hover < 0) {
       return quantity ? lang(toQuantityType(quantity)) : lang("l-all");
     }
     return lang(toQuantityType(hover));
   };
 
-  const onPriceRangeClick = (value: PriceRange): void => {
+  const onPriceRangeClick = (value: IFoodSearchPrice): void => {
     setPriceRange(value);
   };
 
@@ -169,51 +190,47 @@ export default function FoodAroundFilter({
     });
   };
 
-  const backup = () => {
-    localStorage.setItem(
-      "around.food.filter.state.filter",
-      JSON.stringify({
-        addedBy,
-        available,
-        maxDistance,
-        categories,
-        categoryActive,
-        minQuantity,
-        quantityHover,
-        maxDuration,
-        priceOption,
-        priceRange,
-      })
-    );
-  };
-
-  const restore = () => {
-    const saved = localStorage.getItem("around.food.filter.state.filter");
-    if (saved) {
-      try {
-        const meta = JSON.parse(saved);
-        if (meta) {
-          setAddedBy(meta.addedBy);
-          setAvailable(meta.available);
-          setMaxDistance(meta.maxDistance);
-          setCategories(meta.categories);
-          setCategoryActive(meta.categoryActive);
-          setMinQuantity(meta.minQuantity);
-          setQuantityHover(meta.quantityHover);
-          setMaxDuration(meta.maxDuration);
-          setPriceOption(meta.priceOption);
-          setPriceRange(meta.priceRange);
-        }
-      } catch (error) {
-        // DO nothing
-      }
-    }
+  const doSaveStorage = () => {
+    const snapshot: IFoodAroundFilterSnapshotData = {
+      addedBy,
+      available,
+      categories,
+      maxDistance,
+      maxDuration,
+      minQuantity,
+      priceOption,
+      priceRange,
+    };
+    saveToSessionStorage(snapshot, {
+      key: FOOD_AROUND_FILTER_STORAGE_KEY,
+    });
   };
 
   useEffect(() => {
-    restore();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (dirtyRef.current) {
+      dirtyRef.current = false;
+      const snapshot = loadFromSessionStorage<IFoodAroundFilterSnapshotData>({
+        key: FOOD_AROUND_FILTER_STORAGE_KEY,
+        maxDuration: 1 * 24 * 60 * 60 * 1000,
+      });
+      if (snapshot) {
+        setAddedBy(snapshot.addedBy);
+        setAvailable(snapshot.available);
+        setMaxDistance(snapshot.maxDistance);
+        setCategories(snapshot.categories);
+        setMinQuantity(snapshot.minQuantity);
+        setMaxDuration(snapshot.maxDuration);
+        setPriceOption(snapshot.priceOption);
+        setPriceRange(snapshot.priceRange);
+      }
+    }
   }, []);
+
+  const onItemAddedByChange = (value: string) => {
+    setAddedBy(value as ItemAddedBy);
+    const placeTypes = toPlaceTypes(value as ItemAddedBy);
+    searchContext.setAddedBy(placeTypes);
+  };
 
   return (
     <Stack
@@ -266,13 +283,17 @@ export default function FoodAroundFilter({
             {lang("item-added-by")}:
           </Typography>
           <ToggleChipGroup
-            value={addedBy}
-            onValueChange={(value) => setAddedBy(value)}
+            value={addedBy ?? ItemAddedBy.ALL}
+            onValueChange={(value) => onItemAddedByChange(value)}
             exclusive
             sx={{
               display: "flex",
               flexDirection: "row",
               gap: 1,
+              overflowY: "auto",
+              "::-webkit-scrollbar": {
+                display: "none",
+              },
             }}
           >
             <ToggleChip
@@ -289,6 +310,11 @@ export default function FoodAroundFilter({
               variant="outlined"
               label={lang("l-volunteer")}
               value={ItemAddedBy.VOLUNTEER}
+            />
+            <ToggleChip
+              variant="outlined"
+              label={lang("l-place")}
+              value={ItemAddedBy.PLACE}
             />
           </ToggleChipGroup>
         </Box>
@@ -330,8 +356,10 @@ export default function FoodAroundFilter({
             {lang("max-distance")}:
           </Typography>
           <ToggleChipGroup
-            value={maxDistance}
-            onValueChange={(value) => setMaxDistance(value)}
+            value={maxDistance ?? -1}
+            onValueChange={(value) =>
+              setMaxDistance(value === -1 ? undefined : value)
+            }
             sx={{
               display: "flex",
               flexDirection: "row",
@@ -359,8 +387,10 @@ export default function FoodAroundFilter({
             {lang("max-duration")}:
           </Typography>
           <ToggleChipGroup
-            value={maxDuration}
-            onValueChange={(value) => setMaxDuration(value)}
+            value={maxDuration ?? -1}
+            onValueChange={(value) =>
+              setMaxDuration(value === -1 ? undefined : value)
+            }
             sx={{
               display: "flex",
               flexDirection: "row",
@@ -432,15 +462,16 @@ export default function FoodAroundFilter({
                 overflowY: "auto",
               }}
             >
-              {categories.map((category, index) => {
-                return (
-                  <CategoryPiece
-                    text={lang(category)}
-                    onRemove={() => handleCategoryRemoved(index)}
-                    key={index}
-                  />
-                );
-              })}
+              {categories &&
+                categories.map((category, index) => {
+                  return (
+                    <CategoryPiece
+                      text={lang(category)}
+                      onRemove={() => handleCategoryRemoved(index)}
+                      key={index}
+                    />
+                  );
+                })}
             </Stack>
           </Stack>
         </Box>
@@ -460,7 +491,7 @@ export default function FoodAroundFilter({
               }}
             />
             <Box sx={{ ml: 2 }}>
-              {toQuantityLang(minQuantity, quantityHover)}
+              {toQuantityLang(quantityHover, minQuantity)}
             </Box>
           </Stack>
         </Box>
@@ -509,7 +540,7 @@ export default function FoodAroundFilter({
               >
                 <TextField
                   type="number"
-                  value={priceRange.min}
+                  value={priceRange?.min}
                   label={lang("l-min")}
                   inputProps={{
                     min: 0,
@@ -519,7 +550,7 @@ export default function FoodAroundFilter({
                 />
                 <TextField
                   type="number"
-                  value={priceRange.max}
+                  value={priceRange?.max}
                   label={lang("l-max")}
                   inputProps={{
                     min: 0,

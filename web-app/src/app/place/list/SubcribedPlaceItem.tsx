@@ -70,7 +70,8 @@ const SubcribedItem = React.forwardRef<HTMLDivElement, SubcribedItemProps>(
           <Stack direction="row" gap={1}>
             <StarBorderOutlined color="secondary" />
             <Typography>
-              {data.rating.count} lượt, đánh giá {data.rating.mean}/5.0
+              {data.rating.count} lượt, đánh giá {data.rating.mean.toFixed(1)}
+              /5.0
             </Typography>
           </Stack>
           <Stack gap={1} direction={"row"}>

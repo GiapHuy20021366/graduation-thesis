@@ -72,6 +72,7 @@ interface AccountInfo {
   token: string;
   titles: string[];
   avartar?: string;
+  location?: ILocation;
 }
 
 interface ManualRegisterInfo {

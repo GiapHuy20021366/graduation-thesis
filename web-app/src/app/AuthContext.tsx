@@ -87,6 +87,17 @@ export default function AuthContextProvider({
             .refreshToken(auth.token, true)
             .then((result) => {
               const account = result.data;
+              if (account && account?.location) {
+                const location = account.location;
+                if (
+                  location.name == null ||
+                  location.coordinates == null ||
+                  location.coordinates.lat == null ||
+                  location.coordinates.lng == null
+                ) {
+                  account.location = undefined;
+                }
+              }
               setAccount(account);
               setToken(account?.token);
             })

@@ -22,6 +22,8 @@ import {
   PlaceType,
   loadFromSessionStorage,
   saveToSessionStorage,
+  toItemAddedBy,
+  toPlaceTypes,
   toQuantityType,
 } from "../../../data";
 import CategoryPiece from "../sharing/CategoryPiece";
@@ -61,35 +63,6 @@ interface IFoodSearchFilterSnapshotData {
 }
 
 const FOOD_SEARCH_FILTER_STORAGE_KEY = "food.search.filter";
-
-const toItemAddedBy = (value?: PlaceType[]): ItemAddedBy => {
-  if (value == null) return ItemAddedBy.ALL;
-  if (value.includes(PlaceType.PERSONAL)) return ItemAddedBy.PERSONAL;
-  if (value.includes(PlaceType.VOLUNTEER)) return ItemAddedBy.VOLUNTEER;
-  return ItemAddedBy.PLACE;
-};
-
-const toPlaceTypes = (addedBy: ItemAddedBy): PlaceType[] | undefined => {
-  switch (addedBy) {
-    case ItemAddedBy.ALL: {
-      return;
-    }
-    case ItemAddedBy.PERSONAL: {
-      return [PlaceType.PERSONAL];
-    }
-    case ItemAddedBy.VOLUNTEER: {
-      return [PlaceType.VOLUNTEER];
-    }
-    case ItemAddedBy.PLACE: {
-      return [
-        PlaceType.EATERY,
-        PlaceType.GROCERY,
-        PlaceType.RESTAURANT,
-        PlaceType.SUPERMARKET,
-      ];
-    }
-  }
-};
 
 export default function FoodSearchFilter({
   isActive,

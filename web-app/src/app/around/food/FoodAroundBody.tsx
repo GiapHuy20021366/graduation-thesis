@@ -5,13 +5,16 @@ import {
   useJsApiLoader,
 } from "@react-google-maps/api";
 import { GOOGLE_MAP_API_KEY } from "../../../env";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ICoordinates,
-  IFoodSearchInfo,
+  IFoodPostExposed,
+  IFoodSearchParams,
   ILocation,
   OrderState,
+  loadFromSessionStorage,
   mapIcons,
+  saveToSessionStorage,
 } from "../../../data";
 import { Box, Chip, IconButton, Stack, Tooltip } from "@mui/material";
 import {
@@ -19,15 +22,22 @@ import {
   SettingsSuggestOutlined,
 } from "@mui/icons-material";
 import {
-  useAppContentContext,
   useAuthContext,
+  useDistanceCalculation,
   useFoodSearchContext,
-  useI18nContext,
   useLoading,
 } from "../../../hooks";
 import FoodAroundFilter, { IFilterParams } from "./FoodAroundFilter";
-import { IFoodSearchParams, foodFetcher } from "../../../api";
+import { foodFetcher } from "../../../api";
 import InfoWindowFood from "./InfoWindowFood";
+
+interface IFoodAroundBodySnapshotData {
+  center: ICoordinates;
+  foods: IFoodPostExposed[];
+  selectedMarker?: number | string;
+}
+
+const FOOD_AROUND_BODY_STORAGE_KEY = "food.around.body";
 
 export default function FoodAroundBody() {
   const { isLoaded } = useJsApiLoader({
@@ -39,21 +49,143 @@ export default function FoodAroundBody() {
     lng: 105.83,
   });
 
-  const [foods, setFoods] = useState<IFoodSearchInfo[]>([]);
+  const [foods, setFoods] = useState<IFoodPostExposed[]>([]);
 
   const [infoOpen, setInfoOpen] = useState<boolean>(false);
   const fetching = useLoading();
-  const i8nContext = useI18nContext();
-  const lang = i8nContext.of(FoodAroundBody);
   const mapRef = useRef<google.maps.Map>();
   const [loadActive, setLoadActive] = useState<boolean>(false);
   const authContext = useAuthContext();
   const auth = authContext.auth;
-  const [selectedMarker, setSelectedMarker] = useState<number | string>();
+  const [selectedMarker, setSelectedMarker] = useState<string | number>();
   const [home, setHome] = useState<ILocation>();
   const [filterOpen, setFilterOpen] = useState<boolean>(false);
-  const appContentContext = useAppContentContext();
   const searchContext = useFoodSearchContext();
+  const distances = useDistanceCalculation();
+  const dirtyRef = useRef<boolean>(true);
+
+  const doSaveStorage = useCallback(() => {
+    const map = mapRef.current;
+    if (map == null) return;
+    const center = map.getCenter();
+    if (center == null) return;
+
+    const current: ICoordinates = {
+      lat: center.lat(),
+      lng: center.lng(),
+    };
+
+    const snapshot: IFoodAroundBodySnapshotData = {
+      center: current,
+      foods: foods,
+      selectedMarker: selectedMarker,
+    };
+    saveToSessionStorage(snapshot, {
+      key: FOOD_AROUND_BODY_STORAGE_KEY,
+    });
+  }, [foods, selectedMarker]);
+
+  const setCurrentLocation = useCallback(() => {
+    () => {
+      const current = distances.currentLocation;
+      if (current != null) {
+        setCenter(current.coordinates);
+      }
+    };
+  }, [distances.currentLocation]);
+
+  const searchFood = useCallback(
+    (params: IFoodSearchParams) => {
+      if (auth == null) return;
+      if (fetching.isActice) return;
+
+      fetching.active();
+      foodFetcher
+        .searchFood(params, auth)
+        .then((data) => {
+          const datas = data.data;
+          if (datas != null && datas.length > 0) {
+            setFoods(datas);
+            setTimeout(() => {
+              doSaveStorage();
+            }, 0);
+          }
+          fetching.deactive();
+          setLoadActive(false);
+        })
+        .catch(() => {
+          fetching.deactive();
+        });
+    },
+    [auth, doSaveStorage, fetching]
+  );
+
+  const doSearch = useCallback(() => {
+    const map = mapRef.current;
+    if (map == null) return;
+    const center = map.getCenter();
+    if (center == null) return;
+
+    const current: ICoordinates = {
+      lat: center.lat(),
+      lng: center.lng(),
+    };
+
+    const params: IFoodSearchParams = {
+      category: searchContext.categories,
+      active: true,
+      addedBy: searchContext.addedBy,
+      available: searchContext.available,
+      maxDuration: searchContext.maxDuration,
+      minQuantity: searchContext.minQuantity,
+      price: searchContext.price,
+      populate: {
+        user: false,
+        place: false,
+      },
+      distance: {
+        current: current,
+        max: searchContext.maxDistance ?? Number.MAX_SAFE_INTEGER,
+      },
+      pagination: {
+        skip: 0,
+        limit: 200,
+      },
+      order: {
+        distance: OrderState.INCREASE,
+      },
+    };
+    searchFood(params);
+  }, [
+    searchContext.addedBy,
+    searchContext.available,
+    searchContext.categories,
+    searchContext.maxDistance,
+    searchContext.maxDuration,
+    searchContext.minQuantity,
+    searchContext.price,
+    searchFood,
+  ]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (map == null) return;
+    if (dirtyRef.current) {
+      dirtyRef.current = false;
+      const snapshot = loadFromSessionStorage<IFoodAroundBodySnapshotData>({
+        key: FOOD_AROUND_BODY_STORAGE_KEY,
+        maxDuration: 1 * 24 * 60 * 60 * 1000,
+      });
+      if (snapshot) {
+        setCenter(snapshot.center);
+        setFoods(snapshot.foods);
+        setSelectedMarker(snapshot.selectedMarker);
+      } else {
+        setCurrentLocation();
+        doSearch();
+      }
+    }
+  }, [doSearch, setCurrentLocation]);
 
   useEffect(() => {
     const userLocation = authContext.account?.location;
@@ -61,27 +193,6 @@ export default function FoodAroundBody() {
       setHome(userLocation);
     }
   }, [authContext.account, home]);
-
-  const setCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position: GeolocationPosition) => {
-          const pos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
-          setCenter(pos);
-        },
-        (error: GeolocationPositionError) => {
-          console.log(error);
-        }
-      );
-    }
-  };
-
-  useEffect(() => {
-    setCurrentLocation();
-  }, []);
 
   const handleLocateMe = () => {
     setCenter({ ...center });
@@ -92,74 +203,8 @@ export default function FoodAroundBody() {
     setInfoOpen(!infoOpen);
   };
 
-  const searchFood = (params: IFoodSearchParams) => {
-    if (auth == null) return;
-    if (fetching.isActice) return;
-
-    fetching.active();
-    foodFetcher
-      .searchFood(params, auth)
-      .then((data) => {
-        setTimeout(() => {
-          const datas = data.data;
-          if (datas != null && datas.length > 0) {
-            setFoods(datas);
-          }
-          fetching.deactive();
-          setLoadActive(false);
-        }, 200);
-      })
-      .catch(() => {
-        fetching.deactive();
-      });
-  };
-
   const onMapLoaded = (map: google.maps.Map) => {
     mapRef.current = map;
-    setTimeout(() => {
-      // const saved = localStorage.getItem("around.food.filter.state.filter");
-      // if (saved) {
-      //   try {
-      //     const meta = JSON.parse(saved);
-      //     if (meta) {
-      //       setAddedBy(meta.addedBy);
-      //       setAvailable(meta.available);
-      //       setMaxDistance(meta.maxDistance);
-      //       setCategories(meta.categories);
-      //       setCategoryActive(meta.categoryActive);
-      //       setMinQuantity(meta.minQuantity);
-      //       setQuantityHover(meta.quantityHover);
-      //       setMaxDuration(meta.maxDuration);
-      //       setPriceOption(meta.priceOption);
-      //       setPriceRange(meta.priceRange);
-      //     }
-      //   } catch (error) {
-      //     // DO nothing
-      //   }
-      // }
-      const paramsToSearch: IFoodSearchParams = {
-        addedBy: searchContext.addedBy,
-        available: searchContext.available,
-        categories: searchContext.categories,
-        maxDistance: searchContext.maxDistance,
-        maxDuration: searchContext.maxDuration,
-        minQuantity: searchContext.minQuantity,
-        order: {
-          orderDistance: OrderState.NONE,
-          orderNew: OrderState.NONE,
-          orderPrice: OrderState.NONE,
-          orderQuantity: OrderState.NONE,
-        },
-        price: searchContext.price,
-        query: searchContext.query,
-        pagination: {
-          skip: 0,
-          limit: 200,
-        },
-        currentLocation: appContentContext.currentLocation,
-      };
-      searchFood(paramsToSearch);
-    }, 500);
   };
 
   const onMapCenterChanged = () => {
@@ -172,29 +217,43 @@ export default function FoodAroundBody() {
   };
 
   const onFilterApply = (params: IFilterParams) => {
+    setFilterOpen(false);
+
+    const map = mapRef.current;
+    if (map == null) return;
+    const center = map.getCenter();
+    if (center == null) return;
+
+    const current: ICoordinates = {
+      lat: center.lat(),
+      lng: center.lng(),
+    };
+
     const paramsToSearch: IFoodSearchParams = {
+      category: params.categories,
+      active: true,
       addedBy: params.addedBy,
       available: params.available,
-      categories: params.categories,
-      maxDistance: params.maxDistance,
       maxDuration: params.maxDuration,
       minQuantity: params.minQuantity,
-      order: {
-        orderDistance: OrderState.NONE,
-        orderNew: OrderState.NONE,
-        orderPrice: OrderState.NONE,
-        orderQuantity: OrderState.NONE,
-      },
       price: params.price,
-      query: "",
+      populate: {
+        user: false,
+        place: false,
+      },
+      distance: {
+        current: current,
+        max: searchContext.maxDistance ?? Number.MAX_SAFE_INTEGER,
+      },
       pagination: {
         skip: 0,
         limit: 200,
       },
-      currentLocation: appContentContext.currentLocation,
+      order: {
+        distance: OrderState.INCREASE,
+      },
     };
     searchFood(paramsToSearch);
-    setFilterOpen(false);
   };
 
   const onMapClick = () => {
@@ -202,28 +261,7 @@ export default function FoodAroundBody() {
   };
 
   const onButtonLoadClick = () => {
-    const paramsToSearch: IFoodSearchParams = {
-      addedBy: searchContext.addedBy,
-      available: searchContext.available,
-      categories: searchContext.categories,
-      maxDistance: searchContext.maxDistance,
-      maxDuration: searchContext.maxDuration,
-      minQuantity: searchContext.minQuantity,
-      order: {
-        orderDistance: OrderState.NONE,
-        orderNew: OrderState.NONE,
-        orderPrice: OrderState.NONE,
-        orderQuantity: OrderState.NONE,
-      },
-      price: searchContext.price,
-      query: searchContext.query,
-      pagination: {
-        skip: 0,
-        limit: 200,
-      },
-      currentLocation: appContentContext.currentLocation,
-    };
-    searchFood(paramsToSearch);
+    doSearch();
   };
 
   return (
@@ -276,7 +314,7 @@ export default function FoodAroundBody() {
             onCenterChanged={onMapCenterChanged}
             onClick={onMapClick}
           >
-            {/* <MarkerF
+            <MarkerF
               icon={{
                 url: mapIcons.homePin,
                 scaledSize: new google.maps.Size(40, 40),
@@ -291,7 +329,7 @@ export default function FoodAroundBody() {
                   </Box>
                 </InfoWindowF>
               )}
-            </MarkerF> */}
+            </MarkerF>
 
             {foods.map((food, i) => {
               const coordinate = food.location?.coordinates;
@@ -318,7 +356,7 @@ export default function FoodAroundBody() {
               );
             })}
 
-            {/* {home != null && (
+            {home != null && (
               <MarkerF
                 icon={{
                   url: mapIcons.homeGreen,
@@ -332,7 +370,7 @@ export default function FoodAroundBody() {
                   </Box>
                 </InfoWindowF>
               </MarkerF>
-            )} */}
+            )}
           </GoogleMap>
         )}
       </Box>
