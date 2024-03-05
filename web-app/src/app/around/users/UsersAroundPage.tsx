@@ -91,7 +91,7 @@ export default function UsersAroundPage() {
   const lang = i8nContext.of(UsersAroundPage);
   const mapRef = useRef<google.maps.Map>();
   const authContext = useAuthContext();
-  const auth = authContext.auth;
+  const { auth, account } = authContext;
   const [selectedMarker, setSelectedMarker] = useState<number | string>();
   const [home, setHome] = useState<ILocation>();
   const [roles, setRoles] = useState<PlaceType[]>([PlaceType.PERSONAL]);
@@ -157,7 +157,7 @@ export default function UsersAroundPage() {
   const doLoadUsers = useCallback(
     (maxDistance: number) => {
       if (loader.isFetching) return;
-      if (auth == null) return;
+      if (account == null || auth == null) return;
 
       const map = mapRef.current;
       if (map == null) return;
@@ -193,8 +193,9 @@ export default function UsersAroundPage() {
         .then((res) => {
           const data = res.data;
           if (data) {
-            setUsers(data);
-            if (data.length < 50) {
+            const datas = data.filter((d) => d.id_ !== account.id_);
+            setUsers(datas);
+            if (datas.length < 50) {
               loader.setIsEnd(true);
             }
           }
@@ -206,7 +207,7 @@ export default function UsersAroundPage() {
           loader.setIsFetching(false);
         });
     },
-    [auth, loader]
+    [account, auth, loader]
   );
 
   const doLoadPlaces = useCallback(
