@@ -197,8 +197,6 @@ export default function PlaceSearchContextProvider({
 
       params.pagination = pagination;
 
-      console.log(params);
-
       setIsFetching(true);
       // progessContext.start();
       userFetcher
@@ -223,10 +221,9 @@ export default function PlaceSearchContextProvider({
         })
         .catch(() => {
           toastContext.error("Có lỗi xảy ra, vui lòng thử lại");
-          setIsFetching(false);
         })
         .finally(() => {
-          // setIsFetching(false);
+          setIsFetching(false);
           // progessContext.end();
         });
     },

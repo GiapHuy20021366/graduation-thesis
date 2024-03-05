@@ -1,45 +1,44 @@
 import { Avatar, Button, Divider, Stack, Typography } from "@mui/material";
-import { IUserInfo, toDistance } from "../../../data";
+import { IPlaceExposed, toDistance } from "../../../data";
 import { deepOrange } from "@mui/material/colors";
 import { useNavigate } from "react-router";
 import { useAppContentContext } from "../../../hooks";
 import { LocalOfferOutlined, LocationOnOutlined } from "@mui/icons-material";
 
-interface IInfoWindowUser {
-  user: IUserInfo;
+interface IInfoWindowPlaceProps {
+  place: IPlaceExposed;
   onBeforeNavigate?: () => void;
 }
 
-export default function InfoWindowUser({
-  user,
+export default function InfoWindowPlace({
+  place,
   onBeforeNavigate,
-}: IInfoWindowUser) {
+}: IInfoWindowPlaceProps) {
   const navigate = useNavigate();
   const appContentContext = useAppContentContext();
-
   const onNavigate = () => {
     onBeforeNavigate && onBeforeNavigate();
-    navigate(`/profile/${user.id_}`);
+    navigate(`/place/${place._id}`);
   };
   return (
     <Stack gap={1}>
       <Stack direction={"row"} gap={1} alignItems={"center"}>
         <Avatar
-          alt={user.firstName + " " + user.lastName}
+          alt={place.exposeName}
           sx={{ bgcolor: deepOrange[500], cursor: "pointer" }}
-          src={user.avartar}
+          src={place.avartar}
         >
-          {user.firstName ? user.firstName[0] : "U"}
+          {place.exposeName[0]}
         </Avatar>
-        <Typography>{user.firstName + " " + user.lastName}</Typography>
+        <Typography>{place.exposeName}</Typography>
       </Stack>
       <Divider />
       <Stack gap={1} direction={"row"}>
         <LocalOfferOutlined color="secondary" />
         <Typography>
-          {user.location?.coordinates
+          {place.location?.coordinates
             ? toDistance(
-                user.location.coordinates,
+                place.location.coordinates,
                 appContentContext.currentLocation
               )
             : 0}{" "}
@@ -48,7 +47,7 @@ export default function InfoWindowUser({
       </Stack>
       <Stack direction={"row"} gap={1} mt={1}>
         <LocationOnOutlined color="info" />
-        <Typography>{user.location?.name}</Typography>
+        <Typography>{place.location?.name}</Typography>
       </Stack>
       <Divider />
       <Button
@@ -56,7 +55,7 @@ export default function InfoWindowUser({
         sx={{ textTransform: "initial" }}
         onClick={() => onNavigate()}
       >
-        Go to view this user
+        Go to view this place
       </Button>
     </Stack>
   );

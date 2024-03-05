@@ -5,13 +5,18 @@ import {
   useJsApiLoader,
 } from "@react-google-maps/api";
 import { GOOGLE_MAP_API_KEY } from "../../../env";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ICoordinates,
   ILocation,
+  IPlaceExposed,
   IUserInfo,
-  UserRole,
+  IUserSearchParams,
+  OrderState,
+  PlaceType,
+  loadFromSessionStorage,
   mapIcons,
+  saveToSessionStorage,
 } from "../../../data";
 import {
   Accordion,
@@ -37,20 +42,31 @@ import {
 } from "@mui/icons-material";
 import {
   useAuthContext,
+  useDistanceCalculation,
   useI18nContext,
-  useLoading,
-  usePageProgessContext,
+  useLoader,
 } from "../../../hooks";
 import ToggleChipGroup from "../../common/custom/ToggleChipGroup";
 import ToggleChip from "../../common/custom/ToggleChip";
-import { IGetUserNearParams, UserResponse, userFetcher } from "../../../api";
+import { IPlaceSearchParams, userFetcher } from "../../../api";
 import InfoWindowUser from "./InfoWindowUser";
 import TogglePurpleChip from "../../common/custom/TogglePurpleChip";
+import InfoWindowPlace from "./InfoWindowPlace";
 
-interface ISearchRoleParams {
-  maxDistance?: number;
-  maxVisible?: number;
+interface IUserAroundPageSnapshotData {
+  center: ICoordinates;
+  users: IUserInfo[];
+  restaurants: IPlaceExposed[];
+  eateries: IPlaceExposed[];
+  groceries: IPlaceExposed[];
+  markets: IPlaceExposed[];
+  volunteers: IPlaceExposed[];
+  distance: number;
+  roles: PlaceType[];
+  selectedMarker?: number | string;
 }
+
+const USER_AROUND_PAGE_STORAGE_KEY = "food.around.page";
 
 export default function UsersAroundPage() {
   const { isLoaded } = useJsApiLoader({
@@ -63,26 +79,64 @@ export default function UsersAroundPage() {
   });
 
   const [users, setUsers] = useState<IUserInfo[]>([]);
-  const [restaurants, setRestaurants] = useState<IUserInfo[]>([]); // revise later
-  const [eateries, setEateries] = useState<IUserInfo[]>([]); // revise later
-  const [groceries, setGroceries] = useState<IUserInfo[]>([]); // revise later
-  const [markets, setMarkets] = useState<IUserInfo[]>([]); // revise later
-  const [volunteers, setVolunteers] = useState<IUserInfo[]>([]); // revise later
+  const [restaurants, setRestaurants] = useState<IPlaceExposed[]>([]);
+  const [eateries, setEateries] = useState<IPlaceExposed[]>([]);
+  const [groceries, setGroceries] = useState<IPlaceExposed[]>([]);
+  const [markets, setMarkets] = useState<IPlaceExposed[]>([]);
+  const [volunteers, setVolunteers] = useState<IPlaceExposed[]>([]);
 
   const [distance, setDistance] = useState<number>(0.5);
-  // const [maxVisible, setMaxVisible] = useState<number>(50);
   const [infoOpen, setInfoOpen] = useState<boolean>(false);
-  const fetching = useLoading();
-  const processContext = usePageProgessContext();
   const i8nContext = useI18nContext();
   const lang = i8nContext.of(UsersAroundPage);
   const mapRef = useRef<google.maps.Map>();
-  const [loadActive, setLoadActive] = useState<boolean>(false);
   const authContext = useAuthContext();
   const auth = authContext.auth;
   const [selectedMarker, setSelectedMarker] = useState<number | string>();
   const [home, setHome] = useState<ILocation>();
-  const [roles, setRoles] = useState<UserRole[]>([UserRole.PERSONAL]);
+  const [roles, setRoles] = useState<PlaceType[]>([PlaceType.PERSONAL]);
+  const [loadActive, setLoadActive] = useState<boolean>(false);
+  const distances = useDistanceCalculation();
+
+  const loader = useLoader();
+  const dirtyRef = useRef<boolean>(true);
+
+  const doSaveStorage = () => {
+    const map = mapRef.current;
+    if (map == null) return;
+    const center = map.getCenter();
+    if (center == null) return;
+
+    const current: ICoordinates = {
+      lat: center.lat(),
+      lng: center.lng(),
+    };
+
+    const snapshot: IUserAroundPageSnapshotData = {
+      center: current,
+      distance,
+      eateries,
+      groceries,
+      markets,
+      restaurants,
+      roles,
+      users,
+      volunteers,
+      selectedMarker,
+    };
+    saveToSessionStorage(snapshot, {
+      key: USER_AROUND_PAGE_STORAGE_KEY,
+    });
+  };
+
+  const setCurrentLocation = useCallback(() => {
+    () => {
+      const current = distances.currentLocation?.coordinates;
+      if (current) {
+        setCenter(current);
+      }
+    };
+  }, [distances.currentLocation]);
 
   useEffect(() => {
     const userLocation = authContext.account?.location;
@@ -90,27 +144,6 @@ export default function UsersAroundPage() {
       setHome(userLocation);
     }
   }, [authContext.account, home]);
-
-  const setCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position: GeolocationPosition) => {
-          const pos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
-          setCenter(pos);
-        },
-        (error: GeolocationPositionError) => {
-          console.log(error);
-        }
-      );
-    }
-  };
-
-  useEffect(() => {
-    setCurrentLocation();
-  }, []);
 
   const handleLocateMe = () => {
     setCenter({ ...center });
@@ -121,138 +154,180 @@ export default function UsersAroundPage() {
     setInfoOpen(!infoOpen);
   };
 
-  const doLoadAll = (roles: UserRole[], params?: ISearchRoleParams) => {
-    if (auth == null) return;
-    const map = mapRef.current;
-    if (map == null) return;
+  const doLoadUsers = useCallback(
+    (maxDistance: number) => {
+      if (loader.isFetching) return;
+      if (auth == null) return;
 
-    const center = map.getCenter();
-    if (center == null) return;
+      const map = mapRef.current;
+      if (map == null) return;
 
-    if (fetching.isActice) return;
+      const center = map.getCenter();
+      if (center == null) return;
 
-    const _maxDistance = params?.maxDistance ?? distance;
-    const _maxVisible = params?.maxVisible ?? 50;
-
-    const paramsToSearch: IGetUserNearParams = {
-      coordinate: {
+      const current: ICoordinates = {
         lat: center.lat(),
         lng: center.lng(),
-      },
-      maxDistance: _maxDistance,
-      pagination: {
-        skip: 0,
-        limit: _maxVisible,
-      },
-    };
+      };
 
-    const personalPromise: Promise<UserResponse<IUserInfo[]>> = roles.includes(
-      UserRole.PERSONAL
-    )
-      ? userFetcher.getUsersNear(paramsToSearch, auth)
-      : Promise.resolve({ data: users });
+      const params: IUserSearchParams = {
+        distance: {
+          max: maxDistance,
+          current: current,
+        },
+        order: {
+          distance: OrderState.INCREASE,
+        },
+        pagination: {
+          skip: 0,
+          limit: 50,
+        },
+      };
 
-    const volunteerPromise: Promise<UserResponse<IUserInfo[]>> = roles.includes(
-      UserRole.VOLUNTEER
-    )
-      ? userFetcher.getUsersNear(paramsToSearch, auth)
-      : Promise.resolve({ data: volunteers });
+      loader.setIsFetching(true);
+      loader.setIsError(true);
+      loader.setIsEnd(false);
 
-    const restaurantsPromise: Promise<UserResponse<IUserInfo[]>> =
-      roles.includes(UserRole.RESTAURANT)
-        ? userFetcher.getUsersNear(paramsToSearch, auth)
-        : Promise.resolve({ data: restaurants });
-
-    const eateriesPromise: Promise<UserResponse<IUserInfo[]>> = roles.includes(
-      UserRole.EATERY
-    )
-      ? userFetcher.getUsersNear(paramsToSearch, auth)
-      : Promise.resolve({ data: eateries });
-
-    const groceriesPromise: Promise<UserResponse<IUserInfo[]>> = roles.includes(
-      UserRole.GROCERY
-    )
-      ? userFetcher.getUsersNear(paramsToSearch, auth)
-      : Promise.resolve({ data: groceries });
-
-    const marketsPromise: Promise<UserResponse<IUserInfo[]>> = roles.includes(
-      UserRole.SUPERMARKET
-    )
-      ? userFetcher.getUsersNear(paramsToSearch, auth)
-      : Promise.resolve({ data: markets });
-
-    fetching.active();
-    processContext.start();
-    Promise.all([
-      personalPromise,
-      volunteerPromise,
-      restaurantsPromise,
-      eateriesPromise,
-      groceriesPromise,
-      marketsPromise,
-    ])
-      .then(
-        ([
-          personalRes,
-          volunteerRes,
-          restaurantRes,
-          eateriesRes,
-          groceryRes,
-          marketRes,
-        ]) => {
-          const users = personalRes.data;
-          if (users != null && users.length > 0) {
-            setUsers(users);
+      userFetcher
+        .searchUser(params, auth)
+        .then((res) => {
+          const data = res.data;
+          if (data) {
+            setUsers(data);
+            if (data.length < 50) {
+              loader.setIsEnd(true);
+            }
           }
+        })
+        .catch(() => {
+          loader.setIsError(true);
+        })
+        .finally(() => {
+          loader.setIsFetching(false);
+        });
+    },
+    [auth, loader]
+  );
 
-          const volunteers = volunteerRes.data;
-          if (volunteers != null && volunteers.length > 0) {
-            setVolunteers(volunteers);
-          }
+  const doLoadPlaces = useCallback(
+    (type: PlaceType, maxDistance: number): Promise<IPlaceExposed[]> => {
+      if (auth == null) return Promise.resolve([]);
 
-          const restaurants = restaurantRes.data;
-          if (restaurants != null && restaurants.length > 0) {
-            setRestaurants(restaurants);
-          }
+      const map = mapRef.current;
+      if (map == null) return Promise.resolve([]);
 
-          const eateries = eateriesRes.data;
-          if (eateries != null && eateries) {
-            setEateries(eateries);
-          }
+      const center = map.getCenter();
+      if (center == null) return Promise.resolve([]);
 
-          const groceries = groceryRes.data;
-          if (groceries != null && groceries.length > 0) {
-            setGroceries(groceries);
-          }
+      const current: ICoordinates = {
+        lat: center.lat(),
+        lng: center.lng(),
+      };
 
-          const markets = marketRes.data;
-          if (markets != null && markets.length > 0) {
-            setMarkets(markets);
-          }
+      const params: IPlaceSearchParams = {
+        maxDistance: maxDistance,
+        currentLocation: current,
+        pagination: {
+          skip: 0,
+          limit: 50,
+        },
+        types: [type],
+      };
 
-          setLoadActive(false);
-        }
-      )
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => {
-        fetching.deactive();
-        processContext.end();
+      return userFetcher.searchPlace(params, auth).then((res) => {
+        const data = res.data;
+        if (data) return data;
+        else return [];
       });
-  };
+    },
+    [auth]
+  );
 
-  const doLoadUsers = (params?: ISearchRoleParams) => {
-    doLoadAll([UserRole.PERSONAL], params);
-  };
+  const doLoadRestaurants = useCallback(
+    (maxDistance: number) => {
+      doLoadPlaces(PlaceType.RESTAURANT, maxDistance).then((restaurants) => {
+        setRestaurants(restaurants);
+      });
+    },
+    [doLoadPlaces]
+  );
 
-  // const doLoadRestaurants = (params: ISearchRoleParams) => {
-  //   console.log(params);
-  // };
+  const doLoadVolunteers = useCallback(
+    (maxDistance: number) => {
+      doLoadPlaces(PlaceType.VOLUNTEER, maxDistance).then((volunteers) => {
+        setVolunteers(volunteers);
+      });
+    },
+    [doLoadPlaces]
+  );
 
-  const loadRolesDefault = () => {
-    doLoadAll(roles);
-  };
+  const doLoadEateries = useCallback(
+    (maxDistance: number) => {
+      doLoadPlaces(PlaceType.EATERY, maxDistance).then((eateries) => {
+        setEateries(eateries);
+      });
+    },
+    [doLoadPlaces]
+  );
+
+  const doLoadMarkets = useCallback(
+    (maxDistance: number) => {
+      doLoadPlaces(PlaceType.SUPERMARKET, maxDistance).then((markets) => {
+        setMarkets(markets);
+      });
+    },
+    [doLoadPlaces]
+  );
+
+  const doLoadGroceries = useCallback(
+    (maxDistance: number) => {
+      doLoadPlaces(PlaceType.GROCERY, maxDistance).then((groceries) => {
+        setGroceries(groceries);
+      });
+    },
+    [doLoadPlaces]
+  );
+
+  const doLoadAll = useCallback(
+    (types: PlaceType[], maxDistance: number) => {
+      for (let i = 0; i < types.length; ++i) {
+        const type = types[i];
+        switch (type) {
+          case PlaceType.PERSONAL:
+            doLoadUsers(maxDistance);
+            break;
+          case PlaceType.EATERY:
+            doLoadEateries(maxDistance);
+            break;
+          case PlaceType.GROCERY:
+            doLoadGroceries(maxDistance);
+            break;
+          case PlaceType.RESTAURANT:
+            doLoadRestaurants(maxDistance);
+            break;
+          case PlaceType.SUPERMARKET:
+            doLoadMarkets(maxDistance);
+            break;
+          case 16:
+            doLoadVolunteers(maxDistance);
+            break;
+        }
+      }
+    },
+    [
+      doLoadEateries,
+      doLoadGroceries,
+      doLoadMarkets,
+      doLoadRestaurants,
+      doLoadUsers,
+      doLoadVolunteers,
+    ]
+  );
+
+  const doLoadArea = useCallback(() => {
+    setLoadActive(true);
+    doLoadAll(roles, distance);
+  }, [distance, doLoadAll, roles]);
 
   const onMapCenterChanged = () => {
     setLoadActive(true);
@@ -260,14 +335,11 @@ export default function UsersAroundPage() {
 
   const handleMaxDistanceChange = (value: number): void => {
     setDistance(value);
-    doLoadUsers({ maxDistance: value });
+    doLoadAll(roles, value);
   };
 
   const onMapLoaded = (map: google.maps.Map) => {
     mapRef.current = map;
-    setTimeout(() => {
-      loadRolesDefault();
-    }, 500);
   };
 
   const toggleMarker = (index: number | string) => {
@@ -275,13 +347,47 @@ export default function UsersAroundPage() {
     else setSelectedMarker(index);
   };
 
-  const handleChangeRoles = (newRoles: UserRole[]) => {
-    const newSelectedRoles: UserRole[] = [];
+  const handleChangeRoles = (newRoles: PlaceType[]) => {
+    setRoles(newRoles);
+    const newSelectedRoles: PlaceType[] = [];
     newRoles.forEach((role) => {
       if (!roles.includes(role)) newSelectedRoles.push(role);
     });
-    doLoadAll(newSelectedRoles);
-    setRoles(newRoles);
+    doLoadAll(newSelectedRoles, distance);
+  };
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (map == null) return;
+    if (dirtyRef.current) {
+      dirtyRef.current = false;
+      const snapshot = loadFromSessionStorage<IUserAroundPageSnapshotData>({
+        key: USER_AROUND_PAGE_STORAGE_KEY,
+        maxDuration: 1 * 24 * 60 * 60 * 1000,
+      });
+      if (snapshot) {
+        setUsers(snapshot.users);
+        setEateries(snapshot.eateries);
+        setGroceries(snapshot.groceries);
+        setDistance(snapshot.distance);
+        setMarkets(snapshot.markets);
+        setRestaurants(snapshot.restaurants);
+        setVolunteers(snapshot.volunteers);
+        setSelectedMarker(snapshot.selectedMarker);
+        setRoles(snapshot.roles);
+        setTimeout(() => {
+          setCenter(snapshot.center);
+          map.setCenter(snapshot.center);
+        }, 500);
+      } else {
+        setCurrentLocation();
+        doLoadArea();
+      }
+    }
+  }, [doLoadArea, setCurrentLocation]);
+
+  const handleBeforeNavigate = () => {
+    doSaveStorage();
   };
 
   return (
@@ -320,32 +426,32 @@ export default function UsersAroundPage() {
         >
           <TogglePurpleChip
             label={lang("People")}
-            value={UserRole.PERSONAL}
+            value={PlaceType.PERSONAL}
             icon={<Person color="inherit" />}
           />
           <TogglePurpleChip
             label={lang("Restaurants")}
-            value={UserRole.RESTAURANT}
+            value={PlaceType.RESTAURANT}
             icon={<Restaurant color="inherit" />}
           />
           <TogglePurpleChip
             label={lang("Eateries")}
-            value={UserRole.EATERY}
+            value={PlaceType.EATERY}
             icon={<Storefront color="inherit" />}
           />
           <TogglePurpleChip
             label={lang("Grocery")}
-            value={UserRole.GROCERY}
+            value={PlaceType.GROCERY}
             icon={<LocalConvenienceStore color="inherit" />}
           />
           <TogglePurpleChip
             label={lang("Markets")}
-            value={UserRole.SUPERMARKET}
+            value={PlaceType.SUPERMARKET}
             icon={<LocalGroceryStore color="inherit" />}
           />
           <TogglePurpleChip
             label={lang("Volunteers")}
-            value={UserRole.VOLUNTEER}
+            value={PlaceType.VOLUNTEER}
             icon={<VolunteerActivism color="inherit" />}
           />
         </ToggleChipGroup>
@@ -381,7 +487,7 @@ export default function UsersAroundPage() {
             </MarkerF>
 
             {/* Personal */}
-            {roles.includes(UserRole.PERSONAL) &&
+            {roles.includes(PlaceType.PERSONAL) &&
               users.map((user, i) => {
                 const coordinate = user.location?.coordinates;
                 if (coordinate == null) return <></>;
@@ -400,7 +506,10 @@ export default function UsersAroundPage() {
                         position={coordinate}
                         onCloseClick={() => toggleMarker(user.id_)}
                       >
-                        <InfoWindowUser user={user} />
+                        <InfoWindowUser
+                          onBeforeNavigate={handleBeforeNavigate}
+                          user={user}
+                        />
                       </InfoWindowF>
                     )}
                   </MarkerF>
@@ -408,7 +517,7 @@ export default function UsersAroundPage() {
               })}
 
             {/* Restaurant */}
-            {roles.includes(UserRole.RESTAURANT) &&
+            {roles.includes(PlaceType.RESTAURANT) &&
               restaurants.map((restaurant, i) => {
                 const coordinate = restaurant.location?.coordinates;
                 if (coordinate == null) return <></>;
@@ -420,14 +529,17 @@ export default function UsersAroundPage() {
                     }}
                     key={i}
                     position={coordinate}
-                    onClick={() => toggleMarker(restaurant.id_)}
+                    onClick={() => toggleMarker(restaurant._id)}
                   >
-                    {selectedMarker === restaurant.id_ && (
+                    {selectedMarker === restaurant._id && (
                       <InfoWindowF
                         position={coordinate}
-                        onCloseClick={() => toggleMarker(restaurant.id_)}
+                        onCloseClick={() => toggleMarker(restaurant._id)}
                       >
-                        <InfoWindowUser user={restaurant} />
+                        <InfoWindowPlace
+                          onBeforeNavigate={handleBeforeNavigate}
+                          place={restaurant}
+                        />
                       </InfoWindowF>
                     )}
                   </MarkerF>
@@ -435,7 +547,7 @@ export default function UsersAroundPage() {
               })}
 
             {/* Eateries */}
-            {roles.includes(UserRole.EATERY) &&
+            {roles.includes(PlaceType.EATERY) &&
               eateries.map((eatery, i) => {
                 const coordinate = eatery.location?.coordinates;
                 if (coordinate == null) return <></>;
@@ -447,14 +559,17 @@ export default function UsersAroundPage() {
                     }}
                     key={i}
                     position={coordinate}
-                    onClick={() => toggleMarker(eatery.id_)}
+                    onClick={() => toggleMarker(eatery._id)}
                   >
-                    {selectedMarker === eatery.id_ && (
+                    {selectedMarker === eatery._id && (
                       <InfoWindowF
                         position={coordinate}
-                        onCloseClick={() => toggleMarker(eatery.id_)}
+                        onCloseClick={() => toggleMarker(eatery._id)}
                       >
-                        <InfoWindowUser user={eatery} />
+                        <InfoWindowPlace
+                          onBeforeNavigate={handleBeforeNavigate}
+                          place={eatery}
+                        />
                       </InfoWindowF>
                     )}
                   </MarkerF>
@@ -462,7 +577,7 @@ export default function UsersAroundPage() {
               })}
 
             {/* Grocery */}
-            {roles.includes(UserRole.GROCERY) &&
+            {roles.includes(PlaceType.GROCERY) &&
               groceries.map((grocery, i) => {
                 const coordinate = grocery.location?.coordinates;
                 if (coordinate == null) return <></>;
@@ -474,14 +589,17 @@ export default function UsersAroundPage() {
                     }}
                     key={i}
                     position={coordinate}
-                    onClick={() => toggleMarker(grocery.id_)}
+                    onClick={() => toggleMarker(grocery._id)}
                   >
-                    {selectedMarker === grocery.id_ && (
+                    {selectedMarker === grocery._id && (
                       <InfoWindowF
                         position={coordinate}
-                        onCloseClick={() => toggleMarker(grocery.id_)}
+                        onCloseClick={() => toggleMarker(grocery._id)}
                       >
-                        <InfoWindowUser user={grocery} />
+                        <InfoWindowPlace
+                          onBeforeNavigate={handleBeforeNavigate}
+                          place={grocery}
+                        />
                       </InfoWindowF>
                     )}
                   </MarkerF>
@@ -489,7 +607,7 @@ export default function UsersAroundPage() {
               })}
 
             {/* Market */}
-            {roles.includes(UserRole.SUPERMARKET) &&
+            {roles.includes(PlaceType.SUPERMARKET) &&
               markets.map((market, i) => {
                 const coordinate = market.location?.coordinates;
                 if (coordinate == null) return <></>;
@@ -501,14 +619,17 @@ export default function UsersAroundPage() {
                     }}
                     key={i}
                     position={coordinate}
-                    onClick={() => toggleMarker(market.id_)}
+                    onClick={() => toggleMarker(market._id)}
                   >
-                    {selectedMarker === market.id_ && (
+                    {selectedMarker === market._id && (
                       <InfoWindowF
                         position={coordinate}
-                        onCloseClick={() => toggleMarker(market.id_)}
+                        onCloseClick={() => toggleMarker(market._id)}
                       >
-                        <InfoWindowUser user={market} />
+                        <InfoWindowPlace
+                          onBeforeNavigate={handleBeforeNavigate}
+                          place={market}
+                        />
                       </InfoWindowF>
                     )}
                   </MarkerF>
@@ -516,7 +637,7 @@ export default function UsersAroundPage() {
               })}
 
             {/* Volunteer */}
-            {roles.includes(UserRole.VOLUNTEER) &&
+            {roles.includes(PlaceType.VOLUNTEER) &&
               volunteers.map((volunteer, i) => {
                 const coordinate = volunteer.location?.coordinates;
                 if (coordinate == null) return <></>;
@@ -528,14 +649,17 @@ export default function UsersAroundPage() {
                     }}
                     key={i}
                     position={coordinate}
-                    onClick={() => toggleMarker(volunteer.id_)}
+                    onClick={() => toggleMarker(volunteer._id)}
                   >
-                    {selectedMarker === volunteer.id_ && (
+                    {selectedMarker === volunteer._id && (
                       <InfoWindowF
                         position={coordinate}
-                        onCloseClick={() => toggleMarker(volunteer.id_)}
+                        onCloseClick={() => toggleMarker(volunteer._id)}
                       >
-                        <InfoWindowUser user={volunteer} />
+                        <InfoWindowPlace
+                          onBeforeNavigate={handleBeforeNavigate}
+                          place={volunteer}
+                        />
                       </InfoWindowF>
                     )}
                   </MarkerF>
@@ -588,7 +712,7 @@ export default function UsersAroundPage() {
           />
           <Chip
             label={"Load this area"}
-            onClick={loadRolesDefault}
+            onClick={doLoadArea}
             sx={{
               backgroundColor: "purple",
               width: "fit-content",
@@ -601,7 +725,7 @@ export default function UsersAroundPage() {
                 backgroundColor: "white",
                 color: "black",
               },
-              display: fetching.isActice || !loadActive ? "none" : "block",
+              display: !loadActive ? "none" : "block",
             }}
           />
         </Stack>
@@ -624,32 +748,32 @@ export default function UsersAroundPage() {
                 }}
               />
               <Stack direction={"row"} gap={2} marginLeft={"auto"} mr={2}>
-                {roles.includes(UserRole.PERSONAL) && (
+                {roles.includes(PlaceType.PERSONAL) && (
                   <Badge badgeContent={users.length} color="info">
                     <Person />
                   </Badge>
                 )}
-                {roles.includes(UserRole.RESTAURANT) && (
+                {roles.includes(PlaceType.RESTAURANT) && (
                   <Badge badgeContent={restaurants.length} color="info">
                     <Restaurant />
                   </Badge>
                 )}
-                {roles.includes(UserRole.EATERY) && (
+                {roles.includes(PlaceType.EATERY) && (
                   <Badge badgeContent={eateries.length} color="info">
                     <Storefront />
                   </Badge>
                 )}
-                {roles.includes(UserRole.GROCERY) && (
+                {roles.includes(PlaceType.GROCERY) && (
                   <Badge badgeContent={groceries.length} color="info">
                     <LocalConvenienceStore />
                   </Badge>
                 )}
-                {roles.includes(UserRole.SUPERMARKET) && (
+                {roles.includes(PlaceType.SUPERMARKET) && (
                   <Badge badgeContent={markets.length} color="info">
                     <LocalGroceryStore />
                   </Badge>
                 )}
-                {roles.includes(UserRole.VOLUNTEER) && (
+                {roles.includes(PlaceType.VOLUNTEER) && (
                   <Badge badgeContent={volunteers.length} color="info">
                     <VolunteerActivism />
                   </Badge>

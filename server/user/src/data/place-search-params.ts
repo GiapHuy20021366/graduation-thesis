@@ -1,5 +1,6 @@
 import { ICoordinates } from "./coordinates";
 import {
+  isArrayPlaceTypes,
   isCoordinates,
   isNotEmptyString,
   isNotEmptyStringArray,
@@ -39,7 +40,9 @@ const toPlaceSearchOrder = (value: any): IPlaceSearchOrder | undefined => {
   return result;
 };
 
-export const toPlaceSearchParams = (value: any): IPlaceSearchParams | undefined => {
+export const toPlaceSearchParams = (
+  value: any
+): IPlaceSearchParams | undefined => {
   if (value == null || typeof value !== "object") return;
   const result: IPlaceSearchParams = {};
   if (isNotEmptyString(value.query)) {
@@ -66,7 +69,7 @@ export const toPlaceSearchParams = (value: any): IPlaceSearchParams | undefined 
       limit: 24,
     };
   }
-  if (isNotEmptyStringArray(value.types)) {
+  if (isArrayPlaceTypes(value.types)) {
     result.types = value.types;
   }
   return result;
