@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import { Route, Routes } from "react-router-dom";
 
 function HomeTitle() {
-  return <span>Home</span>;
+  return <span>Nhà</span>;
 }
 
 function LevelTitle() {
@@ -18,7 +18,7 @@ function AccountTitle() {
 }
 
 function LocationTitle() {
-  return <span>Location</span>;
+  return <span>Vị trí</span>;
 }
 
 function HelpTitle() {
@@ -26,19 +26,24 @@ function HelpTitle() {
 }
 
 function SettingTitle() {
-  return <span>Setting</span>;
+  return <span>Cài đặt</span>;
 }
 
 function FoodTitle() {
-  return <span>Food</span>;
+  return <span>Thực phẩm</span>;
 }
 
 function SearchTitle() {
-  return <span>Food</span>;
+  return <span>Tìm kiếm</span>;
 }
 
-function ArroundTitle() {
-  return <span>Arround</span>;
+function AroundTitle() {
+  return (
+    <Routes>
+      <Route path="/food/*" element={<span>Thực phẩm</span>} />
+      <Route path="/user/*" element={<span>Người dùng</span>} />
+    </Routes>
+  );
 }
 
 export default function AppHeaderTitle() {
@@ -56,7 +61,7 @@ export default function AppHeaderTitle() {
         <Route path="/profile/*" element={<ProfileTitle />} />
         <Route path="/account/*" element={<AccountTitle />} />
         <Route path="/location/*" element={<LocationTitle />} />
-        <Route path="/arround/*" element={<ArroundTitle />} />
+        <Route path="/around/*" element={<AroundTitle />} />
         <Route path="/help/*" element={<HelpTitle />} />
         <Route path="/setting/*" element={<SettingTitle />} />
         <Route path="/food/*" element={<FoodTitle />} />

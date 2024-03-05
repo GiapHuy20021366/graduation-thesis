@@ -4,7 +4,7 @@ import { RoomOutlined, SearchOutlined } from "@mui/icons-material";
 import { useNavigate } from "react-router";
 import NotificationProvider from "./utils/notification/NotificationProvider";
 
-export default function AppHeaderUntil() {
+export default function AppHeaderUtil() {
   const navigate = useNavigate();
   const iconStyle: SxProps<Theme> = {
     width: "1.3em",
@@ -29,7 +29,7 @@ export default function AppHeaderUntil() {
           sx={{
             color: "black",
           }}
-          onClick={() => navigate("/arround/users")}
+          onClick={() => navigate("/around/users")}
         >
           <RoomOutlined sx={iconStyle} />
         </IconButton>

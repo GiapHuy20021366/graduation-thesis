@@ -65,8 +65,6 @@ export default function FoodSearchItem({
     navigate(`/food/${item._id}`);
   };
 
-  console.log(item);
-
   const exposedUser =
     typeof item.user === "string"
       ? "H"

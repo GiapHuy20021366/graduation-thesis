@@ -1,8 +1,9 @@
 import { Box, Divider, Stack } from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 import AppHeaderTitle from "./AppHeaderTitle";
-import AppHeaderUntil from "./AppHeaderUtil";
+import AppHeaderUtil from "./AppHeaderUtil";
 import AppTabs from "../footer/AppTabs";
+import AvatarButtonAction from "./utils/avartar-menu/AvarvarButtonAction";
 
 export default function AppHeader() {
   return (
@@ -25,16 +26,14 @@ export default function AppHeader() {
       >
         <Grid2 mobile tablet laptop desktop>
           <Stack direction={"row"} width={"100%"} alignItems={"center"} gap={1}>
-            <AppHeaderUntil />
+            <AppHeaderUtil />
             <Divider orientation="vertical" flexItem />
-            <Box display={["none", "block"]}>
-              <u>
-                <AppHeaderTitle />
-              </u>
-            </Box>
+            {/* <Box display={["none", "none", "block"]}>
+              <AppHeaderTitle />
+            </Box> */}
           </Stack>
         </Grid2>
-        <Grid2 display={["none", "none", "block"]}>
+        <Grid2 display={["none", "block", "block"]}>
           <AppTabs sx={{ display: "flex", justifyContent: "center" }} />
         </Grid2>
         <Grid2
@@ -45,12 +44,9 @@ export default function AppHeader() {
           sx={{
             display: ["flex", "none"],
             justifyContent: "end",
-            pr: "0.5em",
           }}
         >
-          <u>
-            <AppHeaderTitle />
-          </u>
+          <AppHeaderTitle />
         </Grid2>
         <Grid2
           mobile
@@ -60,7 +56,9 @@ export default function AppHeader() {
           sx={{
             display: ["none", "flex"],
           }}
-        ></Grid2>
+        >
+          <AvatarButtonAction sx={{ ml: "auto", mr: 1 }} />
+        </Grid2>
       </Grid2>
     </Box>
   );
