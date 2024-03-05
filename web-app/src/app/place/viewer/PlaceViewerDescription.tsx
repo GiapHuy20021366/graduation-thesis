@@ -4,6 +4,7 @@ import { useAuthContext } from "../../../hooks";
 import { FollowType, IAccount, IPlaceExposed } from "../../../data";
 import { RichTextReadOnly } from "mui-tiptap";
 import StarterKit from "@tiptap/starter-kit";
+import { useNavigate } from "react-router";
 
 type PlaceViewerDescriptionProps = BoxProps & {
   data: IPlaceExposed;
@@ -35,6 +36,8 @@ const PlaceViewerDescription = React.forwardRef<
 
   const editable = isEditPermit(data, account);
 
+  const navigate = useNavigate();
+
   return (
     <Box
       ref={ref}
@@ -50,7 +53,11 @@ const PlaceViewerDescription = React.forwardRef<
           <Typography>Trang này hiện chưa được mô tả</Typography>
           {editable && (
             <Stack gap={1}>
-              <Button>Chỉnh sửa ngay</Button>
+              <Button
+                onClick={() => navigate("/place/update", { state: data })}
+              >
+                Chỉnh sửa ngay
+              </Button>
             </Stack>
           )}
         </Stack>

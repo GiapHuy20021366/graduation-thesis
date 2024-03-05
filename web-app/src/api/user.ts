@@ -32,7 +32,7 @@ export const userEndpoints = {
   searchUser: "/users/search",
 
   // places
-  createPlace: "/",
+  createPlace: "/places",
   updatePlace: "/places/:id",
   activePlace: "/places/:id/active",
   followPlace: "/places/:id/follow",

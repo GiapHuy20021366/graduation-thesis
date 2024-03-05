@@ -309,7 +309,7 @@ export default function UsersAroundPage() {
           case PlaceType.SUPERMARKET:
             doLoadMarkets(maxDistance);
             break;
-          case 16:
+          case PlaceType.VOLUNTEER:
             doLoadVolunteers(maxDistance);
             break;
         }
@@ -326,7 +326,7 @@ export default function UsersAroundPage() {
   );
 
   const doLoadArea = useCallback(() => {
-    setLoadActive(true);
+    setLoadActive(false);
     doLoadAll(roles, distance);
   }, [distance, doLoadAll, roles]);
 

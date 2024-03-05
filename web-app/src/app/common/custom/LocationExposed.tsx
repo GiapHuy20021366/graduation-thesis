@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { Box, Chip, Stack, StackProps } from "@mui/material";
 import {
   GoogleMap,
@@ -37,9 +37,20 @@ const LocationExposed = React.forwardRef<HTMLDivElement, LocationExposedProps>(
       targetLocation?.coordinates
     );
 
+    const mapRef = useRef<google.maps.Map>();
+
+    const onMapLoaded = (map: google.maps.Map) => {
+      mapRef.current = map;
+    };
+
     useEffect(() => {
+      const map = mapRef.current;
+      if (map == null) return;
       if (targetLocation != null && center == null) {
-        setCenter(targetLocation.coordinates);
+        setTimeout(() => {
+          setCenter(targetLocation.coordinates);
+          map.setCenter(targetLocation.coordinates);
+        }, 500);
       }
     }, [center, targetLocation]);
 
@@ -73,6 +84,7 @@ const LocationExposed = React.forwardRef<HTMLDivElement, LocationExposedProps>(
                 height: "100%",
                 boxSizing: "border-box",
               }}
+              onLoad={onMapLoaded}
             >
               {homeLocation != null && (
                 <MarkerF
