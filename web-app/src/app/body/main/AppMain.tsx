@@ -3,7 +3,7 @@ import Grid2 from "@mui/material/Unstable_Grid2";
 import AppMainLeft from "./AppMainLeft";
 import AppMainCenter from "./AppMainCenter";
 import AppMainRight from "./AppMainRight";
-import { useAppContentContext } from "../../hooks";
+import { useAppContentContext } from "../../../hooks";
 
 export default function AppMain() {
   const contentContext = useAppContentContext();

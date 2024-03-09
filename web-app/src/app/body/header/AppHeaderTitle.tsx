@@ -41,7 +41,7 @@ function AroundTitle() {
   return (
     <Routes>
       <Route path="/food/*" element={<span>Thực phẩm</span>} />
-      <Route path="/user/*" element={<span>Người dùng</span>} />
+      <Route path="/users/*" element={<span>Người dùng</span>} />
     </Routes>
   );
 }

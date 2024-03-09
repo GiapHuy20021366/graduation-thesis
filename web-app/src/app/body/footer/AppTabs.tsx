@@ -7,11 +7,11 @@ import {
   PlaceOutlined,
 } from "@mui/icons-material";
 import { Location } from "react-router";
-import { ITabOption, useTabNavigate } from "../../hooks";
+import { ITabOption, useTabNavigate } from "../../../hooks";
 
 const AppTab = {
   HOME: 0,
-  FOOD_AROUND: 1,
+  FOOD: 1,
   PEOPLE_AROUND: 2,
   PLACE: 3,
 } as const;
@@ -26,11 +26,11 @@ const appTabs: ITabOption[] = [
     url: "/home",
   },
   {
-    url: "/around/food",
-    value: AppTab.FOOD_AROUND,
+    url: "/food",
+    value: AppTab.FOOD,
   },
   {
-    url: "/around/users",
+    url: "/user/around",
     value: AppTab.PEOPLE_AROUND,
   },
   {
@@ -41,8 +41,8 @@ const appTabs: ITabOption[] = [
 
 const appTabResolver = (location: Location<any>): number => {
   const pathname = location.pathname;
-  if (pathname.includes("/around/users")) return AppTab.PEOPLE_AROUND;
-  if (pathname.includes("/around/food")) return AppTab.FOOD_AROUND;
+  if (pathname.includes("/user/around")) return AppTab.PEOPLE_AROUND;
+  if (pathname.includes("/food")) return AppTab.FOOD;
   if (pathname.includes("/place")) return AppTab.PLACE;
   return AppTab.HOME;
 };
@@ -79,7 +79,7 @@ const AppTabs = React.forwardRef<HTMLDivElement, NearPlaceProps>(
             icon={<FoodBankOutlined />}
             aria-label="Food around"
             label="Food"
-            onClick={() => tabNavigate.setTab(AppTab.FOOD_AROUND)}
+            onClick={() => tabNavigate.setTab(AppTab.FOOD)}
           />
           <Tab
             icon={<PeopleAltOutlined />}

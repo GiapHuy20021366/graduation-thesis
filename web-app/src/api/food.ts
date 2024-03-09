@@ -11,6 +11,7 @@ import {
   IFoodPostExposed,
   IFoodPostExposedWithLike,
   IFoodSearchParams,
+  IPagination,
 } from "../data";
 
 export const foodEndpoints = {
@@ -21,6 +22,7 @@ export const foodEndpoints = {
   searchFood: "/foods/search",
   searchHistory: "/foods/search/history",
   likeFood: "/foods/:id/like",
+  getLikedFood: "/foods/like/users/:userId",
 } as const;
 
 export interface FoodResponseError
@@ -89,6 +91,11 @@ export interface FoodFetcher {
     action: "LIKE" | "UNLIKE" | undefined,
     auth: IAuthInfo
   ): Promise<FoodResponse<void>>;
+  getLikedFood(
+    userId: string,
+    auth: IAuthInfo,
+    pagination?: IPagination
+  ): Promise<FoodResponse<IFoodPostExposedWithLike[]>>;
 }
 
 export const foodFetcher: FoodFetcher = {
@@ -170,6 +177,25 @@ export const foodFetcher: FoodFetcher = {
       {
         action: action ?? "LIKE",
       },
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
+  },
+  getLikedFood: (
+    userId: string,
+    auth: IAuthInfo,
+    pagination?: IPagination
+  ): Promise<FoodResponse<IFoodPostExposedWithLike[]>> => {
+    const params = new URLSearchParams();
+    params.set("skip", String(pagination?.skip ?? 0));
+    params.set("limit", String(pagination?.limit ?? 0));
+    return foodInstance.get(
+      foodEndpoints.getLikedFood.replace(":userId", userId) +
+        "?" +
+        params.toString(),
       {
         headers: {
           Authorization: auth.token,

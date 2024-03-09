@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import {
   AuthLike,
   IFoodSearchParams,
+  IPagination,
   InvalidDataError,
   isAllNotEmptyString,
   isLocation,
@@ -21,6 +22,7 @@ import {
   userLikeOrUnlikeFoodPost,
   IPostFoodData,
   updateFoodPost as updateFoodPostService,
+  getLikedFood as getLikedFoodPostService,
 } from "../services";
 
 interface IPostFoodBody {
@@ -171,9 +173,13 @@ export const searchFoodPost = async (
   const params = req.body;
   const auth = req.authContext as AuthLike;
   const paramsToSearch = toFoodSearchParams(params);
-  saveSearchHistory(auth._id, paramsToSearch);
   searchFoodService(paramsToSearch)
-    .then((data) => res.status(200).json(toResponseSuccessData(data)))
+    .then((data) => {
+      res.status(200).json(toResponseSuccessData(data));
+
+      // Save the history
+      saveSearchHistory(auth._id, paramsToSearch);
+    })
     .catch(next);
 };
 
@@ -197,6 +203,42 @@ export const likeOrUnlikeFoodPost = (
   const action = req.query.action ?? "LIKE";
   const auth = req.authContext as AuthLike;
   userLikeOrUnlikeFoodPost(auth._id, foodId!, action === "LIKE")
+    .then((data) => res.status(200).json(toResponseSuccessData(data)))
+    .catch(next);
+};
+
+export const getLikedFoodPost = (
+  req: Request<
+    { userId?: string },
+    {},
+    {},
+    { user?: string; skip?: string; limit?: string }
+  >,
+  res: Response,
+  next: NextFunction
+) => {
+  const { skip, limit } = req.query;
+  const user = req.params.userId;
+  if (!isObjectId(user)) {
+    return next(
+      new InvalidDataError({
+        message: "Invalid user",
+        data: {
+          reason: "invalid",
+          target: "user",
+        },
+      })
+    );
+  }
+
+  const _skip = +(skip ?? "");
+  const _limit = +(limit ?? "");
+  const pagination: IPagination = {
+    skip: isNaN(_skip) ? 0 : _skip,
+    limit: isNaN(_limit) ? 0 : _limit,
+  };
+
+  getLikedFoodPostService(user, pagination)
     .then((data) => res.status(200).json(toResponseSuccessData(data)))
     .catch(next);
 };

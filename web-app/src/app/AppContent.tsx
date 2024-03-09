@@ -2,9 +2,9 @@ import { Box, Stack } from "@mui/material";
 import SideBar from "./common/menu-side/SideBar";
 
 import AppContentContextProvider from "./AppContentContext";
-import AppHeader from "./header/AppHeader";
-import AppFooter from "./footer/AppFooter";
-import AppMain from "./main/AppMain";
+import AppHeader from "./body/header/AppHeader";
+import AppFooter from "./body/footer/AppFooter";
+import AppMain from "./body/main/AppMain";
 
 export default function AppContent() {
   return (

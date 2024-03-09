@@ -8,6 +8,7 @@ export {
   updateFoodPost,
   IPostFoodData,
   IPostFoodResponse,
+  getLikedFood,
 } from "./food-post";
 
 export {

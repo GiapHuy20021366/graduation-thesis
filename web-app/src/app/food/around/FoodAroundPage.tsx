@@ -1,4 +1,4 @@
-import FoodSearchContextProvider from "../../food/search/FoodSearchContext";
+import FoodSearchContextProvider from "../search/FoodSearchContext";
 import FoodAroundBody from "./FoodAroundBody";
 
 export default function FoodAroundPage() {

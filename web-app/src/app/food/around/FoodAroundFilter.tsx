@@ -27,7 +27,7 @@ import {
   toQuantityType,
 } from "../../../data";
 import { useFoodSearchContext, useI18nContext } from "../../../hooks";
-import CategoryPiece from "../../food/sharing/CategoryPiece";
+import CategoryPiece from "../sharing/CategoryPiece";
 import { CloseOutlined } from "@mui/icons-material";
 
 const PriceOptions = {

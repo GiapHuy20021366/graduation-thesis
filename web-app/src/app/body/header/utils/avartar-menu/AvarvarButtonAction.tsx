@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
-import { useAuthContext } from "../../../../hooks";
+import { useAuthContext } from "../../../../../hooks";
 import { deepOrange } from "@mui/material/colors";
 
 type AvatarActionProps = IconButtonProps;

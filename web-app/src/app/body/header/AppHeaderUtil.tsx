@@ -1,8 +1,12 @@
 import { IconButton, Stack, SxProps, Theme, Tooltip } from "@mui/material";
-import SideBarOpener from "../common/menu-side/SideBarOpener";
-import { RoomOutlined, SearchOutlined } from "@mui/icons-material";
+import SideBarOpener from "../../common/menu-side/SideBarOpener";
+import {
+  BookmarkAddOutlined,
+  RoomOutlined,
+  SearchOutlined,
+} from "@mui/icons-material";
 import { useNavigate } from "react-router";
-import NotificationProvider from "./utils/notification/NotificationProvider";
+// import NotificationProvider from "./utils/notification/NotificationProvider";
 
 export default function AppHeaderUtil() {
   const navigate = useNavigate();
@@ -23,7 +27,17 @@ export default function AppHeaderUtil() {
       }}
     >
       <SideBarOpener />
-      <Tooltip title={"Notification"} children={<NotificationProvider />} />
+      {/* <Tooltip title={"Notification"} children={<NotificationProvider />} /> */}
+      <Tooltip title={"Add food"}>
+        <IconButton
+          sx={{
+            color: "black",
+          }}
+          onClick={() => navigate("/food/sharing")}
+        >
+          <BookmarkAddOutlined sx={iconStyle} />
+        </IconButton>
+      </Tooltip>
       <Tooltip title={"Location"}>
         <IconButton
           sx={{

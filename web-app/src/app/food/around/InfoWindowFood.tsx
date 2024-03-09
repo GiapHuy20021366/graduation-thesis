@@ -1,7 +1,7 @@
-import { IFoodSearchInfo } from "../../../data";
+import { IFoodPostExposed } from "../../../data";
 
 interface IInfoWindowFoodProps {
-  food: IFoodSearchInfo;
+  food: IFoodPostExposed;
 }
 
 export default function InfoWindowFood({ food }: IInfoWindowFoodProps) {

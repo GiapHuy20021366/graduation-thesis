@@ -1,39 +1,28 @@
-import {
-  Avatar,
-  Box,
-  Chip,
-  Divider,
-  Rating,
-  Stack,
-  Typography,
-} from "@mui/material";
-import { IFoodPostExposed, toDistance, toQuantityType } from "../../../data";
-import { useAppContentContext, useI18nContext } from "../../../hooks";
-import { deepOrange } from "@mui/material/colors";
+import { Box, Chip, Divider, Rating, Stack, Typography } from "@mui/material";
+import { IFoodPostExposed, toQuantityType } from "../../../data";
+import { useI18nContext } from "../../../hooks";
 import { useNavigate } from "react-router";
 import {
   LocalOfferOutlined,
   LocationOnOutlined,
   ProductionQuantityLimitsOutlined,
-  SocialDistanceOutlined,
   TimelapseOutlined,
 } from "@mui/icons-material";
-import FoodItemDuration from "./FoodItemDuration";
+import FoodItemDuration from "../search/FoodItemDuration";
 
 interface IFoodSearchItemProps {
   item: IFoodPostExposed;
   onBeforeNavigate?: () => void;
 }
 
-export default function FoodSearchItem({
+export default function MyFoodItem({
   item,
   onBeforeNavigate,
 }: IFoodSearchItemProps) {
   const navigate = useNavigate();
   const i18n = useI18nContext();
-  const lang = i18n.of(FoodSearchItem, "Categories", "Quantities");
+  const lang = i18n.of(MyFoodItem, "Categories", "Quantities");
   const quantityType = toQuantityType(item.quantity);
-  const appContentContext = useAppContentContext();
 
   const handleNavigate = () => {
     if (onBeforeNavigate != null) {
@@ -41,13 +30,6 @@ export default function FoodSearchItem({
     }
     navigate(`/food/${item._id}`);
   };
-
-  const exposedUser =
-    typeof item.user === "string"
-      ? "H"
-      : item.user.firstName + " " + item.user.lastName;
-
-  const userId = typeof item.user === "string" ? item.user : item.user._id;
 
   return (
     <Stack
@@ -105,16 +87,6 @@ export default function FoodSearchItem({
             />
             <Typography component="legend">{lang(quantityType)}</Typography>
           </Stack>
-          <Stack mt={1} direction={"row"} gap={1}>
-            <SocialDistanceOutlined color="info" />
-            <Typography>
-              {toDistance(
-                item.location.coordinates,
-                appContentContext.currentLocation
-              ) * 1000}{" "}
-              m
-            </Typography>
-          </Stack>
           <Stack direction={"row"} gap={1} mt={1}>
             <LocationOnOutlined color="info" />
             <Typography>{item.location.name}</Typography>
@@ -122,45 +94,25 @@ export default function FoodSearchItem({
         </Box>
       </Stack>
       <Divider />
-      <Stack direction="row" gap={1}>
-        <Stack
-          direction="column"
-          sx={{
-            alignItems: "center",
-          }}
-        >
-          <Avatar
-            alt={exposedUser}
-            sx={{ bgcolor: deepOrange[500], cursor: "pointer" }}
-            onClick={() => {
-              navigate(`/profile/${userId}`);
-            }}
-          >
-            {exposedUser[0]}
-          </Avatar>
-          <Box component="h5" width={"fit-content"} mt={1} mb={0}>
-            {exposedUser}
-          </Box>
-        </Stack>
-        <Divider orientation="vertical" flexItem />
-
-        <Box flex={1}>
-          {item.categories.map((category) => {
-            return (
-              <Chip
-                label={lang(category)}
-                key={category}
-                sx={{
-                  my: 0.5,
-                  mx: 0.5,
-                  width: "fit-content",
-                  cursor: "pointer",
-                }}
-              />
-            );
-          })}
-        </Box>
-      </Stack>
+      <Box width={"100%"}>
+        {item.categories.map((category) => {
+          return (
+            <Chip
+              label={lang(category)}
+              key={category}
+              sx={{
+                my: 0.5,
+                mx: 0.5,
+                width: "fit-content",
+                cursor: "pointer",
+              }}
+            />
+          );
+        })}
+        {item.categories.length === 0 && (
+          <Typography>{lang("Không có loại thực phẩm được mô tả")}</Typography>
+        )}
+      </Box>
     </Stack>
   );
 }

@@ -6,7 +6,7 @@ import {
   MessageOutlined,
 } from "@mui/icons-material";
 import { Box, Stack } from "@mui/material";
-import { useI18nContext } from "../../hooks";
+import { useI18nContext } from "../../../hooks";
 import { useNavigate } from "react-router";
 
 export default function AppFooterExtensions() {

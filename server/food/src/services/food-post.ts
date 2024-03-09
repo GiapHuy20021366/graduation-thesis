@@ -5,7 +5,9 @@ import {
   IFoodPostExposedUser,
   IFoodPostLocation,
   IFoodSearchParams,
+  IPagination,
   InternalError,
+  OrderState,
   PlaceType,
   ResourceNotExistedError,
   isArrayPlaceTypes,
@@ -193,7 +195,15 @@ export const findFoodPostById = async (
       user: userId,
       foodPost: foodPost._id,
     });
-    if (liked != null) result.liked = true;
+    if (liked != null) {
+      result.liked = true;
+      result.like = {
+        _id: liked._id,
+        createdAt: liked.createdAt,
+        foodPost: foodPost._id.toString(),
+        user: userId,
+      };
+    }
   }
 
   return result;
@@ -312,7 +322,7 @@ const toFoodSearchCommonOptions = (
 
     const exclude = place.exclude;
     if (typeof exclude === "string") {
-      placeIdOption.$neq = exclude;
+      placeIdOption.$ne = exclude;
     } else if (Array.isArray(exclude)) {
       placeIdOption.$nin = exclude;
     }
@@ -334,7 +344,7 @@ const toFoodSearchCommonOptions = (
 
     const exclude = user.exclude;
     if (typeof exclude === "string") {
-      userOption.$neq = exclude;
+      userOption.$ne = exclude;
     } else if (Array.isArray(exclude)) {
       userOption.$nin = exclude;
     }
@@ -367,7 +377,7 @@ export const searchFood = async (
     const { max, current } = distance;
     options["location.two_array"] = {
       $geoWithin: {
-        $center: [[current.lng, current.lat], max],
+        $centerSphere: [[current.lng, current.lat], max / 6371],
       },
     };
   }
@@ -405,10 +415,14 @@ export const searchFood = async (
     meta
   ).sort(sort);
 
-  // console.log(params, {
-  //   ...options,
-  //   ...commonOptions,
-  // });
+  // console.log(
+  //   params,
+  //   {
+  //     ...options,
+  //     ...commonOptions,
+  //   },
+  //   sort
+  // );
 
   // Pagination
   queryBuilder.skip(pagination?.skip ?? 0).limit(pagination?.limit ?? 24);
@@ -460,7 +474,7 @@ export const searchFood = async (
     ),
   ]);
 
-  if (requireUser || requireUser) {
+  if (requireUser || requirePlace) {
     result.forEach((post) => {
       if (userDict != null) {
         const user = userDict[post.user as string];
@@ -532,4 +546,56 @@ export const userLikeOrUnlikeFoodPost = async (
     await foodPost.save();
     return liked;
   }
+};
+
+export const getLikedFood = async (
+  userId: string,
+  pagination?: IPagination
+): Promise<IFoodPostExposedWithLike[]> => {
+  const likes = await FoodUserLike.find({
+    user: userId,
+  })
+    .populate<{
+      foodPost: IFoodPostExposed;
+    }>("foodPost")
+    .sort({
+      createdAt: OrderState.DECREASE,
+    })
+    .skip(pagination?.skip ?? 0)
+    .limit(pagination?.limit ?? 24);
+
+  if (likes == null) {
+    throw new InternalError();
+  }
+
+  return likes
+    .filter((like) => like.foodPost != null)
+    .map((like): IFoodPostExposedWithLike => {
+      const post = like.foodPost;
+      return {
+        _id: post._id,
+        active: post.active,
+        categories: post.categories,
+        createdAt: post.createdAt,
+        description: post.description,
+        duration: post.duration,
+        images: post.images,
+        isEdited: post.isEdited,
+        likeCount: post.likeCount,
+        location: post.location,
+        price: post.price,
+        quantity: post.quantity,
+        title: post.title,
+        updatedAt: post.updatedAt,
+        user: post.user,
+        liked: true,
+        place: post.place,
+        like: {
+          _id: like._id,
+          createdAt: like.createdAt,
+          foodPost: post._id,
+          user: userId,
+        },
+      };
+    });
 };

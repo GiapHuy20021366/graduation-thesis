@@ -4,6 +4,7 @@ import {
   FavoriteOutlined,
   HomeOutlined,
   PeopleAltOutlined,
+  PlaceOutlined,
   SearchOutlined,
 } from "@mui/icons-material";
 import MyFood from "./MyFood";
@@ -63,7 +64,12 @@ export default function FoodList() {
   };
 
   return (
-    <Box width={"100%"} boxSizing={"border-box"} boxShadow={1}>
+    <Box
+      width={"100%"}
+      boxSizing={"border-box"}
+      boxShadow={1}
+      // position={"relative"}
+    >
       <Stack
         width="100%"
         direction={"row"}
@@ -109,6 +115,12 @@ export default function FoodList() {
       <NearFood active={tab === FoodPageTab.NEAR_FOOD} />
       <LovedFood active={tab === FoodPageTab.LOVED_FOOD} />
 
+      <SpeedDial
+        icon={<PlaceOutlined />}
+        sx={{ position: "absolute", bottom: 136, right: 26 }}
+        ariaLabel={"Around"}
+        onClick={() => navigate("/food/around")}
+      />
       <SpeedDial
         icon={<SearchOutlined />}
         ariaLabel={"search"}

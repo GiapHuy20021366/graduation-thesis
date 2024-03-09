@@ -19,9 +19,17 @@ export interface IFoodPostExposedPlace {
   location: ILocation;
 }
 
+export interface IFoodPostExposedLike {
+  _id: string;
+  user: string;
+  createdAt: string | Date;
+  foodPost: string;
+}
+
 export interface IFoodPostExposed
   extends Omit<IFoodPostSchema, "user" | "place"> {
   _id: string;
   user: string | IFoodPostExposedUser;
   place?: string | IFoodPostExposedPlace;
+  like?: IFoodPostExposedLike;
 }

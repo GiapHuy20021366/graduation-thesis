@@ -72,8 +72,8 @@ export const toFoodSearchParams = (value: any): IFoodSearchParams => {
   if (typeof value !== "object") return {};
   const result: IFoodSearchParams = {};
 
-  result.user = toIncludeAndExclude(result.user);
-  result.place = toIncludeAndExclude(result.place);
+  result.user = toIncludeAndExclude(value.user);
+  result.place = toIncludeAndExclude(value.place);
 
   const query = value.query;
   if (typeof query === "string" && query.trim().length > 0) {
