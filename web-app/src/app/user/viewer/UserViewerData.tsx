@@ -1,7 +1,6 @@
 import { Stack } from "@mui/material";
 import { IUserExposedWithFollower } from "../../../data";
 import { useState } from "react";
-import { useNavigate } from "react-router";
 import { UserViewerTab } from "./user-viewer-tab";
 import UserViewerTabs from "./UserViewerTabs";
 import UserViewerHeader from "./UserViewerHeader";
@@ -13,7 +12,6 @@ interface UserViewerDataProps {
 
 export default function UserViewerData({ data }: UserViewerDataProps) {
   const [tab, setTab] = useState<UserViewerTab>(0);
-  const navigate = useNavigate();
   return (
     <Stack width={"100%"} boxSizing={"border-box"} boxShadow={1} gap={2} px={1}>
       <UserViewerHeader user={data} />

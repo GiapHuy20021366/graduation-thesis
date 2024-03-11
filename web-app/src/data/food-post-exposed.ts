@@ -1,4 +1,4 @@
-import { IFoodUploadData } from ".";
+import { FoodCategory } from "./food-category";
 import { ILocation } from "./location";
 import { PlaceType } from "./place-type";
 
@@ -25,11 +25,22 @@ export interface IFoodPostExposedLike {
   foodPost: string;
 }
 
-export interface IFoodPostExposed extends Omit<IFoodUploadData, "place"> {
+export interface IFoodPostExposed {
   _id: string;
   user: string | IFoodPostExposedUser;
   place?: string | IFoodPostExposedPlace;
+  images: string[];
+  title: string;
+  categories: FoodCategory[];
+  description?: string;
+  quantity: number;
+  duration: string | Date;
+  price: number;
+  isEdited: boolean;
+  createdAt: string | Date;
+  updatedAt: string | Date;
   likeCount: number;
+  active: boolean;
 }
 
 export interface IFoodPostExposedWithLike extends IFoodPostExposed {

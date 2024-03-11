@@ -65,13 +65,6 @@ export { getAuth } from "./get-auth";
 export { BASE64 } from "./file-util";
 export { type IPlaceRating } from "./place-rating";
 export { type IAccount } from "./account";
-export { type IPlaceFollowerExposed } from "./place-follower-exposed";
-export {
-  type IPlaceFoodExposed,
-  type IPlaceFoodExposedAuthor,
-  type IPlaceFoodExposedFood,
-  type IPlaceFoodExposedPlace,
-} from "./place-food-exposed";
 export {
   loadFromLocalStorage,
   saveToLocalStorage,
@@ -130,3 +123,17 @@ export {
   type IUserExposedFollower,
   type IUserExposedWithFollower,
 } from "./user-exposed";
+export { SystemSide } from "./system-side";
+export {
+  type IFollowerBaseExposed,
+  type IFollowerExposed,
+  type IFollowerExposedPlace,
+  type IFollowerExposedSubcriber,
+  type IFollowerExposedTarget,
+  type IFollowerExposedUser,
+  type IPlaceFollowerExposed,
+  type IUserFollowerExposed,
+  isPlaceFollower,
+  isUserFollower,
+} from "./follower-exposed";
+export { type Schemad } from "./schemad";

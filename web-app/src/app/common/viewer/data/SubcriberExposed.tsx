@@ -1,16 +1,37 @@
 import React from "react";
 import { Avatar, Stack, StackProps, Typography } from "@mui/material";
-import { FollowType, IPlaceFollowerExposed, toTimeInfo } from "../../../data";
+import { FollowType, IFollowerExposed, toTimeInfo } from "../../../../data";
 import { useNavigate } from "react-router";
 
-type PlaceViewerSubciberProps = StackProps & {
-  data: IPlaceFollowerExposed;
+type SubciberExposedProps = StackProps & {
+  data: IFollowerExposed;
   onBeforeNavigate?: () => void;
 };
 
-const PlaceViewerSubciber = React.forwardRef<
+const toSubcriberId = (data: IFollowerExposed): string => {
+  const subcriber = data.subcriber;
+  return typeof subcriber === "string" ? subcriber : subcriber._id;
+};
+
+const toSubcriberNameAndAvartar = (
+  data: IFollowerExposed
+): { name: string; avartar?: string } => {
+  const subcriber = data.subcriber;
+  if (typeof subcriber === "string") {
+    return {
+      name: "SYSTEM_USER",
+    };
+  } else {
+    return {
+      name: subcriber.firstName + " " + subcriber.lastName,
+      avartar: subcriber.avartar,
+    };
+  }
+};
+
+const SubcriberExposed = React.forwardRef<
   HTMLDivElement,
-  PlaceViewerSubciberProps
+  SubciberExposedProps
 >((props, ref) => {
   const { data, onBeforeNavigate, ...rest } = props;
   const navigate = useNavigate();
@@ -21,8 +42,11 @@ const PlaceViewerSubciber = React.forwardRef<
   ) => {
     props.onClick && props.onClick(event);
     onBeforeNavigate && onBeforeNavigate();
-    navigate("/user/" + data.subcriber._id);
+    const subcriberId = toSubcriberId(data);
+    navigate("/user/" + subcriberId);
   };
+
+  const nameAndAvartar = toSubcriberNameAndAvartar(data);
 
   return (
     <Stack
@@ -37,13 +61,9 @@ const PlaceViewerSubciber = React.forwardRef<
       }}
       onClick={handleNavigateClick}
     >
-      <Avatar src={data.subcriber.avartar}>
-        {data.subcriber.firstName[0]}
-      </Avatar>
+      <Avatar src={nameAndAvartar.avartar}>{nameAndAvartar.name[0]}</Avatar>
       <Stack>
-        <Typography sx={{ fontWeight: 450 }}>
-          {data.subcriber.firstName} {data.subcriber.lastName}
-        </Typography>
+        <Typography sx={{ fontWeight: 450 }}>{nameAndAvartar.name}</Typography>
         <Typography>
           {[data.type].map((followType) => {
             switch (followType) {
@@ -64,4 +84,4 @@ const PlaceViewerSubciber = React.forwardRef<
   );
 });
 
-export default PlaceViewerSubciber;
+export default SubcriberExposed;

@@ -1,50 +1,38 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Box, Button, Divider, Stack, StackProps } from "@mui/material";
-import { FoodCategory, IPlaceExposed, IPlaceFoodExposed } from "../../../data";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Divider, Stack, StackProps } from "@mui/material";
+import {
+  IFoodPostExposed,
+  IFoodSearchParams,
+  IPagination,
+  IPlaceExposed,
+  OrderState,
+  loadFromSessionStorage,
+  saveToSessionStorage,
+} from "../../../data";
 import {
   useAppContentContext,
   useAuthContext,
+  useLoader,
   usePageProgessContext,
 } from "../../../hooks";
-import PlaceViewerSubciberHolder from "./PlaceViewerSubcriberHolder";
-import PlaceViewerSharedFood from "./PlaceViewerSharedFood";
+import { foodFetcher } from "../../../api";
+import SharedFood from "../../common/viewer/data/SharedFood";
+import SharedFoodHolder from "../../common/viewer/holder/SharedFoodHolder";
+import ErrorRetry from "../../common/viewer/data/ErrorRetry";
+import SearchMore from "../../common/viewer/data/SearchMore";
 
 type PlaceViewerSharedProps = StackProps & {
   place: IPlaceExposed;
   active: boolean;
 };
 
-const sample: IPlaceFoodExposed = {
-  author: {
-    _id: "0",
-    email: "0",
-    firstName: "Giap",
-    lastName: "Huy",
-  },
-  food: {
-    _id: "0",
-    duration: Date.now() + 1 * 24 * 60 * 60 * 1000,
-    images: [],
-    time: Date.now(),
-    title: "Thực phẩm sạch cho mọi nhà",
-    categories: [FoodCategory.FRUITS],
-  },
-  place: {
-    _id: "0",
-    exposedName: "Địa điểm 1",
-    location: {
-      name: "Phố hàng bông",
-      coordinates: {
-        lat: 0,
-        lng: 1,
-      },
-    },
-  },
-};
+interface IPlaceViewerSharedSnapshotData {
+  data: IFoodPostExposed[];
+  scrollTop?: number;
+}
 
-const genSample = (): IPlaceFoodExposed => {
-  return sample;
-};
+const PLACE_VIEWER_SHARED = (placeId: string) =>
+  `place.viewer@${placeId}.shared`;
 
 const PlaceViewerShared = React.forwardRef<
   HTMLDivElement,
@@ -52,31 +40,63 @@ const PlaceViewerShared = React.forwardRef<
 >((props, ref) => {
   const { place, active, ...rest } = props;
 
-  const [end, setEnd] = useState<boolean>(false);
-  const [foods, setFoods] = useState<IPlaceFoodExposed[]>([sample]);
+  const [foods, setFoods] = useState<IFoodPostExposed[]>([]);
 
   const progessContext = usePageProgessContext();
   const authContext = useAuthContext();
-  const auth = authContext.auth;
-  const appContextContext = useAppContentContext();
+  const { auth, account } = authContext;
+  const appContentContext = useAppContentContext();
+  const loader = useLoader();
+  const dirtyRef = useRef<boolean>(true);
 
-  const doSearchMore = useCallback(() => {
-    const skip = foods.length;
-    console.log(skip, place._id, auth);
+  const doSearch = useCallback(() => {
+    if (auth == null) return;
+    if (loader.isFetching || !active) return;
 
-    if (progessContext.isLoading) return;
+    const pagination: IPagination = {
+      skip: foods.length,
+      limit: 24,
+    };
+
     progessContext.start();
-    setTimeout(() => {
-      const nFoods = [...foods];
-      nFoods.push(genSample(), genSample(), genSample());
-      setFoods(nFoods);
-      setEnd(true);
-      progessContext.end();
-    }, 1000);
-  }, [auth, foods, place._id, progessContext]);
+    loader.setIsFetching(true);
+    loader.setIsError(false);
+    loader.setIsEnd(false);
+
+    const searchParams: IFoodSearchParams = {
+      pagination: pagination,
+      order: {
+        time: OrderState.DECREASE,
+      },
+      place: {
+        include: [place._id],
+      },
+    };
+
+    foodFetcher
+      .searchFood(searchParams, auth)
+      .then((res) => {
+        const data = res.data;
+        if (data != null) {
+          if (data.length < pagination.limit) {
+            loader.setIsEnd(true);
+          }
+          const _newData = foods.slice();
+          _newData.push(...data);
+          setFoods(_newData);
+        }
+      })
+      .catch(() => {
+        loader.setIsError(true);
+      })
+      .finally(() => {
+        loader.setIsFetching(false);
+        progessContext.end();
+      });
+  }, [active, auth, foods, loader, place._id, progessContext]);
 
   useEffect(() => {
-    const main = appContextContext.mainRef?.current;
+    const main = appContentContext.mainRef?.current;
     let listener: any;
 
     if (main != null) {
@@ -85,8 +105,8 @@ const PlaceViewerShared = React.forwardRef<
         const isAtBottom =
           element.scrollTop + element.clientHeight === element.scrollHeight;
 
-        if (isAtBottom && active && !end) {
-          doSearchMore();
+        if (isAtBottom && !loader.isEnd) {
+          doSearch();
         }
       };
       main.addEventListener("scroll", listener);
@@ -96,7 +116,52 @@ const PlaceViewerShared = React.forwardRef<
         main.removeEventListener("scroll", listener);
       }
     };
-  }, [appContextContext.mainRef, active, doSearchMore, end]);
+  }, [appContentContext.mainRef, doSearch, loader.isEnd]);
+
+  const doSaveStorage = () => {
+    const snapshot: IPlaceViewerSharedSnapshotData = {
+      data: foods,
+      scrollTop: appContentContext.mainRef?.current?.scrollTop,
+    };
+    saveToSessionStorage(snapshot, {
+      key: PLACE_VIEWER_SHARED(place._id),
+      account: authContext.account?.id_,
+    });
+  };
+
+  const handleBeforeNavigate = () => {
+    doSaveStorage();
+  };
+
+  // Recover result
+  useEffect(() => {
+    if (account == null) return;
+    if (!active) return;
+    if (dirtyRef.current) {
+      dirtyRef.current = false;
+      // At begining
+      const snapshot = loadFromSessionStorage<IPlaceViewerSharedSnapshotData>({
+        key: PLACE_VIEWER_SHARED(place._id),
+        maxDuration: 1 * 24 * 60 * 60 * 1000,
+        account: account.id_,
+      });
+      if (snapshot) {
+        const snapshotData = snapshot.data;
+        setFoods(snapshotData);
+        if (snapshotData.length < 24) {
+          loader.setIsEnd(true);
+        }
+        const mainRef = appContentContext.mainRef?.current;
+        if (mainRef) {
+          setTimeout(() => {
+            mainRef.scrollTop = snapshot.scrollTop ?? 0;
+          }, 300);
+        }
+      } else {
+        doSearch();
+      }
+    }
+  }, [account, active, appContentContext.mainRef, doSearch, loader, place._id]);
 
   return (
     <Stack
@@ -108,30 +173,28 @@ const PlaceViewerShared = React.forwardRef<
         ...(props.sx ?? {}),
       }}
     >
-      {foods.map((food, index) => {
+      {foods.map((food) => {
         return (
           <>
-            <PlaceViewerSharedFood py={1} data={food} key={index} />
+            <SharedFood
+              py={1}
+              data={food}
+              key={food._id}
+              onBeforeNavigate={handleBeforeNavigate}
+            />
             <Divider variant="middle" />
           </>
         );
       })}
 
-      {end && (
-        <Box textAlign={"center"} mt={2}>
-          Đã hết
-        </Box>
-      )}
+      {progessContext.isLoading && <SharedFoodHolder />}
 
-      {progessContext.isLoading && <PlaceViewerSubciberHolder />}
+      <SearchMore
+        active={loader.isEnd && !loader.isError}
+        onSearchMore={doSearch}
+      />
 
-      {!progessContext.isLoading && !end && (
-        <Stack alignItems={"center"} mt={2}>
-          <Button sx={{ width: "fit-content" }} onClick={() => doSearchMore()}>
-            Tìm kiếm thêm
-          </Button>
-        </Stack>
-      )}
+      <ErrorRetry active={loader.isError} onRetry={doSearch} />
     </Stack>
   );
 });

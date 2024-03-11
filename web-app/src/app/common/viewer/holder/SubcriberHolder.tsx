@@ -1,11 +1,11 @@
 import React from "react";
 import { Skeleton, Stack, StackProps } from "@mui/material";
 
-type PlaceViewerSubciberHolderProps = StackProps;
+type SubcriberHolderProps = StackProps;
 
-const PlaceViewerSubciberHolder = React.forwardRef<
+const SubcriberHolder = React.forwardRef<
   HTMLDivElement,
-  PlaceViewerSubciberHolderProps
+  SubcriberHolderProps
 >((props, ref) => {
   return (
     <Stack
@@ -28,4 +28,4 @@ const PlaceViewerSubciberHolder = React.forwardRef<
   );
 });
 
-export default PlaceViewerSubciberHolder;
+export default SubcriberHolder;

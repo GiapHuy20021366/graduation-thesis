@@ -62,10 +62,10 @@ export default function PlaceViewer({ id }: PlaceViewerProps) {
   }, [auth, id, isNotFound, loader, progressContext]);
 
   useEffect(() => {
-    if (data == null) {
+    if (data == null && !loader.isError) {
       doLoadPlace();
     }
-  }, [data, doLoadPlace]);
+  }, [data, doLoadPlace, loader.isError]);
 
   if (typeof id !== "string" || id.length !== 24 || isNotFound) {
     return <PageNotFound />;

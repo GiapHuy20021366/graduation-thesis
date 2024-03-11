@@ -1,12 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Box,
-  Button,
-  Divider,
-  Stack,
-  StackProps,
-  Typography,
-} from "@mui/material";
+import { Divider, Stack, StackProps } from "@mui/material";
 import {
   IPagination,
   IPlaceExposed,
@@ -20,9 +13,11 @@ import {
   useLoader,
   usePageProgessContext,
 } from "../../../hooks";
-import PlaceViewerSubciber from "./PlaceViewerSubcriber";
-import PlaceViewerSubciberHolder from "./PlaceViewerSubcriberHolder";
 import { userFetcher } from "../../../api";
+import SubcriberHolder from "../../common/viewer/holder/SubcriberHolder";
+import SubcriberExposed from "../../common/viewer/data/SubcriberExposed";
+import SearchMore from "../../common/viewer/data/SearchMore";
+import ErrorRetry from "../../common/viewer/data/ErrorRetry";
 
 type PlaceViewerSubcribedProps = StackProps & {
   place: IPlaceExposed;
@@ -53,7 +48,7 @@ const PlaceViewerSubcribed = React.forwardRef<
   const loader = useLoader();
 
   // Recover at begining or fetch at begining
-  const dirtyRef = useRef<boolean>(false);
+  const dirtyRef = useRef<boolean>(true);
 
   const doSaveStorage = () => {
     const snapshot: IPlaceViewerSubcribedSnapshotData = {
@@ -133,8 +128,8 @@ const PlaceViewerSubcribed = React.forwardRef<
   useEffect(() => {
     if (account == null) return;
     if (!active) return;
-    if (!dirtyRef.current) {
-      dirtyRef.current = true;
+    if (dirtyRef.current) {
+      dirtyRef.current = false;
       // At begining
       const snapshot =
         loadFromSessionStorage<IPlaceViewerSubcribedSnapshotData>({
@@ -171,13 +166,13 @@ const PlaceViewerSubcribed = React.forwardRef<
         display: active ? "flex" : "none",
       }}
     >
-      {followers.map((follower, index) => {
+      {followers.map((follower) => {
         return (
           <>
-            <PlaceViewerSubciber
+            <SubcriberExposed
               py={1}
               data={follower}
-              key={index}
+              key={follower._id}
               onBeforeNavigate={handleBeforeNavigate}
             />
             <Divider variant="middle" />
@@ -185,20 +180,14 @@ const PlaceViewerSubcribed = React.forwardRef<
         );
       })}
 
-      {loader.isFetching && <PlaceViewerSubciberHolder />}
+      {loader.isFetching && <SubcriberHolder />}
 
-      {loader.isEnd && !loader.isError && (
-        <Box textAlign={"center"} mt={2}>
-          <Typography>Bạn đã tìm kiếm hết</Typography>
-          <Button onClick={() => doSearch()}>Tìm kiếm thêm</Button>
-        </Box>
-      )}
-      {loader.isError && (
-        <Box textAlign={"center"} mt={2}>
-          <Typography>Có lỗi xảy ra</Typography>
-          <Button onClick={() => doSearch()}>Thử lại</Button>
-        </Box>
-      )}
+      <SearchMore
+        active={loader.isEnd && !loader.isError}
+        onSearchMore={doSearch}
+      />
+
+      <ErrorRetry active={loader.isError} onRetry={doSearch} />
     </Stack>
   );
 });

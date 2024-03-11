@@ -3,13 +3,13 @@ export const FollowType = {
   MEMBER: 2,
   SUB_ADMIN: 4,
   ADMIN: 8,
-};
+} as const;
 export type FollowType = (typeof FollowType)[keyof typeof FollowType];
 
 export const FollowRole = {
   USER: 1,
   PLACE: 2,
-};
+} as const;
 export type FollowRole = (typeof FollowRole)[keyof typeof FollowRole];
 
 export interface IFollowerBase {

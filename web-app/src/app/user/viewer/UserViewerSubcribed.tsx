@@ -9,7 +9,6 @@ import {
 } from "@mui/material";
 import {
   IPagination,
-  IPlaceExposed,
   IPlaceFollowerExposed,
   IUserExposedWithFollower,
   loadFromSessionStorage,
@@ -21,9 +20,9 @@ import {
   useLoader,
   usePageProgessContext,
 } from "../../../hooks";
-import PlaceViewerSubciber from "./PlaceViewerSubcriber";
-import PlaceViewerSubciberHolder from "./PlaceViewerSubcriberHolder";
 import { userFetcher } from "../../../api";
+import SubcriberExposed from "../../common/viewer/data/SubcriberExposed";
+import SubcriberHolder from "../../common/viewer/holder/SubcriberHolder";
 
 type UserViewerSubcribedProps = StackProps & {
   place: IUserExposedWithFollower;
@@ -137,12 +136,13 @@ const PlaceViewerSubcribed = React.forwardRef<
     if (!dirtyRef.current) {
       dirtyRef.current = true;
       // At begining
-      const snapshot =
-        loadFromSessionStorage<IUserViewerSubcribedSnapshotData>({
+      const snapshot = loadFromSessionStorage<IUserViewerSubcribedSnapshotData>(
+        {
           key: PLACE_VIEWER_SUBCRIBED(place._id),
           maxDuration: 1 * 24 * 60 * 60 * 1000,
           account: account.id_,
-        });
+        }
+      );
       if (snapshot) {
         const snapshotData = snapshot.data;
         setFollowers(snapshotData);
@@ -172,13 +172,13 @@ const PlaceViewerSubcribed = React.forwardRef<
         display: active ? "flex" : "none",
       }}
     >
-      {followers.map((follower, index) => {
+      {followers.map((follower) => {
         return (
           <>
-            <PlaceViewerSubciber
+            <SubcriberExposed
               py={1}
               data={follower}
-              key={index}
+              key={follower._id}
               onBeforeNavigate={handleBeforeNavigate}
             />
             <Divider variant="middle" />
@@ -186,7 +186,7 @@ const PlaceViewerSubcribed = React.forwardRef<
         );
       })}
 
-      {loader.isFetching && <PlaceViewerSubciberHolder />}
+      {loader.isFetching && <SubcriberHolder />}
 
       {loader.isEnd && !loader.isError && (
         <Box textAlign={"center"} mt={2}>

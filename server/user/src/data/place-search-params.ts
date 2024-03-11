@@ -3,7 +3,6 @@ import {
   isArrayPlaceTypes,
   isCoordinates,
   isNotEmptyString,
-  isNotEmptyStringArray,
   isNumber,
   isObjectId,
   isPagination,
