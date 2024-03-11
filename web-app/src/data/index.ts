@@ -59,7 +59,7 @@ export {
   type IPlaceFollower,
   type IUserFollower,
   toFollowTypeLabel,
-} from "./user-place-follower";
+} from "./follower";
 export { RequestStatus } from "./request-status";
 export { getAuth } from "./get-auth";
 export { BASE64 } from "./file-util";
@@ -136,7 +136,7 @@ export {
   isPlaceFollower,
   isUserFollower,
 } from "./follower-exposed";
-export { type Schemad } from "./schemad";
+export { type Schemad, type Ided, type Named, type Timed } from "./schemad";
 export {
   type IFollowerSearchDuration,
   type IFollowerSearchParams,
@@ -145,3 +145,4 @@ export {
   type IFollowerSearchUser,
   type IFollowerSearchOrder,
 } from "./follower-search-params";
+export { type IUser, type IUserCredential, type IUserPersonal } from "./user";

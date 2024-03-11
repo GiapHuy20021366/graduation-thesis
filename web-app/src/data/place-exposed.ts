@@ -1,7 +1,7 @@
 import { IPlace } from "./place";
 import { IPlaceRating } from "./place-rating";
 import { IRating } from "./rating";
-import { IPlaceFollower } from "./user-place-follower";
+import { IPlaceFollower } from "./follower";
 
 export interface IPlaceAuthorExposed {
   firstName: string;

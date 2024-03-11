@@ -3,7 +3,7 @@ import { ILocation } from "./location";
 import { OrderState } from "./order-state";
 import { IPagination } from "./pagination";
 import { PlaceType } from "./place-type";
-import { FollowType } from "./follower";
+import { FollowRole, FollowType } from "./follower";
 
 export const isObjectId = (value: any): value is string => {
   return typeof value === "string" && value.length === 24;
@@ -23,7 +23,7 @@ export const isEmptyString = (value: any): value is string => {
 };
 
 export const isNotEmptyString = (value: any): value is string => {
-  return !isEmptyString(value);
+  return typeof value === "string" && value.length > 0;
 };
 
 export const isAllNotEmptyString = (value: any): value is string[] => {
@@ -81,6 +81,14 @@ export const isFollowType = (value: any): value is FollowType => {
 
 export const isArrayFollowTypes = (value: any): value is FollowType[] => {
   return Array.isArray(value) && value.every((v) => isFollowType(v));
+};
+
+export const isFollowRole = (value: any): value is FollowRole => {
+  return Object.values(FollowRole).includes(value);
+};
+
+export const isArrayFollowRoles = (value: any): value is FollowRole[] => {
+  return Array.isArray(value) && value.every((v) => isFollowRole(v));
 };
 
 export const isOrderState = (value: any): value is OrderState => {

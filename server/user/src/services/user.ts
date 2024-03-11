@@ -4,13 +4,15 @@ import {
   FollowType,
   ICoordinates,
   IPagination,
+  IPersonalDataUpdate,
   IUserFollowerExposed,
   IUserSearchParams,
   Ided,
   InternalError,
   ResourceNotExistedError,
+  IUserCredential,
+  IUserPersonal,
 } from "../data";
-import { IUserCredential, IUserPersonal } from "~/data/user";
 
 export interface ISearchedUser
   extends Ided,
@@ -198,4 +200,75 @@ export const unFollowUser = async (
   return {
     success: true,
   };
+};
+
+export const updateUserPersonal = async (
+  userId: string,
+  data: IPersonalDataUpdate
+): Promise<{ success: boolean }> => {
+  const user = await User.findById(userId);
+  if (user == null) {
+    throw new ResourceNotExistedError({
+      message: `No user with id ${user} found`,
+      data: {
+        target: "id",
+        reason: "not-found",
+      },
+    });
+  }
+  const { updated, deleted } = data;
+
+  if (updated) {
+    const {
+      exposedName,
+      firstName,
+      lastName,
+      avatar,
+      categories,
+      description,
+      location,
+    } = updated;
+    if (updated.avatar) {
+      user.avatar = avatar;
+    }
+    if (exposedName) {
+      user.exposedName = exposedName;
+    }
+    if (firstName) {
+      user.firstName = firstName;
+    }
+    if (lastName) {
+      user.lastName = lastName;
+    }
+    if (categories) {
+      user.categories = categories;
+    }
+    if (description) {
+      user.description = description;
+    }
+    if (location) {
+      user.location = {
+        ...location,
+        two_array: [location.coordinates.lng, location.coordinates.lat],
+      };
+    }
+  }
+  if (deleted) {
+    const { avatar, categories, description, location } = deleted;
+    if (avatar) {
+      user.avatar = undefined;
+    }
+    if (categories) {
+      user.categories = [];
+    }
+    if (description) {
+      user.description = undefined;
+    }
+    if (location) {
+      user.location = undefined;
+    }
+  }
+  user.updatedAt = new Date();
+  await user.save();
+  return { success: true };
 };

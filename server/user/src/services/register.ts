@@ -4,9 +4,8 @@ import {
   InternalError,
   InvalidDataError,
   ResourceExistedError,
-  UserInfo,
 } from "../data";
-import { User } from "../db/model";
+import { IUserSchema, User } from "../db/model";
 import { USER_SERVICE } from "../config";
 import { operations, brokerChannel } from "../broker";
 import {
@@ -103,7 +102,6 @@ export const createManualAccountFromToken = async (
     lastName: newAccount.lastName,
     email: newAccount.email,
     avatar: newAccount.avatar,
-    categories: newAccount.categories,
     token: toAuthToken({
       email: newAccount.email,
       _id: newAccount._id.toString(),
@@ -130,7 +128,7 @@ export const registAccountByGoogleCridential = async (
   const { email } = googleOAuth;
   const user = await User.findOneByEmail(email);
 
-  let responseUser: UserInfo | undefined;
+  let responseUser: IUserSchema | undefined;
   const newDate = new Date();
   if (user != null) {
     // update information
@@ -156,7 +154,7 @@ export const registAccountByGoogleCridential = async (
         message: "Internal server error",
       });
     }
-    const newUser: UserInfo = {
+    const newUser: IUserSchema = {
       googleOAuth: {
         ...googleOAuth,
         createdAt: newDate,
@@ -171,6 +169,8 @@ export const registAccountByGoogleCridential = async (
       validSince: newDate,
       password: password,
       categories: [],
+      active: true,
+      exposedName: "",
     };
     const user = new User(newUser);
     await user.save();
@@ -193,7 +193,6 @@ export const registAccountByGoogleCridential = async (
     lastName: responseUser.lastName,
     email: responseUser.email,
     avatar: responseUser.avatar,
-    categories: responseUser.categories,
     token: toAuthToken({
       email: responseUser.email,
       _id: user!._id.toString(),

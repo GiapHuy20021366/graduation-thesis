@@ -1,6 +1,6 @@
 import { FoodCategory } from "./food-category";
 import { ILocation } from "./location";
-import { IUserFollower } from "./user-place-follower";
+import { IUserFollower } from "./follower";
 
 export interface IUserExposed {
   _id: string;

@@ -1,75 +1,110 @@
-import { ICoordinates } from "./coordinates";
 import {
+  ICoordinates,
+  IIncludeAndExclude,
+  IPagination,
+  PlaceType,
   isArrayPlaceTypes,
   isCoordinates,
   isNotEmptyString,
   isNumber,
-  isObjectId,
+  isOrderState,
   isPagination,
-} from "./data-validate";
+  toIncludeAndExclude,
+} from ".";
 import { OrderState } from "./order-state";
-import { IPagination } from "./pagination";
-import { PlaceType } from "./place-type";
+
+export interface IPlaceSearchAuthor extends IIncludeAndExclude {}
 
 export interface IPlaceSearchOrder {
   distance?: OrderState;
   rating?: OrderState;
+  time?: OrderState;
+}
+
+export interface IPlaceSearchDistance {
+  current: ICoordinates;
+  max: number;
+}
+
+export interface IPlaceSearchRating {
+  min?: number;
+  max?: number;
 }
 
 export interface IPlaceSearchParams {
   query?: string;
-  author?: string;
-  maxDistance?: number;
-  minRating?: number;
+  author?: IPlaceSearchAuthor;
+  distance?: IPlaceSearchDistance;
   order?: IPlaceSearchOrder;
-  currentLocation?: ICoordinates;
   pagination?: IPagination;
   types?: PlaceType[];
+  rating?: IPlaceSearchRating;
 }
 
-const toPlaceSearchOrder = (value: any): IPlaceSearchOrder | undefined => {
-  if (value == null || typeof value !== "object") return;
+export const toPlaceSearchDistance = (
+  value: any
+): IPlaceSearchDistance | undefined => {
+  if (typeof value !== "object") return;
+  const { max, current } = value;
+  if (!isNumber(max) || !isCoordinates(current)) return;
+  return {
+    current: current,
+    max: max,
+  };
+};
+
+export const toPlaceSearchOrder = (
+  value: any
+): IPlaceSearchOrder | undefined => {
+  if (typeof value !== "object") return;
   const result: IPlaceSearchOrder = {};
-  if (Object.values(OrderState).includes(value.distance)) {
-    result.distance = value.distance;
+  const { distance, rating, time } = value;
+  if (isOrderState(distance) && distance !== OrderState.NONE) {
+    result.distance = distance;
   }
-  if (Object.values(OrderState).includes(value.rating)) {
-    result.rating = value.rating;
+  if (isOrderState(rating) && rating !== OrderState.NONE) {
+    result.rating = rating;
+  }
+  if (isOrderState(time) && time !== OrderState.NONE) {
+    result.time = time;
   }
   return result;
 };
 
-export const toPlaceSearchParams = (
+export const toPlaceSearchRating = (
   value: any
-): IPlaceSearchParams | undefined => {
-  if (value == null || typeof value !== "object") return;
+): IPlaceSearchRating | undefined => {
+  if (typeof value !== "object") return;
+  const result: IPlaceSearchRating = {};
+  const { min, max } = value;
+  if (isNumber(min)) {
+    result.min = min;
+  }
+  if (isNumber(max)) {
+    result.max = max;
+  }
+  return result;
+};
+
+export const toPlaceSearchParams = (value: any): IPlaceSearchParams => {
+  if (typeof value !== "object") return {};
+
   const result: IPlaceSearchParams = {};
-  if (isNotEmptyString(value.query)) {
-    result.query = value.query;
+  result.author = toIncludeAndExclude(value.author);
+
+  const { query, distance, order, pagination, types, rating } = value;
+  if (isNotEmptyString(query)) {
+    result.query = query;
   }
-  if (isObjectId(value.author)) {
-    result.author = value.author;
+
+  result.distance = toPlaceSearchDistance(distance);
+  result.order = toPlaceSearchOrder(order);
+  if (isPagination(pagination)) {
+    result.pagination = pagination;
   }
-  if (isNumber(value.maxDistance) && value.maxDistance > 0) {
-    result.maxDistance = value.maxDistance;
+  if (isArrayPlaceTypes(types)) {
+    result.types = types;
   }
-  if (isNumber(value.minRating)) {
-    result.minRating = value.minRating;
-  }
-  result.order = toPlaceSearchOrder(value.order);
-  if (isCoordinates(value.currentLocation)) {
-    result.currentLocation = value.currentLocation;
-  }
-  if (isPagination(value.pagination)) {
-    result.pagination = value.pagination;
-  } else {
-    result.pagination = {
-      skip: 0,
-      limit: 24,
-    };
-  }
-  if (isArrayPlaceTypes(value.types)) {
-    result.types = value.types;
-  }
+  result.rating = toPlaceSearchRating(rating);
   return result;
 };

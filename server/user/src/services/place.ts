@@ -250,15 +250,18 @@ export const unfollowPlace = async (placeId: string, userId: string) => {
 
 export const searchPlaces = async (params: IPlaceSearchParams) => {
   const {
-    currentLocation,
-    maxDistance,
+    distance,
     pagination,
     order,
     author,
     query: searchQuery,
-    minRating,
+    rating,
     types,
   } = params;
+  const maxDistance = distance?.max;
+  const minRating = rating?.min;
+  const currentLocation = distance?.current;
+
   const options: any = {};
   const meta: any = {};
   const sort: any = {};

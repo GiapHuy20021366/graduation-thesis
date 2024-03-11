@@ -1,5 +1,5 @@
 export { GoogleOAuthInfo } from "./google-oauth-info";
-export { IUser } from "./user";
+export { IUser, IUserCredential, IUserPersonal } from "./user";
 export {
   TAccountRegisterMethod,
   validateAccountRegisterMethod,
@@ -55,6 +55,8 @@ export {
   isFollowType,
   isPlaceType,
   isOrderState,
+  isArrayFollowRoles,
+  isFollowRole,
 } from "./data-validate";
 export { IPagination } from "./pagination";
 export { ILocation } from "./location";
@@ -76,6 +78,12 @@ export { OrderState } from "./order-state";
 export {
   IPlaceSearchOrder,
   IPlaceSearchParams,
+  IPlaceSearchAuthor,
+  IPlaceSearchDistance,
+  IPlaceSearchRating,
+  toPlaceSearchDistance,
+  toPlaceSearchOrder,
+  toPlaceSearchRating,
   toPlaceSearchParams,
 } from "./place-search-params";
 export { toDistance } from "./to-distance";
@@ -110,3 +118,9 @@ export {
   IUserExposedSimple,
   IUserExposedWithFollower,
 } from "./user-exposed";
+export {
+  IPersonalDataUpdate,
+  IUserRemovable,
+  toPersonalDataUpdate,
+} from "./personal-data-update";
+export { IIncludeAndExclude, toIncludeAndExclude } from "./include-and-exclude";
