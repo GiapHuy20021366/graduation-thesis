@@ -12,7 +12,7 @@ export interface IPlace {
   description?: string;
   categories: string[];
   location: ILocation;
-  avartar?: string;
+  avatar?: string;
   images: string[];
   author?: string; // author id
   type: PlaceType;
@@ -26,8 +26,8 @@ export const toPlace = (value: any): IPlace | undefined => {
     return;
   if (!isLocation(value.location)) return;
   if (
-    value.avartar != null &&
-    (isEmptyString(value.avartar) || !isString(value.avartar))
+    value.avatar != null &&
+    (isEmptyString(value.avatar) || !isString(value.avatar))
   )
     return;
   if (value.images != null && !isAllNotEmptyString(value.images)) return;
@@ -37,7 +37,7 @@ export const toPlace = (value: any): IPlace | undefined => {
     description: value.description ?? "",
     categories: value.categories ?? [],
     location: value.location as ILocation, // require,
-    avartar: value.avartar,
+    avatar: value.avatar,
     images: value.images,
     author: value.author as string,
     type: PlaceType.PERSONAL,

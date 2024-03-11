@@ -175,11 +175,11 @@ export const findFoodPostById = async (
   const [user, place] = await Promise.all([
     rpcGetUser<IFoodPostExposedUser>(
       foodPost.user,
-      "_id firstName lastName avartar location"
+      "_id firstName lastName avatar location"
     ),
     rpcGetPlace<IFoodPostExposedPlace>(
       foodPost.place?._id,
-      "_id exposeName avartar type location"
+      "_id exposeName avatar type location"
     ),
   ]);
 
@@ -466,11 +466,11 @@ export const searchFood = async (
   const [userDict, placeDict] = await Promise.all([
     rpcGetDictUser<Record<string, IFoodPostExposedUser>>(
       users,
-      "_id firstName lastName avartar location"
+      "_id firstName lastName avatar location"
     ),
     rpcGetDictPlace<Record<string, IFoodPostExposedPlace>>(
       places,
-      "_id exposeName avartar type location"
+      "_id exposeName avatar type location"
     ),
   ]);
 

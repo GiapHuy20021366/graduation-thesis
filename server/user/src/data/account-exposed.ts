@@ -1,12 +1,14 @@
-import { ILocation } from "./location";
+import { Ided } from "./schemad";
+import { IUserCredential, IUserPersonal } from "./user";
 
-export interface AccountExposed {
-  id_: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  titles?: string[];
-  avatar?: string;
+export interface AccountExposed
+  extends Ided,
+    Partial<Pick<IUserCredential, "active" | "email">>,
+    Partial<
+      Pick<
+        IUserPersonal,
+        "avatar" | "location" | "firstName" | "lastName" | "exposedName"
+      >
+    > {
   token: string;
-  location?: ILocation;
 }

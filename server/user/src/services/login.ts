@@ -33,7 +33,7 @@ export const loginAccountByManual = async (
   }
 
   return {
-    id_: user._id.toString(),
+    _id: user._id.toString(),
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
@@ -42,7 +42,8 @@ export const loginAccountByManual = async (
       _id: user._id.toString(),
     }),
     avatar: user.avatar,
-    titles: user.titles,
     location: user.location,
+    active: user.active,
+    exposedName: user.exposedName,
   };
 };

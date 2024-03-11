@@ -1,14 +1,13 @@
 import { Model, Schema, model, ObjectId } from "mongoose";
 import collections from "../collections";
-import { FollowRole, FollowType, IFollower } from "../../data";
+import { FollowRole, FollowType, IFollower, Timed } from "../../data";
 
 export interface IFollowerSchema
-  extends Omit<IFollower, "place" | "user" | "subcriber"> {
+  extends Omit<IFollower, "place" | "user" | "subcriber">,
+    Timed {
   place: ObjectId;
   user: ObjectId;
   subcriber: ObjectId;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 interface IFollowerMethods {}

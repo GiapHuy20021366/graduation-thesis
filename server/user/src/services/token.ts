@@ -22,7 +22,7 @@ export const refreshToken = async (
       });
     }
     return {
-      id_: auth._id,
+      _id: user._id.toString(),
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
@@ -31,15 +31,13 @@ export const refreshToken = async (
         _id: user._id.toString(),
       }),
       avatar: user.avatar,
-      titles: user.titles,
-      location: user.location
+      location: user.location,
+      active: user.active,
+      exposedName: user.exposedName,
     };
   } else {
     return {
-      id_: auth._id,
-      email: "",
-      firstName: "",
-      lastName: "",
+      _id: auth._id,
       token: toAuthToken(auth),
     };
   }

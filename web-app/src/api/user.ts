@@ -71,13 +71,13 @@ userInstance.interceptors.response.use(
 );
 
 interface AccountInfo {
-  id_: string;
+  _id: string;
   email: string;
   firstName: string;
   lastName: string;
   token: string;
-  titles: string[];
-  avartar?: string;
+  categories: string[];
+  avatar?: string;
   location?: ILocation;
 }
 
@@ -99,7 +99,7 @@ export interface IPlaceData {
   description?: string;
   categories: string[];
   location: ILocation;
-  avartar?: string;
+  avatar?: string;
   images: string[];
   type: PlaceType;
 }
@@ -572,7 +572,7 @@ const fakeOneUser = (params: IGetUserNearParams): IUserInfo => {
     email: "something@gmail.com",
     firstName: "A",
     lastName: "B",
-    id_: String(Math.random() * 1000000),
+    _id: String(Math.random() * 1000000),
     location: {
       name: "Fake",
       coordinates: userCoor,

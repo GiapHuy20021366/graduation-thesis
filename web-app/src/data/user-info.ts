@@ -5,10 +5,10 @@ export interface IUserInfo {
     name: string;
     coordinates: ICoordinates;
   };
-  id_: string;
+  _id: string;
   email: string;
   firstName: string;
   lastName: string;
-  titles?: string[];
-  avartar?: string;
+  categories?: string[];
+  avatar?: string;
 }

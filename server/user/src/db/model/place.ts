@@ -1,13 +1,11 @@
 import { Model, Schema, model, ObjectId } from "mongoose";
 import collections from "../collections";
-import { IPlace, IRating, PlaceType } from "../../data";
+import { IPlace, IRating, PlaceType, Timed } from "../../data";
 
-export interface IPlaceSchema extends Omit<IPlace, "author"> {
+export interface IPlaceSchema extends Omit<IPlace, "author">, Timed {
   author: ObjectId;
   rating: IRating;
   active: boolean;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 interface IPlaceMethods {}
@@ -56,7 +54,7 @@ const placeSchema = new Schema<IPlaceSchema, IPlaceModel, IPlaceMethods>({
     index: true,
     default: PlaceType.PERSONAL,
   },
-  avartar: String,
+  avatar: String,
   author: {
     type: Schema.ObjectId,
     required: true,

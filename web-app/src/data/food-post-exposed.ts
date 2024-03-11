@@ -6,14 +6,14 @@ export interface IFoodPostExposedUser {
   _id: string;
   firstName: string;
   lastName: string;
-  avartar?: string;
+  avatar?: string;
   location?: ILocation;
 }
 
 export interface IFoodPostExposedPlace {
   _id: string;
   exposeName: string;
-  avartar?: string;
+  avatar?: string;
   type: PlaceType;
   location: ILocation;
 }

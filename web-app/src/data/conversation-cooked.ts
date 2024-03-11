@@ -5,7 +5,7 @@ export interface IConversationParticipant {
   _id: string;
   firstName: string;
   lastName: string;
-  avartar?: string;
+  avatar?: string;
 }
 
 export interface IConversationCooked

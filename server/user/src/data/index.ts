@@ -1,5 +1,5 @@
 export { GoogleOAuthInfo } from "./google-oauth-info";
-export { UserInfo } from "./user-info";
+export { IUser } from "./user";
 export {
   TAccountRegisterMethod,
   validateAccountRegisterMethod,
@@ -7,7 +7,6 @@ export {
   validatePassword,
   validateName,
 } from "./validation";
-
 export { InternalErrorInfo, InternalError } from "./internal-error";
 export { InvalidDataErrorInfo, InvalidDataError } from "./invalid-data-error";
 export {
@@ -67,7 +66,7 @@ export {
   IUserFollower,
   toFollower,
   IPlaceFollower,
-} from "./user-place-follower";
+} from "./follower";
 export { PlaceType } from "./place-type";
 export { IPlace, toPlace } from "./place";
 export { IPlaceRating } from "./place-rating";
@@ -87,13 +86,27 @@ export {
   toNotFoundError,
 } from "./to-error";
 export {
-  IPlaceFollowerExposed,
-  IPlaceFollowerExposedPlace,
-  IPlaceFollowerExposedSubcriber,
-} from "./place-follower-exposed";
-export {
   IUserSearchDistance,
   IUserSearchOrder,
   IUserSearchParams,
   toUserSearchParams,
 } from "./user-search-params";
+export { Ided, Named, Schemad, Timed } from "./schemad";
+export {
+  IFollowerBaseExposed,
+  IFollowerExposed,
+  IFollowerExposedPlace,
+  IFollowerExposedSubcriber,
+  IFollowerExposedTarget,
+  IFollowerExposedUser,
+  IPlaceFollowerExposed,
+  IUserFollowerExposed,
+  isPlaceFollower,
+  isUserFollower,
+} from "./follower-exposed";
+export {
+  IUserExposed,
+  IUserExposedFollower,
+  IUserExposedSimple,
+  IUserExposedWithFollower,
+} from "./user-exposed";

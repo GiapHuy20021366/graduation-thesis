@@ -1,6 +1,6 @@
 import { IPlaceExposed } from "./place-exposed";
 import { Schemad } from "./schemad";
-import { FollowRole, IFollowerBase } from "./user-place-follower";
+import { FollowRole, IFollowerBase } from "./follower";
 
 export interface IFollowerExposedTarget {
   _id: string;

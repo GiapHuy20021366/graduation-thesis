@@ -69,7 +69,7 @@ export const useUserResolver = (): IUserResolverState => {
           });
 
           //   Save and callback
-          users.forEach((user) => (usersDict[user.id_] = user));
+          users.forEach((user) => (usersDict[user._id] = user));
           if (fn) {
             fn([...existseds, ...users]);
           }

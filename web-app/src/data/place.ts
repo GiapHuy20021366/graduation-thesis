@@ -6,7 +6,7 @@ export interface IPlace {
   description?: string;
   categories: string[];
   location: ILocation;
-  avartar?: string;
+  avatar?: string;
   images: string[];
   type: PlaceType;
 }

@@ -1,13 +1,12 @@
 import { Model, Schema, model, ObjectId } from "mongoose";
 import collections from "../collections";
-import { IPlaceRating } from "../../data";
+import { IPlaceRating, Timed } from "../../data";
 
 export interface IPlaceRatingSchema
-  extends Omit<IPlaceRating, "place" | "user"> {
+  extends Omit<IPlaceRating, "place" | "user">,
+    Timed {
   place: ObjectId;
   user: ObjectId;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 interface IPlaceRatingMethods {}

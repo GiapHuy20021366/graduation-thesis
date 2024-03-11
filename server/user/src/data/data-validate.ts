@@ -3,7 +3,7 @@ import { ILocation } from "./location";
 import { OrderState } from "./order-state";
 import { IPagination } from "./pagination";
 import { PlaceType } from "./place-type";
-import { FollowType } from "./user-place-follower";
+import { FollowType } from "./follower";
 
 export const isObjectId = (value: any): value is string => {
   return typeof value === "string" && value.length === 24;

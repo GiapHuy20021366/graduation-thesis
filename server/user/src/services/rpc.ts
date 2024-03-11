@@ -1,10 +1,10 @@
+import { Ided } from "~/data";
 import { Place, User } from "../db/model";
+import { IUserPersonal } from "~/data/user";
 
-export interface RPCGetUserInfoReturn {
-  _id: string;
-  firstName: string;
-  lastName: string;
-}
+export interface RPCGetUserInfoReturn
+  extends Ided,
+    Pick<IUserPersonal, "firstName" | "lastName"> {}
 
 export const rpcGetUserInfo = async (
   _id: string
@@ -47,7 +47,7 @@ export const rpcGetDictUserByListId = async (
     }
     const users = await query.exec();
     users.forEach((user) => {
-      result[user._id] = user;
+      result[user._id.toString()] = user;
     });
   }
   return result;

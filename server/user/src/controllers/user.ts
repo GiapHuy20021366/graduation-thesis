@@ -94,3 +94,13 @@ export const searchUser = async (
     .then((data) => res.send(toResponseSuccessData(data)))
     .catch(next);
 };
+
+// follow user
+
+// unfollow user
+
+// get exposed user
+
+// update information of user
+
+// get exposed follower with new

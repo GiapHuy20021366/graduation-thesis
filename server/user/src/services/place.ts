@@ -11,6 +11,7 @@ import {
   IPlaceFollowerExposed,
   IPlaceRating,
   IRating,
+  Ided,
   InternalError,
   OrderState,
   PlaceType,
@@ -18,7 +19,7 @@ import {
   UnauthorizationError,
   toDistance,
 } from "../data";
-import { Follower, Place, PlaceRating, UserDocument } from "../db/model";
+import { Follower, Place, PlaceRating, IUserSchema } from "../db/model";
 
 export interface IPlaceData extends Omit<IPlace, "author"> {}
 
@@ -54,7 +55,7 @@ export const createNewPlace = async (data: IPlaceData, authorId: string) => {
     rating: newPlace.rating,
     type: newPlace.type,
     updatedAt: newPlace.updatedAt,
-    avartar: newPlace.avartar,
+    avatar: newPlace.avatar,
   };
   return result;
 };
@@ -110,7 +111,7 @@ export const updatePlace = async (
   place.images = newData.images;
   place.location = newData.location;
   place.type = newData.type;
-  place.avartar = newData.avartar;
+  place.avatar = newData.avatar;
   place.updatedAt = new Date();
 
   await place.save();
@@ -128,7 +129,7 @@ export const updatePlace = async (
     rating: place.rating,
     type: place.type,
     updatedAt: place.updatedAt,
-    avartar: place.avartar,
+    avatar: place.avatar,
   };
   return result;
 };
@@ -451,7 +452,7 @@ export const getPlaceInfo = async (placeId: string, userId?: string) => {
     rating: place.rating,
     type: place.type,
     updatedAt: place.updatedAt,
-    avartar: place.avartar,
+    avatar: place.avatar,
     description: place.description,
   };
   if (userId != null) {
@@ -557,7 +558,7 @@ export const getPlacesByUserFollow = async (
         rating: follower.place.rating,
         type: follower.place.type,
         updatedAt: follower.place.updatedAt,
-        avartar: follower.place.avartar,
+        avatar: follower.place.avatar,
         description: follower.place.description,
         subcribers: follower.place.subcribers,
         userFollow: {
@@ -615,7 +616,7 @@ export const getPlacesAround = async (
       rating: place.rating,
       type: place.type,
       updatedAt: place.updatedAt,
-      avartar: place.avartar,
+      avatar: place.avatar,
       description: place.description,
     })
   );
@@ -654,7 +655,7 @@ export const getPlacesRankByFavorite = async (
       rating: place.rating,
       type: place.type,
       updatedAt: place.updatedAt,
-      avartar: place.avartar,
+      avatar: place.avatar,
       description: place.description,
     })
   );
@@ -694,7 +695,7 @@ export const getPlacesRatedByUser = async (
         rating: place.rating,
         type: place.type,
         updatedAt: place.updatedAt,
-        avartar: place.avartar,
+        avatar: place.avatar,
         description: place.description,
         userRating: {
           place: place._id,
@@ -741,7 +742,7 @@ export const getPlaceFollowers = async (
 
   const followers = await Follower.find(options)
     .populate<{
-      subcriber: UserDocument;
+      subcriber: IUserSchema & Ided;
       place: string;
     }>("subcriber")
     .sort({
@@ -768,7 +769,7 @@ export const getPlaceFollowers = async (
           _id: subcriber._id,
           firstName: subcriber.firstName,
           lastName: subcriber.lastName,
-          avartar: subcriber.avatar,
+          avatar: subcriber.avatar,
         },
         type: follower.type,
       };

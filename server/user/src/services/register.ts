@@ -98,12 +98,12 @@ export const createManualAccountFromToken = async (
   });
 
   return {
-    id_: newAccount._id.toString(),
+    _id: newAccount._id.toString(),
     firstName: newAccount.firstName,
     lastName: newAccount.lastName,
     email: newAccount.email,
     avatar: newAccount.avatar,
-    titles: newAccount.titles,
+    categories: newAccount.categories,
     token: toAuthToken({
       email: newAccount.email,
       _id: newAccount._id.toString(),
@@ -170,7 +170,7 @@ export const registAccountByGoogleCridential = async (
       updatedAt: newDate,
       validSince: newDate,
       password: password,
-      titles: [],
+      categories: [],
     };
     const user = new User(newUser);
     await user.save();
@@ -188,12 +188,12 @@ export const registAccountByGoogleCridential = async (
   }
 
   return {
-    id_: user!._id.toString(),
+    _id: user!._id.toString(),
     firstName: responseUser.firstName,
     lastName: responseUser.lastName,
     email: responseUser.email,
     avatar: responseUser.avatar,
-    titles: responseUser.titles,
+    categories: responseUser.categories,
     token: toAuthToken({
       email: responseUser.email,
       _id: user!._id.toString(),
