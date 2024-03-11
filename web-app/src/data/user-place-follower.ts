@@ -16,7 +16,6 @@ export interface IFollowerBase {
   subcriber: string;
   type: FollowType;
   role: FollowRole; // is subcriber user or place ?
-  time: string | number;
 }
 
 export interface IPlaceFollower extends IFollowerBase {

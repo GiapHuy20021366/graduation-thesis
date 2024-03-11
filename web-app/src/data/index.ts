@@ -125,3 +125,8 @@ export {
   type IUserSearchOrder,
   type IUserSearchParams,
 } from "./user-search-params";
+export {
+  type IUserExposed,
+  type IUserExposedFollower,
+  type IUserExposedWithFollower,
+} from "./user-exposed";

@@ -18,6 +18,8 @@ import {
   OrderState,
   IPlaceFollowerExposed,
   IUserSearchParams,
+  IUserExposedWithFollower,
+  FollowRole,
 } from "../data";
 
 export const userEndpoints = {
@@ -146,6 +148,10 @@ export interface UserFetcher {
     auth: IAuthInfo
   ): Promise<UserResponse<IUserInfo[]>>;
   getUserInfo(id: string, auth: IAuthInfo): Promise<UserResponse<IUserInfo>>;
+  getUserExposed(
+    id: string,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IUserExposedWithFollower>>;
   setLocation(
     userId: string,
     location: ILocation,
@@ -328,6 +334,34 @@ export const userFetcher: UserFetcher = {
     return userInstance.post(userEndpoints.searchUser, params, {
       headers: {
         Authorization: auth.token,
+      },
+    });
+  },
+  getUserExposed: (
+    id: string,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IUserExposedWithFollower>> => {
+    console.log(id, auth);
+    return Promise.resolve({
+      data: {
+        _id: "656224f0d5a6da1d1e2c49e2",
+        categories: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        firstName: "Huy",
+        lastName: "Giap",
+        avatar: undefined,
+        description: "",
+        email: "gv.huy.2002@gmail.com",
+        location: undefined,
+        userFollower: {
+          _id: "656224f0d5a6da1d1e2c49e2",
+          createdAt: new Date(),
+          role: FollowRole.USER,
+          subcriber: "656224f0d5a6da1d1e2c49e2",
+          type: FollowType.SUBCRIBER,
+          user: "656224f0d5a6da1d1e2c49e2",
+        },
       },
     });
   },

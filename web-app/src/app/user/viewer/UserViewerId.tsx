@@ -1,30 +1,30 @@
 import { useCallback, useEffect, useState } from "react";
-import { IPlaceExposed } from "../../../data";
-import PlaceViewerHolder from "./PlaceViewerHolder";
-import PlaceViewerRetry from "./PlaceViewerRetry";
+import { IUserExposedWithFollower } from "../../../data";
 import {
   useAuthContext,
   useLoader,
   usePageProgessContext,
 } from "../../../hooks";
-import PageNotFound from "../../common/PageNotFound";
 import { userFetcher } from "../../../api";
-import PlaceViewerData from "./PlaceViewerData";
+import PageNotFound from "../../common/PageNotFound";
+import UserViewerData from "./UserViewerData";
+import UserViewerHolder from "./UserViewerHolder";
+import UserViewerRetry from "./UserViewerRetry";
 
-interface PlaceViewerProps {
+interface IUserViewerIdProps {
   id?: string;
 }
 
-export default function PlaceViewer({ id }: PlaceViewerProps) {
-  const [data, setData] = useState<IPlaceExposed>();
+export default function UserViewerId({ id }: IUserViewerIdProps) {
+  const [data, setData] = useState<IUserExposedWithFollower>();
   const [isNotFound, setIsNotFound] = useState<boolean>(false);
   const authContext = useAuthContext();
   const auth = authContext.auth;
-
-  const progressContext = usePageProgessContext();
   const loader = useLoader();
 
-  const doLoadPlace = useCallback(() => {
+  const progressContext = usePageProgessContext();
+
+  const doLoadUser = useCallback(() => {
     if (loader.isFetching || isNotFound) return;
     if (auth == null) return;
     if (id == null) return;
@@ -34,7 +34,7 @@ export default function PlaceViewer({ id }: PlaceViewerProps) {
 
     progressContext.start();
     userFetcher
-      .getPlace(id, auth)
+      .getUserExposed(id, auth)
       .then((res) => {
         const datas = res.data;
         if (datas != null) {
@@ -63,19 +63,21 @@ export default function PlaceViewer({ id }: PlaceViewerProps) {
 
   useEffect(() => {
     if (data == null) {
-      doLoadPlace();
+      doLoadUser();
     }
-  }, [data, doLoadPlace]);
+  }, [data, doLoadUser]);
 
-  if (typeof id !== "string" || id.length !== 24 || isNotFound) {
+  if (typeof id !== "string" || isNotFound) {
     return <PageNotFound />;
   }
 
   return (
     <>
-      {data && <PlaceViewerData data={data} />}
-      {loader.isFetching && <PlaceViewerHolder />}
-      {loader.isError && <PlaceViewerRetry onRetry={doLoadPlace} />}
+      {data && !loader.isError && !loader.isFetching && (
+        <UserViewerData data={data} />
+      )}
+      {loader.isFetching && <UserViewerHolder />}
+      {loader.isError && <UserViewerRetry onRetry={doLoadUser} />}
     </>
   );
 }
