@@ -58,7 +58,7 @@ const LovedFood = React.forwardRef<HTMLDivElement, LovedFoodProps>(
       };
       saveToSessionStorage(snapshot, {
         key: LOVED_FOOD_STORAGE_KEY,
-        account: authContext.account?.id_,
+        account: authContext.account?._id,
       });
     };
 
@@ -83,7 +83,7 @@ const LovedFood = React.forwardRef<HTMLDivElement, LovedFoodProps>(
       loader.setIsEnd(false);
 
       foodFetcher
-        .getLikedFood(account.id_, auth, pagination)
+        .getLikedFood(account._id, auth, pagination)
         .then((res) => {
           const foods = res.data;
           if (foods != null) {
@@ -144,7 +144,7 @@ const LovedFood = React.forwardRef<HTMLDivElement, LovedFoodProps>(
         const snapshot = loadFromSessionStorage<ILovedFoodSnapshotData>({
           key: LOVED_FOOD_STORAGE_KEY,
           maxDuration: 1 * 24 * 60 * 60 * 1000,
-          account: account.id_,
+          account: account._id,
         });
         if (snapshot) {
           const snapshotData = snapshot.data;

@@ -50,7 +50,7 @@ const SubcribedItem = React.forwardRef<HTMLDivElement, SubcribedItemProps>(
             cursor: "pointer",
             boxShadow: 5,
           }}
-          src={data.avartar}
+          src={data.avatar}
         >
           {data.exposeName[0]}
         </Avatar>

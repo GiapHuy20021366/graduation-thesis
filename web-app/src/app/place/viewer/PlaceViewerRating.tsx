@@ -52,7 +52,7 @@ const PlaceViewerRating = React.forwardRef<
   useEffect(() => {
     if (rating == null) {
       if (account != null) {
-        if (account.id_ === data.userRating?.user) {
+        if (account._id === data.userRating?.user) {
           setRating(data.userRating.score);
         }
       }

@@ -26,7 +26,7 @@ export default function InfoWindowPlace({
         <Avatar
           alt={place.exposeName}
           sx={{ bgcolor: deepOrange[500], cursor: "pointer" }}
-          src={place.avartar}
+          src={place.avatar}
         >
           {place.exposeName[0]}
         </Avatar>

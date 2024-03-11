@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import {
   FollowType,
-  IAccount,
+  IAccountExposed,
   IUserExposedWithFollower,
 } from "../../../data";
 import { useAuthContext, useToastContext } from "../../../hooks";
@@ -35,23 +35,23 @@ type UserSubcribeChipActionProps = ChipProps & {
 
 const isSubcribed = (
   user: IUserExposedWithFollower,
-  account?: IAccount
+  account?: IAccountExposed
 ): boolean => {
   if (account == null) return false;
-  if (user._id === account.id_) return true;
+  if (user._id === account._id) return true;
   if (user.userFollow != null) {
     const followerId = user.userFollow.subcriber;
-    if (followerId === account.id_) return true;
+    if (followerId === account._id) return true;
   }
   return false;
 };
 
 const isPermitSubcribe = (
   user: IUserExposedWithFollower,
-  account?: IAccount
+  account?: IAccountExposed
 ): boolean => {
   if (account == null) return false;
-  if (account.id_ === user._id) {
+  if (account._id === user._id) {
     return false;
   }
   return true;

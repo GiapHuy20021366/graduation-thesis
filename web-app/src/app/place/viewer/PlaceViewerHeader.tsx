@@ -78,7 +78,7 @@ const PlaceViewerHeader = React.forwardRef<
             zIndex: 1000,
             boxShadow: 5,
           }}
-          src={place.avartar}
+          src={place.avatar}
         >
           {place.exposeName.charAt(0)}
         </Avatar>

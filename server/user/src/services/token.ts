@@ -1,6 +1,6 @@
 import { User } from "../db/model";
 import {
-  AccountExposed,
+  IAccountExposed,
   AuthLike,
   ResourceNotExistedError,
   toAuthToken,
@@ -9,7 +9,7 @@ import {
 export const refreshToken = async (
   auth: AuthLike,
   profile?: boolean
-): Promise<AccountExposed> => {
+): Promise<IAccountExposed> => {
   if (profile) {
     const user = await User.findOneByEmail(auth.email);
     if (user == null) {

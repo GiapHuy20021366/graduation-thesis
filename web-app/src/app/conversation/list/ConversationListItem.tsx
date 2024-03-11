@@ -37,7 +37,7 @@ const ConversationListItem = React.forwardRef<
 >((props, ref) => {
   const { active, conversation, ...rest } = props;
   const authContext = useAuthContext();
-  const op = toOpposite(conversation.participants, authContext.account?.id_);
+  const op = toOpposite(conversation.participants, authContext.account?._id);
 
   const latestMessage = toLastestMessage(conversation.messages);
 
@@ -64,7 +64,7 @@ const ConversationListItem = React.forwardRef<
           cursor: "pointer",
           boxShadow: 5,
         }}
-        src={op?.avartar}
+        src={op?.avatar}
       >
         {op?.firstName[0] ?? "H"}
       </Avatar>

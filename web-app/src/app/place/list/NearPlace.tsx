@@ -66,7 +66,7 @@ const NearPlace = React.forwardRef<HTMLDivElement, NearPlaceProps>(
       };
       saveToSessionStorage(snapshot, {
         key: NEAR_PLACE_STORAGE_KEY,
-        account: authContext.account?.id_,
+        account: authContext.account?._id,
       });
     };
 
@@ -165,7 +165,7 @@ const NearPlace = React.forwardRef<HTMLDivElement, NearPlaceProps>(
         const snapshot = loadFromSessionStorage<INearPlaceSnapshotData>({
           key: NEAR_PLACE_STORAGE_KEY,
           maxDuration: 1 * 24 * 60 * 60 * 1000,
-          account: account.id_,
+          account: account._id,
         });
         if (snapshot) {
           const snapshotData = snapshot.data;

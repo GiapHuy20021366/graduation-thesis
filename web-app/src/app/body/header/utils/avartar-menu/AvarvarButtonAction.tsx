@@ -46,7 +46,7 @@ const AvatarButtonAction = React.forwardRef<
           ml: "auto",
           ...(props.sx ?? {}),
         }}
-        aria-controls={open ? "avartar-context-menu" : undefined}
+        aria-controls={open ? "avatar-context-menu" : undefined}
         aria-haspopup="true"
         aria-expanded={open ? "true" : undefined}
         onClick={handleOpen}
@@ -61,7 +61,7 @@ const AvatarButtonAction = React.forwardRef<
       </IconButton>
       <Menu
         sx={{ mt: "45px" }}
-        id="avartar-context-menu"
+        id="avatar-context-menu"
         anchorEl={anchorEl}
         anchorOrigin={{
           vertical: "top",

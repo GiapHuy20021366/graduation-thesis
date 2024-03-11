@@ -2,7 +2,7 @@ import {
   ResourceNotExistedError,
   UnauthorizationError,
   toAuthToken,
-  AccountExposed,
+  IAccountExposed,
 } from "../data";
 import { User } from "../db/model";
 import { compareHash } from "../utils";
@@ -10,7 +10,7 @@ import { compareHash } from "../utils";
 export const loginAccountByManual = async (
   email: string,
   password: string
-): Promise<AccountExposed> => {
+): Promise<IAccountExposed> => {
   const user = await User.findOneByEmail(email);
   if (user == null) {
     throw new ResourceNotExistedError({

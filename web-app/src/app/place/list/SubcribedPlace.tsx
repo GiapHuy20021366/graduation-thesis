@@ -57,7 +57,7 @@ const SubcribedPlace = React.forwardRef<HTMLDivElement, SubcribedPlaceProps>(
       };
       saveToSessionStorage(snapshot, {
         key: SUBCRIBED_PLACE_STORAGE_KEY,
-        account: authContext.account?.id_,
+        account: authContext.account?._id,
       });
     };
 
@@ -80,7 +80,7 @@ const SubcribedPlace = React.forwardRef<HTMLDivElement, SubcribedPlaceProps>(
 
       userFetcher
         .getPlacesByFollow(
-          authContext.account!.id_,
+          authContext.account!._id,
           { pagination: pagination },
           auth
         )
@@ -152,7 +152,7 @@ const SubcribedPlace = React.forwardRef<HTMLDivElement, SubcribedPlaceProps>(
         const snapshot = loadFromSessionStorage<ISubcribedPlaceSnapshotData>({
           key: SUBCRIBED_PLACE_STORAGE_KEY,
           maxDuration: 1 * 24 * 60 * 60 * 100,
-          account: account.id_,
+          account: account._id,
         });
         if (snapshot) {
           const snapshotData = snapshot.data;

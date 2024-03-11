@@ -13,9 +13,9 @@ const toSubcriberId = (data: IFollowerExposed): string => {
   return typeof subcriber === "string" ? subcriber : subcriber._id;
 };
 
-const toSubcriberNameAndAvartar = (
+const toSubcriberNameAndavatar = (
   data: IFollowerExposed
-): { name: string; avartar?: string } => {
+): { name: string; avatar?: string } => {
   const subcriber = data.subcriber;
   if (typeof subcriber === "string") {
     return {
@@ -24,7 +24,7 @@ const toSubcriberNameAndAvartar = (
   } else {
     return {
       name: subcriber.firstName + " " + subcriber.lastName,
-      avartar: subcriber.avartar,
+      avatar: subcriber.avatar,
     };
   }
 };
@@ -46,7 +46,7 @@ const SubcriberExposed = React.forwardRef<
     navigate("/user/" + subcriberId);
   };
 
-  const nameAndAvartar = toSubcriberNameAndAvartar(data);
+  const nameAndavatar = toSubcriberNameAndavatar(data);
 
   return (
     <Stack
@@ -61,9 +61,9 @@ const SubcriberExposed = React.forwardRef<
       }}
       onClick={handleNavigateClick}
     >
-      <Avatar src={nameAndAvartar.avartar}>{nameAndAvartar.name[0]}</Avatar>
+      <Avatar src={nameAndavatar.avatar}>{nameAndavatar.name[0]}</Avatar>
       <Stack>
-        <Typography sx={{ fontWeight: 450 }}>{nameAndAvartar.name}</Typography>
+        <Typography sx={{ fontWeight: 450 }}>{nameAndavatar.name}</Typography>
         <Typography>
           {[data.type].map((followType) => {
             switch (followType) {

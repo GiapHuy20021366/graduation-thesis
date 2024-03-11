@@ -60,7 +60,7 @@ const UserViewerPlace = React.forwardRef<HTMLDivElement, UserViewerPlaceProps>((
     };
     saveToSessionStorage(snapshot, {
       key: USER_VIEWER_PLACE(user._id),
-      account: authContext.account?.id_,
+      account: authContext.account?._id,
     });
   };
 
@@ -160,7 +160,7 @@ const UserViewerPlace = React.forwardRef<HTMLDivElement, UserViewerPlaceProps>((
       const snapshot = loadFromSessionStorage<IUserViewerPlaceSnapshotData>({
         key: USER_VIEWER_PLACE(user._id),
         maxDuration: 1 * 24 * 60 * 60 * 1000,
-        account: account.id_,
+        account: account._id,
       });
       if (snapshot) {
         const snapshotData = snapshot.data;

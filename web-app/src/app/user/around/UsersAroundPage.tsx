@@ -193,7 +193,7 @@ export default function UsersAroundPage() {
         .then((res) => {
           const data = res.data;
           if (data) {
-            const datas = data.filter((d) => d.id_ !== account.id_);
+            const datas = data.filter((d) => d._id !== account._id);
             setUsers(datas);
             if (datas.length < 50) {
               loader.setIsEnd(true);
@@ -500,12 +500,12 @@ export default function UsersAroundPage() {
                     }}
                     key={i}
                     position={coordinate}
-                    onClick={() => toggleMarker(user.id_)}
+                    onClick={() => toggleMarker(user._id)}
                   >
-                    {selectedMarker === user.id_ && (
+                    {selectedMarker === user._id && (
                       <InfoWindowF
                         position={coordinate}
-                        onCloseClick={() => toggleMarker(user.id_)}
+                        onCloseClick={() => toggleMarker(user._id)}
                       >
                         <InfoWindowUser
                           onBeforeNavigate={handleBeforeNavigate}

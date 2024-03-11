@@ -170,9 +170,9 @@ export default function FoodSearchBody() {
     };
     saveToSessionStorage(snapshot, {
       key: FOOD_SEARCH_BODY_STORAGE_KEY,
-      account: account?.id_,
+      account: account?._id,
     });
-  }, [account?.id_, appContentContext.mainRef, foods, tab]);
+  }, [account?._id, appContentContext.mainRef, foods, tab]);
 
   const handleInputChange = (
     _event: React.SyntheticEvent<Element, Event>,
@@ -184,7 +184,7 @@ export default function FoodSearchBody() {
   useEffect(() => {
     const params: IFoodSearchHistoryParams = {};
     if (query && query.trim() === "" && authContext.account != null) {
-      params["users"] = [authContext.account.id_];
+      params["users"] = [authContext.account._id];
     }
     if (query && query.trim() !== "") {
       params["query"] = query.trim();
@@ -447,7 +447,7 @@ export default function FoodSearchBody() {
       const snapshot = loadFromSessionStorage<IFoodSearchBodySnapshotData>({
         key: FOOD_SEARCH_BODY_STORAGE_KEY,
         maxDuration: 1 * 24 * 60 * 60 * 1000,
-        account: account.id_,
+        account: account._id,
       });
       if (snapshot) {
         setTab(snapshot.tab);
@@ -503,7 +503,7 @@ export default function FoodSearchBody() {
                   <SearchOutlined />
                 </ListItemIcon>
                 <ListItemText primary={option.query} />
-                {option.userId === authContext?.account?.id_ && (
+                {option.userId === authContext?.account?._id && (
                   <ListItemIcon>
                     <History />
                   </ListItemIcon>

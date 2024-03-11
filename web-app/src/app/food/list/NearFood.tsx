@@ -60,7 +60,7 @@ const NearFood = React.forwardRef<HTMLDivElement, NearFoodProps>(
       };
       saveToSessionStorage(snapshot, {
         key: NEAR_FOOD_STORAGE_KEY,
-        account: authContext.account?.id_,
+        account: authContext.account?._id,
       });
     };
 
@@ -81,7 +81,7 @@ const NearFood = React.forwardRef<HTMLDivElement, NearFoodProps>(
 
       const params: IFoodSearchParams = {
         user: {
-          exclude: [account.id_],
+          exclude: [account._id],
         },
         order: {
           distance: OrderState.INCREASE,
@@ -161,7 +161,7 @@ const NearFood = React.forwardRef<HTMLDivElement, NearFoodProps>(
         const snapshot = loadFromSessionStorage<INearFoodSnapshotData>({
           key: NEAR_FOOD_STORAGE_KEY,
           maxDuration: 1 * 24 * 60 * 60 * 1000,
-          account: account.id_,
+          account: account._id,
         });
         if (snapshot) {
           const snapshotData = snapshot.data;

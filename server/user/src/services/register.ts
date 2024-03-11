@@ -1,5 +1,5 @@
 import {
-  AccountExposed,
+  IAccountExposed,
   GoogleOAuthInfo,
   InternalError,
   InvalidDataError,
@@ -62,7 +62,7 @@ export const registAccountByManual = async (
 
 export const createManualAccountFromToken = async (
   token: string
-): Promise<AccountExposed> => {
+): Promise<IAccountExposed> => {
   const info = verifyToken(token) as {
     data: ManualAccountRegisterInfo;
   } | null;
@@ -112,7 +112,7 @@ export const createManualAccountFromToken = async (
 
 export const registAccountByGoogleCridential = async (
   cridential: string
-): Promise<AccountExposed> => {
+): Promise<IAccountExposed> => {
   let googleOAuth: GoogleOAuthInfo | undefined;
   try {
     googleOAuth = jwtDecode(cridential) as GoogleOAuthInfo;

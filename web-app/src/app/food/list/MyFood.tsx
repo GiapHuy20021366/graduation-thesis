@@ -57,7 +57,7 @@ const MyFood = React.forwardRef<HTMLDivElement, MyFoodProps>((props, ref) => {
     };
     saveToSessionStorage(snapshot, {
       key: MY_FOOD_STORAGE_KEY,
-      account: authContext.account?.id_,
+      account: authContext.account?._id,
     });
   };
 
@@ -76,7 +76,7 @@ const MyFood = React.forwardRef<HTMLDivElement, MyFoodProps>((props, ref) => {
 
     const params: IFoodSearchParams = {
       user: {
-        include: [account.id_],
+        include: [account._id],
       },
       order: {
         time: OrderState.DECREASE,
@@ -143,7 +143,7 @@ const MyFood = React.forwardRef<HTMLDivElement, MyFoodProps>((props, ref) => {
       const snapshot = loadFromSessionStorage<IMyFoodSnapshotData>({
         key: MY_FOOD_STORAGE_KEY,
         maxDuration: 1 * 24 * 60 * 60 * 1000,
-        account: account.id_,
+        account: account._id,
       });
       if (snapshot) {
         const snapshotData = snapshot.data;

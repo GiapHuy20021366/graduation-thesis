@@ -65,7 +65,7 @@ const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
       };
       saveToSessionStorage(snapshot, {
         key: FAVORITE_PLACE_STORAGE_KEY,
-        account: authContext.account?.id_,
+        account: authContext.account?._id,
       });
     };
 
@@ -155,7 +155,7 @@ const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
         const snapshot = loadFromSessionStorage<IFavoritePlaceSnapshotData>({
           key: FAVORITE_PLACE_STORAGE_KEY,
           maxDuration: 1 * 24 * 60 * 60 * 1000,
-          account: account.id_,
+          account: account._id,
         });
         if (snapshot) {
           const snapshotData = snapshot.data;

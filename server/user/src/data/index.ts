@@ -25,7 +25,7 @@ export {
 export { HttpResponseCode } from "./http-response-code";
 export { toResponseSuccessData } from "./to-response-success-data";
 export { toAuthToken, AuthLike } from "./to-auth-token";
-export { AccountExposed } from "./account-exposed";
+export { IAccountExposed } from "./account-exposed";
 
 export { RpcAction } from "./rpc-action";
 export { RpcQueueName } from "./rpc-queue-name";

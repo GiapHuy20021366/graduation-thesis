@@ -125,7 +125,7 @@ const UserViewerShared = React.forwardRef<
     };
     saveToSessionStorage(snapshot, {
       key: USER_VIEWER_SHARED(user._id),
-      account: authContext.account?.id_,
+      account: authContext.account?._id,
     });
   };
 
@@ -143,7 +143,7 @@ const UserViewerShared = React.forwardRef<
       const snapshot = loadFromSessionStorage<IUserViewerSharedSnapshotData>({
         key: USER_VIEWER_SHARED(user._id),
         maxDuration: 1 * 24 * 60 * 60 * 1000,
-        account: account.id_,
+        account: account._id,
       });
       if (snapshot) {
         const snapshotData = snapshot.data;

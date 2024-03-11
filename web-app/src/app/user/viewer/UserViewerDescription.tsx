@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, BoxProps, Button, Stack, Typography } from "@mui/material";
 import { useAuthContext } from "../../../hooks";
-import { IAccount, IUserExposedWithFollower } from "../../../data";
+import { IAccountExposed, IUserExposedWithFollower } from "../../../data";
 import { RichTextReadOnly } from "mui-tiptap";
 import StarterKit from "@tiptap/starter-kit";
 import { useNavigate } from "react-router";
@@ -12,10 +12,10 @@ type UserViewerDescriptionProps = BoxProps & {
 
 const isEditPermit = (
   data: IUserExposedWithFollower,
-  account?: IAccount
+  account?: IAccountExposed
 ): boolean => {
   if (account == null) return false;
-  if (data._id !== account.id_) return false;
+  if (data._id !== account._id) return false;
   return true;
 };
 

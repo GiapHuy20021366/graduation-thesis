@@ -136,7 +136,7 @@ export default function FoodSearchContextProvider({
       const snapshot = loadFromSessionStorage<IFoodSearchContextSnapshotData>({
         key: FOOD_SEARCH_CONTEXT_STORAGE_KEY,
         maxDuration: 1 * 24 * 60 * 60 * 1000,
-        account: account.id_,
+        account: account._id,
       });
       if (snapshot) {
         setMaxDistance(snapshot.maxDistance);
@@ -174,7 +174,7 @@ export default function FoodSearchContextProvider({
     };
     saveToSessionStorage(snapshot, {
       key: FOOD_SEARCH_CONTEXT_STORAGE_KEY,
-      account: authContext.account?.id_,
+      account: authContext.account?._id,
     });
   };
 

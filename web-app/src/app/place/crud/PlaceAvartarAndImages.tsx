@@ -18,14 +18,14 @@ import {
 import { AddOutlined, CloseOutlined, EditOutlined } from "@mui/icons-material";
 import { BASE64 } from "../../../data";
 
-type PlaceAvartarAndImagesProps = BoxProps;
+type PlaceavatarAndImagesProps = BoxProps;
 
-const PlaceAvartarAndImages = React.forwardRef<
+const PlaceavatarAndImages = React.forwardRef<
   HTMLDivElement,
-  PlaceAvartarAndImagesProps
+  PlaceavatarAndImagesProps
 >((props, ref) => {
   const editContext = usePlaceEditContext();
-  const { images, setImages, avartar, setAvartar, exposeName } = editContext;
+  const { images, setImages, avatar, setavatar, exposeName } = editContext;
   const [index, setIndex] = useState<number>(0);
 
   const inputImageAddRef = useRef<HTMLInputElement>(null);
@@ -37,7 +37,7 @@ const PlaceAvartarAndImages = React.forwardRef<
   const saveImage = useSaveImage();
   const toast = useToastContext();
 
-  const handleClickAvartar = () => {
+  const handleClickavatar = () => {
     inputAvatarRef.current?.click();
   };
 
@@ -105,7 +105,7 @@ const PlaceAvartarAndImages = React.forwardRef<
     setIndex(Math.max(0, index - 1));
   };
 
-  const handleAvartarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleavatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (auth == null) return;
 
     const files = event.target.files;
@@ -120,7 +120,7 @@ const PlaceAvartarAndImages = React.forwardRef<
         result,
         {
           onSuccess: (image) => {
-            setAvartar(image.url);
+            setavatar(image.url);
           },
           onError: () => {
             toast.error("Không thể thực hiện hành động bây giờ");
@@ -217,7 +217,7 @@ const PlaceAvartarAndImages = React.forwardRef<
           ref={inputAvatarRef}
           hidden
           accept="image/*"
-          onChange={handleAvartarChange}
+          onChange={handleavatarChange}
         />
         <Avatar
           sx={{
@@ -228,8 +228,8 @@ const PlaceAvartarAndImages = React.forwardRef<
             cursor: "pointer",
             boxShadow: 5,
           }}
-          onClick={() => handleClickAvartar()}
-          src={avartar}
+          onClick={() => handleClickavatar()}
+          src={avatar}
         >
           H
         </Avatar>
@@ -241,4 +241,4 @@ const PlaceAvartarAndImages = React.forwardRef<
   );
 });
 
-export default PlaceAvartarAndImages;
+export default PlaceavatarAndImages;

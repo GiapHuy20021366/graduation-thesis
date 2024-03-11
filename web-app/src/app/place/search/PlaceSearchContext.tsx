@@ -159,7 +159,7 @@ export default function PlaceSearchContextProvider({
     };
     saveToSessionStorage(snapshot, {
       key: PLACE_SEARCH_KEY,
-      account: authContext.account?.id_,
+      account: authContext.account?._id,
     });
   }, [
     appContentContext.mainRef,
@@ -416,7 +416,7 @@ export default function PlaceSearchContextProvider({
       // At begining
       const snapshot = loadFromLocalStorage<IPlaceSearchContextSnapshotData>({
         key: PLACE_SEARCH_KEY,
-        account: account.id_,
+        account: account._id,
         maxDuration: 1 * 24 * 60 * 60 * 1000,
       });
       if (snapshot) {

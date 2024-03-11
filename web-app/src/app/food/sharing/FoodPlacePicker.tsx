@@ -50,7 +50,7 @@ const FoodPlacePicker = React.forwardRef<HTMLDivElement, FoodPlacePickerProps>(
       loader.setIsFetching(true);
       userFetcher
         .getPlacesByFollow(
-          account.id_,
+          account._id,
           {
             pagination: {
               skip: 0,

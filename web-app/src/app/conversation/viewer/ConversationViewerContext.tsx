@@ -97,10 +97,10 @@ export default function ConversationViewerContextProvider({
         _messages.push({
           ...message,
           sender: senderInfo && {
-            _id: senderInfo.id_,
+            _id: senderInfo._id,
             firstName: senderInfo.firstName,
             lastName: senderInfo.lastName,
-            avartar: senderInfo.avartar,
+            avatar: senderInfo.avatar,
           },
         });
         console.log("New messages", _messages);
@@ -167,7 +167,7 @@ export default function ConversationViewerContextProvider({
           _id: uuid,
           createdAt: new Date(),
           udpatedAt: new Date(),
-          sender: account.id_,
+          sender: account._id,
         },
       ]);
       socket.emit(

@@ -7,7 +7,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import PlaceAvartarAndImages from "./PlaceAvartarAndImages";
+import PlaceavatarAndImages from "./PlaceavatarAndImages";
 import {
   useAuthContext,
   useI18nContext,
@@ -61,7 +61,7 @@ export default function PlaceEditForm() {
       images: editContext.images,
       location: location,
       type: editContext.type,
-      avartar: editContext.avartar,
+      avatar: editContext.avatar,
       description: editContext.description,
     };
 
@@ -93,7 +93,7 @@ export default function PlaceEditForm() {
 
   return (
     <Stack width={"100%"} boxSizing={"border-box"} boxShadow={1} gap={2} p={1}>
-      <PlaceAvartarAndImages />
+      <PlaceavatarAndImages />
       <TextField
         label={lang("l-expose-name")}
         type="text"

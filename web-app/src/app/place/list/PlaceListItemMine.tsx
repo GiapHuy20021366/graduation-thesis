@@ -52,7 +52,7 @@ const PlaceListItemMine = React.forwardRef<
           cursor: "pointer",
           boxShadow: 5,
         }}
-        src={data.avartar}
+        src={data.avatar}
       >
         {data.exposeName[0]}
       </Avatar>

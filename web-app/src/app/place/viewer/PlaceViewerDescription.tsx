@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, BoxProps, Button, Stack, Typography } from "@mui/material";
 import { useAuthContext } from "../../../hooks";
-import { FollowType, IAccount, IPlaceExposed } from "../../../data";
+import { FollowType, IAccountExposed, IPlaceExposed } from "../../../data";
 import { RichTextReadOnly } from "mui-tiptap";
 import StarterKit from "@tiptap/starter-kit";
 import { useNavigate } from "react-router";
@@ -10,7 +10,7 @@ type PlaceViewerDescriptionProps = BoxProps & {
   data: IPlaceExposed;
 };
 
-const isEditPermit = (data: IPlaceExposed, account?: IAccount): boolean => {
+const isEditPermit = (data: IPlaceExposed, account?: IAccountExposed): boolean => {
   if (account == null) return false;
 
   const follower = data.userFollow;
@@ -18,7 +18,7 @@ const isEditPermit = (data: IPlaceExposed, account?: IAccount): boolean => {
 
   if (
     follower.type !== FollowType.ADMIN ||
-    follower.subcriber !== account.id_
+    follower.subcriber !== account._id
   ) {
     return false;
   }

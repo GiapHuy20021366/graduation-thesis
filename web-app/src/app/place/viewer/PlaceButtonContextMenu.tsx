@@ -6,7 +6,7 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import { FollowType, IAccount, IPlaceExposed } from "../../../data";
+import { FollowType, IAccountExposed, IPlaceExposed } from "../../../data";
 import { Edit, MoreVert, ReportGmailerrorred } from "@mui/icons-material";
 import { useNavigate } from "react-router";
 import { useAuthContext } from "../../../hooks";
@@ -15,12 +15,12 @@ type PlaceButtonContextMenuProps = IconButtonProps & {
   data: IPlaceExposed;
 };
 
-const isPermitEdit = (place: IPlaceExposed, account?: IAccount): boolean => {
+const isPermitEdit = (place: IPlaceExposed, account?: IAccountExposed): boolean => {
   if (account == null) return false;
   if (place.userFollow == null) return false;
   if (
     place.userFollow.type !== FollowType.ADMIN ||
-    place.userFollow.subcriber !== account.id_
+    place.userFollow.subcriber !== account._id
   )
     return false;
   return true;

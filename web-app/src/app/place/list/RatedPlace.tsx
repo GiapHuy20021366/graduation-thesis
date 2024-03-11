@@ -65,7 +65,7 @@ const RatedPlace = React.forwardRef<HTMLDivElement, RatedPlaceProps>(
       };
       saveToSessionStorage(snapshot, {
         key: RATED_PLACE_STORAGE_KEY,
-        account: authContext.account?.id_,
+        account: authContext.account?._id,
       });
     };
 
@@ -87,7 +87,7 @@ const RatedPlace = React.forwardRef<HTMLDivElement, RatedPlaceProps>(
       setIsEnd(false);
 
       userFetcher
-        .getRatedPlace(authContext.account!.id_, pagination, auth)
+        .getRatedPlace(authContext.account!._id, pagination, auth)
         .then((res) => {
           const places = res.data;
           if (places != null) {
@@ -155,7 +155,7 @@ const RatedPlace = React.forwardRef<HTMLDivElement, RatedPlaceProps>(
         // At begining
         const snapshot = loadFromSessionStorage<IRatedPlaceSnapshotData>({
           key: RATED_PLACE_STORAGE_KEY,
-          account: account.id_,
+          account: account._id,
           maxDuration: 1 * 24 * 60 * 60 * 1000,
         });
         if (snapshot) {

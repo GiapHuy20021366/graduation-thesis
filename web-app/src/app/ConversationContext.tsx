@@ -117,10 +117,10 @@ export default function ConversationContextProvider({
                     const cacheUser = userDict[user];
                     if (cacheUser) {
                       return {
-                        _id: cacheUser.id_,
+                        _id: cacheUser._id,
                         firstName: cacheUser.firstName,
                         lastName: cacheUser.lastName,
-                        avartar: cacheUser.avartar,
+                        avatar: cacheUser.avatar,
                       };
                     } else {
                       return newDefaultParticipant();
@@ -148,10 +148,10 @@ export default function ConversationContextProvider({
           conversations[meta._id] = {
             ...meta,
             participants: users.map((user) => ({
-              _id: user.id_,
+              _id: user._id,
               firstName: user.firstName,
               lastName: user.lastName,
-              avartar: user.avartar,
+              avatar: user.avatar,
             })),
           };
           refreshRefMeta();
@@ -225,10 +225,10 @@ export default function ConversationContextProvider({
               conversations[conversation._id] = {
                 ...conversation,
                 participants: users.map((user) => ({
-                  _id: user.id_,
+                  _id: user._id,
                   firstName: user.firstName,
                   lastName: user.lastName,
-                  avartar: user.avartar,
+                  avatar: user.avatar,
                 })),
               };
               refreshRefMeta();
@@ -279,10 +279,10 @@ export default function ConversationContextProvider({
                 const user = userDict[userId];
                 if (user) {
                   return {
-                    _id: user.id_,
+                    _id: user._id,
                     firstName: user.firstName,
                     lastName: user.lastName,
-                    avartar: user.avartar,
+                    avatar: user.avatar,
                   };
                 } else return newDefaultParticipant();
               }),

@@ -15,7 +15,7 @@ export default function ConversationViewerData() {
     if (account == null) return;
     sendMessage({
       conversation: conversation._id,
-      sender: account.id_,
+      sender: account._id,
       type: ConversationMessageType.TEXT,
       textContent: text,
     });

@@ -64,7 +64,7 @@ const MyPlace = React.forwardRef<HTMLDivElement, MyPlaceProps>((props, ref) => {
     };
     saveToSessionStorage(snapshot, {
       key: MY_PLACE_STORAGE_KEY,
-      account: authContext.account?.id_,
+      account: authContext.account?._id,
     });
   };
 
@@ -88,7 +88,7 @@ const MyPlace = React.forwardRef<HTMLDivElement, MyPlaceProps>((props, ref) => {
     userFetcher
       .searchPlace(
         {
-          author: account!.id_,
+          author: account!._id,
           pagination: pagination,
         },
         auth
@@ -163,7 +163,7 @@ const MyPlace = React.forwardRef<HTMLDivElement, MyPlaceProps>((props, ref) => {
       const snapshot = loadFromSessionStorage<IMyPlaceSnapshotData>({
         key: MY_PLACE_STORAGE_KEY,
         maxDuration: 1 * 24 * 60 * 60 * 1000,
-        account: account.id_,
+        account: account._id,
       });
       if (snapshot) {
         const snapshotData = snapshot.data;

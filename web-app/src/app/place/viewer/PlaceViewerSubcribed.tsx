@@ -57,7 +57,7 @@ const PlaceViewerSubcribed = React.forwardRef<
     };
     saveToSessionStorage(snapshot, {
       key: PLACE_VIEWER_SUBCRIBED(place._id),
-      account: authContext.account?.id_,
+      account: authContext.account?._id,
     });
   };
 
@@ -135,7 +135,7 @@ const PlaceViewerSubcribed = React.forwardRef<
         loadFromSessionStorage<IPlaceViewerSubcribedSnapshotData>({
           key: PLACE_VIEWER_SUBCRIBED(place._id),
           maxDuration: 1 * 24 * 60 * 60 * 1000,
-          account: account.id_,
+          account: account._id,
         });
       if (snapshot) {
         const snapshotData = snapshot.data;

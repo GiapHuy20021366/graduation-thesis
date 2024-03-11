@@ -120,7 +120,7 @@ export default function LocationPage() {
     };
 
     userFetcher
-      .setLocation(authContext.account!.id_, newLocation, auth)
+      .setLocation(authContext.account!._id, newLocation, auth)
       .then(() => {
         setHome(newLocation);
         authContext.updateLocation(newLocation);

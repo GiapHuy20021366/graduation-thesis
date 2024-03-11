@@ -14,9 +14,9 @@ import {
 } from "@mui/material";
 import {
   FollowType,
-  IAccount,
+  IAccountExposed,
   IPlaceExposed,
-  IPlaceFoodExposedAuthor,
+  IFoodPostExposedUser,
 } from "../../../data";
 import { useAuthContext, useToastContext } from "../../../hooks";
 import { DoneOutlined } from "@mui/icons-material";
@@ -34,29 +34,29 @@ type SubcribeChipActionProps = ChipProps & {
   onUnFollowed?: () => void;
 };
 
-const isSubcribed = (place: IPlaceExposed, account?: IAccount): boolean => {
+const isSubcribed = (place: IPlaceExposed, account?: IAccountExposed): boolean => {
   if (account == null) return false;
   if (place.userFollow == null) return false;
-  if (place.userFollow.subcriber !== account.id_) return false;
+  if (place.userFollow.subcriber !== account._id) return false;
   return true;
 };
 
-const toUserId = (value: string | IPlaceFoodExposedAuthor): string => {
+const toUserId = (value: string | IFoodPostExposedUser): string => {
   return typeof value === "string" ? value : value._id;
 };
 
 const isPermitSubcribe = (
   place: IPlaceExposed,
-  account?: IAccount
+  account?: IAccountExposed
 ): boolean => {
   if (account == null) return false;
   const authorId = toUserId(place.author);
-  if (authorId === account.id_) {
+  if (authorId === account._id) {
     return false;
   }
   if (place.userFollow != null) {
     return (
-      place.userFollow.subcriber === account.id_ &&
+      place.userFollow.subcriber === account._id &&
       place.userFollow.type !== FollowType.ADMIN
     );
   }

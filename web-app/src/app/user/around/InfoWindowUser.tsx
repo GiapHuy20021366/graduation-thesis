@@ -19,7 +19,7 @@ export default function InfoWindowUser({
 
   const onNavigate = () => {
     onBeforeNavigate && onBeforeNavigate();
-    navigate(`/profile/${user.id_}`);
+    navigate(`/profile/${user._id}`);
   };
   return (
     <Stack gap={1}>
@@ -27,7 +27,7 @@ export default function InfoWindowUser({
         <Avatar
           alt={user.firstName + " " + user.lastName}
           sx={{ bgcolor: deepOrange[500], cursor: "pointer" }}
-          src={user.avartar}
+          src={user.avatar}
         >
           {user.firstName ? user.firstName[0] : "U"}
         </Avatar>

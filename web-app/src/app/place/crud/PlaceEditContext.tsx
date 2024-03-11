@@ -16,7 +16,7 @@ interface IPlaceEditContext {
   description?: string;
   categories: FoodCategory[];
   location?: ILocation;
-  avartar?: string;
+  avatar?: string;
   images: string[];
   type: PlaceType;
   isEditable?: boolean;
@@ -26,7 +26,7 @@ interface IPlaceEditContext {
   setDescription: Dispatch<SetStateAction<string | undefined>>;
   setCategories: Dispatch<SetStateAction<FoodCategory[]>>;
   setLocation: Dispatch<SetStateAction<ILocation | undefined>>;
-  setAvartar: Dispatch<SetStateAction<string | undefined>>;
+  setavatar: Dispatch<SetStateAction<string | undefined>>;
   setImages: Dispatch<SetStateAction<string[]>>;
   setType: Dispatch<SetStateAction<PlaceType>>;
 }
@@ -37,7 +37,7 @@ const defaultPlaceEditContext: IPlaceEditContext = {
   images: [],
   type: PlaceType.PERSONAL,
 
-  setAvartar: () => {},
+  setavatar: () => {},
   setCategories: () => {},
   setDescription: () => {},
   setExposeName: () => {},
@@ -71,8 +71,8 @@ export default function PlaceEditContextProvider({
   const [location, setLocation] = useState<ILocation | undefined>(
     dataToEdit.location
   );
-  const [avartar, setAvartar] = useState<string | undefined>(
-    dataToEdit.avartar
+  const [avatar, setavatar] = useState<string | undefined>(
+    dataToEdit.avatar
   );
 
   const [images, setImages] = useState<string[]>(dataToEdit.images);
@@ -86,11 +86,11 @@ export default function PlaceEditContextProvider({
         images,
         location,
         type,
-        avartar,
+        avatar,
         description,
         isEditable: preData != null,
 
-        setAvartar,
+        setavatar,
         setCategories,
         setDescription,
         setExposeName,
