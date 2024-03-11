@@ -3,7 +3,7 @@ import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 import AppHeaderTitle from "./AppHeaderTitle";
 import AppHeaderUtil from "./AppHeaderUtil";
 import AppTabs from "../footer/AppTabs";
-import AvatarButtonAction from "./utils/avatar-menu/AvarvarButtonAction";
+import AvatarButtonAction from "./utils/avatar-menu/AvavarButtonAction";
 
 export default function AppHeader() {
   return (

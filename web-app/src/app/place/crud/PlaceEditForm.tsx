@@ -7,7 +7,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import PlaceavatarAndImages from "./PlaceavatarAndImages";
+import PlaceAvatarAndImages from "./PlaceAvatarAndImages";
 import {
   useAuthContext,
   useI18nContext,
@@ -93,7 +93,7 @@ export default function PlaceEditForm() {
 
   return (
     <Stack width={"100%"} boxSizing={"border-box"} boxShadow={1} gap={2} p={1}>
-      <PlaceavatarAndImages />
+      <PlaceAvatarAndImages />
       <TextField
         label={lang("l-expose-name")}
         type="text"

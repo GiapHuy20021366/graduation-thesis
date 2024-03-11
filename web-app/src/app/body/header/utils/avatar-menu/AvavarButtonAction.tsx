@@ -56,7 +56,7 @@ const AvatarButtonAction = React.forwardRef<
           sx={{ bgcolor: deepOrange[500], cursor: "pointer" }}
           src={account?.avatar}
         >
-          {account?.firstName[0]}
+          {account?.firstName && account.firstName[0]}
         </Avatar>
       </IconButton>
       <Menu
