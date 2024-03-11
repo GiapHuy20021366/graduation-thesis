@@ -6,6 +6,7 @@ import {
   IPagination,
   IPlaceExposed,
   OrderState,
+  SystemSide,
   loadFromSessionStorage,
   saveToSessionStorage,
 } from "../../../data";
@@ -105,7 +106,7 @@ const PlaceViewerShared = React.forwardRef<
         const isAtBottom =
           element.scrollTop + element.clientHeight === element.scrollHeight;
 
-        if (isAtBottom && !loader.isEnd) {
+        if (isAtBottom && !loader.isEnd && !loader.isError) {
           doSearch();
         }
       };
@@ -116,7 +117,7 @@ const PlaceViewerShared = React.forwardRef<
         main.removeEventListener("scroll", listener);
       }
     };
-  }, [appContentContext.mainRef, doSearch, loader.isEnd]);
+  }, [appContentContext.mainRef, doSearch, loader.isEnd, loader.isError]);
 
   const doSaveStorage = () => {
     const snapshot: IPlaceViewerSharedSnapshotData = {
@@ -172,6 +173,7 @@ const PlaceViewerShared = React.forwardRef<
         width: "100%",
         ...(props.sx ?? {}),
       }}
+      display={active ? "flex" : "none"}
     >
       {foods.map((food) => {
         return (
@@ -181,6 +183,7 @@ const PlaceViewerShared = React.forwardRef<
               data={food}
               key={food._id}
               onBeforeNavigate={handleBeforeNavigate}
+              source={SystemSide.PLACE}
             />
             <Divider variant="middle" />
           </>

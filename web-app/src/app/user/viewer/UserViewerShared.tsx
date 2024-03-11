@@ -1,75 +1,102 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Box, Button, Divider, Stack, StackProps } from "@mui/material";
-import { IFoodPostExposed, IUserExposed, SystemSide } from "../../../data";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Divider, Stack, StackProps } from "@mui/material";
+import {
+  IFoodPostExposed,
+  IFoodSearchParams,
+  IPagination,
+  IUserExposed,
+  OrderState,
+  SystemSide,
+  loadFromSessionStorage,
+  saveToSessionStorage,
+} from "../../../data";
 import {
   useAppContentContext,
   useAuthContext,
+  useLoader,
   usePageProgessContext,
 } from "../../../hooks";
+import { foodFetcher } from "../../../api";
 import SharedFood from "../../common/viewer/data/SharedFood";
+import SharedFoodHolder from "../../common/viewer/holder/SharedFoodHolder";
+import ErrorRetry from "../../common/viewer/data/ErrorRetry";
+import SearchMore from "../../common/viewer/data/SearchMore";
 
 type UserViewerSharedProps = StackProps & {
   user: IUserExposed;
   active: boolean;
 };
 
-const sample: IFoodPostExposed = {
-  user: {
-    _id: "656224f0d5a6da1d1e2c49e2",
-    firstName: "Giap",
-    lastName: "Huy",
-    avartar: undefined,
-  },
-  _id: "0",
-  active: true,
-  categories: [],
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  duration: new Date(),
-  images: [],
-  isEdited: true,
-  likeCount: 4,
-  price: 9999,
-  quantity: 5,
-  title: "Sample",
-  description: "",
-};
+interface IUserViewerSharedSnapshotData {
+  data: IFoodPostExposed[];
+  scrollTop?: number;
+}
 
-const genSample = (): IFoodPostExposed => {
-  return sample;
-};
+const USER_VIEWER_SHARED = (userId: string) => `user.viewer@${userId}.shared`;
 
-const PlaceViewerShared = React.forwardRef<
+const UserViewerShared = React.forwardRef<
   HTMLDivElement,
   UserViewerSharedProps
 >((props, ref) => {
-  const { place, active, ...rest } = props;
+  const { user, active, ...rest } = props;
 
-  const [end, setEnd] = useState<boolean>(false);
-  const [foods, setFoods] = useState<IFoodPostExposed[]>([sample]);
+  const [foods, setFoods] = useState<IFoodPostExposed[]>([]);
 
   const progessContext = usePageProgessContext();
   const authContext = useAuthContext();
-  const auth = authContext.auth;
-  const appContextContext = useAppContentContext();
+  const { auth, account } = authContext;
+  const appContentContext = useAppContentContext();
+  const loader = useLoader();
+  const dirtyRef = useRef<boolean>(true);
 
-  const doSearchMore = useCallback(() => {
-    const skip = foods.length;
-    console.log(skip, place._id, auth);
+  const doSearch = useCallback(() => {
+    if (auth == null) return;
+    if (loader.isFetching || !active) return;
 
-    if (progessContext.isLoading) return;
+    const pagination: IPagination = {
+      skip: foods.length,
+      limit: 24,
+    };
+
     progessContext.start();
-    setTimeout(() => {
-      const nFoods = [...foods];
-      nFoods.push(genSample(), genSample(), genSample());
-      setFoods(nFoods);
-      setEnd(true);
-      progessContext.end();
-    }, 1000);
-  }, [auth, foods, place._id, progessContext]);
+    loader.setIsFetching(true);
+    loader.setIsError(false);
+    loader.setIsEnd(false);
+
+    const searchParams: IFoodSearchParams = {
+      pagination: pagination,
+      order: {
+        time: OrderState.DECREASE,
+      },
+      user: {
+        include: [user._id],
+      },
+    };
+
+    foodFetcher
+      .searchFood(searchParams, auth)
+      .then((res) => {
+        const data = res.data;
+        if (data != null) {
+          if (data.length < pagination.limit) {
+            loader.setIsEnd(true);
+          }
+          const _newData = foods.slice();
+          _newData.push(...data);
+          setFoods(_newData);
+        }
+      })
+      .catch(() => {
+        loader.setIsError(true);
+      })
+      .finally(() => {
+        loader.setIsFetching(false);
+        progessContext.end();
+      });
+  }, [active, auth, foods, loader, user._id, progessContext]);
 
   useEffect(() => {
-    const main = appContextContext.mainRef?.current;
+    const main = appContentContext.mainRef?.current;
     let listener: any;
 
     if (main != null) {
@@ -78,8 +105,8 @@ const PlaceViewerShared = React.forwardRef<
         const isAtBottom =
           element.scrollTop + element.clientHeight === element.scrollHeight;
 
-        if (isAtBottom && active && !end) {
-          doSearchMore();
+        if (isAtBottom && !loader.isEnd && !loader.isError) {
+          doSearch();
         }
       };
       main.addEventListener("scroll", listener);
@@ -89,12 +116,56 @@ const PlaceViewerShared = React.forwardRef<
         main.removeEventListener("scroll", listener);
       }
     };
-  }, [appContextContext.mainRef, active, doSearchMore, end]);
+  }, [appContentContext.mainRef, doSearch, loader.isEnd, loader.isError]);
+
+  const doSaveStorage = () => {
+    const snapshot: IUserViewerSharedSnapshotData = {
+      data: foods,
+      scrollTop: appContentContext.mainRef?.current?.scrollTop,
+    };
+    saveToSessionStorage(snapshot, {
+      key: USER_VIEWER_SHARED(user._id),
+      account: authContext.account?.id_,
+    });
+  };
+
+  const handleBeforeNavigate = () => {
+    doSaveStorage();
+  };
+
+  // Recover result
+  useEffect(() => {
+    if (account == null) return;
+    if (!active) return;
+    if (dirtyRef.current) {
+      dirtyRef.current = false;
+      // At begining
+      const snapshot = loadFromSessionStorage<IUserViewerSharedSnapshotData>({
+        key: USER_VIEWER_SHARED(user._id),
+        maxDuration: 1 * 24 * 60 * 60 * 1000,
+        account: account.id_,
+      });
+      if (snapshot) {
+        const snapshotData = snapshot.data;
+        setFoods(snapshotData);
+        if (snapshotData.length < 24) {
+          loader.setIsEnd(true);
+        }
+        const mainRef = appContentContext.mainRef?.current;
+        if (mainRef) {
+          setTimeout(() => {
+            mainRef.scrollTop = snapshot.scrollTop ?? 0;
+          }, 300);
+        }
+      } else {
+        doSearch();
+      }
+    }
+  }, [account, active, appContentContext.mainRef, doSearch, loader, user._id]);
 
   return (
     <Stack
       ref={ref}
-      minHeight={"60vh"}
       {...rest}
       sx={{
         width: "100%",
@@ -102,37 +173,31 @@ const PlaceViewerShared = React.forwardRef<
       }}
       display={active ? "flex" : "none"}
     >
-      {foods.map((food, index) => {
+      {foods.map((food) => {
         return (
           <>
             <SharedFood
-              source={SystemSide.USER}
               py={1}
               data={food}
-              key={index}
+              key={food._id}
+              onBeforeNavigate={handleBeforeNavigate}
+              source={SystemSide.USER}
             />
             <Divider variant="middle" />
           </>
         );
       })}
 
-      {end && (
-        <Box textAlign={"center"} mt={2}>
-          Đã hết
-        </Box>
-      )}
+      {loader.isFetching && <SharedFoodHolder />}
 
-      {progessContext.isLoading && <PlaceViewerSubciberHolder />}
+      <SearchMore
+        active={loader.isEnd && !loader.isError}
+        onSearchMore={doSearch}
+      />
 
-      {!progessContext.isLoading && !end && (
-        <Stack alignItems={"center"} mt={2}>
-          <Button sx={{ width: "fit-content" }} onClick={() => doSearchMore()}>
-            Tìm kiếm thêm
-          </Button>
-        </Stack>
-      )}
+      <ErrorRetry active={loader.isError} onRetry={doSearch} />
     </Stack>
   );
 });
 
-export default PlaceViewerShared;
+export default UserViewerShared;

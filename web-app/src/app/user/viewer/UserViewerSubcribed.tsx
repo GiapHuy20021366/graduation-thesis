@@ -1,16 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Box,
-  Button,
-  Divider,
-  Stack,
-  StackProps,
-  Typography,
-} from "@mui/material";
+import { Divider, Stack, StackProps } from "@mui/material";
 import {
   IPagination,
-  IPlaceFollowerExposed,
-  IUserExposedWithFollower,
+  IUserFollowerExposed,
+  IUserExposed,
   loadFromSessionStorage,
   saveToSessionStorage,
 } from "../../../data";
@@ -21,29 +14,31 @@ import {
   usePageProgessContext,
 } from "../../../hooks";
 import { userFetcher } from "../../../api";
-import SubcriberExposed from "../../common/viewer/data/SubcriberExposed";
 import SubcriberHolder from "../../common/viewer/holder/SubcriberHolder";
+import SubcriberExposed from "../../common/viewer/data/SubcriberExposed";
+import SearchMore from "../../common/viewer/data/SearchMore";
+import ErrorRetry from "../../common/viewer/data/ErrorRetry";
 
 type UserViewerSubcribedProps = StackProps & {
-  place: IUserExposedWithFollower;
+  user: IUserExposed;
   active: boolean;
 };
 
 interface IUserViewerSubcribedSnapshotData {
-  data: IPlaceFollowerExposed[];
+  data: IUserFollowerExposed[];
   scrollTop?: number;
 }
 
-const PLACE_VIEWER_SUBCRIBED = (placeId: string) =>
-  `place.viewer@${placeId}.subcribed`;
+const USER_VIEWER_SUBCRIBED = (userId: string) =>
+  `user.viewer@${userId}.subcribed`;
 
-const PlaceViewerSubcribed = React.forwardRef<
+const UserViewerSubcribed = React.forwardRef<
   HTMLDivElement,
   UserViewerSubcribedProps
 >((props, ref) => {
-  const { place, active, ...rest } = props;
+  const { user, active, ...rest } = props;
 
-  const [followers, setFollowers] = useState<IPlaceFollowerExposed[]>([]);
+  const [followers, setFollowers] = useState<IUserFollowerExposed[]>([]);
 
   const progessContext = usePageProgessContext();
   const authContext = useAuthContext();
@@ -53,7 +48,7 @@ const PlaceViewerSubcribed = React.forwardRef<
   const loader = useLoader();
 
   // Recover at begining or fetch at begining
-  const dirtyRef = useRef<boolean>(false);
+  const dirtyRef = useRef<boolean>(true);
 
   const doSaveStorage = () => {
     const snapshot: IUserViewerSubcribedSnapshotData = {
@@ -61,7 +56,7 @@ const PlaceViewerSubcribed = React.forwardRef<
       scrollTop: appContentContext.mainRef?.current?.scrollTop,
     };
     saveToSessionStorage(snapshot, {
-      key: PLACE_VIEWER_SUBCRIBED(place._id),
+      key: USER_VIEWER_SUBCRIBED(user._id),
       account: authContext.account?.id_,
     });
   };
@@ -85,7 +80,7 @@ const PlaceViewerSubcribed = React.forwardRef<
     loader.setIsEnd(false);
 
     userFetcher
-      .getPlaceFollowers(place._id, { pagination: pagination }, auth)
+      .getUserFollowers(user._id, { pagination: pagination }, auth)
       .then((res) => {
         const data = res.data;
         if (data != null) {
@@ -104,7 +99,7 @@ const PlaceViewerSubcribed = React.forwardRef<
         loader.setIsFetching(false);
         progessContext.end();
       });
-  }, [active, auth, followers, loader, place._id, progessContext]);
+  }, [active, auth, followers, loader, user._id, progessContext]);
 
   useEffect(() => {
     const main = appContentContext.mainRef?.current;
@@ -116,7 +111,7 @@ const PlaceViewerSubcribed = React.forwardRef<
         const isAtBottom =
           element.scrollTop + element.clientHeight === element.scrollHeight;
 
-        if (isAtBottom && !loader.isEnd) {
+        if (isAtBottom && !loader.isEnd && !loader.isError) {
           doSearch();
         }
       };
@@ -127,18 +122,18 @@ const PlaceViewerSubcribed = React.forwardRef<
         main.removeEventListener("scroll", listener);
       }
     };
-  }, [appContentContext.mainRef, doSearch, loader.isEnd]);
+  }, [appContentContext.mainRef, doSearch, loader.isEnd, loader.isError]);
 
   // Recover result
   useEffect(() => {
     if (account == null) return;
     if (!active) return;
-    if (!dirtyRef.current) {
-      dirtyRef.current = true;
+    if (dirtyRef.current) {
+      dirtyRef.current = false;
       // At begining
       const snapshot = loadFromSessionStorage<IUserViewerSubcribedSnapshotData>(
         {
-          key: PLACE_VIEWER_SUBCRIBED(place._id),
+          key: USER_VIEWER_SUBCRIBED(user._id),
           maxDuration: 1 * 24 * 60 * 60 * 1000,
           account: account.id_,
         }
@@ -159,7 +154,7 @@ const PlaceViewerSubcribed = React.forwardRef<
         doSearch();
       }
     }
-  }, [account, active, appContentContext.mainRef, doSearch, loader, place._id]);
+  }, [account, active, appContentContext.mainRef, doSearch, loader, user._id]);
 
   return (
     <Stack
@@ -169,8 +164,8 @@ const PlaceViewerSubcribed = React.forwardRef<
       sx={{
         width: "100%",
         ...(props.sx ?? {}),
-        display: active ? "flex" : "none",
       }}
+      display={active ? "flex" : "none"}
     >
       {followers.map((follower) => {
         return (
@@ -188,20 +183,14 @@ const PlaceViewerSubcribed = React.forwardRef<
 
       {loader.isFetching && <SubcriberHolder />}
 
-      {loader.isEnd && !loader.isError && (
-        <Box textAlign={"center"} mt={2}>
-          <Typography>Bạn đã tìm kiếm hết</Typography>
-          <Button onClick={() => doSearch()}>Tìm kiếm thêm</Button>
-        </Box>
-      )}
-      {loader.isError && (
-        <Box textAlign={"center"} mt={2}>
-          <Typography>Có lỗi xảy ra</Typography>
-          <Button onClick={() => doSearch()}>Thử lại</Button>
-        </Box>
-      )}
+      <SearchMore
+        active={loader.isEnd && !loader.isError}
+        onSearchMore={doSearch}
+      />
+
+      <ErrorRetry active={loader.isError} onRetry={doSearch} />
     </Stack>
   );
 });
 
-export default PlaceViewerSubcribed;
+export default UserViewerSubcribed;

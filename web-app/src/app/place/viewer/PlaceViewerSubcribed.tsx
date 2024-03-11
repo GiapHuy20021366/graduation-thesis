@@ -111,7 +111,7 @@ const PlaceViewerSubcribed = React.forwardRef<
         const isAtBottom =
           element.scrollTop + element.clientHeight === element.scrollHeight;
 
-        if (isAtBottom && !loader.isEnd) {
+        if (isAtBottom && !loader.isEnd && !loader.isError) {
           doSearch();
         }
       };
@@ -122,7 +122,7 @@ const PlaceViewerSubcribed = React.forwardRef<
         main.removeEventListener("scroll", listener);
       }
     };
-  }, [appContentContext.mainRef, doSearch, loader.isEnd]);
+  }, [appContentContext.mainRef, doSearch, loader.isEnd, loader.isError]);
 
   // Recover result
   useEffect(() => {
@@ -163,8 +163,8 @@ const PlaceViewerSubcribed = React.forwardRef<
       sx={{
         width: "100%",
         ...(props.sx ?? {}),
-        display: active ? "flex" : "none",
       }}
+      display={active ? "flex" : "none"}
     >
       {followers.map((follower) => {
         return (

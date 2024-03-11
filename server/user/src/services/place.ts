@@ -723,15 +723,15 @@ export const getPlaceFollowers = async (
 
   const { exclude, followTypes, include, pagination } = params;
 
-  const subciberOption: any = {};
+  const subcriberOption: any = {};
   if (exclude && exclude.length > 0) {
-    subciberOption.$nin = exclude;
+    subcriberOption.$nin = exclude;
   }
   if (include && include.length > 0) {
-    subciberOption.$in = include;
+    subcriberOption.$in = include;
   }
-  if (Object.keys(subciberOption).length > 0) {
-    options["subcriber"] = subciberOption;
+  if (Object.keys(subcriberOption).length > 0) {
+    options["subcriber"] = subcriberOption;
   }
   if (followTypes && followTypes.length > 0) {
     options.type = {
@@ -754,21 +754,23 @@ export const getPlaceFollowers = async (
   if (followers == null) {
     throw new InternalError();
   }
-  return followers.map((follower): IPlaceFollowerExposed => {
-    const subcriber = follower.subcriber;
-    return {
-      _id: follower._id.toString(),
-      createdAt: follower.createdAt,
-      updatedAt: follower.updatedAt,
-      place: follower.place,
-      role: follower.role,
-      subcriber: {
-        _id: subcriber._id,
-        firstName: subcriber.firstName,
-        lastName: subcriber.lastName,
-        avartar: subcriber.avatar,
-      },
-      type: follower.type,
-    };
-  });
+  return followers
+    .filter((f) => f.subcriber != null)
+    .map((follower): IPlaceFollowerExposed => {
+      const subcriber = follower.subcriber;
+      return {
+        _id: follower._id.toString(),
+        createdAt: follower.createdAt,
+        updatedAt: follower.updatedAt,
+        place: follower.place,
+        role: follower.role,
+        subcriber: {
+          _id: subcriber._id,
+          firstName: subcriber.firstName,
+          lastName: subcriber.lastName,
+          avartar: subcriber.avatar,
+        },
+        type: follower.type,
+      };
+    });
 };

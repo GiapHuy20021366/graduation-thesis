@@ -5,6 +5,9 @@ import { UserViewerTab } from "./user-viewer-tab";
 import UserViewerTabs from "./UserViewerTabs";
 import UserViewerHeader from "./UserViewerHeader";
 import UserViewerIntroduction from "./UserViewerIntroduction";
+import UserViewerShared from "./UserViewerShared";
+import UserViewerSubcribed from "./UserViewerSubcribed";
+import UserViewerPlace from "./UserViewerPlace";
 
 interface UserViewerDataProps {
   data: IUserExposedWithFollower;
@@ -31,21 +34,14 @@ export default function UserViewerData({ data }: UserViewerDataProps) {
           active={tab === UserViewerTab.DESCRIPTION}
         />
 
-        {/* <PlaceViewerShared
-          sx={{
-            display: tab === PlaceViewerTab.FOOD ? "block" : "none",
-          }}
-          place={data}
-          active={tab === PlaceViewerTab.FOOD}
-        /> */}
+        <UserViewerShared user={data} active={tab === UserViewerTab.FOOD} />
 
-        {/* <PlaceViewerSubcribed
-          sx={{
-            display: tab === PlaceViewerTab.SUBCRIBED ? "block" : "none",
-          }}
-          active={tab === PlaceViewerTab.SUBCRIBED}
-          place={data}
-        /> */}
+        <UserViewerPlace active={tab === UserViewerTab.PLACE} user={data} />
+
+        <UserViewerSubcribed
+          active={tab === UserViewerTab.SUBCRIBED}
+          user={data}
+        />
       </>
       {/* <SpeedDial
         icon={<Add />}

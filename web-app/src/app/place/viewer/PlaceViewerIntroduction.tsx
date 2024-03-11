@@ -7,13 +7,14 @@ import PlaceViewerCategories from "./PlaceViewerCategories";
 
 type PlaceViewerIntroductionProps = StackProps & {
   data: IPlaceExposed;
+  active: boolean;
 };
 
 const PlaceViewerIntroduction = React.forwardRef<
   HTMLDivElement,
   PlaceViewerIntroductionProps
 >((props, ref) => {
-  const { data, ...rest } = props;
+  const { data, active, ...rest } = props;
   return (
     <Stack
       ref={ref}
@@ -23,6 +24,7 @@ const PlaceViewerIntroduction = React.forwardRef<
         width: "100%",
         ...(props.sx ?? {}),
       }}
+      display={active ? "flex" : "none"}
     >
       <PlaceViewerDescription data={data} />
       <Divider />

@@ -34,23 +34,12 @@ export default function PlaceViewerData({ data }: PlaceViewerDataProps) {
       <>
         <PlaceViewerIntroduction
           data={data}
-          sx={{
-            display: tab === PlaceViewerTab.DESCRIPTION ? "flex" : "none",
-          }}
+          active={tab === PlaceViewerTab.DESCRIPTION}
         />
 
-        <PlaceViewerShared
-          sx={{
-            display: tab === PlaceViewerTab.FOOD ? "block" : "none",
-          }}
-          place={data}
-          active={tab === PlaceViewerTab.FOOD}
-        />
+        <PlaceViewerShared place={data} active={tab === PlaceViewerTab.FOOD} />
 
         <PlaceViewerSubcribed
-          sx={{
-            display: tab === PlaceViewerTab.SUBCRIBED ? "block" : "none",
-          }}
           active={tab === PlaceViewerTab.SUBCRIBED}
           place={data}
         />

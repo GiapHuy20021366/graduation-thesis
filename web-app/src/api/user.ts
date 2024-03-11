@@ -20,6 +20,8 @@ import {
   IUserSearchParams,
   IUserExposedWithFollower,
   FollowRole,
+  IFollowerSearchParams,
+  IUserFollowerExposed,
 } from "../data";
 
 export const userEndpoints = {
@@ -148,10 +150,6 @@ export interface UserFetcher {
     auth: IAuthInfo
   ): Promise<UserResponse<IUserInfo[]>>;
   getUserInfo(id: string, auth: IAuthInfo): Promise<UserResponse<IUserInfo>>;
-  getUserExposed(
-    id: string,
-    auth: IAuthInfo
-  ): Promise<UserResponse<IUserExposedWithFollower>>;
   setLocation(
     userId: string,
     location: ILocation,
@@ -161,6 +159,15 @@ export interface UserFetcher {
     params: IUserSearchParams,
     auth: IAuthInfo
   ): Promise<UserResponse<IUserInfo[]>>;
+  getUserExposed(
+    userId: string,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IUserExposedWithFollower>>;
+  getUserFollowers(
+    user: string,
+    params: IFollowerSearchParams,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IUserFollowerExposed[]>>;
 
   // Place
   createPlace(
@@ -363,6 +370,15 @@ export const userFetcher: UserFetcher = {
           user: "656224f0d5a6da1d1e2c49e2",
         },
       },
+    });
+  },
+  getUserFollowers: (
+    user: string,
+    params: IFollowerSearchParams,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IUserFollowerExposed[]>> => {
+    return Promise.resolve({
+      data: [],
     });
   },
 

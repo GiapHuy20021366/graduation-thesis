@@ -17,6 +17,11 @@ export interface IPlaceSearchDistance {
   max: number;
 }
 
+export interface IPlaceSearchRating {
+  min?: number;
+  max?: number;
+}
+
 export interface IPlaceSearchParams {
   query?: string;
   author?: IPlaceSearchAuthor;
@@ -24,4 +29,5 @@ export interface IPlaceSearchParams {
   order?: IPlaceSearchOrder;
   pagination?: IPagination;
   types?: PlaceType[];
+  rating?: IPlaceSearchRating;
 }
