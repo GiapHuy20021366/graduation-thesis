@@ -12,7 +12,6 @@ import {
   refreshToken,
   setUserLocation,
   searchUsersAround,
-  getBasicUserInfo,
   createNewPlace,
   updatePlace,
   activePlace,
@@ -25,6 +24,9 @@ import {
   ratingPlace,
   getPlaceFollowers,
   searchUser,
+  followUser,
+  getUser,
+  updateUserPersonal,
 } from "../controllers";
 
 const initUserRouter = (app: Express) => {
@@ -46,13 +48,19 @@ const initUserRouter = (app: Express) => {
   userRouter.put("/:id/location", tokenParser, setUserLocation);
 
   // Get information of an user
-  userRouter.get("/:id", tokenParser, getBasicUserInfo);
+  userRouter.get("/:id", tokenParser, getUser);
 
   // Search user
   userRouter.post("/search", tokenParser, searchUser);
 
   // Find users around a position
   userRouter.post("/around", tokenParser, searchUsersAround);
+
+  // Follow / Unfollow user
+  userRouter.put("/:id/follow", tokenParser, followUser);
+
+  // update information data of user
+  userRouter.put("/:id", tokenParser, updateUserPersonal);
 
   userRouter.use(errorHandler);
   app.use("/users", userRouter);

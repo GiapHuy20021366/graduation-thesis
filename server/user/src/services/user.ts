@@ -12,6 +12,8 @@ import {
   ResourceNotExistedError,
   IUserCredential,
   IUserPersonal,
+  IUserExposedSimple,
+  IUserExposedWithFollower,
 } from "../data";
 
 export interface ISearchedUser
@@ -85,6 +87,68 @@ export const getBasicUserInfo = async (id: string) => {
     lastName: user.lastName,
     location: user.location,
   };
+};
+
+export const getUser = async (
+  id: string,
+  sourceId: string,
+  detail?: boolean
+): Promise<IUserExposedSimple | IUserExposedWithFollower> => {
+  const user = await User.findById(id);
+  if (user == null) {
+    throw new ResourceNotExistedError();
+  }
+
+  if (detail) {
+    const numFollowers = await Follower.count({
+      type: FollowType.SUBCRIBER,
+      role: FollowRole.USER,
+      user: id,
+    });
+    const userFollower = await Follower.findOne({
+      type: FollowType.SUBCRIBER,
+      role: FollowRole.USER,
+      user: id,
+      subcriber: sourceId, // does this user follow this user or not
+    });
+    const result: IUserExposedWithFollower = {
+      _id: user._id.toString(),
+      active: user.active,
+      createdAt: user.createdAt,
+      email: user.email,
+      exposedName: user.exposedName,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      avatar: user.avatar,
+      categories: user.categories,
+      description: user.description,
+      location: user.location,
+      subcribers: numFollowers,
+    };
+    if (userFollower) {
+      result.userFollow = {
+        _id: userFollower._id.toString(),
+        createdAt: userFollower.createdAt,
+        role: userFollower.role,
+        subcriber: userFollower.subcriber.toString(),
+        type: userFollower.type,
+        user: userFollower.user.toString(),
+      };
+    }
+    return result;
+  } else {
+    const result: IUserExposedSimple = {
+      _id: user._id.toString(),
+      active: user.active,
+      email: user.email,
+      exposedName: user.exposedName,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      avatar: user.avatar,
+      location: user.location,
+    };
+    return result;
+  }
 };
 
 export const searchUser = async (

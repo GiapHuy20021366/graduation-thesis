@@ -1,26 +1,26 @@
-import { FoodCategory } from "./food-category";
-import { ILocation } from "./location";
 import { IUserFollower } from "./follower";
+import { Ided, Named, Timed } from "./schemad";
+import { IUserCredential, IUserPersonal } from "./user";
 
-export interface IUserExposed {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  avatar?: string;
-  email?: string;
-  location?: ILocation;
-  createdAt: string | Date;
-  updatedAt?: string | Date;
-  description?: string;
-  categories: FoodCategory[];
-  subcribers?: number;
-}
+export interface IUserExposedSimple
+  extends Ided,
+    Named,
+    Pick<IUserPersonal, "firstName" | "lastName" | "location" | "avatar">,
+    Pick<IUserCredential, "email" | "active"> {}
 
-export interface IUserExposedFollower extends IUserFollower {
-  _id: string;
-  createdAt: string | Date;
-}
+export interface IUserExposed
+  extends Ided,
+    Named,
+    IUserPersonal,
+    Pick<Timed, "createdAt">,
+    Pick<IUserCredential, "active" | "email"> {}
+
+export interface IUserExposedFollower
+  extends IUserFollower,
+    Ided,
+    Pick<Timed, "createdAt"> {}
 
 export interface IUserExposedWithFollower extends IUserExposed {
+  subcribers?: number;
   userFollow?: IUserExposedFollower;
 }

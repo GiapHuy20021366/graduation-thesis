@@ -10,7 +10,7 @@ import {
   ICoordinates,
   ILocation,
   IPlaceExposed,
-  IUserInfo,
+  IUserExposedSimple,
   IUserSearchParams,
   OrderState,
   PlaceType,
@@ -55,7 +55,7 @@ import InfoWindowPlace from "./InfoWindowPlace";
 
 interface IUserAroundPageSnapshotData {
   center: ICoordinates;
-  users: IUserInfo[];
+  users: IUserExposedSimple[];
   restaurants: IPlaceExposed[];
   eateries: IPlaceExposed[];
   groceries: IPlaceExposed[];
@@ -78,7 +78,7 @@ export default function UsersAroundPage() {
     lng: 105.83,
   });
 
-  const [users, setUsers] = useState<IUserInfo[]>([]);
+  const [users, setUsers] = useState<IUserExposedSimple[]>([]);
   const [restaurants, setRestaurants] = useState<IPlaceExposed[]>([]);
   const [eateries, setEateries] = useState<IPlaceExposed[]>([]);
   const [groceries, setGroceries] = useState<IPlaceExposed[]>([]);

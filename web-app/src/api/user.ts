@@ -8,7 +8,6 @@ import {
   IPagination,
   ICoordinates,
   IAuthInfo,
-  IUserInfo,
   ILocation,
   PlaceType,
   IPlaceExposed,
@@ -19,9 +18,10 @@ import {
   IPlaceFollowerExposed,
   IUserSearchParams,
   IUserExposedWithFollower,
-  FollowRole,
   IFollowerSearchParams,
   IUserFollowerExposed,
+  IUserExposedSimple,
+  IPersonalDataUpdate,
 } from "../data";
 
 export const userEndpoints = {
@@ -34,6 +34,8 @@ export const userEndpoints = {
   getUserInfo: "/users/:id",
   setUserLocation: "/users/:id/location",
   searchUser: "/users/search",
+  followUser: "/users/:id/follow",
+  updatePersonal: "/users/:id",
 
   // places
   createPlace: "/places",
@@ -148,8 +150,15 @@ export interface UserFetcher {
   getUsersNear(
     params: IGetUserNearParams,
     auth: IAuthInfo
-  ): Promise<UserResponse<IUserInfo[]>>;
-  getUserInfo(id: string, auth: IAuthInfo): Promise<UserResponse<IUserInfo>>;
+  ): Promise<UserResponse<IUserExposedSimple[]>>;
+  getSimpleUser(
+    id: string,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IUserExposedSimple>>;
+  getDetailUser(
+    userId: string,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IUserExposedWithFollower>>;
   setLocation(
     userId: string,
     location: ILocation,
@@ -158,16 +167,25 @@ export interface UserFetcher {
   searchUser(
     params: IUserSearchParams,
     auth: IAuthInfo
-  ): Promise<UserResponse<IUserInfo[]>>;
-  getUserExposed(
-    userId: string,
-    auth: IAuthInfo
-  ): Promise<UserResponse<IUserExposedWithFollower>>;
+  ): Promise<UserResponse<IUserExposedSimple[]>>;
   getUserFollowers(
     user: string,
     params: IFollowerSearchParams,
     auth: IAuthInfo
   ): Promise<UserResponse<IUserFollowerExposed[]>>;
+  followUser(
+    userId: string,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IUserFollowerExposed>>;
+  unFollowUser(
+    userId: string,
+    auth: IAuthInfo
+  ): Promise<UserResponse<{ success: boolean }>>;
+  updatePersonalData(
+    userId: string,
+    data: IPersonalDataUpdate,
+    auth: IAuthInfo
+  ): Promise<UserResponse<{ success: boolean }>>;
 
   // Place
   createPlace(
@@ -298,7 +316,7 @@ export const userFetcher: UserFetcher = {
   getUsersNear: async (
     params: IGetUserNearParams,
     auth: IAuthInfo
-  ): Promise<UserResponse<IUserInfo[]>> => {
+  ): Promise<UserResponse<IUserExposedSimple[]>> => {
     console.log(params, auth);
     const data = [];
     const limit = params.pagination?.limit ?? 50;
@@ -309,15 +327,30 @@ export const userFetcher: UserFetcher = {
       data: data,
     };
   },
-  getUserInfo: (
+  getSimpleUser: (
     id: string,
     auth: IAuthInfo
-  ): Promise<UserResponse<IUserInfo>> => {
+  ): Promise<UserResponse<IUserExposedSimple>> => {
     return userInstance.get(userEndpoints.getUserInfo.replace(":id", id), {
       headers: {
         Authorization: auth.token,
       },
     });
+  },
+  getDetailUser: (
+    id: string,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IUserExposedWithFollower>> => {
+    const params = new URLSearchParams();
+    params.set("detail", "true");
+    return userInstance.get(
+      userEndpoints.getUserInfo.replace(":id", id) + "?" + params.toString(),
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
   },
   setLocation: (
     userId: string,
@@ -337,38 +370,10 @@ export const userFetcher: UserFetcher = {
   searchUser: (
     params: IUserSearchParams,
     auth: IAuthInfo
-  ): Promise<UserResponse<IUserInfo[]>> => {
+  ): Promise<UserResponse<IUserExposedSimple[]>> => {
     return userInstance.post(userEndpoints.searchUser, params, {
       headers: {
         Authorization: auth.token,
-      },
-    });
-  },
-  getUserExposed: (
-    id: string,
-    auth: IAuthInfo
-  ): Promise<UserResponse<IUserExposedWithFollower>> => {
-    console.log(id, auth);
-    return Promise.resolve({
-      data: {
-        _id: "656224f0d5a6da1d1e2c49e2",
-        categories: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        firstName: "Huy",
-        lastName: "Giap",
-        avatar: undefined,
-        description: "",
-        email: "gv.huy.2002@gmail.com",
-        location: undefined,
-        userFollower: {
-          _id: "656224f0d5a6da1d1e2c49e2",
-          createdAt: new Date(),
-          role: FollowRole.USER,
-          subcriber: "656224f0d5a6da1d1e2c49e2",
-          type: FollowType.SUBCRIBER,
-          user: "656224f0d5a6da1d1e2c49e2",
-        },
       },
     });
   },
@@ -377,9 +382,57 @@ export const userFetcher: UserFetcher = {
     params: IFollowerSearchParams,
     auth: IAuthInfo
   ): Promise<UserResponse<IUserFollowerExposed[]>> => {
+    console.log(user, params, auth);
     return Promise.resolve({
       data: [],
     });
+  },
+  followUser: (
+    userId: string,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IUserFollowerExposed>> => {
+    const params = new URLSearchParams();
+    params.set("action", "follow");
+    return userInstance.put(
+      userEndpoints.followUser.replace(":id", userId) + "?" + params.toString(),
+      {},
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
+  },
+  unFollowUser: (
+    userId: string,
+    auth: IAuthInfo
+  ): Promise<UserResponse<{ success: boolean }>> => {
+    const params = new URLSearchParams();
+    params.set("action", "unfollow");
+    return userInstance.put(
+      userEndpoints.followUser.replace(":id", userId) + "?" + params.toString(),
+      {},
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
+  },
+  updatePersonalData: (
+    userId: string,
+    data: IPersonalDataUpdate,
+    auth: IAuthInfo
+  ): Promise<UserResponse<{ success: boolean }>> => {
+    return userInstance.put(
+      userEndpoints.updatePersonal.replace(":id", userId),
+      data,
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
   },
 
   // place
@@ -557,7 +610,7 @@ export const userFetcher: UserFetcher = {
   },
 };
 
-const fakeOneUser = (params: IGetUserNearParams): IUserInfo => {
+const fakeOneUser = (params: IGetUserNearParams): IUserExposedSimple => {
   const center = params.coordinate;
   const deltaLat = Math.min(0.01, Math.random() / 100);
   const isPlusLat = Math.random() > 0.5;
@@ -577,5 +630,7 @@ const fakeOneUser = (params: IGetUserNearParams): IUserInfo => {
       name: "Fake",
       coordinates: userCoor,
     },
+    active: true,
+    exposedName: "",
   };
 };

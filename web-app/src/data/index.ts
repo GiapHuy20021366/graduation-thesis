@@ -44,7 +44,6 @@ export { OrderState, toNextOrderState } from "./order-state";
 export { ItemAddedBy } from "./item-added-by";
 export { ItemAvailable } from "./item-available";
 export { type IPagination } from "./pagination";
-export { type IUserInfo } from "./user-info";
 export { type ILocation } from "./location";
 export { UserRole } from "./user-role";
 export { PlaceType, toPlaceTypeLabel } from "./place-type";
@@ -122,6 +121,7 @@ export {
   type IUserExposed,
   type IUserExposedFollower,
   type IUserExposedWithFollower,
+  type IUserExposedSimple,
 } from "./user-exposed";
 export { SystemSide } from "./system-side";
 export {
@@ -146,3 +146,7 @@ export {
   type IFollowerSearchOrder,
 } from "./follower-search-params";
 export { type IUser, type IUserCredential, type IUserPersonal } from "./user";
+export {
+  type IPersonalDataUpdate,
+  type IUserRemovable,
+} from "./personal-data-update";

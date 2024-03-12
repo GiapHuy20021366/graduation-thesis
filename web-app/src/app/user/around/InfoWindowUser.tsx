@@ -1,12 +1,13 @@
 import { Avatar, Button, Divider, Stack, Typography } from "@mui/material";
-import { IUserInfo, toDistance } from "../../../data";
+import { toDistance } from "../../../data";
 import { deepOrange } from "@mui/material/colors";
 import { useNavigate } from "react-router";
 import { useAppContentContext } from "../../../hooks";
 import { LocalOfferOutlined, LocationOnOutlined } from "@mui/icons-material";
+import { IUserExposedSimple } from "../../../data/user-exposed";
 
 interface IInfoWindowUser {
-  user: IUserInfo;
+  user: IUserExposedSimple;
   onBeforeNavigate?: () => void;
 }
 

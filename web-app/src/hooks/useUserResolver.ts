@@ -1,14 +1,17 @@
 import { useAuthContext } from ".";
 import { userFetcher } from "../api";
-import { IUserInfo } from "../data";
+import { IUserExposedSimple } from "../data";
 import { useAppCacheContext } from "./useAppCacheContext";
 
 interface IUserResolverState {
-  get: (userId: string, fn?: (user: IUserInfo) => void) => void;
-  getAll: (userIds: string[], fn?: (users: IUserInfo[]) => void) => void;
-  getAsynch: (userId: string) => IUserInfo | undefined;
-  getAllAsynch: (userIds: string[]) => IUserInfo[];
-  getDict: () => Record<string, IUserInfo>;
+  get: (userId: string, fn?: (user: IUserExposedSimple) => void) => void;
+  getAll: (
+    userIds: string[],
+    fn?: (users: IUserExposedSimple[]) => void
+  ) => void;
+  getAsynch: (userId: string) => IUserExposedSimple | undefined;
+  getAllAsynch: (userIds: string[]) => IUserExposedSimple[];
+  getDict: () => Record<string, IUserExposedSimple>;
 }
 
 const USER_CACHE = "USERS";
@@ -23,8 +26,14 @@ export const useUserResolver = (): IUserResolverState => {
   const authContext = useAuthContext();
   const auth = authContext.auth;
 
-  const get = (userId: string, fn?: (user: IUserInfo) => void): void => {
-    const usersDict = getOrCreate<Record<string, IUserInfo>>(USER_CACHE, {});
+  const get = (
+    userId: string,
+    fn?: (user: IUserExposedSimple) => void
+  ): void => {
+    const usersDict = getOrCreate<Record<string, IUserExposedSimple>>(
+      USER_CACHE,
+      {}
+    );
 
     const cacheUser = usersDict[userId];
     if (cacheUser == null) {
@@ -39,10 +48,13 @@ export const useUserResolver = (): IUserResolverState => {
 
   const getAll = (
     userIds: string[],
-    fn?: (users: IUserInfo[]) => void
+    fn?: (users: IUserExposedSimple[]) => void
   ): void => {
-    const usersDict = getOrCreate<Record<string, IUserInfo>>(USER_CACHE, {});
-    const existseds: IUserInfo[] = [];
+    const usersDict = getOrCreate<Record<string, IUserExposedSimple>>(
+      USER_CACHE,
+      {}
+    );
+    const existseds: IUserExposedSimple[] = [];
     const notExisteds: string[] = [];
     userIds.forEach((userId) => {
       const userCache = usersDict[userId];
@@ -57,10 +69,10 @@ export const useUserResolver = (): IUserResolverState => {
       if (auth != null) {
         Promise.all(
           notExisteds.map((id) => {
-            return userFetcher.getUserInfo(id, auth);
+            return userFetcher.getSimpleUser(id, auth);
           })
         ).then((responses) => {
-          const users: IUserInfo[] = [];
+          const users: IUserExposedSimple[] = [];
           responses.forEach((res) => {
             const user = res.data;
             if (user) {
@@ -86,14 +98,20 @@ export const useUserResolver = (): IUserResolverState => {
     }
   };
 
-  const getAsynch = (userId: string): IUserInfo | undefined => {
-    const usersDict = getOrCreate<Record<string, IUserInfo>>(USER_CACHE, {});
+  const getAsynch = (userId: string): IUserExposedSimple | undefined => {
+    const usersDict = getOrCreate<Record<string, IUserExposedSimple>>(
+      USER_CACHE,
+      {}
+    );
     return usersDict[userId];
   };
 
-  const getAllAsynch = (userIds: string[]): IUserInfo[] => {
-    const usersDict = getOrCreate<Record<string, IUserInfo>>(USER_CACHE, {});
-    const result: IUserInfo[] = [];
+  const getAllAsynch = (userIds: string[]): IUserExposedSimple[] => {
+    const usersDict = getOrCreate<Record<string, IUserExposedSimple>>(
+      USER_CACHE,
+      {}
+    );
+    const result: IUserExposedSimple[] = [];
     userIds.forEach((userId) => {
       const user = usersDict[userId];
       if (user != null) result.push(user);
@@ -101,8 +119,8 @@ export const useUserResolver = (): IUserResolverState => {
     return result;
   };
 
-  const getDict = (): Record<string, IUserInfo> => {
-    return getOrCreate<Record<string, IUserInfo>>(USER_CACHE, {});
+  const getDict = (): Record<string, IUserExposedSimple> => {
+    return getOrCreate<Record<string, IUserExposedSimple>>(USER_CACHE, {});
   };
 
   return { get, getAll, getAllAsynch, getAsynch, getDict };

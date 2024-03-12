@@ -1,4 +1,4 @@
-import { DurationType } from ".";
+import { DurationType } from "./duration-type";
 
 export const convertDateToString = (date: Date | number): string => {
     if (typeof date == "number") return convertDateToString(new Date(date));

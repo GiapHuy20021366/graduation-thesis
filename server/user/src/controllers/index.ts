@@ -11,7 +11,15 @@ export { refreshToken } from "./token";
 
 export { setUserLocation } from "./location";
 
-export { searchUsersAround, getBasicUserInfo, searchUser } from "./user";
+export {
+  searchUsersAround,
+  getBasicUserInfo,
+  searchUser,
+  followUser,
+  getFollowers,
+  getUser,
+  updateUserPersonal,
+} from "./user";
 
 export {
   activePlace,

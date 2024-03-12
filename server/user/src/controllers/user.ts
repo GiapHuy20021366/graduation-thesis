@@ -1,13 +1,18 @@
 import { NextFunction, Request, Response } from "express";
 import {
+  AuthLike,
   ICoordinates,
+  IFollowerSearchParams,
   IPagination,
+  IPersonalDataUpdate,
   IUserSearchParams,
   InvalidDataError,
+  UnauthorizationError,
   isCoordinates,
   isLocation,
   isNumber,
   isObjectId,
+  toPersonalDataUpdate,
   toResponseSuccessData,
   toUserSearchParams,
 } from "../data";
@@ -15,6 +20,10 @@ import {
   searchUsersAround as searchUsersAroundService,
   getBasicUserInfo as getBasicUserInfoService,
   searchUser as searchUserService,
+  followUser as followUserService,
+  unFollowUser as unFollowUserService,
+  updateUserPersonal as updateUserPersonalService,
+  getUser as getUserService,
 } from "../services";
 
 interface ISearchUsersAroundParams {
@@ -95,12 +104,66 @@ export const searchUser = async (
     .catch(next);
 };
 
-// follow user
+export const followUser = async (
+  req: Request<{ id: string }, {}, {}, { action?: "follow" | "unfollow" }>,
+  res: Response,
+  next: NextFunction
+) => {
+  const targetUser = req.params.id;
+  if (!isObjectId(targetUser)) {
+    return next(new InvalidDataError());
+  }
+  const auth = req.authContext as AuthLike;
+  const sourceUser = auth._id;
+  const action = req.query.action;
+  const service = action === "follow" ? followUserService : unFollowUserService;
+  service(targetUser, sourceUser)
+    .then((data) => res.status(200).json(toResponseSuccessData(data)))
+    .catch(next);
+};
 
-// unfollow user
+export const getUser = async (
+  req: Request<{ id: string }, {}, {}, { detail?: string }>,
+  res: Response,
+  next: NextFunction
+) => {
+  const targetUser = req.params.id;
+  if (!isObjectId(targetUser)) {
+    return next(new InvalidDataError());
+  }
+  const auth = req.authContext as AuthLike;
+  const sourceUser = auth._id;
+  const detail = req.query.detail === "true";
+  getUserService(targetUser, sourceUser, detail)
+    .then((data) => res.status(200).json(toResponseSuccessData(data)))
+    .catch(next);
+};
 
-// get exposed user
+export const updateUserPersonal = async (
+  req: Request<{ id: string }, {}, IPersonalDataUpdate, {}>,
+  res: Response,
+  next: NextFunction
+) => {
+  const targetUser = req.params.id;
+  if (!isObjectId(targetUser)) {
+    return next(new InvalidDataError());
+  }
+  const auth = req.authContext as AuthLike;
+  const sourceUser = auth._id;
+  if (targetUser !== sourceUser) {
+    return next(new UnauthorizationError());
+  }
+  const params = req.body;
+  const updateParams = toPersonalDataUpdate(params);
+  updateUserPersonalService(targetUser, updateParams)
+    .then((data) => res.status(200).json(toResponseSuccessData(data)))
+    .catch(next);
+};
 
-// update information of user
-
-// get exposed follower with new
+export const getFollowers = async (
+  _req: Request<{ id: string }, {}, IFollowerSearchParams, {}>,
+  _res: Response,
+  _next: NextFunction
+) => {
+  // Implement later
+};

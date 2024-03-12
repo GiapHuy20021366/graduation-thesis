@@ -124,3 +124,14 @@ export {
   toPersonalDataUpdate,
 } from "./personal-data-update";
 export { IIncludeAndExclude, toIncludeAndExclude } from "./include-and-exclude";
+export {
+  IFollowerSearchDuration,
+  IFollowerSearchOrder,
+  IFollowerSearchParams,
+  IFollowerSearchPlace,
+  IFollowerSearchSubcriber,
+  IFollowerSearchUser,
+  toFollowerSearchDuration,
+  toFollowerSearchOrder,
+  toFollowerSearchParams,
+} from "./follower-search-params";
