@@ -115,7 +115,7 @@ const PlaceSearchSearchBar = React.forwardRef<
                 <>
                   {params.InputProps.endAdornment}
                   <InputAdornment position="end">
-                    <Tooltip title={lang("l-search")}>
+                    <Tooltip arrow title={lang("l-search")}>
                       <IconButton
                         color="info"
                         onClick={() => onButtonSearchClick()}
@@ -124,6 +124,7 @@ const PlaceSearchSearchBar = React.forwardRef<
                       </IconButton>
                     </Tooltip>
                     <Tooltip
+                      arrow
                       title={lang("l-advance-search")}
                       onClick={() => setOpenFilter(true)}
                     >

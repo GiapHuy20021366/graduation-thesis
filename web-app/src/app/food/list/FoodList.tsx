@@ -1,4 +1,4 @@
-import { Box, SpeedDial, Stack, Tab, Tabs } from "@mui/material";
+import { Box, SpeedDial, Stack, Tab, Tabs, Tooltip } from "@mui/material";
 import { ITabOption, useI18nContext, useTabNavigate } from "../../../hooks";
 import {
   FavoriteOutlined,
@@ -115,11 +115,18 @@ export default function FoodList() {
       <NearFood active={tab === FoodPageTab.NEAR_FOOD} />
       <LovedFood active={tab === FoodPageTab.LOVED_FOOD} />
 
-      <SpeedDial
-        icon={<PlaceOutlined />}
-        sx={{ position: "absolute", bottom: 136, right: 26 }}
-        ariaLabel={"Around"}
-        onClick={() => navigate("/food/around")}
+      <Tooltip
+        arrow
+        children={
+          <SpeedDial
+            icon={<PlaceOutlined />}
+            sx={{ position: "absolute", bottom: 136, right: 26 }}
+            ariaLabel={"Around"}
+            onClick={() => navigate("/food/around")}
+          />
+        }
+        title="Thực phẩm xung quanh"
+        placement="left"
       />
       <SpeedDial
         icon={<SearchOutlined />}

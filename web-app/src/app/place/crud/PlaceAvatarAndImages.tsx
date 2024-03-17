@@ -37,7 +37,7 @@ const PlaceavatarAndImages = React.forwardRef<
   const saveImage = useSaveImage();
   const toast = useToastContext();
 
-  const handleClickavatar = () => {
+  const handleClickAvatar = () => {
     inputAvatarRef.current?.click();
   };
 
@@ -105,7 +105,7 @@ const PlaceavatarAndImages = React.forwardRef<
     setIndex(Math.max(0, index - 1));
   };
 
-  const handleavatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (auth == null) return;
 
     const files = event.target.files;
@@ -217,7 +217,7 @@ const PlaceavatarAndImages = React.forwardRef<
           ref={inputAvatarRef}
           hidden
           accept="image/*"
-          onChange={handleavatarChange}
+          onChange={handleAvatarChange}
         />
         <Avatar
           sx={{
@@ -228,7 +228,7 @@ const PlaceavatarAndImages = React.forwardRef<
             cursor: "pointer",
             boxShadow: 5,
           }}
-          onClick={() => handleClickavatar()}
+          onClick={() => handleClickAvatar()}
           src={avatar}
         >
           H

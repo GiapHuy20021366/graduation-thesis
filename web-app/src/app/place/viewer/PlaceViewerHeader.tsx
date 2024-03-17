@@ -103,7 +103,7 @@ const PlaceViewerHeader = React.forwardRef<
               sx={{ ml: 2 }}
             />
             <Box ml={"auto"}>
-              <Tooltip title="Xem thêm">
+              <Tooltip arrow title="Xem thêm">
                 <PlaceButtonContextMenu
                   data={place}
                   sx={{ flex: 1 }}

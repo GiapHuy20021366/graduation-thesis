@@ -14,7 +14,7 @@ export default function AppMain() {
         padding: 0,
         margin: 0,
         boxSizing: "content-box",
-        overflowY: "auto",
+        overflowY: "scroll",
         overflowX: "hidden",
         flex: 1,
         height: "100%",

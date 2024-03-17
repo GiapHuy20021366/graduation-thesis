@@ -246,6 +246,7 @@ export default function FoodAroundFilter({
       }}
     >
       <Tooltip
+        arrow
         children={
           <IconButton
             sx={{ position: "absolute", left: 5, top: 5 }}

@@ -38,7 +38,7 @@ export default function FoodPostButtonWithMenu({
 
   return (
     <>
-      <Tooltip title="Account settings">
+      <Tooltip arrow title="Account settings">
         <IconButton
           onClick={handleClick}
           size="small"

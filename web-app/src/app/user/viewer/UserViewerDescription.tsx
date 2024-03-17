@@ -38,6 +38,7 @@ const UserViewerDescription = React.forwardRef<
         <h4>Mô tả </h4>
         {isEditable && (
           <Tooltip
+            arrow
             children={
               <IconButton color="info" onClick={() => setOpenEditor(true)}>
                 <EditOutlined />
@@ -52,7 +53,9 @@ const UserViewerDescription = React.forwardRef<
           <Typography>Người dùng chưa mô tả</Typography>
           {isEditable && (
             <Stack gap={1}>
-              <Button>Chỉnh sửa ngay</Button>
+              <Button onClick={() => setOpenEditor(true)}>
+                Chỉnh sửa ngay
+              </Button>
             </Stack>
           )}
         </Stack>
@@ -69,7 +72,7 @@ const UserViewerDescription = React.forwardRef<
         open={openEditor}
         onClose={() => setOpenEditor(false)}
         onCancel={() => setOpenEditor(false)}
-        onSucess={() => setOpenEditor(false)}
+        onSuccess={() => setOpenEditor(false)}
       />
     </Box>
   );

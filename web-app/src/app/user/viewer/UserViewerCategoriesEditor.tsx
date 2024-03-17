@@ -17,20 +17,21 @@ import {
   useAuthContext,
   useI18nContext,
   useLoader,
+  useToastContext,
   useUserViewerContext,
 } from "../../../hooks";
 import { userFetcher } from "../../../api";
 
 type UserViewerCategoriesEditorProps = Omit<DialogProps, "children"> & {
   onCancel: () => void;
-  onSucess: (categories: FoodCategory[]) => void;
+  onSuccess: (categories: FoodCategory[]) => void;
 };
 
 const UserViewerCategoriesEditor = React.forwardRef<
   HTMLDivElement,
   UserViewerCategoriesEditorProps
 >((props, ref) => {
-  const { onCancel, onSucess, ...rest } = props;
+  const { onCancel, onSuccess, ...rest } = props;
   const viewerContext = useUserViewerContext();
   const {
     _id,
@@ -48,6 +49,7 @@ const UserViewerCategoriesEditor = React.forwardRef<
   const authContext = useAuthContext();
   const { auth } = authContext;
   const loader = useLoader();
+  const toast = useToastContext();
 
   const handleCategoryChange = (
     _event: React.SyntheticEvent<Element, Event>,
@@ -72,7 +74,7 @@ const UserViewerCategoriesEditor = React.forwardRef<
 
   const handleOnClickOk = () => {
     if (JSON.stringify(categories) === JSON.stringify(viewerCategories)) {
-      onSucess && onSucess(categories);
+      onSuccess && onSuccess(categories);
       return;
     }
     if (auth == null) return;
@@ -91,11 +93,12 @@ const UserViewerCategoriesEditor = React.forwardRef<
         auth
       )
       .then(() => {
-        onSucess && onSucess(categories);
+        onSuccess && onSuccess(categories);
         setViewerCategories(categories);
       })
       .catch(() => {
         loader.setIsError(true);
+        toast.error("Không thể thực hiện hành động bây giờ");
       })
       .finally(() => {
         loader.setIsFetching(false);

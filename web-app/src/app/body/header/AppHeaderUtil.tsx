@@ -27,8 +27,8 @@ export default function AppHeaderUtil() {
       }}
     >
       <SideBarOpener />
-      {/* <Tooltip title={"Notification"} children={<NotificationProvider />} /> */}
-      <Tooltip title={"Add food"}>
+      {/* <Tooltip arrow title={"Notification"} children={<NotificationProvider />} /> */}
+      <Tooltip arrow title={"Add food"}>
         <IconButton
           sx={{
             color: "black",
@@ -38,7 +38,7 @@ export default function AppHeaderUtil() {
           <BookmarkAddOutlined sx={iconStyle} />
         </IconButton>
       </Tooltip>
-      <Tooltip title={"Location"}>
+      <Tooltip arrow title={"Location"}>
         <IconButton
           sx={{
             color: "black",
@@ -48,7 +48,7 @@ export default function AppHeaderUtil() {
           <RoomOutlined sx={iconStyle} />
         </IconButton>
       </Tooltip>
-      <Tooltip title={"Search"}>
+      <Tooltip arrow title={"Search"}>
         <IconButton
           sx={{
             color: "black",

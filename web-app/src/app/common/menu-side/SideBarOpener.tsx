@@ -6,7 +6,7 @@ export default function SideBarOpener() {
   const appContentContext = useAppContentContext();
   const isActive = appContentContext.menuSide.active;
   return (
-    <Tooltip title={`${isActive ? "Close" : "Open"} Menu`}>
+    <Tooltip arrow title={`${isActive ? "Close" : "Open"} Menu`}>
       <IconButton
         sx={{
           color: "black",

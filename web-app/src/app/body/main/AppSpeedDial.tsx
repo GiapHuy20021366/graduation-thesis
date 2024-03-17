@@ -32,11 +32,11 @@ export default function AppSpeedDial({ sx }: IAppSpeedDialProps) {
         ...sx,
         height: "80vh",
         ":hover": {
-            overflowY: open ? "auto" : "hidden"
+          overflowY: open ? "auto" : "hidden",
         },
       }}
       icon={
-        <Tooltip title="Click to open" placement="right-end" arrow>
+        <Tooltip arrow title="Click to open" placement="right-end">
           <StarOutlined
             sx={{
               width: "70%",

@@ -41,6 +41,7 @@ const UserViewerCategories = React.forwardRef<
         <h4>Quan tâm </h4>
         {isEditable && (
           <Tooltip
+            arrow
             children={
               <IconButton color="info" onClick={() => setOpenEditor(true)}>
                 <EditOutlined />
@@ -69,7 +70,7 @@ const UserViewerCategories = React.forwardRef<
         open={openEditor}
         onClose={() => setOpenEditor(false)}
         onCancel={() => setOpenEditor(false)}
-        onSucess={() => setOpenEditor(false)}
+        onSuccess={() => setOpenEditor(false)}
       />
     </Box>
   );

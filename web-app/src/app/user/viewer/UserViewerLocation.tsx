@@ -13,11 +13,13 @@ import {
   useUserViewerContext,
 } from "../../../hooks";
 import {
+  EditOutlined,
   LocationOnOutlined,
   NearMeOutlined,
   SocialDistanceOutlined,
 } from "@mui/icons-material";
 import UserViewerLocationExposedDialog from "./UserViewerLocationExposedDialog";
+import UserViewerLocationEditor from "./UserViewerLocationEditor";
 
 type UserViewerLocationProps = BoxProps;
 
@@ -34,6 +36,7 @@ const UserViewerLocation = React.forwardRef<
   const distances = useDistanceCalculation();
 
   const [openMap, setOpenMap] = useState<boolean>(false);
+  const [openEditor, setOpenEditor] = useState<boolean>(false);
 
   useEffect(() => {
     distances.setTargetLocation(location);
@@ -63,24 +66,36 @@ const UserViewerLocation = React.forwardRef<
         <h4>Vị trí</h4>
         {isEditable && (
           <Tooltip
+            arrow
             children={
-              <IconButton color="secondary" onClick={() => setOpenMap(true)}>
-                <NearMeOutlined />
+              <IconButton color="info" onClick={() => setOpenEditor(true)}>
+                <EditOutlined />
               </IconButton>
             }
-            title={"Xem vị trí"}
+            title={"Chỉnh sửa"}
           />
         )}
         {isLocated && (
           <Tooltip
+            arrow
             children={
-              <IconButton color="secondary" onClick={() => setOpenMap(true)}>
+              <IconButton
+                color="secondary"
+                onClick={() => setOpenMap(true)}
+                sx={{ ml: -2 }}
+              >
                 <NearMeOutlined />
               </IconButton>
             }
             title={"Xem vị trí"}
           />
         )}
+        <UserViewerLocationEditor
+          open={openEditor}
+          onClose={() => setOpenEditor(false)}
+          onCancel={() => setOpenEditor(false)}
+          onSuccess={() => setOpenEditor(false)}
+        />
       </Stack>
       <Stack direction={"row"} gap={1}>
         <LocationOnOutlined color="info" />

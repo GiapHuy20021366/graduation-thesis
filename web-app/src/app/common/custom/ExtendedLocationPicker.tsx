@@ -217,7 +217,7 @@ const ExtendedLocationPicker = React.forwardRef<
         color="error"
         onClick={() => onCloseClick && onCloseClick()}
       >
-        <Tooltip title="close">
+        <Tooltip arrow title="close">
           <CloseOutlined />
         </Tooltip>
       </IconButton>

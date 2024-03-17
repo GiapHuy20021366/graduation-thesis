@@ -12,6 +12,7 @@ import { userFetcher } from "../../../api";
 import {
   useAuthContext,
   useLoader,
+  useToastContext,
   useUserViewerContext,
 } from "../../../hooks";
 import StarterKitEditor from "../../common/custom/StarterKitEditor";
@@ -19,14 +20,14 @@ import { RichTextEditorRef } from "mui-tiptap";
 
 type UserViewerDescriptionEditorProps = DialogProps & {
   onCancel: () => void;
-  onSucess: (description?: string) => void;
+  onSuccess: (description?: string) => void;
 };
 
 const UserViewerDescriptionEditor = React.forwardRef<
   HTMLDivElement,
   UserViewerDescriptionEditorProps
 >((props, ref) => {
-  const { onCancel, onSucess, ...rest } = props;
+  const { onCancel, onSuccess, ...rest } = props;
   const authContext = useAuthContext();
   const { auth } = authContext;
   const loader = useLoader();
@@ -38,6 +39,7 @@ const UserViewerDescriptionEditor = React.forwardRef<
   } = viewerContext;
   const [description, setDescription] = useState<string | undefined>();
   const editorRef = useRef<RichTextEditorRef>(null);
+  const toast = useToastContext();
 
   const dirtyRef = useRef<boolean>(false);
 
@@ -60,7 +62,7 @@ const UserViewerDescriptionEditor = React.forwardRef<
 
   const handleOnClickOk = () => {
     if (description === viewerDescription) {
-      onSucess && onSucess(description);
+      onSuccess && onSuccess(description);
       return;
     }
     if (auth == null) return;
@@ -82,11 +84,12 @@ const UserViewerDescriptionEditor = React.forwardRef<
         auth
       )
       .then(() => {
-        onSucess && onSucess(description);
+        onSuccess && onSuccess(description);
         setViewerDescription(description);
       })
       .catch(() => {
         loader.setIsError(true);
+        toast.error("Không thể thực hiện hành động bây giờ");
       })
       .finally(() => {
         loader.setIsFetching(false);
@@ -98,42 +101,40 @@ const UserViewerDescriptionEditor = React.forwardRef<
   };
   return (
     <Dialog ref={ref} {...rest}>
-      <Dialog ref={ref} {...rest}>
-        <DialogTitle>Chỉnh sửa</DialogTitle>
-        <DialogContent>
-          <Stack
-            gap={1}
-            flex={1}
-            sx={{
-              width: ["100vw", "60vw", "50vw", "40vw"],
-            }}
-          >
-            <StarterKitEditor
-              editorRef={editorRef}
-              onUpdate={({ editor }) => setDescription(editor.getHTML())}
-              content={description}
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={handleOnClickCancel}
-            disabled={loader.isFetching}
-          >
-            Hủy bỏ
-          </Button>
-          <Button
-            color="success"
-            variant="contained"
-            onClick={handleOnClickOk}
-            disabled={loader.isFetching}
-          >
-            Đồng ý
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <DialogTitle>Chỉnh sửa</DialogTitle>
+      <DialogContent>
+        <Stack
+          gap={1}
+          flex={1}
+          sx={{
+            width: ["100vw", "60vw", "50vw", "40vw"],
+          }}
+        >
+          <StarterKitEditor
+            editorRef={editorRef}
+            onUpdate={({ editor }) => setDescription(editor.getHTML())}
+            content={description}
+          />
+        </Stack>
+      </DialogContent>
+      <DialogActions>
+        <Button
+          color="primary"
+          variant="contained"
+          onClick={handleOnClickCancel}
+          disabled={loader.isFetching}
+        >
+          Hủy bỏ
+        </Button>
+        <Button
+          color="success"
+          variant="contained"
+          onClick={handleOnClickOk}
+          disabled={loader.isFetching}
+        >
+          Đồng ý
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 });

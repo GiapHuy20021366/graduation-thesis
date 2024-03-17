@@ -292,6 +292,7 @@ export default function FoodAroundBody() {
         }}
       >
         <Tooltip
+          arrow
           children={
             <IconButton color="info" onClick={() => setFilterOpen(true)}>
               <SettingsSuggestOutlined />

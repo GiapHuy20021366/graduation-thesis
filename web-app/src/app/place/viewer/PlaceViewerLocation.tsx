@@ -52,6 +52,7 @@ const PlaceViewerLocation = React.forwardRef<
       <Stack direction={"row"} gap={1} alignItems={"center"}>
         <h4>Vị trí</h4>
         <Tooltip
+          arrow
           children={
             <IconButton color="secondary" onClick={() => setOpenMap(true)}>
               <NearMeOutlined />
