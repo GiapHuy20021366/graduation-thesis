@@ -10,6 +10,7 @@ import PageNotFound from "../../common/PageNotFound";
 import UserViewerData from "./UserViewerData";
 import UserViewerHolder from "./UserViewerHolder";
 import UserViewerRetry from "./UserViewerRetry";
+import UserViewerContextProvider from "./UserViewerContext";
 
 interface IUserViewerIdProps {
   id?: string;
@@ -34,10 +35,11 @@ export default function UserViewerId({ id }: IUserViewerIdProps) {
 
     progressContext.start();
     userFetcher
-      .getUserExposed(id, auth)
+      .getDetailUser(id, auth)
       .then((res) => {
         const datas = res.data;
         if (datas != null) {
+          console.log(datas);
           setData(datas);
         } else {
           setIsNotFound(true);
@@ -62,10 +64,10 @@ export default function UserViewerId({ id }: IUserViewerIdProps) {
   }, [auth, id, isNotFound, loader, progressContext]);
 
   useEffect(() => {
-    if (data == null) {
+    if (data == null && !loader.isError) {
       doLoadUser();
     }
-  }, [data, doLoadUser]);
+  }, [data, doLoadUser, loader.isError]);
 
   if (typeof id !== "string" || isNotFound) {
     return <PageNotFound />;
@@ -74,7 +76,9 @@ export default function UserViewerId({ id }: IUserViewerIdProps) {
   return (
     <>
       {data && !loader.isError && !loader.isFetching && (
-        <UserViewerData data={data} />
+        <UserViewerContextProvider user={data}>
+          <UserViewerData />
+        </UserViewerContextProvider>
       )}
       {loader.isFetching && <UserViewerHolder />}
       {loader.isError && <UserViewerRetry onRetry={doLoadUser} />}

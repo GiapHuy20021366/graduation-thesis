@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Button, Dialog, DialogProps } from "@mui/material";
-import { ILocation, IUserExposedWithFollower } from "../../../data";
+import { ILocation } from "../../../data";
 import LocationExposed from "../../common/custom/LocationExposed";
 import UserViewerMapExposedContent from "./UserViewerMapExposedContent";
 
@@ -8,7 +8,6 @@ type UserViewerLocationExposedDialogProps = DialogProps & {
   currentLocation?: ILocation;
   targetLocation?: ILocation;
   homeLocation?: ILocation;
-  data: IUserExposedWithFollower;
   onCloseClick?: () => void;
 };
 

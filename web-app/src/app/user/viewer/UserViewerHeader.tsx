@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Avatar,
   Box,
@@ -8,28 +8,38 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { IUserExposedWithFollower } from "../../../data";
+
 import {
   AccessTimeOutlined,
+  MapsUgcOutlined,
   NotificationsActiveOutlined,
+  Share,
 } from "@mui/icons-material";
 import UserSubcribeChipAction from "./SubcribedChipAction";
 import UserContextMenu from "./UserButtonContextMenu";
 import TimeExposed from "../../common/custom/TimeExposed";
+import { useConversationContext, useUserViewerContext } from "../../../hooks";
 
-type UserViewerHeaderProps = BoxProps & {
-  user: IUserExposedWithFollower;
-};
+type UserViewerHeaderProps = BoxProps;
 
 const UserViewerHeader = React.forwardRef<
   HTMLDivElement,
   UserViewerHeaderProps
 >((props, ref) => {
-  const { user, ...rest } = props;
+  const { ...rest } = props;
 
-  const [subribedCount, setSubcribedCount] = useState<number>(
-    user.subcribers ?? 0
-  );
+  const viewerContext = useUserViewerContext();
+  const {
+    _id,
+    subcribers,
+    avatar,
+    firstName,
+    lastName,
+    createdAt,
+    setSubcribers,
+  } = viewerContext;
+
+  const conversationContext = useConversationContext();
 
   return (
     <Box
@@ -50,33 +60,30 @@ const UserViewerHeader = React.forwardRef<
             zIndex: 1000,
             boxShadow: 5,
           }}
-          src={user.avatar}
+          src={avatar}
         >
-          {user.firstName.charAt(0)}
+          {firstName.charAt(0)}
         </Avatar>
         <Stack gap={1} flex={1}>
           <Typography
             sx={{ fontWeight: 500, fontSize: "1.3rem", mt: 2, ml: 2 }}
           >
-            {user.firstName + " " + user.lastName}
+            {firstName + " " + lastName}
           </Typography>
 
           <Stack direction={"row"} sx={{ alignItems: "center" }} ml={1} gap={1}>
             <IconButton color="success">
               <NotificationsActiveOutlined />
             </IconButton>
-            <Typography>{subribedCount} đang theo dõi</Typography>
+            <Typography>{subcribers ?? 0} đang theo dõi</Typography>
             <UserSubcribeChipAction
-              onFollowed={() => setSubcribedCount(subribedCount + 1)}
-              onUnFollowed={() =>
-                setSubcribedCount(Math.max(subribedCount - 1, 0))
-              }
-              data={user}
+              onFollowed={() => setSubcribers((subcribers ?? 0) + 1)}
+              onUnFollowed={() => setSubcribers((subcribers ?? 1) - 1)}
               sx={{ ml: 2 }}
             />
             <Box ml={"auto"}>
               <Tooltip title="Xem thêm">
-                <UserContextMenu data={user} sx={{ flex: 1 }} color="primary" />
+                <UserContextMenu sx={{ flex: 1 }} color="primary" />
               </Tooltip>
             </Box>
           </Stack>
@@ -85,8 +92,20 @@ const UserViewerHeader = React.forwardRef<
               <AccessTimeOutlined />
             </IconButton>
             <Typography>
-              Tham gia vào <TimeExposed time={user.createdAt} hour={false} />
+              Tham gia vào <TimeExposed time={createdAt} hour={false} />
             </Typography>
+            <IconButton color="info" sx={{ ml: "auto" }}>
+              <Share />
+            </IconButton>
+            <IconButton
+              color="success"
+              onClick={() => {
+                conversationContext.doBeginConversationWith(_id);
+              }}
+              sx={{ ml: -1 }}
+            >
+              <MapsUgcOutlined />
+            </IconButton>
           </Stack>
         </Stack>
       </Stack>

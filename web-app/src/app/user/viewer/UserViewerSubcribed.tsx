@@ -3,7 +3,6 @@ import { Divider, Stack, StackProps } from "@mui/material";
 import {
   IPagination,
   IUserFollowerExposed,
-  IUserExposed,
   loadFromSessionStorage,
   saveToSessionStorage,
 } from "../../../data";
@@ -12,6 +11,7 @@ import {
   useAuthContext,
   useLoader,
   usePageProgessContext,
+  useUserViewerContext,
 } from "../../../hooks";
 import { userFetcher } from "../../../api";
 import SubcriberHolder from "../../common/viewer/holder/SubcriberHolder";
@@ -20,7 +20,6 @@ import SearchMore from "../../common/viewer/data/SearchMore";
 import ErrorRetry from "../../common/viewer/data/ErrorRetry";
 
 type UserViewerSubcribedProps = StackProps & {
-  user: IUserExposed;
   active: boolean;
 };
 
@@ -36,7 +35,9 @@ const UserViewerSubcribed = React.forwardRef<
   HTMLDivElement,
   UserViewerSubcribedProps
 >((props, ref) => {
-  const { user, active, ...rest } = props;
+  const { active, ...rest } = props;
+  const viewerContext = useUserViewerContext();
+  const { _id } = viewerContext;
 
   const [followers, setFollowers] = useState<IUserFollowerExposed[]>([]);
 
@@ -56,7 +57,7 @@ const UserViewerSubcribed = React.forwardRef<
       scrollTop: appContentContext.mainRef?.current?.scrollTop,
     };
     saveToSessionStorage(snapshot, {
-      key: USER_VIEWER_SUBCRIBED(user._id),
+      key: USER_VIEWER_SUBCRIBED(_id),
       account: authContext.account?._id,
     });
   };
@@ -80,7 +81,7 @@ const UserViewerSubcribed = React.forwardRef<
     loader.setIsEnd(false);
 
     userFetcher
-      .getUserFollowers(user._id, { pagination: pagination }, auth)
+      .getUserFollowers(_id, { pagination: pagination }, auth)
       .then((res) => {
         const data = res.data;
         if (data != null) {
@@ -99,7 +100,7 @@ const UserViewerSubcribed = React.forwardRef<
         loader.setIsFetching(false);
         progessContext.end();
       });
-  }, [active, auth, followers, loader, user._id, progessContext]);
+  }, [active, auth, followers, loader, _id, progessContext]);
 
   useEffect(() => {
     const main = appContentContext.mainRef?.current;
@@ -133,7 +134,7 @@ const UserViewerSubcribed = React.forwardRef<
       // At begining
       const snapshot = loadFromSessionStorage<IUserViewerSubcribedSnapshotData>(
         {
-          key: USER_VIEWER_SUBCRIBED(user._id),
+          key: USER_VIEWER_SUBCRIBED(_id),
           maxDuration: 1 * 24 * 60 * 60 * 1000,
           account: account._id,
         }
@@ -154,7 +155,7 @@ const UserViewerSubcribed = React.forwardRef<
         doSearch();
       }
     }
-  }, [account, active, appContentContext.mainRef, doSearch, loader, user._id]);
+  }, [account, active, appContentContext.mainRef, doSearch, loader, _id]);
 
   return (
     <Stack

@@ -7,17 +7,17 @@ import React, {
   useState,
 } from "react";
 import { userFetcher } from "../api";
-import { IAccount, IAuthInfo, ILocation } from "../data";
+import { IAccountExposed, IAuthInfo, ILocation } from "../data";
 
 interface IAuthContextProviderProps {
   children: React.ReactNode;
 }
 
 interface IAuthContext {
-  account?: IAccount;
+  account?: IAccountExposed;
   auth?: IAuthInfo;
   token?: string;
-  setAccount: Dispatch<SetStateAction<IAccount | undefined>>;
+  setAccount: Dispatch<SetStateAction<IAccountExposed | undefined>>;
   setToken(token?: string, time?: number): void;
   logout(): void;
   updateLocation(location: ILocation): void;
@@ -33,7 +33,7 @@ export const AuthenticationContext = createContext<IAuthContext>({
 export default function AuthContextProvider({
   children,
 }: IAuthContextProviderProps) {
-  const [account, setAccount] = useState<IAccount | undefined>();
+  const [account, setAccount] = useState<IAccountExposed | undefined>();
   const [auth, setAuth] = useState<IAuthInfo | undefined>();
 
   const logout = () => {
@@ -65,10 +65,10 @@ export default function AuthContextProvider({
   useEffect(() => {
     const authValue = localStorage.getItem("auth");
     const accountValue = localStorage.getItem("account");
-    let account: IAccount | undefined;
+    let account: IAccountExposed | undefined;
     if (accountValue != null) {
       try {
-        account = JSON.parse(accountValue) as IAccount | undefined;
+        account = JSON.parse(accountValue) as IAccountExposed | undefined;
       } catch (error) {
         // Do nothing
       }

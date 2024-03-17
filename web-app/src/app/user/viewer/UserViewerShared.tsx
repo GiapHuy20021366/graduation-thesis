@@ -4,7 +4,6 @@ import {
   IFoodPostExposed,
   IFoodSearchParams,
   IPagination,
-  IUserExposed,
   OrderState,
   SystemSide,
   loadFromSessionStorage,
@@ -15,6 +14,7 @@ import {
   useAuthContext,
   useLoader,
   usePageProgessContext,
+  useUserViewerContext,
 } from "../../../hooks";
 import { foodFetcher } from "../../../api";
 import SharedFood from "../../common/viewer/data/SharedFood";
@@ -23,13 +23,12 @@ import ErrorRetry from "../../common/viewer/data/ErrorRetry";
 import SearchMore from "../../common/viewer/data/SearchMore";
 
 type UserViewerSharedProps = StackProps & {
-  user: IUserExposed;
   active: boolean;
 };
 
 interface IUserViewerSharedSnapshotData {
-  data: IFoodPostExposed[];
   scrollTop?: number;
+  data: IFoodPostExposed[];
 }
 
 const USER_VIEWER_SHARED = (userId: string) => `user.viewer@${userId}.shared`;
@@ -38,7 +37,9 @@ const UserViewerShared = React.forwardRef<
   HTMLDivElement,
   UserViewerSharedProps
 >((props, ref) => {
-  const { user, active, ...rest } = props;
+  const { active, ...rest } = props;
+  const viewerContext = useUserViewerContext();
+  const { _id } = viewerContext;
 
   const [foods, setFoods] = useState<IFoodPostExposed[]>([]);
 
@@ -69,7 +70,7 @@ const UserViewerShared = React.forwardRef<
         time: OrderState.DECREASE,
       },
       user: {
-        include: [user._id],
+        include: [_id],
       },
     };
 
@@ -93,7 +94,7 @@ const UserViewerShared = React.forwardRef<
         loader.setIsFetching(false);
         progessContext.end();
       });
-  }, [active, auth, foods, loader, user._id, progessContext]);
+  }, [active, auth, foods, loader, _id, progessContext]);
 
   useEffect(() => {
     const main = appContentContext.mainRef?.current;
@@ -124,7 +125,7 @@ const UserViewerShared = React.forwardRef<
       scrollTop: appContentContext.mainRef?.current?.scrollTop,
     };
     saveToSessionStorage(snapshot, {
-      key: USER_VIEWER_SHARED(user._id),
+      key: USER_VIEWER_SHARED(_id),
       account: authContext.account?._id,
     });
   };
@@ -141,7 +142,7 @@ const UserViewerShared = React.forwardRef<
       dirtyRef.current = false;
       // At begining
       const snapshot = loadFromSessionStorage<IUserViewerSharedSnapshotData>({
-        key: USER_VIEWER_SHARED(user._id),
+        key: USER_VIEWER_SHARED(_id),
         maxDuration: 1 * 24 * 60 * 60 * 1000,
         account: account._id,
       });
@@ -161,7 +162,7 @@ const UserViewerShared = React.forwardRef<
         doSearch();
       }
     }
-  }, [account, active, appContentContext.mainRef, doSearch, loader, user._id]);
+  }, [account, active, appContentContext.mainRef, doSearch, loader, _id]);
 
   return (
     <Stack

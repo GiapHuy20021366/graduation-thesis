@@ -1,35 +1,29 @@
-import React from "react";
-import { Box, BoxProps, Button, Stack, Typography } from "@mui/material";
-import { useAuthContext } from "../../../hooks";
-import { IAccountExposed, IUserExposedWithFollower } from "../../../data";
+import React, { useState } from "react";
+import {
+  Box,
+  BoxProps,
+  Button,
+  IconButton,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import { useUserViewerContext } from "../../../hooks";
 import { RichTextReadOnly } from "mui-tiptap";
 import StarterKit from "@tiptap/starter-kit";
-import { useNavigate } from "react-router";
+import { EditOutlined } from "@mui/icons-material";
+import UserViewerDescriptionEditor from "./UserViewerDescriptionEditor";
 
-type UserViewerDescriptionProps = BoxProps & {
-  data: IUserExposedWithFollower;
-};
-
-const isEditPermit = (
-  data: IUserExposedWithFollower,
-  account?: IAccountExposed
-): boolean => {
-  if (account == null) return false;
-  if (data._id !== account._id) return false;
-  return true;
-};
+type UserViewerDescriptionProps = BoxProps;
 
 const UserViewerDescription = React.forwardRef<
   HTMLDivElement,
   UserViewerDescriptionProps
 >((props, ref) => {
-  const { data, ...rest } = props;
-  const authContext = useAuthContext();
-  const account = authContext.account;
-
-  const editable = isEditPermit(data, account);
-
-  const navigate = useNavigate();
+  const { ...rest } = props;
+  const viewerContext = useUserViewerContext();
+  const { isEditable, description } = viewerContext;
+  const [openEditor, setOpenEditor] = useState<boolean>(false);
 
   return (
     <Box
@@ -40,28 +34,43 @@ const UserViewerDescription = React.forwardRef<
         ...(props.sx ?? {}),
       }}
     >
-      <h4>Mô tả</h4>
-      {(data.description == null || data.description === "") && (
+      <Stack direction={"row"} gap={1} alignItems={"center"}>
+        <h4>Mô tả </h4>
+        {isEditable && (
+          <Tooltip
+            children={
+              <IconButton color="info" onClick={() => setOpenEditor(true)}>
+                <EditOutlined />
+              </IconButton>
+            }
+            title={"Chỉnh sửa"}
+          />
+        )}
+      </Stack>
+      {(description == null || description === "") && (
         <Stack alignItems={"center"} flex={1}>
           <Typography>Người dùng chưa mô tả</Typography>
-          {editable && (
+          {isEditable && (
             <Stack gap={1}>
-              <Button
-                onClick={() => navigate("/place/update", { state: data })}
-              >
-                Chỉnh sửa ngay
-              </Button>
+              <Button>Chỉnh sửa ngay</Button>
             </Stack>
           )}
         </Stack>
       )}
-      {data.description && (
+      {description && (
         <RichTextReadOnly
           extensions={[StarterKit]}
           spell-check={false}
-          content={data.description}
+          content={description}
         />
       )}
+
+      <UserViewerDescriptionEditor
+        open={openEditor}
+        onClose={() => setOpenEditor(false)}
+        onCancel={() => setOpenEditor(false)}
+        onSucess={() => setOpenEditor(false)}
+      />
     </Box>
   );
 });

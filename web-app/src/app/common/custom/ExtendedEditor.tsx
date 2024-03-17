@@ -18,6 +18,7 @@ import {
   MenuButtonBold,
   MenuButtonItalic,
   MenuButtonBulletedList,
+  RichTextEditorRef,
 } from "mui-tiptap";
 import { useI18nContext } from "../../../hooks";
 
@@ -26,6 +27,7 @@ type ExtendedEditorProps = BoxProps & {
   onHTMLChange?: (newContent: string) => void;
   defaulExpaned?: boolean;
   sumaryElement?: ReactNode;
+  editorRef?: React.Ref<RichTextEditorRef>;
 };
 
 const EditMode = {
@@ -38,8 +40,14 @@ export type EditMode = (typeof EditMode)[keyof typeof EditMode];
 
 const ExtendedEditor = React.forwardRef<HTMLDivElement, ExtendedEditorProps>(
   (props, ref) => {
-    const { defaultHTML, onHTMLChange, defaulExpaned, sumaryElement, ...rest } =
-      props;
+    const {
+      defaultHTML,
+      onHTMLChange,
+      defaulExpaned,
+      sumaryElement,
+      editorRef,
+      ...rest
+    } = props;
     const [editable, setEditable] = useState<EditMode>(EditMode.EDIT);
     const i18n = useI18nContext();
     const lang = i18n.of(ExtendedEditor);
@@ -80,6 +88,7 @@ const ExtendedEditor = React.forwardRef<HTMLDivElement, ExtendedEditorProps>(
               onUpdate={({ editor }) =>
                 onHTMLChange && onHTMLChange(editor.getHTML())
               }
+              ref={editorRef}
               renderControls={() => (
                 <Box>
                   {

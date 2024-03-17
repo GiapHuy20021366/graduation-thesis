@@ -7,8 +7,11 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { IUserExposedWithFollower } from "../../../data";
-import { useAuthContext, useDistanceCalculation } from "../../../hooks";
+import {
+  useAuthContext,
+  useDistanceCalculation,
+  useUserViewerContext,
+} from "../../../hooks";
 import {
   LocationOnOutlined,
   NearMeOutlined,
@@ -16,21 +19,26 @@ import {
 } from "@mui/icons-material";
 import UserViewerLocationExposedDialog from "./UserViewerLocationExposedDialog";
 
-type UserViewerLocationProps = BoxProps & {
-  data: IUserExposedWithFollower;
-};
+type UserViewerLocationProps = BoxProps;
 
 const UserViewerLocation = React.forwardRef<
   HTMLDivElement,
   UserViewerLocationProps
 >((props, ref) => {
-  const { data, ...rest } = props;
+  const { ...rest } = props;
 
   const authContext = useAuthContext();
   const account = authContext.account;
-  const distances = useDistanceCalculation({ targetLocation: data.location });
+  const viewerContext = useUserViewerContext();
+  const { location, isEditable } = viewerContext;
+  const distances = useDistanceCalculation();
 
   const [openMap, setOpenMap] = useState<boolean>(false);
+
+  useEffect(() => {
+    distances.setTargetLocation(location);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location]);
 
   useEffect(() => {
     if (account?.location != null && distances.homeLocation == null) {
@@ -40,7 +48,7 @@ const UserViewerLocation = React.forwardRef<
 
   const { homeToTartgetDistance, currentToTargetDistance } = distances;
 
-  const isLocated = data.location?.name != null;
+  const isLocated = location?.name != null;
 
   return (
     <Box
@@ -53,6 +61,16 @@ const UserViewerLocation = React.forwardRef<
     >
       <Stack direction={"row"} gap={1} alignItems={"center"}>
         <h4>Vị trí</h4>
+        {isEditable && (
+          <Tooltip
+            children={
+              <IconButton color="secondary" onClick={() => setOpenMap(true)}>
+                <NearMeOutlined />
+              </IconButton>
+            }
+            title={"Xem vị trí"}
+          />
+        )}
         {isLocated && (
           <Tooltip
             children={
@@ -67,7 +85,7 @@ const UserViewerLocation = React.forwardRef<
       <Stack direction={"row"} gap={1}>
         <LocationOnOutlined color="info" />
         <Typography>
-          {isLocated ? data.location!.name : "Người dùng ẩn vị trí"}
+          {isLocated ? location!.name : "Người dùng ẩn vị trí"}
         </Typography>
       </Stack>
       {homeToTartgetDistance != null && (
@@ -90,7 +108,6 @@ const UserViewerLocation = React.forwardRef<
         currentLocation={distances.currentLocation}
         targetLocation={distances.targetLocation}
         homeLocation={distances.homeLocation}
-        data={data}
         onCloseClick={() => setOpenMap(false)}
         open={openMap}
       />

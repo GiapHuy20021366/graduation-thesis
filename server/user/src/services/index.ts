@@ -27,6 +27,7 @@ export {
   followUser,
   unFollowUser,
   updateUserPersonal,
+  getUser,
 } from "./user";
 
 export {

@@ -1,5 +1,4 @@
 import { Stack } from "@mui/material";
-import { IUserExposedWithFollower } from "../../../data";
 import { useState } from "react";
 import { UserViewerTab } from "./user-viewer-tab";
 import UserViewerTabs from "./UserViewerTabs";
@@ -9,15 +8,11 @@ import UserViewerShared from "./UserViewerShared";
 import UserViewerSubcribed from "./UserViewerSubcribed";
 import UserViewerPlace from "./UserViewerPlace";
 
-interface UserViewerDataProps {
-  data: IUserExposedWithFollower;
-}
-
-export default function UserViewerData({ data }: UserViewerDataProps) {
+export default function UserViewerData() {
   const [tab, setTab] = useState<UserViewerTab>(0);
   return (
     <Stack width={"100%"} boxSizing={"border-box"} boxShadow={1} gap={2} px={1}>
-      <UserViewerHeader user={data} />
+      <UserViewerHeader />
       <UserViewerTabs
         onTabSet={(tab) => setTab(tab)}
         sx={{
@@ -29,19 +24,13 @@ export default function UserViewerData({ data }: UserViewerDataProps) {
       />
       {/* Tabs display */}
       <>
-        <UserViewerIntroduction
-          data={data}
-          active={tab === UserViewerTab.DESCRIPTION}
-        />
+        <UserViewerIntroduction active={tab === UserViewerTab.DESCRIPTION} />
 
-        <UserViewerShared user={data} active={tab === UserViewerTab.FOOD} />
+        <UserViewerShared active={tab === UserViewerTab.FOOD} />
 
-        <UserViewerPlace active={tab === UserViewerTab.PLACE} user={data} />
+        <UserViewerPlace active={tab === UserViewerTab.PLACE} />
 
-        <UserViewerSubcribed
-          active={tab === UserViewerTab.SUBCRIBED}
-          user={data}
-        />
+        <UserViewerSubcribed active={tab === UserViewerTab.SUBCRIBED} />
       </>
       {/* <SpeedDial
         icon={<Add />}

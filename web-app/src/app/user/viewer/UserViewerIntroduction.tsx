@@ -1,12 +1,11 @@
 import React from "react";
 import { Divider, Stack, StackProps } from "@mui/material";
-import { IUserExposedWithFollower } from "../../../data";
 import UserViewerDescription from "./UserViewerDescription";
 import UserViewerLocation from "./UserViewerLocation";
 import UserViewerCategories from "./UserViewerCategories";
+import { useUserViewerContext } from "../../../hooks";
 
 type UserViewerIntroductionProps = StackProps & {
-  data: IUserExposedWithFollower;
   active: boolean;
 };
 
@@ -14,7 +13,9 @@ const UserViewerIntroduction = React.forwardRef<
   HTMLDivElement,
   UserViewerIntroductionProps
 >((props, ref) => {
-  const { data, active, ...rest } = props;
+  const { active, ...rest } = props;
+  const viewerContext = useUserViewerContext();
+  const { categories } = viewerContext;
   return (
     <Stack
       ref={ref}
@@ -26,11 +27,11 @@ const UserViewerIntroduction = React.forwardRef<
       }}
       display={active ? "flex" : "none"}
     >
-      <UserViewerDescription data={data} />
+      <UserViewerDescription />
       <Divider />
-      <UserViewerLocation data={data} />
+      <UserViewerLocation />
       <Divider />
-      <UserViewerCategories categories={data.categories} />
+      <UserViewerCategories categories={categories} />
     </Stack>
   );
 });

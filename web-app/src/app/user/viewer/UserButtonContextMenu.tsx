@@ -6,18 +6,15 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import { IUserExposedWithFollower } from "../../../data";
 import { MoreVert, ReportGmailerrorred } from "@mui/icons-material";
 
-type UserButtonContextMenuProps = IconButtonProps & {
-  data: IUserExposedWithFollower;
-};
+type UserButtonContextMenuProps = IconButtonProps;
 
 const UserContextMenu = React.forwardRef<
   HTMLButtonElement,
   UserButtonContextMenuProps
 >((props, ref) => {
-  const { data, ...rest } = props;
+  const { ...rest } = props;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const open = Boolean(anchorEl);

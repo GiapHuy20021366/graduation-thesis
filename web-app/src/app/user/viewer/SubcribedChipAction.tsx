@@ -12,17 +12,16 @@ import {
   DialogActions,
   DialogTitle,
 } from "@mui/material";
+import { IAccountExposed, IUserExposedFollower } from "../../../data";
 import {
-  FollowType,
-  IAccountExposed,
-  IUserExposedWithFollower,
-} from "../../../data";
-import { useAuthContext, useToastContext } from "../../../hooks";
+  useAuthContext,
+  useToastContext,
+  useUserViewerContext,
+} from "../../../hooks";
 import { DoneOutlined } from "@mui/icons-material";
 import { userFetcher } from "../../../api";
 
 type UserSubcribeChipActionProps = ChipProps & {
-  data: IUserExposedWithFollower;
   subcribedIcon?:
     | ReactElement<any, string | JSXElementConstructor<any>>
     | undefined;
@@ -34,32 +33,27 @@ type UserSubcribeChipActionProps = ChipProps & {
 };
 
 const isSubcribed = (
-  user: IUserExposedWithFollower,
+  userId: string,
+  userFollow?: IUserExposedFollower,
   account?: IAccountExposed
 ): boolean => {
   if (account == null) return false;
-  if (user._id === account._id) return true;
-  if (user.userFollow != null) {
-    const followerId = user.userFollow.subcriber;
+  if (userId === account._id) return true;
+  if (userFollow != null) {
+    const followerId = userFollow.subcriber;
     if (followerId === account._id) return true;
   }
   return false;
 };
 
 const isPermitSubcribe = (
-  user: IUserExposedWithFollower,
+  userId: string,
   account?: IAccountExposed
 ): boolean => {
   if (account == null) return false;
-  if (account._id === user._id) {
+  if (account._id === userId) {
     return false;
   }
-  return true;
-};
-
-const toSubcribed = (data: IUserExposedWithFollower): boolean => {
-  const follow = data.userFollow;
-  if (follow == null) return false;
   return true;
 };
 
@@ -67,36 +61,33 @@ const UserSubcribeChipAction = React.forwardRef<
   HTMLDivElement,
   UserSubcribeChipActionProps
 >((props, ref) => {
-  const {
-    data,
-    subcribedIcon,
-    unSubcribedIcon,
-    onFollowed,
-    onUnFollowed,
-    ...rest
-  } = props;
+  const { subcribedIcon, unSubcribedIcon, onFollowed, onUnFollowed, ...rest } =
+    props;
 
-  const [subcribed, setSubcribed] = useState<boolean>(toSubcribed(data));
+  const viewerContext = useUserViewerContext();
+  const { userFollow, _id } = viewerContext;
+
+  const [subcribed, setSubcribed] = useState<boolean>(userFollow != null);
   const [openConfirm, setOpenConfirm] = useState<boolean>(false);
 
   const authContext = useAuthContext();
   const { account, auth } = authContext;
   const toastContext = useToastContext();
 
-  const canSubcribe = isPermitSubcribe(data, account);
+  const canSubcribe = isPermitSubcribe(_id, account);
 
   useEffect(() => {
     if (subcribed == null) {
       if (account != null) {
-        setSubcribed(isSubcribed(data, account));
+        setSubcribed(isSubcribed(_id, userFollow, account));
       }
     }
-  }, [account, data, subcribed]);
+  }, [_id, account, subcribed, userFollow]);
 
   const followUser = () => {
     if (auth == null) return;
     userFetcher
-      .followPlace(data._id, FollowType.SUBCRIBER, auth)
+      .followUser(_id, auth)
       .then(() => {
         setSubcribed(true);
         onFollowed && onFollowed();
@@ -109,7 +100,7 @@ const UserSubcribeChipAction = React.forwardRef<
   const unfollowUser = () => {
     if (auth == null) return;
     userFetcher
-      .unFollowPlace(data._id, auth)
+      .unFollowUser(_id, auth)
       .then(() => {
         setSubcribed(false);
         onUnFollowed && onUnFollowed();
@@ -146,6 +137,7 @@ const UserSubcribeChipAction = React.forwardRef<
           cursor: canSubcribe ? "pointer" : "unset",
         }}
         onClick={handleChipClick}
+        disabled={!canSubcribe}
       />
       <Dialog open={openConfirm} onClose={() => setOpenConfirm(false)}>
         <DialogTitle>Bạn chắc chắn muốn hủy theo dõi trang này</DialogTitle>
