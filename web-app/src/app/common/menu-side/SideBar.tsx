@@ -44,10 +44,7 @@ export default function SideBar() {
       onClose={() => appContentContext.setMenuSideActive(false)}
       variant="temporary"
     >
-      <Stack
-        p={1}
-        gap={1}
-      >
+      <Stack p={1} gap={1}>
         <Stack direction="row">
           <Box
             component="img"
@@ -88,6 +85,16 @@ export default function SideBar() {
                 <SentimentSatisfiedAltOutlined fontSize="medium" />
               </ListItemIcon>
               <ListItemText>{lang("user")}</ListItemText>
+            </MenuItem>
+          </StyledLink>
+
+          {/* User */}
+          <StyledLink to={"/place"}>
+            <MenuItem selected={is("/place")}>
+              <ListItemIcon>
+                <SentimentSatisfiedAltOutlined fontSize="medium" />
+              </ListItemIcon>
+              <ListItemText>{lang("place")}</ListItemText>
             </MenuItem>
           </StyledLink>
 
