@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import {
   AuthLike,
+  FollowRole,
   ICoordinates,
   IFollowerSearchParams,
   IPagination,
@@ -12,6 +13,7 @@ import {
   isLocation,
   isNumber,
   isObjectId,
+  toFollowerSearchParams,
   toPersonalDataUpdate,
   toResponseSuccessData,
   toUserSearchParams,
@@ -24,6 +26,7 @@ import {
   unFollowUser as unFollowUserService,
   updateUserPersonal as updateUserPersonalService,
   getUser as getUserService,
+  getFollowers,
 } from "../services";
 
 interface ISearchUsersAroundParams {
@@ -160,10 +163,45 @@ export const updateUserPersonal = async (
     .catch(next);
 };
 
-export const getFollowers = async (
-  _req: Request<{ id: string }, {}, IFollowerSearchParams, {}>,
-  _res: Response,
-  _next: NextFunction
+export const getUsersAndPlacesFollowed = async (
+  req: Request<{ id: string }, {}, IFollowerSearchParams, {}>,
+  res: Response,
+  next: NextFunction
 ) => {
-  // Implement later
+  const targetUser = req.params.id;
+  if (!isObjectId(targetUser)) {
+    return next(new InvalidDataError());
+  }
+  const params = req.body;
+  const searchParams: IFollowerSearchParams = {
+    ...toFollowerSearchParams(params),
+    subcriber: {
+      include: targetUser,
+    },
+  };
+  getFollowers(searchParams)
+    .then((data) => res.status(200).json(toResponseSuccessData(data)))
+    .catch(next);
+};
+
+export const getUserFollowers = async (
+  req: Request<{ id: string }, {}, IFollowerSearchParams, {}>,
+  res: Response,
+  next: NextFunction
+) => {
+  const targetUser = req.params.id;
+  if (!isObjectId(targetUser)) {
+    return next(new InvalidDataError());
+  }
+  const params = req.body;
+  const searchParams: IFollowerSearchParams = {
+    ...toFollowerSearchParams(params),
+    role: [FollowRole.USER],
+    user: {
+      include: targetUser,
+    },
+  };
+  getFollowers(searchParams)
+    .then((data) => res.status(200).json(toResponseSuccessData(data)))
+    .catch(next);
 };

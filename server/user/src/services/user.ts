@@ -1,4 +1,4 @@
-import { Follower, User } from "../db/model";
+import { Follower, IPlaceSchema, IUserSchema, User } from "../db/model";
 import {
   FollowRole,
   FollowType,
@@ -14,7 +14,15 @@ import {
   IUserPersonal,
   IUserExposedSimple,
   IUserExposedWithFollower,
+  IFollowerSearchParams,
+  IFollowerExposed,
+  toIncludeAndExcludeQueryOptions,
+  OrderState,
+  IFollowerExposedUser,
+  IFollowerExposedPlace,
+  IFollowerExposedSubcriber,
 } from "../data";
+import { HydratedDocument, ObjectId } from "mongoose";
 
 export interface ISearchedUser
   extends Ided,
@@ -335,4 +343,180 @@ export const updateUserPersonal = async (
   user.updatedAt = new Date();
   await user.save();
   return { success: true };
+};
+
+const toSubcriber = (
+  populates: string[],
+  data: any
+): string | IFollowerExposedSubcriber => {
+  if (!populates.includes("subcriber")) {
+    const datas = <ObjectId>data;
+    return datas.toString();
+  }
+  const subcriber = <HydratedDocument<IUserSchema>>data;
+  return {
+    _id: subcriber._id.toString(),
+    firstName: subcriber.firstName,
+    lastName: subcriber.lastName,
+    avatar: subcriber.avatar,
+    active: subcriber.active,
+  };
+};
+
+const toUser = (
+  populates: string[],
+  data: any
+): string | IFollowerExposedUser | undefined => {
+  if (data == null) return;
+  if (!populates.includes("user")) {
+    const datas = <ObjectId>data;
+    return datas.toString();
+  }
+  const user = <HydratedDocument<IUserSchema>>data;
+  return {
+    _id: user._id.toString(),
+    firstName: user.firstName,
+    lastName: user.lastName,
+    avatar: user.avatar,
+    active: user.active,
+  };
+};
+
+const toPlace = (
+  populates: string[],
+  data: any
+): string | IFollowerExposedPlace | undefined => {
+  if (data == null) return;
+  if (!populates.includes("place")) {
+    const datas = <ObjectId>data;
+    return datas.toString();
+  }
+  const place = <HydratedDocument<IPlaceSchema>>data;
+  return {
+    _id: place._id.toString(),
+    active: place.active,
+    author: place.author.toString(),
+    categories: place.categories,
+    createdAt: place.createdAt,
+    exposeName: place.exposeName,
+    images: place.images,
+    location: place.location,
+    rating: place.rating,
+    type: place.type,
+    updatedAt: place.updatedAt,
+    avatar: place.avatar,
+  };
+};
+export const getFollowers = async (
+  params: IFollowerSearchParams
+): Promise<IFollowerExposed[]> => {
+  const {
+    duration,
+    order,
+    pagination,
+    place,
+    role,
+    subcriber,
+    type,
+    user,
+    populate,
+  } = params;
+
+  const options: any = {};
+  if (duration != null) {
+    const { from, to } = duration;
+    const createdAtOptions: any = {};
+    if (from != null) {
+      createdAtOptions.$gte = from;
+    }
+    if (to != null) {
+      createdAtOptions.$lte = to;
+    }
+    if (from != null || to != null) {
+      options["createdAt"] = createdAtOptions;
+    }
+  }
+
+  const placeOptions = toIncludeAndExcludeQueryOptions(place);
+  if (placeOptions != null) {
+    options["place"] = placeOptions;
+  }
+
+  const subcriberOptions = toIncludeAndExcludeQueryOptions(subcriber);
+  if (subcriberOptions != null) {
+    options["subcriber"] = subcriberOptions;
+  }
+
+  const userOptions = toIncludeAndExcludeQueryOptions(user);
+  if (userOptions != null) {
+    options["user"] = userOptions;
+  }
+
+  if (role != null) {
+    if (role.length === 1) {
+      options["role"] = role[0];
+    } else {
+      options["role"] = { $in: role };
+    }
+  }
+
+  if (type != null) {
+    if (type.length === 1) {
+      options["type"] = type[0];
+    } else {
+      options["type"] = { $in: type };
+    }
+  }
+
+  const sort: any = {};
+  if (order != null) {
+    const { time } = order;
+    if (time != null && time !== OrderState.NONE) {
+      sort["createdAt"] = time;
+    }
+  }
+
+  const query = Follower.find(options);
+  const populates: string[] = [];
+  if (populate != null && Object.keys(populate).length > 0) {
+    if (populate.place) populates.push("place");
+    if (populate.user) populates.push("user");
+    if (populate.subcriber) populates.push("subcriber");
+    query.populate<{
+      user?: IFollowerExposedUser;
+      place?: IFollowerExposedPlace;
+      subcriber: IFollowerExposedSubcriber;
+    }>(populates.join(""));
+  }
+
+  const followers = await query
+    .sort(sort)
+    .skip(pagination?.skip ?? 0)
+    .limit(pagination?.limit ?? 24)
+    .exec();
+
+  if (followers == null) throw new InternalError();
+
+  return followers
+    .filter((f) => {
+      if (f.subcriber == null) return false;
+      if (f.role === FollowRole.PLACE && f.place == null) return false;
+      if (f.role === FollowRole.USER && f.user == null) return false;
+      return true;
+    })
+    .map((f): IFollowerExposed => {
+      const subcriber = f.subcriber;
+      const user = f.user;
+      const place = f.place;
+      return {
+        _id: f._id.toString(),
+        createdAt: f.createdAt,
+        subcriber: toSubcriber(populates, subcriber),
+        role: f.role,
+        type: f.type,
+        updatedAt: f.updatedAt,
+        user: toUser(populates, user)!,
+        place: toPlace(populates, place)!
+      };
+    });
 };

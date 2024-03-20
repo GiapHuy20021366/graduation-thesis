@@ -16,9 +16,10 @@ export {
   getBasicUserInfo,
   searchUser,
   followUser,
-  getFollowers,
+  getUserFollowers,
   getUser,
   updateUserPersonal,
+  getUsersAndPlacesFollowed
 } from "./user";
 
 export {

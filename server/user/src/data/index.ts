@@ -123,7 +123,11 @@ export {
   IUserRemovable,
   toPersonalDataUpdate,
 } from "./personal-data-update";
-export { IIncludeAndExclude, toIncludeAndExclude } from "./include-and-exclude";
+export {
+  IIncludeAndExclude,
+  toIncludeAndExclude,
+  toIncludeAndExcludeQueryOptions,
+} from "./include-and-exclude";
 export {
   IFollowerSearchDuration,
   IFollowerSearchOrder,

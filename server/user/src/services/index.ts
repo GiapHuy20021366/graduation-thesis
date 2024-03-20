@@ -28,6 +28,7 @@ export {
   unFollowUser,
   updateUserPersonal,
   getUser,
+  getFollowers
 } from "./user";
 
 export {

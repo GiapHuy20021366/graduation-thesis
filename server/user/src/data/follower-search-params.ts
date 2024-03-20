@@ -25,6 +25,12 @@ export interface IFollowerSearchOrder {
   time?: OrderState;
 }
 
+export interface IFollowerSearchPopulate {
+  user?: boolean;
+  place?: boolean;
+  subcriber?: boolean;
+}
+
 export interface IFollowerSearchParams {
   place?: IFollowerSearchPlace;
   user?: IFollowerSearchUser;
@@ -34,6 +40,7 @@ export interface IFollowerSearchParams {
   duration?: IFollowerSearchDuration;
   pagination?: IPagination;
   order?: IFollowerSearchOrder;
+  populate?: IFollowerSearchPopulate;
 }
 
 export const toFollowerSearchDuration = (
@@ -81,6 +88,22 @@ export const toFollowerSearchParams = (value: any): IFollowerSearchParams => {
   const pagination = value.pagination;
   if (isPagination(pagination)) {
     result.pagination = pagination;
+  }
+
+  const populate = value.populate;
+  if (typeof populate === "object") {
+    const {user, place, subcriber} = populate;
+    const populateValue: IFollowerSearchPopulate = {};
+    if (typeof user === "boolean") {
+      populateValue.user = user;
+    }
+    if (typeof place === "boolean") {
+      populateValue.place = place;
+    }
+    if (typeof subcriber === "boolean") {
+      populateValue.subcriber = subcriber;
+    }
+    result.populate = populateValue;
   }
 
   return result;

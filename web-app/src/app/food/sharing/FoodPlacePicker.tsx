@@ -9,7 +9,13 @@ import {
   StackProps,
   Typography,
 } from "@mui/material";
-import { FollowType, IPlaceExposed } from "../../../data";
+import {
+  FollowRole,
+  FollowType,
+  IFollowerSearchParams,
+  IPlaceExposed,
+  IPlaceFollowerExposed,
+} from "../../../data";
 import {
   useAuthContext,
   useFoodSharingFormContext,
@@ -48,22 +54,29 @@ const FoodPlacePicker = React.forwardRef<HTMLDivElement, FoodPlacePickerProps>(
       dirtyRef.current = false;
 
       loader.setIsFetching(true);
+      const params: IFollowerSearchParams = {
+        pagination: {
+          skip: 0,
+          limit: Number.MAX_SAFE_INTEGER,
+        },
+        type: [FollowType.ADMIN, FollowType.SUB_ADMIN],
+        role: [FollowRole.PLACE],
+        populate: {
+          place: true,
+        },
+      };
       userFetcher
-        .getPlacesByFollow(
-          account._id,
-          {
-            pagination: {
-              skip: 0,
-              limit: Number.MAX_SAFE_INTEGER,
-            },
-            followTypes: [FollowType.ADMIN, FollowType.SUB_ADMIN],
-          },
-          auth
-        )
+        .getUsersAndPlacesFollowed(account._id, params, auth)
         .then((res) => {
           const data = res.data;
           if (data != null) {
-            setPlaces(data);
+            const places = data
+              .filter((d) => d.role === FollowRole.PLACE)
+              .map((d): IPlaceExposed => {
+                const place = (d as IPlaceFollowerExposed).place;
+                return place as IPlaceExposed;
+              });
+            setPlaces(places);
           }
         })
         .catch(() => {})
@@ -98,7 +111,7 @@ const FoodPlacePicker = React.forwardRef<HTMLDivElement, FoodPlacePickerProps>(
           onChange={onPlaceChanged}
           sx={{
             flex: 1,
-            mt: 1
+            mt: 1,
           }}
         >
           <MenuItem value={PERSONAL_PAGE}>Trang cá nhân của bạn</MenuItem>

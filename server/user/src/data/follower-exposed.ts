@@ -7,6 +7,7 @@ export interface IFollowerExposedTarget {
   firstName: string;
   lastName: string;
   avatar?: string;
+  active: boolean;
 }
 
 export interface IFollowerExposedSubcriber extends IFollowerExposedTarget {}

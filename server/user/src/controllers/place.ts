@@ -12,17 +12,18 @@ import {
   getPlacesByUserFollow as getPlacesByUserFollowService,
   getPlacesRankByFavorite,
   getPlacesRatedByUser,
-  getPlaceFollowers as getPlaceFollowersService,
+  getFollowers,
 } from "../services";
 import {
   AuthLike,
+  FollowRole,
   FollowType,
+  IFollowerSearchParams,
   IPagination,
   IPlaceSearchParams,
   InvalidDataError,
   PlaceType,
   isAllNotEmptyString,
-  isAllObjectId,
   isArrayFollowTypes,
   isArrayPlaceTypes,
   isLocation,
@@ -31,6 +32,7 @@ import {
   isPagination,
   isString,
   throwErrorIfInvalidFormat,
+  toFollowerSearchParams,
   toPlace,
   toPlaceSearchParams,
   toResponseSuccessData,
@@ -358,51 +360,24 @@ export const getRatedPlaces = async (
     .catch(next);
 };
 
-interface IGetPlaceFollowersParams {
-  include?: string[]; // include users
-  exclude?: string[]; // exclude users
-  followTypes?: FollowType[];
-  pagination?: IPagination;
-}
-
-export const getPlaceFollowers = (
-  req: Request<{ id: string }, {}, IGetPlaceFollowersParams, {}>,
+export const getPlaceFollowers = async (
+  req: Request<{ id: string }, {}, IFollowerSearchParams, {}>,
   res: Response,
   next: NextFunction
 ) => {
-  const placeId = req.params.id;
-  if (!isObjectId(placeId)) {
-    return next(
-      new InvalidDataError({
-        message: "Invalid id",
-        data: {
-          reason: "invalid",
-          target: "id",
-        },
-      })
-    );
+  const targetUser = req.params.id;
+  if (!isObjectId(targetUser)) {
+    return next(new InvalidDataError());
   }
-  const body = req.body;
-  const { exclude, include, pagination, followTypes } = body;
-
-  const _pagination: IPagination = isPagination(pagination)
-    ? pagination
-    : {
-        skip: 0,
-        limit: 24,
-      };
-  const _include = isAllObjectId(include) ? include : undefined;
-  const _exclude = isAllObjectId(exclude) ? exclude : undefined;
-  const _followTypes = isArrayFollowTypes(followTypes)
-    ? followTypes
-    : undefined;
-
-  getPlaceFollowersService(placeId, {
-    exclude: _exclude,
-    followTypes: _followTypes,
-    include: _include,
-    pagination: _pagination,
-  })
+  const params = req.body;
+  const searchParams: IFollowerSearchParams = {
+    ...toFollowerSearchParams(params),
+    role: [FollowRole.PLACE],
+    place: {
+      include: targetUser,
+    },
+  };
+  getFollowers(searchParams)
     .then((data) => res.status(200).json(toResponseSuccessData(data)))
     .catch(next);
 };

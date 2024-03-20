@@ -10,7 +10,6 @@ import {
   activeManualAccount,
   loginAccount,
   refreshToken,
-  setUserLocation,
   searchUsersAround,
   createNewPlace,
   updatePlace,
@@ -27,6 +26,8 @@ import {
   followUser,
   getUser,
   updateUserPersonal,
+  getUserFollowers,
+  getUsersAndPlacesFollowed,
 } from "../controllers";
 
 const initUserRouter = (app: Express) => {
@@ -44,9 +45,6 @@ const initUserRouter = (app: Express) => {
   // Refresh token session
   userRouter.get("/token/refresh", tokenParser, refreshToken);
 
-  // Set user location
-  userRouter.put("/:id/location", tokenParser, setUserLocation);
-
   // Get information of an user
   userRouter.get("/:id", tokenParser, getUser);
 
@@ -59,8 +57,14 @@ const initUserRouter = (app: Express) => {
   // Follow / Unfollow user
   userRouter.put("/:id/follow", tokenParser, followUser);
 
-  // update information data of user
+  // Update information data of user
   userRouter.put("/:id", tokenParser, updateUserPersonal);
+
+  // Get places or users that an user followed
+  userRouter.post("/:id/follow/search", tokenParser, getUsersAndPlacesFollowed);
+
+  // Get subcribers of an user
+  userRouter.post("/:id/subcribe/search", tokenParser, getUserFollowers);
 
   userRouter.use(errorHandler);
   app.use("/users", userRouter);
@@ -93,14 +97,14 @@ const initPlaceRouter = (app: Express) => {
   // Get places by follow util
   placeRouter.post("/follow/users/:userId", tokenParser, getPlacesByUserFollow);
 
-  // Get user follow a page
-  placeRouter.post("/:id/follow/users", tokenParser, getPlaceFollowers);
-
   // Get rank favorite place
   placeRouter.get("/rank/favorite", tokenParser, getRankFavoritePlaces);
 
   // Get place rated by an user
   placeRouter.get("/rating/users/:userId", tokenParser, getRatedPlaces);
+
+  // Get subcribers of an place
+  placeRouter.post("/:id/subcriber/search", tokenParser, getPlaceFollowers);
 
   placeRouter.use(errorHandler);
   app.use("/places", placeRouter);

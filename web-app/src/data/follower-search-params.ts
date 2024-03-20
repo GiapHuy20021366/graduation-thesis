@@ -24,6 +24,12 @@ export interface IFollowerSearchOrder {
   time?: OrderState;
 }
 
+export interface IFollowerSearchPopulate {
+  user?: boolean;
+  place?: boolean;
+  subcriber?: boolean;
+}
+
 export interface IFollowerSearchParams {
   role?: FollowRole[];
   type?: FollowType[];
@@ -33,4 +39,5 @@ export interface IFollowerSearchParams {
   duration?: IFollowerSearchDuration;
   pagination?: IPagination;
   order?: IFollowerSearchOrder;
+  populate?: IFollowerSearchPopulate;
 }

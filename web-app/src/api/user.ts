@@ -22,6 +22,7 @@ import {
   IUserFollowerExposed,
   IUserExposedSimple,
   IPersonalDataUpdate,
+  IFollowerExposed,
 } from "../data";
 
 export const userEndpoints = {
@@ -32,10 +33,11 @@ export const userEndpoints = {
   activeManual: "/users/active",
   findUsersAround: "/users/around",
   getUserInfo: "/users/:id",
-  setUserLocation: "/users/:id/location",
   searchUser: "/users/search",
   followUser: "/users/:id/follow",
   updatePersonal: "/users/:id",
+  getUserFollowers: "/users/:id/subcribe/search",
+  getUsersAndPlacesFollowed: "/users/:id/follow/search",
 
   // places
   createPlace: "/places",
@@ -48,7 +50,7 @@ export const userEndpoints = {
   getPlaceByFollow: "/places/follow/users/:userId",
   getRankPlaceByFavorite: "/places/rank/favorite",
   getRatedPlaces: "/places/rating/users/:userId",
-  getPlaceFollowers: "/places/:id/follow/users",
+  getPlaceFollowers: "/places/:id/follow/search",
 } as const;
 
 export interface UserResponseError
@@ -128,13 +130,6 @@ export interface IGetPlacesByFollowParams {
   placeTypes?: PlaceType[];
 }
 
-export interface IGetPlaceFollowersParams {
-  include?: string[]; // include users
-  exclude?: string[]; // exclude users
-  followTypes?: FollowType[];
-  pagination?: IPagination;
-}
-
 export interface UserFetcher {
   manualLogin(
     email: string,
@@ -186,6 +181,16 @@ export interface UserFetcher {
     data: IPersonalDataUpdate,
     auth: IAuthInfo
   ): Promise<UserResponse<{ success: boolean }>>;
+  getUserFollowers(
+    user: string,
+    params: IFollowerSearchParams,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IUserFollowerExposed[]>>;
+  getUsersAndPlacesFollowed(
+    user: string,
+    params: IFollowerSearchParams,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IFollowerExposed[]>>;
 
   // Place
   createPlace(
@@ -240,7 +245,7 @@ export interface UserFetcher {
   ): Promise<UserResponse<IPlaceExposed[]>>;
   getPlaceFollowers(
     place: string,
-    params: IGetPlaceFollowersParams,
+    params: IFollowerSearchParams,
     auth: IAuthInfo
   ): Promise<UserResponse<IPlaceFollowerExposed[]>>;
 }
@@ -357,9 +362,14 @@ export const userFetcher: UserFetcher = {
     location: ILocation,
     auth: IAuthInfo
   ): Promise<UserResponse<void>> => {
+    const data: IPersonalDataUpdate = {
+      updated: {
+        location: location,
+      },
+    };
     return userInstance.put(
-      userEndpoints.setUserLocation.replace(":id", userId),
-      location,
+      userEndpoints.updatePersonal.replace(":id", userId),
+      data,
       {
         headers: {
           Authorization: auth.token,
@@ -375,16 +385,6 @@ export const userFetcher: UserFetcher = {
       headers: {
         Authorization: auth.token,
       },
-    });
-  },
-  getUserFollowers: (
-    user: string,
-    params: IFollowerSearchParams,
-    auth: IAuthInfo
-  ): Promise<UserResponse<IUserFollowerExposed[]>> => {
-    console.log(user, params, auth);
-    return Promise.resolve({
-      data: [],
     });
   },
   followUser: (
@@ -427,6 +427,36 @@ export const userFetcher: UserFetcher = {
     return userInstance.put(
       userEndpoints.updatePersonal.replace(":id", userId),
       data,
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
+  },
+  getUserFollowers: (
+    user: string,
+    params: IFollowerSearchParams,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IUserFollowerExposed[]>> => {
+    return userInstance.post(
+      userEndpoints.getUserFollowers.replace(":id", user),
+      params,
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
+  },
+  getUsersAndPlacesFollowed: (
+    user: string,
+    params: IFollowerSearchParams,
+    auth: IAuthInfo
+  ): Promise<UserResponse<IFollowerExposed[]>> => {
+    return userInstance.post(
+      userEndpoints.getUsersAndPlacesFollowed.replace(":id", user),
+      params,
       {
         headers: {
           Authorization: auth.token,
@@ -595,7 +625,7 @@ export const userFetcher: UserFetcher = {
   },
   getPlaceFollowers: (
     place: string,
-    params: IGetPlaceFollowersParams,
+    params: IFollowerSearchParams,
     auth: IAuthInfo
   ): Promise<UserResponse<IPlaceFollowerExposed[]>> => {
     return userInstance.post(

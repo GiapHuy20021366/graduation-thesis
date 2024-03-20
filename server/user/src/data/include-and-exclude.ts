@@ -32,3 +32,30 @@ export const toIncludeAndExclude = (
   }
   return result;
 };
+
+export const toIncludeAndExcludeQueryOptions = (
+  value?: IIncludeAndExclude
+): object | null => {
+  if (value == null) return null;
+  const options: any = {};
+  const { exclude, include } = value;
+  if (exclude != null) {
+    if (typeof exclude === "string") {
+      options.$ne = exclude;
+    } else if (Array.isArray(exclude)) {
+      options.$nin = exclude;
+    }
+  }
+  if (include) {
+    if (typeof include === "string") {
+      options.$eq = include;
+    } else if (Array.isArray(include)) {
+      options.$in = include;
+    }
+  }
+  if (Object.keys(options).length > 0) {
+    return options;
+  } else {
+    return null;
+  }
+};
