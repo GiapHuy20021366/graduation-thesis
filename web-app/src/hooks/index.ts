@@ -30,3 +30,9 @@ export { useConversationViewerContext } from "./useConversationViewerContext";
 export { useLoader } from "./useLoader";
 export { useUserViewerContext } from "./useUserViewerContext";
 export { type DeviceType, useQueryDevice, deviceTypes } from "./useQueryDevice";
+export {
+  type ApplicationPage,
+  type IUsePageResolverState,
+  applicationPages,
+  usePageResolver,
+} from "./usePageResolver";

@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, BoxProps, Tab, Tabs } from "@mui/material";
+import { Box, BoxProps, Tab, Tabs, Tooltip } from "@mui/material";
 import {
   HomeOutlined,
   FoodBankOutlined,
@@ -69,30 +69,35 @@ const AppTabs = React.forwardRef<HTMLDivElement, NearPlaceProps>(
           scrollButtons
           allowScrollButtonsMobile
         >
-          <Tab
-            icon={<HomeOutlined />}
-            aria-label="Home"
-            label="Home"
-            onClick={() => tabNavigate.setTab(AppTab.HOME)}
-          />
-          <Tab
-            icon={<FoodBankOutlined />}
-            aria-label="Food around"
-            label="Food"
-            onClick={() => tabNavigate.setTab(AppTab.FOOD)}
-          />
-          <Tab
-            icon={<PeopleAltOutlined />}
-            aria-label="People"
-            label="People"
-            onClick={() => tabNavigate.setTab(AppTab.PEOPLE_AROUND)}
-          />
-          <Tab
-            icon={<PlaceOutlined />}
-            aria-label="Place"
-            label="Place"
-            onClick={() => tabNavigate.setTab(AppTab.PLACE)}
-          />
+          <Tooltip title="Home" arrow>
+            <Tab
+              icon={<HomeOutlined />}
+              label="Home"
+              onClick={() => tabNavigate.setTab(AppTab.HOME)}
+            />
+          </Tooltip>
+          <Tooltip title="Food around" arrow>
+            <Tab
+              icon={<FoodBankOutlined />}
+              label="Food"
+              onClick={() => tabNavigate.setTab(AppTab.FOOD)}
+            />
+          </Tooltip>
+          <Tooltip title="People" arrow>
+            <Tab
+              icon={<PeopleAltOutlined />}
+              label="People"
+              onClick={() => tabNavigate.setTab(AppTab.PEOPLE_AROUND)}
+            />
+          </Tooltip>
+          <Tooltip title="Place" arrow>
+            <Tab
+              icon={<PlaceOutlined />}
+              aria-label="Place"
+              label="Place"
+              onClick={() => tabNavigate.setTab(AppTab.PLACE)}
+            />
+          </Tooltip>
         </Tabs>
       </Box>
     );

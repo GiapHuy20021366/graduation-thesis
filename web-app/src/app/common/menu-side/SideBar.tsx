@@ -1,8 +1,10 @@
 import Drawer from "@mui/material/Drawer";
 import {
+  applicationPages,
   useAppContentContext,
   useAuthContext,
   useI18nContext,
+  usePageResolver,
 } from "../../../hooks";
 import {
   Box,
@@ -24,7 +26,6 @@ import {
 import SideBarItemText from "./SideBarItemText";
 import SideBarOpener from "./SideBarOpener";
 import StyledLink from "../navigate/StyledLink";
-import { useLocation } from "react-router-dom";
 
 export default function SideBar() {
   const appContentContext = useAppContentContext();
@@ -32,10 +33,8 @@ export default function SideBar() {
   const authContext = useAuthContext();
   const languageContext = useI18nContext();
   const lang = languageContext.of(SideBar);
-  const location = useLocation();
-  const is = (prefix: string) => {
-    return location.pathname.startsWith(prefix);
-  };
+
+  const page = usePageResolver();
 
   return (
     <Drawer
@@ -70,7 +69,7 @@ export default function SideBar() {
         <MenuList sx={{ gap: 2 }}>
           {/* Home */}
           <StyledLink to={"/home"}>
-            <MenuItem selected={is("/home")}>
+            <MenuItem selected={page.is(applicationPages.HOME)}>
               <ListItemIcon>
                 <HomeOutlined fontSize="medium" />
               </ListItemIcon>
@@ -80,7 +79,7 @@ export default function SideBar() {
 
           {/* User */}
           <StyledLink to={"/user"}>
-            <MenuItem selected={is("/user")}>
+            <MenuItem selected={page.is(applicationPages.USER)}>
               <ListItemIcon>
                 <SentimentSatisfiedAltOutlined fontSize="medium" />
               </ListItemIcon>
@@ -90,7 +89,7 @@ export default function SideBar() {
 
           {/* User */}
           <StyledLink to={"/place"}>
-            <MenuItem selected={is("/place")}>
+            <MenuItem selected={page.is(applicationPages.PLACE)}>
               <ListItemIcon>
                 <SentimentSatisfiedAltOutlined fontSize="medium" />
               </ListItemIcon>
@@ -100,7 +99,7 @@ export default function SideBar() {
 
           {/* Location */}
           <StyledLink to={"/location"}>
-            <MenuItem selected={is("/location")}>
+            <MenuItem selected={page.is(applicationPages.SET_LOCATION)}>
               <ListItemIcon>
                 <RoomOutlined fontSize="medium" />
               </ListItemIcon>
@@ -110,7 +109,7 @@ export default function SideBar() {
 
           {/* User Around */}
           <StyledLink to={"/user/around"}>
-            <MenuItem selected={is("/user/around")}>
+            <MenuItem selected={page.is(applicationPages.USER_AROUND)}>
               <ListItemIcon>
                 <People fontSize="medium" />
               </ListItemIcon>
@@ -120,7 +119,7 @@ export default function SideBar() {
 
           {/* Food Around */}
           <StyledLink to={"/food/around"}>
-            <MenuItem selected={is("/food/around")}>
+            <MenuItem selected={page.is(applicationPages.FOOD_AROUND)}>
               <ListItemIcon>
                 <LunchDiningOutlined fontSize="medium" />
               </ListItemIcon>
@@ -131,7 +130,7 @@ export default function SideBar() {
           <Divider />
           {/* Setting */}
           <StyledLink to={"/setting"}>
-            <MenuItem selected={is("/setting")}>
+            <MenuItem selected={page.is(applicationPages.SETTING)}>
               <ListItemIcon>
                 <SettingsOutlined fontSize="medium" />
               </ListItemIcon>

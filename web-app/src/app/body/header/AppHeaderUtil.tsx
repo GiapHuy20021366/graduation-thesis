@@ -5,11 +5,10 @@ import {
   RoomOutlined,
   SearchOutlined,
 } from "@mui/icons-material";
-import { useNavigate } from "react-router";
+import StyledLink from "../../common/navigate/StyledLink";
 // import NotificationProvider from "./utils/notification/NotificationProvider";
 
 export default function AppHeaderUtil() {
-  const navigate = useNavigate();
   const iconStyle: SxProps<Theme> = {
     width: "1.3em",
     height: "1.3em",
@@ -27,36 +26,38 @@ export default function AppHeaderUtil() {
       }}
     >
       <SideBarOpener />
-      {/* <Tooltip arrow title={"Notification"} children={<NotificationProvider />} /> */}
       <Tooltip arrow title={"Add food"}>
-        <IconButton
-          sx={{
-            color: "black",
-          }}
-          onClick={() => navigate("/food/sharing")}
-        >
-          <BookmarkAddOutlined sx={iconStyle} />
-        </IconButton>
+        <StyledLink to={"/food/sharing"}>
+          <IconButton
+            sx={{
+              color: "black",
+            }}
+          >
+            <BookmarkAddOutlined sx={iconStyle} />
+          </IconButton>
+        </StyledLink>
       </Tooltip>
       <Tooltip arrow title={"Location"}>
-        <IconButton
-          sx={{
-            color: "black",
-          }}
-          onClick={() => navigate("/around/users")}
-        >
-          <RoomOutlined sx={iconStyle} />
-        </IconButton>
+        <StyledLink to={"/user/around"}>
+          <IconButton
+            sx={{
+              color: "black",
+            }}
+          >
+            <RoomOutlined sx={iconStyle} />
+          </IconButton>
+        </StyledLink>
       </Tooltip>
       <Tooltip arrow title={"Search"}>
-        <IconButton
-          sx={{
-            color: "black",
-          }}
-          onClick={() => navigate("/food/search")}
-        >
-          <SearchOutlined sx={iconStyle} />
-        </IconButton>
+        <StyledLink to={"/food/search"}>
+          <IconButton
+            sx={{
+              color: "black",
+            }}
+          >
+            <SearchOutlined sx={iconStyle} />
+          </IconButton>
+        </StyledLink>
       </Tooltip>
     </Stack>
   );
