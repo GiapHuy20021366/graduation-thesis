@@ -14,9 +14,9 @@ import {
   useAuthContext,
   useFoodSharingFormContext,
   useI18nContext,
+  useSaveImage,
   useToastContext,
 } from "../../../hooks";
-import { foodFetcher } from "../../../api";
 
 interface IFoodImagesContainerProps {
   maxPicked: number;
@@ -29,6 +29,8 @@ export default function FoodImagesContainer({
   const authContext = useAuthContext();
   const { auth } = authContext;
   const { images, setImages } = formContext;
+  const saveImage = useSaveImage(auth);
+
   const handlePicked = (image: File): void => {
     const reader = new FileReader();
     reader.onload = () => {
@@ -48,27 +50,18 @@ export default function FoodImagesContainer({
     const index = images.length;
     const newImages = [...images, null];
     setImages(newImages);
-    if (auth) {
-      foodFetcher
-        .uploadImage("", image, auth)
-        .then((result) => {
-          const _images = result.data;
-          if (_images) {
-            const image = _images[0];
-            if (image) {
-              const cpyImages = [...images];
-              cpyImages[index] = image;
-              setImages(cpyImages);
-            }
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          const imgsToSet = newImages.slice(0, -1);
-          setImages(imgsToSet);
-          toast.error(lang("error-retry"))
-        });
-    }
+    saveImage.doSave(image, {
+      onSuccess: (image) => {
+        const cpyImages = [...images];
+        cpyImages[index] = image;
+        setImages(cpyImages);
+      },
+      onError: () => {
+        const imgsToSet = newImages.slice(0, -1);
+        setImages(imgsToSet);
+        toast.error(lang("error-retry"));
+      },
+    });
   };
 
   const handleImageRemoved = (index: number): void => {
@@ -135,7 +128,6 @@ export default function FoodImagesContainer({
               sx={{
                 width: "100%",
                 height: "100%",
-                // border: "1px solid black",
               }}
               onPicked={handlePicked}
             />

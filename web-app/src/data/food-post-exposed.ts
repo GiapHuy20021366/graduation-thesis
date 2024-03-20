@@ -41,6 +41,7 @@ export interface IFoodPostExposed {
   updatedAt: string | Date;
   likeCount: number;
   active: boolean;
+  location: ILocation;
 }
 
 export interface IFoodPostExposedWithLike extends IFoodPostExposed {

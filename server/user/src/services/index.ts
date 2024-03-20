@@ -28,7 +28,7 @@ export {
   unFollowUser,
   updateUserPersonal,
   getUser,
-  getFollowers
+  getFollowers,
 } from "./user";
 
 export {
@@ -46,6 +46,4 @@ export {
   getPlacesAround,
   getPlacesRankByFavorite,
   getPlacesRatedByUser,
-  IGetPlaceFollowersParams,
-  getPlaceFollowers,
 } from "./place";

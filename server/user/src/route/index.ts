@@ -104,7 +104,7 @@ const initPlaceRouter = (app: Express) => {
   placeRouter.get("/rating/users/:userId", tokenParser, getRatedPlaces);
 
   // Get subcribers of an place
-  placeRouter.post("/:id/subcriber/search", tokenParser, getPlaceFollowers);
+  placeRouter.post("/:id/subcribe/search", tokenParser, getPlaceFollowers);
 
   placeRouter.use(errorHandler);
   app.use("/places", placeRouter);

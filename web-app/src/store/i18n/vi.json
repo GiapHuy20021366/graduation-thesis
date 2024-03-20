@@ -74,7 +74,8 @@
         "setting": "Cài đặt",
         "avatar": "Avatar",
         "users-around-me": "Mọi người",
-        "foods-around-me": "Thực phẩm"
+        "foods-around-me": "Thực phẩm",
+        "user": "Người dùng"
     },
     "ContentFooter": {
         "home": "Nhà",

@@ -8,10 +8,8 @@ import {
   IPlaceAuthorExposed,
   IPlaceExposed,
   IPlaceFollower,
-  IPlaceFollowerExposed,
   IPlaceRating,
   IRating,
-  Ided,
   InternalError,
   OrderState,
   PlaceType,
@@ -19,7 +17,7 @@ import {
   UnauthorizationError,
   toDistance,
 } from "../data";
-import { Follower, Place, PlaceRating, IUserSchema } from "../db/model";
+import { Follower, Place, PlaceRating } from "../db/model";
 
 export interface IPlaceData extends Omit<IPlace, "author"> {}
 
@@ -706,75 +704,6 @@ export const getPlacesRatedByUser = async (
           time: rating.updatedAt.getTime(),
           user: rating.user.toString(),
         },
-      };
-    });
-};
-
-export interface IGetPlaceFollowersParams {
-  include?: string[]; // include users
-  exclude?: string[]; // exclude users
-  followTypes?: FollowType[];
-  pagination?: IPagination;
-}
-
-export const getPlaceFollowers = async (
-  place: string,
-  params: IGetPlaceFollowersParams
-): Promise<IPlaceFollowerExposed[]> => {
-  const options: any = {};
-  options.role = FollowRole.PLACE;
-  options.place = place;
-
-  const { exclude, followTypes, include, pagination } = params;
-
-  const subcriberOption: any = {};
-  if (exclude && exclude.length > 0) {
-    subcriberOption.$nin = exclude;
-  }
-  if (include && include.length > 0) {
-    subcriberOption.$in = include;
-  }
-  if (Object.keys(subcriberOption).length > 0) {
-    options["subcriber"] = subcriberOption;
-  }
-  if (followTypes && followTypes.length > 0) {
-    options.type = {
-      $in: followTypes,
-    };
-  }
-
-  const followers = await Follower.find(options)
-    .populate<{
-      subcriber: IUserSchema & Ided;
-      place: string;
-    }>("subcriber")
-    .sort({
-      updatedAt: OrderState.DECREASE,
-    })
-    .skip(pagination?.skip ?? 0)
-    .limit(pagination?.limit ?? 24)
-    .exec();
-
-  if (followers == null) {
-    throw new InternalError();
-  }
-  return followers
-    .filter((f) => f.subcriber != null)
-    .map((follower): IPlaceFollowerExposed => {
-      const subcriber = follower.subcriber;
-      return {
-        _id: follower._id.toString(),
-        createdAt: follower.createdAt,
-        updatedAt: follower.updatedAt,
-        place: follower.place,
-        role: follower.role,
-        subcriber: {
-          _id: subcriber._id,
-          firstName: subcriber.firstName,
-          lastName: subcriber.lastName,
-          avatar: subcriber.avatar,
-        },
-        type: follower.type,
       };
     });
 };

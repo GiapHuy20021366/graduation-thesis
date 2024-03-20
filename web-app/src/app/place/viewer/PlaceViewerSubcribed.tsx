@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Divider, Stack, StackProps } from "@mui/material";
 import {
+  IFollowerSearchParams,
   IPagination,
   IPlaceExposed,
   IPlaceFollowerExposed,
@@ -79,8 +80,15 @@ const PlaceViewerSubcribed = React.forwardRef<
     loader.setIsError(false);
     loader.setIsEnd(false);
 
+    const params: IFollowerSearchParams = {
+      pagination: pagination,
+      populate: {
+        subcriber: true,
+      },
+    };
+
     userFetcher
-      .getPlaceFollowers(place._id, { pagination: pagination }, auth)
+      .getPlaceFollowers(place._id, params, auth)
       .then((res) => {
         const data = res.data;
         if (data != null) {

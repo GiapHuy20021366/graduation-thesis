@@ -48,7 +48,7 @@ export default function PlaceViewerData({ data }: PlaceViewerDataProps) {
         icon={<Add />}
         ariaLabel={"Add food"}
         sx={{ position: "absolute", bottom: 76, right: 26 }}
-        onClick={() => navigate("/food/sharing?target=place&id=" + data._id)}
+        onClick={() => navigate(`/food/sharing?place=${data._id}`)}
       />
     </Stack>
   );

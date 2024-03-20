@@ -19,6 +19,7 @@ import { useAuthContext } from "../../../hooks";
 
 interface IFoodSearchContextProviderProps {
   children?: React.ReactNode;
+  categories?: FoodCategory[];
 }
 
 interface IFoodSearchContextSnapshotData {
@@ -105,9 +106,12 @@ export const FoodSearchContext = createContext<IFoodSearchContext>({
 
 export default function FoodSearchContextProvider({
   children,
+  categories: targetCategories,
 }: IFoodSearchContextProviderProps) {
   const [maxDistance, setMaxDistance] = useState<number | undefined>();
-  const [categories, setCategories] = useState<FoodCategory[] | undefined>();
+  const [categories, setCategories] = useState<FoodCategory[] | undefined>(
+    targetCategories
+  );
   const [maxDuration, setMaxDuration] = useState<number | undefined>();
   const [query, setQuery] = useState<string>("");
   const [minQuantity, setMinQuantity] = useState<number>();

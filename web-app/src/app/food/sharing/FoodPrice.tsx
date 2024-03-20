@@ -11,15 +11,30 @@ import {
 import { useFoodSharingFormContext, useI18nContext } from "../../../hooks";
 import { useRef, useState } from "react";
 
+const priceOptions = {
+  OTHER: -1,
+  FREE: 0,
+  TEN_THOUSANDS: 9999,
+  THIRTY_THOUSANDS: 29999,
+  FIFTY_THOUSANDS: 49999,
+  ONE_HUNDRED: 99999,
+  TWO_HUNDREDS: 199999,
+} as const;
+
+type PriceOption = (typeof priceOptions)[keyof typeof priceOptions];
+
 export default function FoodPrice() {
   const formContext = useFoodSharingFormContext();
   const { price, setPrice } = formContext;
   const languageContext = useI18nContext();
   const lang = languageContext.of(FoodPrice);
+  const [priceOption, setPriceOption] = useState<PriceOption>(
+    Object.values(priceOptions).includes(price as PriceOption)
+      ? (price as PriceOption)
+      : priceOptions.OTHER
+  );
 
   const selectRef = useRef<HTMLSelectElement>(null);
-
-  const [custom, setCustom] = useState<boolean>(false);
 
   const onPriceChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -43,7 +58,11 @@ export default function FoodPrice() {
 
   const onSelectPriceChange = (event: SelectChangeEvent): void => {
     const value = +event.target.value;
-    setCustom(value === -1);
+    if (Object.values(priceOptions).includes(value as PriceOption)) {
+      setPriceOption(value as PriceOption);
+    } else {
+      setPriceOption(priceOptions.OTHER);
+    }
     value >= 0 && setPrice(value);
   };
 
@@ -66,19 +85,29 @@ export default function FoodPrice() {
           variant="standard"
           disableUnderline={true}
           displayEmpty={true}
-          value={String(price)}
+          value={String(priceOption)}
           onChange={onSelectPriceChange}
           sx={{
             flex: 1,
           }}
           ref={selectRef}
         >
-          <MenuItem value={0}>{lang("FREE")}</MenuItem>
-          <MenuItem value={9999}>{lang("9 999 VNĐ")}</MenuItem>
-          <MenuItem value={29999}>{lang("29 999 VNĐ")}</MenuItem>
-          <MenuItem value={49999}>{lang("49 999 VNĐ")}</MenuItem>
-          <MenuItem value={99999}>{lang("99 999 VNĐ")}</MenuItem>
-          <MenuItem value={199999}>{lang("199 999 VNĐ")}</MenuItem>
+          <MenuItem value={priceOptions.FREE}>{lang("FREE")}</MenuItem>
+          <MenuItem value={priceOptions.TEN_THOUSANDS}>
+            {lang("9 999 VNĐ")}
+          </MenuItem>
+          <MenuItem value={priceOptions.THIRTY_THOUSANDS}>
+            {lang("29 999 VNĐ")}
+          </MenuItem>
+          <MenuItem value={priceOptions.FIFTY_THOUSANDS}>
+            {lang("49 999 VNĐ")}
+          </MenuItem>
+          <MenuItem value={priceOptions.ONE_HUNDRED}>
+            {lang("99 999 VNĐ")}
+          </MenuItem>
+          <MenuItem value={priceOptions.TWO_HUNDREDS}>
+            {lang("199 999 VNĐ")}
+          </MenuItem>
           <MenuItem value={-1}>{lang("CUSTOM")}</MenuItem>
         </Select>
         <TextField
@@ -88,7 +117,7 @@ export default function FoodPrice() {
           onChange={onPriceChange}
           fullWidth
           sx={{
-            display: custom ? "block" : "none",
+            display: priceOption === priceOptions.OTHER ? "block" : "none",
             flex: 1,
           }}
           InputProps={{

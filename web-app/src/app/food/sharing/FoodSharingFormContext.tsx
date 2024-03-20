@@ -28,6 +28,7 @@ interface IFoodSharingFormContext {
   title: string;
   description: string;
   place?: string;
+  isEditable: boolean;
 
   setImages: Dispatch<SetStateAction<(IImageExposed | null)[]>>;
   setCategories: Dispatch<SetStateAction<FoodCategory[]>>;
@@ -59,6 +60,7 @@ const defaultSharingContext: IFoodSharingFormContext = {
   quantity: toQuantityLevel(QuantityType.TOTAL_GOOD),
   title: "",
   description: "",
+  isEditable: false,
 
   setCategories: () => {},
   setDuration: () => {},
@@ -95,11 +97,13 @@ const toImageExposeds = (
 interface IFoodSharingFormContextProviderProps {
   children?: React.ReactNode;
   preData?: IFoodPostExposedWithLike;
+  place?: string | null;
 }
 
 export default function FoodSharingFormContextProvider({
   children,
   preData,
+  place: targetPlace,
 }: IFoodSharingFormContextProviderProps) {
   // Props state from edit function
   const defaultData = preData ?? defaultSharingContext;
@@ -127,10 +131,13 @@ export default function FoodSharingFormContextProvider({
   const [quantity, setQuantity] = useState<number>(defaultData.quantity);
   const [title, setTitle] = useState<string>(defaultData.title);
   const [description, setDescription] = useState<string>(
-    defaultData.description
+    defaultData.description ?? ""
   );
   const [place, setPlace] = useState<string | undefined>(
-    typeof preData?.place === "string" ? preData?.place : preData?.place?._id
+    targetPlace ??
+      (typeof preData?.place === "string"
+        ? preData?.place
+        : preData?.place?._id)
   );
 
   const setLocationName = (name: string) => {
@@ -191,6 +198,7 @@ export default function FoodSharingFormContextProvider({
         place,
         setPlace,
 
+        isEditable: preData != null,
         editDataRef,
       }}
     >

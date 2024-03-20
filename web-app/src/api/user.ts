@@ -50,7 +50,7 @@ export const userEndpoints = {
   getPlaceByFollow: "/places/follow/users/:userId",
   getRankPlaceByFavorite: "/places/rank/favorite",
   getRatedPlaces: "/places/rating/users/:userId",
-  getPlaceFollowers: "/places/:id/follow/search",
+  getPlaceFollowers: "/places/:id/subcribe/search",
 } as const;
 
 export interface UserResponseError
