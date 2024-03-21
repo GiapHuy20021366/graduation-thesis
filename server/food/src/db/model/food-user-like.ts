@@ -1,28 +1,20 @@
-import {
-  Model,
-  Schema,
-  model,
-  Document,
-  ObjectId,
-  SchemaTypes,
-} from "mongoose";
+import { Model, Schema, model, ObjectId, SchemaTypes } from "mongoose";
 import collections from "../collections";
-import { IFoodUserLike } from "../../data";
+import { IFoodUserLike, Timed } from "../../data";
 
-export interface FoodUserLikeDocument
+export interface IIFoodUserLikeSchema
   extends Omit<IFoodUserLike, "foodPost">,
-    Document {
-  createdAt: Date;
+    Pick<Timed, "createdAt"> {
   foodPost: ObjectId;
 }
 
 interface IFoodUserLikeMethods {}
 
 interface IFoodUserLikeModel
-  extends Model<FoodUserLikeDocument, {}, IFoodUserLikeMethods> {}
+  extends Model<IIFoodUserLikeSchema, {}, IFoodUserLikeMethods> {}
 
 const foodUserLikeSchema = new Schema<
-  FoodUserLikeDocument,
+  IIFoodUserLikeSchema,
   IFoodUserLikeModel,
   IFoodUserLikeMethods
 >({
@@ -47,7 +39,7 @@ const foodUserLikeSchema = new Schema<
 
 // Methods
 
-export const FoodUserLike = model<FoodUserLikeDocument, IFoodUserLikeModel>(
+export const FoodUserLike = model<IIFoodUserLikeSchema, IFoodUserLikeModel>(
   "FoodUserLike",
   foodUserLikeSchema,
   collections.foodUserLike

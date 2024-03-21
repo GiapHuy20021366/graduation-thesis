@@ -1,12 +1,12 @@
 import { ILocation } from "./location";
 import { PlaceType } from "./place-type";
+import { Ided } from "./schemad";
 
 export interface IFoodPostLocation extends ILocation {
   two_array?: number[];
 }
 
-export interface IFoodPostPlace {
-  _id: string;
+export interface IFoodPostPlace extends Ided {
   type: PlaceType;
 }
 

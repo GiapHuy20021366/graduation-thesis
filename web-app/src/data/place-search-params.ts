@@ -1,5 +1,7 @@
-import { ICoordinates, IPagination, PlaceType } from ".";
+import { ICoordinates } from "./coordinates";
 import { OrderState } from "./order-state";
+import { PlaceType } from "./place-type";
+import { Paginationed, Queried } from "./schemad";
 
 export interface IPlaceSearchAuthor {
   include?: string[];
@@ -22,12 +24,10 @@ export interface IPlaceSearchRating {
   max?: number;
 }
 
-export interface IPlaceSearchParams {
-  query?: string;
+export interface IPlaceSearchParams extends Paginationed, Queried {
   author?: IPlaceSearchAuthor;
   distance?: IPlaceSearchDistance;
   order?: IPlaceSearchOrder;
-  pagination?: IPagination;
   types?: PlaceType[];
   rating?: IPlaceSearchRating;
 }

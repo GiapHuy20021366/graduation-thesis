@@ -1,6 +1,6 @@
 import { ICoordinates } from "./coordinates";
 import { OrderState } from "./order-state";
-import { IPagination } from "./pagination";
+import { Paginationed, Queried } from "./schemad";
 
 export interface IUserSearchDistance {
   max: number;
@@ -13,9 +13,7 @@ export interface IUserSearchOrder {
   like?: OrderState;
 }
 
-export interface IUserSearchParams {
-  query?: string;
+export interface IUserSearchParams extends Paginationed, Queried {
   distance?: IUserSearchDistance;
-  pagination?: IPagination;
   order?: IUserSearchOrder;
 }

@@ -1,9 +1,9 @@
-import { PlaceType } from ".";
 import { ICoordinates } from "./coordinates";
 import { FoodCategory } from "./food-category";
 import { ItemAvailable } from "./item-available";
 import { OrderState } from "./order-state";
-import { IPagination } from "./pagination";
+import { PlaceType } from "./place-type";
+import { Paginationed, Queried } from "./schemad";
 
 export interface IFoodSearchPrice {
   min?: number;
@@ -38,10 +38,9 @@ export interface IFoodSearchPopulate {
   place?: boolean;
 }
 
-export interface IFoodSearchParams {
+export interface IFoodSearchParams extends Queried, Paginationed {
   user?: IFoodSearchUser;
   place?: IFoodSearchPlace;
-  query?: string;
   distance?: IFoodSearchDistance;
   category?: FoodCategory[];
   maxDuration?: number; // time left
@@ -51,6 +50,5 @@ export interface IFoodSearchParams {
   available?: ItemAvailable;
   active?: boolean;
   order?: IFoodSeachOrder;
-  pagination?: IPagination;
   populate?: IFoodSearchPopulate;
 }

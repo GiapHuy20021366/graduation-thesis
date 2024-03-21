@@ -136,7 +136,16 @@ export {
   isPlaceFollower,
   isUserFollower,
 } from "./follower-exposed";
-export { type Schemad, type Ided, type Named, type Timed } from "./schemad";
+export {
+  type Schemad,
+  type Ided,
+  type Named,
+  type Timed,
+  type Actived,
+  type Edited,
+  type Paginationed,
+  type Queried,
+} from "./schemad";
 export {
   type IFollowerSearchDuration,
   type IFollowerSearchParams,

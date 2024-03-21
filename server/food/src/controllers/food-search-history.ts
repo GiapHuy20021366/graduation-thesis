@@ -1,15 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 import {
-  IPagination,
+  Paginationed,
   toHistorySearchParams,
   toResponseSuccessData,
 } from "../data";
 import { searchHistory as searchHistoryService } from "../services";
+import { Queried } from "~/data/schemad";
 
-interface ISearchHistoryBody {
+interface ISearchHistoryBody extends Paginationed, Queried {
   users?: string[];
-  query?: string;
-  pagination?: IPagination;
 }
 export const searchHistory = async (
   req: Request<{}, {}, ISearchHistoryBody, {}>,

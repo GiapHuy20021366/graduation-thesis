@@ -16,16 +16,16 @@ const foodRouter = express.Router();
 export const initUserRouters = (app: Express): void => {
   foodRouter.post("/images", tokenParser, uploadImages);
 
-  foodRouter.post("/foods", tokenParser, postFood);
-  foodRouter.put("/foods/:id", tokenParser, updateFoodPost);
+  foodRouter.post("/", tokenParser, postFood);
+  foodRouter.put("/:id", tokenParser, updateFoodPost);
 
-  foodRouter.post("/foods/search", tokenParser, searchFoodPost);
-  foodRouter.post("/foods/search/history", tokenParser, searchHistory);
-  foodRouter.get("/foods/:id", tokenParser, findFoodPost);
-  foodRouter.put("/foods/:id/like", tokenParser, likeOrUnlikeFoodPost);
+  foodRouter.post("/search", tokenParser, searchFoodPost);
+  foodRouter.post("/search/history", tokenParser, searchHistory);
+  foodRouter.get("/:id", tokenParser, findFoodPost);
+  foodRouter.put("/:id/like", tokenParser, likeOrUnlikeFoodPost);
 
-  foodRouter.get("/foods/like/users/:userId", tokenParser, getLikedFoodPost);
+  foodRouter.get("/like/users/:userId", tokenParser, getLikedFoodPost);
 
   foodRouter.use(errorHandler);
-  app.use("/", foodRouter);
+  app.use("/foods/", foodRouter);
 };

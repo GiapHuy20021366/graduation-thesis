@@ -4,6 +4,7 @@ import { IPlaceRating, Timed } from "../../data";
 
 export interface IPlaceRatingSchema
   extends Omit<IPlaceRating, "place" | "user">,
+    Timed,
     Timed {
   place: ObjectId;
   user: ObjectId;

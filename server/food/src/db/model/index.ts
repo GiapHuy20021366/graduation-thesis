@@ -1,3 +1,7 @@
-export { Image, ImageDocument } from "./image";
+export { Image, IIImageSchema } from "./image";
 export { FoodPost, IFoodPostSchema, FoodPostMappings } from "./food-post";
-export { FoodUserLike, FoodUserLikeDocument } from "./food-user-like";
+export { FoodUserLike, IIFoodUserLikeSchema } from "./food-user-like";
+export {
+  FoodSeachHistory,
+  IFoodSearchHistorySchema,
+} from "./food-search-history";

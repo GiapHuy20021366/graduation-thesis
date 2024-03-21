@@ -23,6 +23,8 @@ import {
   IUserExposedSimple,
   IPersonalDataUpdate,
   IFollowerExposed,
+  Paginationed,
+  Queried,
 } from "../data";
 
 export const userEndpoints = {
@@ -92,8 +94,7 @@ interface ManualRegisterInfo {
   password: string;
 }
 
-export interface IGetUserNearParams {
-  pagination?: IPagination;
+export interface IGetUserNearParams extends Paginationed {
   coordinate: ICoordinates;
   maxDistance: number;
 }
@@ -113,20 +114,17 @@ export interface IPlaceSearchOrder {
   rating?: OrderState;
 }
 
-export interface IPlaceSearchParams {
-  query?: string;
+export interface IPlaceSearchParams extends Paginationed, Queried {
   author?: string;
   maxDistance?: number;
   minRating?: number;
   order?: IPlaceSearchOrder;
   currentLocation?: ICoordinates;
-  pagination?: IPagination;
   types?: PlaceType[];
 }
 
-export interface IGetPlacesByFollowParams {
+export interface IGetPlacesByFollowParams extends Paginationed {
   followTypes?: FollowType[];
-  pagination?: IPagination;
   placeTypes?: PlaceType[];
 }
 

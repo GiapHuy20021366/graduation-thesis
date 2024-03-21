@@ -1,5 +1,6 @@
-export interface IConversationParticipantMeta {
-  id: string;
+import { Ided } from "./schemad";
+
+export interface IConversationParticipantMeta extends Ided {
   joinTime: Date;
   addedBy?: string;
 }

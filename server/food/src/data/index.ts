@@ -90,5 +90,13 @@ export {
   IFoodPostExposedUser,
 } from "./food-post-exposed";
 export { PlaceType } from "./place-type";
-
 export { ILocation } from "./location";
+export {
+  Ided,
+  Named,
+  Schemad,
+  Timed,
+  Actived,
+  Edited,
+  Paginationed,
+} from "./schemad";

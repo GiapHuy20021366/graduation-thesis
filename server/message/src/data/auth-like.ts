@@ -1,4 +1,5 @@
-export interface AuthLike {
-  _id: string;
+import { Ided } from "./schemad";
+
+export interface AuthLike extends Ided {
   email: string;
 }

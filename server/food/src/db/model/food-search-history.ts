@@ -1,20 +1,18 @@
-import { Model, Schema, model, Document } from "mongoose";
+import { Model, Schema, model } from "mongoose";
 import collections from "../collections";
-import { IFoodSearchHistory } from "../../data";
+import { IFoodSearchHistory, Timed } from "../../data";
 
-export interface FoodSearchHistoryDocument
+export interface IFoodSearchHistorySchema
   extends IFoodSearchHistory,
-    Document {
-  createdAt: Date;
-}
+    Pick<Timed, "createdAt"> {}
 
 interface IFoodSearchHistoryMethods {}
 
 interface IFoodSearchHistoryModel
-  extends Model<FoodSearchHistoryDocument, {}, IFoodSearchHistoryMethods> {}
+  extends Model<IFoodSearchHistorySchema, {}, IFoodSearchHistoryMethods> {}
 
 const foodSeachHistorySchema = new Schema<
-  FoodSearchHistoryDocument,
+  IFoodSearchHistorySchema,
   IFoodSearchHistoryModel,
   IFoodSearchHistoryMethods
 >({
@@ -70,7 +68,7 @@ const foodSeachHistorySchema = new Schema<
 // Methods
 
 export const FoodSeachHistory = model<
-  FoodSearchHistoryDocument,
+  IFoodSearchHistorySchema,
   IFoodSearchHistoryModel
 >("FoodSeachHistory", foodSeachHistorySchema, collections.foodSearchHistory);
 

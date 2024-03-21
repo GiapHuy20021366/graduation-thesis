@@ -1,11 +1,8 @@
 import { Model, Schema, model } from "mongoose";
 import collections from "../collections";
-import { IConversation } from "../../data";
+import { IConversation, Timed } from "../../data";
 
-export interface IConversationSchema extends IConversation {
-  createdAt: Date;
-  updatedAt: Date;
-}
+export interface IConversationSchema extends IConversation, Timed {}
 
 interface IConversationMethods {}
 
@@ -24,7 +21,7 @@ const conversationSchema = new Schema<
   },
   meta: [
     {
-      id: {
+      _id: {
         type: String,
         required: true,
         index: true,

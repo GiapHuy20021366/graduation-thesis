@@ -1,10 +1,8 @@
 import { isAllObjectId, isNotEmptyString, isNumber } from "./data-validate";
-import { IPagination } from "./pagination";
+import { Paginationed, Queried } from "./schemad";
 
-export interface IHistorySearchParams {
+export interface IHistorySearchParams extends Paginationed, Queried {
   users?: string[];
-  query?: string;
-  pagination?: IPagination;
 }
 
 export const toHistorySearchParams = (value: any): IHistorySearchParams => {

@@ -47,3 +47,13 @@ export {
 } from "./data-validate";
 export { IConversationExposed } from "./conversation-exposed";
 export { IConversationMessageExposed } from "./conversation-message-exposed";
+export {
+  Actived,
+  Edited,
+  Ided,
+  Named,
+  Schemad,
+  Timed,
+  Paginationed,
+  Queried,
+} from "./schemad";

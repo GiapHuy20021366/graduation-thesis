@@ -8,6 +8,7 @@ import {
   IPersonalDataUpdate,
   IUserSearchParams,
   InvalidDataError,
+  Paginationed,
   UnauthorizationError,
   isCoordinates,
   isLocation,
@@ -29,9 +30,8 @@ import {
   getFollowers,
 } from "../services";
 
-interface ISearchUsersAroundParams {
+interface ISearchUsersAroundParams extends Paginationed {
   currentLocation?: ICoordinates;
-  pagination?: IPagination;
   maxDistance?: number;
 }
 

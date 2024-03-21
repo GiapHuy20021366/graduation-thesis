@@ -1,12 +1,11 @@
 import { Model, Schema, model } from "mongoose";
 import collections from "../collections";
-import { IConversationMessage } from "../../data";
+import { IConversationMessage, Timed } from "../../data";
 
 export interface IConversationMessageSchema
-  extends Omit<IConversationMessage, "conversation"> {
+  extends Omit<IConversationMessage, "conversation">,
+    Timed {
   conversation: Schema.Types.ObjectId;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 interface IConversationMessageMethods {}

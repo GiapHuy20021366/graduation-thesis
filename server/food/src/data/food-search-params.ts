@@ -1,4 +1,6 @@
 import {
+  Actived,
+  Paginationed,
   PlaceType,
   isAllNotEmptyString,
   isAllObjectId,
@@ -17,7 +19,7 @@ import {
 } from "./data-validate";
 import { ItemAvailable } from "./item-available";
 import { OrderState } from "./order-state";
-import { IPagination } from "./pagination";
+import { Queried } from "./schemad";
 
 export interface IFoodSearchPrice {
   min?: number;
@@ -51,10 +53,12 @@ export interface IFoodSearchPopulate {
   place?: boolean;
 }
 
-export interface IFoodSearchParams {
+export interface IFoodSearchParams
+  extends Paginationed,
+    Queried,
+    Partial<Actived> {
   user?: IFoodSearchUser;
   place?: IFoodSearchPlace;
-  query?: string;
   distance?: IFoodSearchDistance;
   category?: string | string[];
   maxDuration?: number; // time left
@@ -62,9 +66,7 @@ export interface IFoodSearchParams {
   minQuantity?: number;
   addedBy?: PlaceType | PlaceType[];
   available?: ItemAvailable;
-  active?: boolean;
   order?: IFoodSeachOrder;
-  pagination?: IPagination;
   populate?: IFoodSearchPopulate;
 }
 

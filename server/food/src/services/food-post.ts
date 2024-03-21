@@ -198,7 +198,7 @@ export const findFoodPostById = async (
     if (liked != null) {
       result.liked = true;
       result.like = {
-        _id: liked._id,
+        _id: liked._id.toString(),
         createdAt: liked.createdAt,
         foodPost: foodPost._id.toString(),
         user: userId,
@@ -591,7 +591,7 @@ export const getLikedFood = async (
         liked: true,
         place: post.place,
         like: {
-          _id: like._id,
+          _id: like._id.toString(),
           createdAt: like.createdAt,
           foodPost: post._id,
           user: userId,

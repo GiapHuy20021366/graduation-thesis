@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import {
   AuthLike,
+  IFoodPost,
   IFoodSearchParams,
   IPagination,
   InvalidDataError,
@@ -25,21 +26,13 @@ import {
   getLikedFood as getLikedFoodPostService,
 } from "../services";
 
-interface IPostFoodBody {
-  images?: string[];
-  title?: string;
-  location?: any;
-  categories?: string[];
-  description?: string;
-  quantity?: number;
-  duration?: Date; // number | string
-  price?: number;
+interface IPostFoodUploadData
+  extends Omit<Partial<IFoodPost>, "place" | "user"> {
   place?: string;
 }
 
-interface IPostFoodExtend extends IPostFoodBody {
+interface IPostFoodExtend extends IPostFoodUploadData {
   user?: string;
-  place?: string;
 }
 
 const validatePostFoodBody = (data: IPostFoodExtend): data is IPostFoodData => {
@@ -82,7 +75,7 @@ const validatePostFoodBody = (data: IPostFoodExtend): data is IPostFoodData => {
 };
 
 export const postFood = async (
-  req: Request<{}, {}, IPostFoodBody, {}>,
+  req: Request<{}, {}, IPostFoodUploadData, {}>,
   res: Response,
   next: NextFunction
 ) => {
@@ -102,21 +95,18 @@ export const postFood = async (
   }
 };
 
-interface IUpdateFoodPostBody extends IPostFoodBody {
-  _id?: string;
-}
 export const updateFoodPost = async (
-  req: Request<{}, {}, IUpdateFoodPostBody, {}>,
+  req: Request<{ id: string }, {}, IPostFoodUploadData, {}>,
   res: Response,
   next: NextFunction
 ) => {
-  const id = req.body._id;
+  const id = req.params.id;
   const auth = req.authContext as AuthLike;
 
   if (!isObjectId(id)) {
     return next(
       new InvalidDataError({
-        message: `Invalid _id: ${req.body._id}`,
+        message: `Invalid _id: ${id}`,
         data: {
           target: "_id",
           reason: "invalid",
@@ -124,6 +114,7 @@ export const updateFoodPost = async (
       })
     );
   }
+
   const valData: IPostFoodExtend = {
     ...req.body,
     user: auth._id,

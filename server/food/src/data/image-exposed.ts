@@ -1,5 +1,6 @@
-export interface IImageExposed {
-    name: string;
-    url: string;
-    _id: string;
+import { Ided } from "./schemad";
+
+export interface IImageExposed extends Ided {
+  name: string;
+  url: string;
 }

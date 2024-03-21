@@ -99,7 +99,6 @@ export {
   IUserSearchParams,
   toUserSearchParams,
 } from "./user-search-params";
-export { Ided, Named, Schemad, Timed } from "./schemad";
 export {
   IFollowerBaseExposed,
   IFollowerExposed,
@@ -139,3 +138,13 @@ export {
   toFollowerSearchOrder,
   toFollowerSearchParams,
 } from "./follower-search-params";
+export {
+  Actived,
+  Edited,
+  Ided,
+  Named,
+  Paginationed,
+  Queried,
+  Schemad,
+  Timed,
+} from "./schemad";

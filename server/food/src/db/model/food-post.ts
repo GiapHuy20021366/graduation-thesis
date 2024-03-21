@@ -1,13 +1,9 @@
 import { Model, Schema, model } from "mongoose";
 import collections from "../collections";
-import { IImage, IFoodPost } from "../../data";
+import { IImage, IFoodPost, Timed, Actived, Edited } from "../../data";
 
-export interface IFoodPostSchema extends IFoodPost {
-  isEdited: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+export interface IFoodPostSchema extends IFoodPost, Timed, Actived, Edited {
   likeCount: number;
-  active: boolean;
 }
 
 interface IFoodPostMethods {}

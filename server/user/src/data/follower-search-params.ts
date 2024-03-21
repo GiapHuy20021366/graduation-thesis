@@ -8,7 +8,7 @@ import {
 import { FollowRole, FollowType } from "./follower";
 import { IIncludeAndExclude, toIncludeAndExclude } from "./include-and-exclude";
 import { OrderState } from "./order-state";
-import { IPagination } from "./pagination";
+import { Paginationed } from "./schemad";
 
 export interface IFollowerSearchPlace extends IIncludeAndExclude {}
 
@@ -31,14 +31,13 @@ export interface IFollowerSearchPopulate {
   subcriber?: boolean;
 }
 
-export interface IFollowerSearchParams {
+export interface IFollowerSearchParams extends Paginationed {
   place?: IFollowerSearchPlace;
   user?: IFollowerSearchUser;
   subcriber?: IFollowerSearchSubcriber;
   role?: FollowRole[];
   type?: FollowType[];
   duration?: IFollowerSearchDuration;
-  pagination?: IPagination;
   order?: IFollowerSearchOrder;
   populate?: IFollowerSearchPopulate;
 }
@@ -92,7 +91,7 @@ export const toFollowerSearchParams = (value: any): IFollowerSearchParams => {
 
   const populate = value.populate;
   if (typeof populate === "object") {
-    const {user, place, subcriber} = populate;
+    const { user, place, subcriber } = populate;
     const populateValue: IFollowerSearchPopulate = {};
     if (typeof user === "boolean") {
       populateValue.user = user;

@@ -1,5 +1,4 @@
 import { IConversationSchema } from "../db/model";
+import { Ided } from "./schemad";
 
-export interface IConversationExposed extends IConversationSchema {
-  _id: string;
-}
+export interface IConversationExposed extends IConversationSchema, Ided {}

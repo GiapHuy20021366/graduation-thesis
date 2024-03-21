@@ -12,6 +12,7 @@ import {
   IFoodPostExposedWithLike,
   IFoodSearchParams,
   IPagination,
+  Queried,
 } from "../data";
 
 export const foodEndpoints = {
@@ -49,9 +50,8 @@ export interface IFoodUploadResponseData {
   active: boolean;
 }
 
-export interface IFoodSearchHistoryParams {
+export interface IFoodSearchHistoryParams extends Queried {
   users?: string[];
-  query?: string;
 }
 
 export interface IFoodSearchHistorySimple {

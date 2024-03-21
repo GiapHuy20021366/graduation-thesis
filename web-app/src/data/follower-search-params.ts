@@ -1,4 +1,6 @@
-import { FollowRole, FollowType, IPagination, OrderState } from ".";
+import { FollowRole, FollowType } from "./follower";
+import { OrderState } from "./order-state";
+import { Paginationed } from "./schemad";
 
 export interface IFollowerSearchPlace {
   include?: string[];
@@ -30,14 +32,13 @@ export interface IFollowerSearchPopulate {
   subcriber?: boolean;
 }
 
-export interface IFollowerSearchParams {
+export interface IFollowerSearchParams extends Paginationed {
   role?: FollowRole[];
   type?: FollowType[];
   place?: IFollowerSearchPlace;
   user?: IFollowerSearchUser;
   subcriber?: IFollowerSearchSubcriber;
   duration?: IFollowerSearchDuration;
-  pagination?: IPagination;
   order?: IFollowerSearchOrder;
   populate?: IFollowerSearchPopulate;
 }

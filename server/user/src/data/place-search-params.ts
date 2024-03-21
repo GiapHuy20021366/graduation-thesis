@@ -1,8 +1,9 @@
 import {
   ICoordinates,
   IIncludeAndExclude,
-  IPagination,
+  Paginationed,
   PlaceType,
+  Queried,
   isArrayPlaceTypes,
   isCoordinates,
   isNotEmptyString,
@@ -31,12 +32,10 @@ export interface IPlaceSearchRating {
   max?: number;
 }
 
-export interface IPlaceSearchParams {
-  query?: string;
+export interface IPlaceSearchParams extends Paginationed, Queried {
   author?: IPlaceSearchAuthor;
   distance?: IPlaceSearchDistance;
   order?: IPlaceSearchOrder;
-  pagination?: IPagination;
   types?: PlaceType[];
   rating?: IPlaceSearchRating;
 }

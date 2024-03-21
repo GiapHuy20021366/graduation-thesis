@@ -22,6 +22,7 @@ import {
   IPagination,
   IPlaceSearchParams,
   InvalidDataError,
+  Paginationed,
   PlaceType,
   isAllNotEmptyString,
   isArrayFollowTypes,
@@ -268,9 +269,8 @@ export const getPlaceInfo = async (
     .catch(next);
 };
 
-interface IGetPlacesParams {
+interface IGetPlacesParams extends Paginationed {
   followTypes?: FollowType[];
-  pagination?: IPagination;
   placeTypes?: PlaceType[];
 }
 
