@@ -1,12 +1,13 @@
-import { Stack, StackProps } from "@mui/material";
+import { Button, Stack, StackProps, Typography } from "@mui/material";
 import React from "react";
 
 type ListEndProps = StackProps & {
   active: boolean;
+  onRetry?: () => void;
 };
 
 const ListEnd = React.forwardRef<HTMLDivElement, ListEndProps>((props, ref) => {
-  const { active, ...rest } = props;
+  const { active, onRetry, ...rest } = props;
   return (
     <Stack
       ref={ref}
@@ -16,7 +17,8 @@ const ListEnd = React.forwardRef<HTMLDivElement, ListEndProps>((props, ref) => {
       {...rest}
       display={active ? "flex" : "none"}
     >
-      Đã hết
+      <Typography>Đã hết</Typography>
+      {onRetry && <Button onClick={() => onRetry()}>Thử lại</Button>}
     </Stack>
   );
 });

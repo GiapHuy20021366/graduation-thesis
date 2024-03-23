@@ -135,5 +135,5 @@ export const toNotificationGroups = (
     }
   });
 
-  return result.sort((a, b) => a.maxTime.getTime() - b.maxTime.getTime());
+  return result.sort((a, b) => b.maxTime.getTime() - a.maxTime.getTime());
 };

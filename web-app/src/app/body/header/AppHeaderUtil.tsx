@@ -2,11 +2,11 @@ import { IconButton, Stack, SxProps, Theme, Tooltip } from "@mui/material";
 import SideBarOpener from "../../common/menu-side/SideBarOpener";
 import {
   BookmarkAddOutlined,
-  RoomOutlined,
+  // RoomOutlined,
   SearchOutlined,
 } from "@mui/icons-material";
 import StyledLink from "../../common/navigate/StyledLink";
-// import NotificationProvider from "./utils/notification/NotificationProvider";
+import NotificationButtonAction from "./utils/notification/NotificationButtonAction";
 
 export default function AppHeaderUtil() {
   const iconStyle: SxProps<Theme> = {
@@ -37,7 +37,10 @@ export default function AppHeaderUtil() {
           </IconButton>
         </StyledLink>
       </Tooltip>
-      <Tooltip arrow title={"Location"}>
+      <Tooltip arrow title={"Notification"}>
+        <NotificationButtonAction />
+      </Tooltip>
+      {/* <Tooltip arrow title={"Location"}>
         <StyledLink to={"/user/around"}>
           <IconButton
             sx={{
@@ -47,7 +50,7 @@ export default function AppHeaderUtil() {
             <RoomOutlined sx={iconStyle} />
           </IconButton>
         </StyledLink>
-      </Tooltip>
+      </Tooltip> */}
       <Tooltip arrow title={"Search"}>
         <StyledLink to={"/food/search"}>
           <IconButton

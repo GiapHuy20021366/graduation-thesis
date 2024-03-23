@@ -36,3 +36,5 @@ export {
   applicationPages,
   usePageResolver,
 } from "./usePageResolver";
+export { useDirty } from "./useDirty";
+export { useNotificationContext } from "./useNotificationContext";

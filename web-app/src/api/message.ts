@@ -6,10 +6,12 @@ import {
   IConversationMessageExposed,
   INotificationExposed,
   IPagination,
+  NotificationType,
   ResponseErrorLike,
   ResponseLike,
   UserErrorReason,
   UserErrorTarget,
+  durations,
 } from "../data";
 
 export const messageEndpoints = {
@@ -67,7 +69,8 @@ export interface MessageFetcher {
 
   getNotifications: (
     latestTime: number,
-    limit: number
+    limit: number,
+    auth: IAuthInfo
   ) => Promise<MessageResponse<INotificationExposed[]>>;
 }
 
@@ -135,11 +138,48 @@ export const messageFetcher: MessageFetcher = {
 
   getNotifications: (
     before: number,
-    limit: number
+    limit: number,
+    auth: IAuthInfo
   ): Promise<MessageResponse<INotificationExposed[]>> => {
-    console.log(before, limit);
+    console.log(before, limit, auth);
     return Promise.resolve({
-      data: [],
+      data: fakeNotification(),
     });
   },
+};
+
+const fakeNotification = (): INotificationExposed[] => {
+  const result: INotificationExposed[] = [];
+
+  const current = Date.now();
+  const types = Object.values(NotificationType);
+  let idx = 0;
+  types.forEach((type) => {
+    const limit = [
+      NotificationType.FOOD_EXPIRED,
+      NotificationType.FOOD_NEAR_EXPIRED,
+      NotificationType.FOOD_SUBCRIBED_PLACE,
+      NotificationType.FOOD_SUBCRIBED_USER,
+      NotificationType.FOOD_SUGGESTED_AROUND,
+      NotificationType.FOOD_SUGGESTED_CATEGORY,
+    ].includes(type)
+      ? 50
+      : 5;
+    for (let i = 0; i < limit; ++i) {
+      const time = current - durations.TEN_MINUTES * i - idx * 1000;
+      result.push({
+        user: "123",
+        _id: String(Date.now() + ++idx),
+        createdAt: new Date(time),
+        updatedAt: new Date(time),
+        read: false,
+        type: type,
+        typedFoods: ["1", "2", "3"],
+        typedPlace: "123",
+        typedUser: "123",
+      });
+    }
+  });
+
+  return result;
 };

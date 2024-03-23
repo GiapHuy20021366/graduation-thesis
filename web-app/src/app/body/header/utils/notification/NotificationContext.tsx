@@ -6,6 +6,7 @@ import {
 } from "../../../../../data";
 import {
   useAuthContext,
+  useDirty,
   useLoader,
   useSocketContext,
 } from "../../../../../hooks";
@@ -29,6 +30,7 @@ interface INotificationContext {
   groups: INotificationGroup[];
   readNotification: (groupId: string) => void;
   loadNotification: () => void;
+  readAll: () => void;
 
   isError: boolean;
   isEnd: boolean;
@@ -40,6 +42,7 @@ export const NotificationContext = createContext<INotificationContext>({
   groups: [],
   readNotification: () => {},
   loadNotification: () => {},
+  readAll: () => {},
 
   isEnd: false,
   isError: false,
@@ -109,7 +112,7 @@ export default function NotificationContextProvider({
     loader.setIsError(false);
 
     messageFetcher
-      .getNotifications(minTime, 50)
+      .getNotifications(minTime, 50, auth)
       .then((res) => {
         const data = res.data;
         if (data) {
@@ -132,18 +135,43 @@ export default function NotificationContextProvider({
   }, [auth, groups, loader, notifications]);
 
   const readNotification = (groupId: string) => {
-    const groupIndex = groups.findIndex((g) => g._id === groupId);
-    if (groupIndex !== -1) {
-      const group = groups[groupIndex];
-      const socket = socketContext.socket;
-      if (socket) {
-        socket.emit(
-          NotificationEmitKey.READ_NOTIFICATION,
-          group.datas.map((d) => d._id)
-        );
+    const socket = socketContext.socket;
+    if (socket) {
+      const groupIndex = groups.findIndex((g) => g._id === groupId);
+      if (groupIndex !== -1) {
+        const group = groups[groupIndex];
+        if (!group.read) {
+          socket.emit(
+            NotificationEmitKey.READ_NOTIFICATION,
+            group.datas.map((d) => d._id)
+          );
+        }
       }
     }
   };
+
+  const readAll = () => {
+    const socket = socketContext.socket;
+    if (socket) {
+      groups.forEach((group) => {
+        if (!group.read) {
+          socket.emit(
+            NotificationEmitKey.READ_NOTIFICATION,
+            group.datas.map((d) => d._id)
+          );
+        }
+      });
+    }
+  };
+
+  const dirty = useDirty();
+  useEffect(() => {
+    if (auth != null) {
+      dirty.perform(() => {
+        loadNotification();
+      });
+    }
+  }, [auth, dirty, loadNotification]);
 
   return (
     <NotificationContext.Provider
@@ -154,6 +182,7 @@ export default function NotificationContextProvider({
         isFetching: loader.isFetching,
         loadNotification,
         readNotification,
+        readAll,
         notifications,
       }}
     >

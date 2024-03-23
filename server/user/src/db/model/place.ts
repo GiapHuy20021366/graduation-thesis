@@ -1,11 +1,10 @@
 import { Model, Schema, model, ObjectId } from "mongoose";
 import collections from "../collections";
-import { IPlace, IRating, PlaceType, Timed } from "../../data";
+import { Actived, IPlace, IRating, PlaceType, Timed } from "../../data";
 
-export interface IPlaceSchema extends Omit<IPlace, "author">, Timed {
+export interface IPlaceSchema extends Omit<IPlace, "author">, Timed, Actived {
   author: ObjectId;
   rating: IRating;
-  active: boolean;
 }
 
 interface IPlaceMethods {}

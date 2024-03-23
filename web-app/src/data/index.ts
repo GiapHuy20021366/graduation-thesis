@@ -159,7 +159,7 @@ export {
   type IPersonalDataUpdate,
   type IUserRemovable,
 } from "./personal-data-update";
-export { type INotification, type NotificationType } from "./notification";
+export { type INotification, NotificationType } from "./notification";
 export {
   type INotificationExposed,
   type INotificationGroup,

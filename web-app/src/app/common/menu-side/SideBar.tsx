@@ -66,7 +66,10 @@ export default function SideBar() {
           </Stack>
         </Stack>
         <Divider />
-        <MenuList sx={{ gap: 2 }}>
+        <MenuList
+          sx={{ gap: 2 }}
+          onClick={() => appContentContext.setMenuSideActive(false)}
+        >
           {/* Home */}
           <StyledLink to={"/home"}>
             <MenuItem selected={page.is(applicationPages.HOME)}>

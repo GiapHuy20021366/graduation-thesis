@@ -75,7 +75,8 @@
         "avatar": "Avatar",
         "users-around-me": "Mọi người",
         "foods-around-me": "Thực phẩm",
-        "user": "Người dùng"
+        "user": "Người dùng",
+        "place": "Địa điểm"
     },
     "ContentFooter": {
         "home": "Nhà",
