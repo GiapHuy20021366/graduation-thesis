@@ -8,15 +8,13 @@ import {
 import { verifyToken } from "../utils";
 import { AuthLike, IConversationMessage, INotificationExposed } from "../data";
 import { consoleLogger } from "../config";
-import {
-  joinNotificationChannel,
-  sendNotification,
-} from "./notification";
+import { readNotifications, sendNotification } from "./notification";
 
 const socketOnKey = {
   CONVERSATION_JOIN: "conversation-join",
   CONVERSATION_LEAVE: "conversation-leave",
   CONVERSATION_SEND_MESSAGE: "conversation-send-message",
+  READ_NOTIFICATION: "read-notification",
 } as const;
 
 let socketServer: Server | null = null;
@@ -34,8 +32,6 @@ export const onClientConnected = (auth: AuthLike, client: Socket) => {
     auth.email,
     "connected"
   );
-
-  joinNotificationChannel(client, auth);
 
   if (userIdToSockets[user] == null) {
     userIdToSockets[user] = [client];
@@ -105,6 +101,11 @@ const initSocketListener = (socketServer: Server) => {
         userIdToSockets,
         socketIdToAuth,
       });
+    });
+
+    // read notification
+    socket.on(socketOnKey.READ_NOTIFICATION, (notificationIds: string[]) => {
+      readNotifications(auth._id, notificationIds, userIdToSockets[auth._id]);
     });
 
     // disconnected

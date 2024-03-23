@@ -159,3 +159,14 @@ export {
   type IPersonalDataUpdate,
   type IUserRemovable,
 } from "./personal-data-update";
+export { type INotification, type NotificationType } from "./notification";
+export {
+  type INotificationExposed,
+  type INotificationGroup,
+  type INotificationGroupAbstract,
+  groupNotificationsByDuration,
+  toNotificationAnyGroups,
+  toNotificationGroups,
+  toNotificationTypeGroups,
+} from "./notification-exposed";
+export { durations } from "./durations";

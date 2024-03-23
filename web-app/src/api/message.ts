@@ -4,6 +4,7 @@ import {
   IAuthInfo,
   IConversationExposed,
   IConversationMessageExposed,
+  INotificationExposed,
   IPagination,
   ResponseErrorLike,
   ResponseLike,
@@ -16,6 +17,7 @@ export const messageEndpoints = {
   getConversation: "/conversations/:id",
   getConversations: "/conversations",
   getConversationMessages: "/conversations/:id/messages",
+  getNotifications: "/notifications",
 } as const;
 
 export interface MessageResponseError
@@ -62,6 +64,11 @@ export interface MessageFetcher {
     to: string,
     auth: IAuthInfo
   ) => Promise<MessageResponse<IConversationExposed>>;
+
+  getNotifications: (
+    latestTime: number,
+    limit: number
+  ) => Promise<MessageResponse<INotificationExposed[]>>;
 }
 
 export const messageFetcher: MessageFetcher = {
@@ -124,5 +131,15 @@ export const messageFetcher: MessageFetcher = {
         },
       }
     );
+  },
+
+  getNotifications: (
+    before: number,
+    limit: number
+  ): Promise<MessageResponse<INotificationExposed[]>> => {
+    console.log(before, limit);
+    return Promise.resolve({
+      data: [],
+    });
   },
 };

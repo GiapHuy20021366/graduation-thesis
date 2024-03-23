@@ -1,0 +1,7 @@
+export const durations = {
+  THIRTY_MINUTES: 1800000,
+  ONE_HOUR: 3600000,
+  TWO_HOURS: 7200000,
+  ONE_DAY: 86400000,
+  TWO_DAYS: 172800000,
+} as const;

@@ -1,13 +1,18 @@
-// A component for providing all utils notification when it called
-
-import { Badge } from "@mui/material";
+import { Badge, BadgeProps, IconButtonProps } from "@mui/material";
 import NotificationButtonAction from "./NotificationButtonAction";
 
-// Display as a button to open notification center
-export default function NotificationProvider() {
+interface INotificationProviderProps {
+  IconProps?: IconButtonProps;
+  BadgeProps?: BadgeProps;
+}
+
+export default function NotificationProvider({
+  IconProps,
+  BadgeProps,
+}: INotificationProviderProps) {
   return (
-    <Badge badgeContent={"4"} color="secondary">
-      <NotificationButtonAction />
+    <Badge badgeContent={"4"} color="secondary" {...BadgeProps}>
+      <NotificationButtonAction {...IconProps} />
     </Badge>
   );
 }

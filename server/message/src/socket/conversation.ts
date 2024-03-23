@@ -12,7 +12,7 @@ export interface ISocketServerMeta {
 const socketIdToConversationRooms: Record<string, string[]> = {};
 const roomIdToConversationMeta: Record<string, IConversationSchema> = {};
 
-const socketRoomEmitKey = {
+const socketConversationEmitKey = {
   CONVERSATION_META: "conversation-meta",
   CONVERSATION_MESSAGE_ERROR: (conversationId?: string) => {
     if (conversationId) {
@@ -59,13 +59,13 @@ export const joinConversation = (
       }
 
       // Emit to client to know their joined conversation
-      client.emit(socketRoomEmitKey.CONVERSATION_META, data);
+      client.emit(socketConversationEmitKey.CONVERSATION_META, data);
       return data;
     });
   } else {
     const meta = roomIdToConversationMeta[conversationId];
     // Emit to client to know their joined conversation
-    client.emit(socketRoomEmitKey.CONVERSATION_META, meta);
+    client.emit(socketConversationEmitKey.CONVERSATION_META, meta);
     return Promise.resolve(meta);
   }
 };
@@ -152,11 +152,11 @@ export const sendMessageToConversation = (
               if (!listenedUsers.includes(participant)) {
                 sockets.forEach((socket) => {
                   socket.emit(
-                    socketRoomEmitKey.CONVERSATION_META,
+                    socketConversationEmitKey.CONVERSATION_META,
                     conversationMeta
                   );
                   socket.emit(
-                    socketRoomEmitKey.CONVERSATION_NEW_MESSAGE(),
+                    socketConversationEmitKey.CONVERSATION_NEW_MESSAGE(),
                     uuid,
                     message
                   );
@@ -164,7 +164,7 @@ export const sendMessageToConversation = (
               }
               sockets.forEach((socket) =>
                 socket.emit(
-                  socketRoomEmitKey.CONVERSATION_NEW_MESSAGE(conversationId),
+                  socketConversationEmitKey.CONVERSATION_NEW_MESSAGE(conversationId),
                   uuid,
                   messageExposed
                 )
@@ -174,7 +174,7 @@ export const sendMessageToConversation = (
         })
         .catch((_error) => {
           client.emit(
-            socketRoomEmitKey.CONVERSATION_MESSAGE_ERROR(conversationId),
+            socketConversationEmitKey.CONVERSATION_MESSAGE_ERROR(conversationId),
             uuid
           );
         });
