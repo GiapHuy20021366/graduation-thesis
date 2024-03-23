@@ -1,7 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { getConversation, newConversationMessage } from "../services";
 import { AuthLike, IConversationMessage } from "../data";
-import { IConversationSchema } from "~/db/model";
+import { IConversationSchema } from "../db/model";
 
 export interface ISocketServerMeta {
   socketServer: Server;

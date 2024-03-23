@@ -57,3 +57,5 @@ export {
   Paginationed,
   Queried,
 } from "./schemad";
+export { INotification, NotificationType } from "./notification";
+export { INotificationExposed } from "./notification-exposed";

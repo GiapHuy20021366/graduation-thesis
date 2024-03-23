@@ -1,4 +1,5 @@
 export default {
-    conversation: "conversations",
-    conversationMessage: "conversation-messages"
-}
+  conversation: "conversations",
+  conversationMessage: "conversation-messages",
+  notifcation: "notifications",
+};

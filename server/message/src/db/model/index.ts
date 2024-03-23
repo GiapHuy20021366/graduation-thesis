@@ -3,3 +3,4 @@ export {
   ConversationMessage,
   IConversationMessageSchema,
 } from "./conversation-message";
+export { INotificationSchema, Notification } from "./notification";

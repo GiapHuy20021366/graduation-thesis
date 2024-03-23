@@ -6,8 +6,12 @@ import {
   sendMessageToConversation,
 } from "./conversation";
 import { verifyToken } from "../utils";
-import { AuthLike, IConversationMessage } from "../data";
+import { AuthLike, IConversationMessage, INotificationExposed } from "../data";
 import { consoleLogger } from "../config";
+import {
+  joinNotificationChannel,
+  sendNotification,
+} from "./notification";
 
 const socketOnKey = {
   CONVERSATION_JOIN: "conversation-join",
@@ -30,6 +34,8 @@ export const onClientConnected = (auth: AuthLike, client: Socket) => {
     auth.email,
     "connected"
   );
+
+  joinNotificationChannel(client, auth);
 
   if (userIdToSockets[user] == null) {
     userIdToSockets[user] = [client];
@@ -123,4 +129,16 @@ export const initSocketServer = (server: any) => {
     initSocketListener(socketServer);
   }
   return socketServer;
+};
+
+export const sendNotificationToUsers = (
+  users: string[],
+  notification: INotificationExposed
+) => {
+  users.forEach((user) => {
+    const sockets = userIdToSockets[user];
+    if (sockets) {
+      sendNotification(sockets, notification);
+    }
+  });
 };
