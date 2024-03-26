@@ -8,4 +8,7 @@ export type I18nReactComponent =
   | "ExtendedEditor"
   | "ExtendedLocationPicker"
   | "LocationExposed"
-  | "StarterKitEditor";
+  | "StarterKitEditor"
+  | "SideBar"
+  | "SideBarOpener"
+  | "ViewerData";
