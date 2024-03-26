@@ -9,6 +9,7 @@ import {
 import { CenterFocusStrongOutlined } from "@mui/icons-material";
 import { ICoordinates, ILocation, mapIcons } from "../../../data";
 import { GOOGLE_MAP_API_KEY } from "../../../env";
+import { useComponentLanguage } from "../../../hooks";
 
 type LocationExposedProps = StackProps & {
   targetLocation?: ILocation;
@@ -36,6 +37,8 @@ const LocationExposed = React.forwardRef<HTMLDivElement, LocationExposedProps>(
     const [center, setCenter] = useState<ICoordinates | undefined>(
       targetLocation?.coordinates
     );
+
+    const lang = useComponentLanguage("LocationExposed");
 
     const mapRef = useRef<google.maps.Map>();
 
@@ -95,7 +98,7 @@ const LocationExposed = React.forwardRef<HTMLDivElement, LocationExposedProps>(
                   position={homeLocation.coordinates}
                 >
                   <InfoWindowF position={homeLocation.coordinates}>
-                    <Box>Nhà của bạn</Box>
+                    <Box>{lang("your-home")}</Box>
                   </InfoWindowF>
                 </MarkerF>
               )}
@@ -108,7 +111,7 @@ const LocationExposed = React.forwardRef<HTMLDivElement, LocationExposedProps>(
                   position={currentLocation.coordinates}
                 >
                   <InfoWindowF position={currentLocation.coordinates}>
-                    <Box>Vị trí hiện tại của bạn</Box>
+                    <Box>{lang("your-current-location")}</Box>
                   </InfoWindowF>
                 </MarkerF>
               )}
@@ -124,7 +127,7 @@ const LocationExposed = React.forwardRef<HTMLDivElement, LocationExposedProps>(
                     {infoContent ? (
                       infoContent
                     ) : (
-                      <Box>"Vị trí của mục tiêu"</Box>
+                      <Box>{lang("target-current-location")}</Box>
                     )}
                   </InfoWindowF>
                 </MarkerF>
@@ -133,7 +136,7 @@ const LocationExposed = React.forwardRef<HTMLDivElement, LocationExposedProps>(
           )}
         </Box>
         <Chip
-          label={"Vị trí hiện tại của tôi"}
+          label={lang("your-current-location")}
           sx={{
             position: "absolute",
             bottom: 80,
@@ -156,7 +159,7 @@ const LocationExposed = React.forwardRef<HTMLDivElement, LocationExposedProps>(
           icon={<CenterFocusStrongOutlined color="inherit" />}
         />
         <Chip
-          label={"Vị trí nhà của tôi"}
+          label={lang("your-home-location")}
           sx={{
             position: "absolute",
             bottom: 40,

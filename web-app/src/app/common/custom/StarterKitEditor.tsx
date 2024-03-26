@@ -12,7 +12,7 @@ import {
   RichTextEditorRef,
 } from "mui-tiptap";
 import React, { useState } from "react";
-import { useI18nContext } from "../../../hooks";
+import { useComponentLanguage } from "../../../hooks";
 
 type EditorProps = Omit<RichTextEditorProps, "extensions"> & {
   onModeChange?: (mode: EditMode) => void;
@@ -31,8 +31,7 @@ const StarterKitEditor = React.forwardRef<HTMLDivElement, EditorProps>(
   (props) => {
     const { onModeChange, editorRef, ...rest } = props;
     const [editMode, setEditMode] = useState<EditMode>(EditMode.EDIT);
-    const i18n = useI18nContext();
-    const lang = i18n.of(StarterKitEditor);
+    const lang = useComponentLanguage("StarterKitEditor");
 
     const handleModeChange = (
       event: SelectChangeEvent<"HIDE" | "EDIT" | "PREVIEW">

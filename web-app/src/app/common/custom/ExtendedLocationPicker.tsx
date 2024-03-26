@@ -23,7 +23,7 @@ import {
   mapIcons,
 } from "../../../data";
 import { GOOGLE_MAP_API_KEY } from "../../../env";
-import { useFetchLocation } from "../../../hooks";
+import { useComponentLanguage, useFetchLocation } from "../../../hooks";
 
 type ExtendedLocationPickerProps = StackProps & {
   defaultLocation?: ILocation;
@@ -43,6 +43,8 @@ const ExtendedLocationPicker = React.forwardRef<
     homeLocation,
     ...rest
   } = props;
+
+  const lang = useComponentLanguage("ExtendedLocationPicker");
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -137,7 +139,7 @@ const ExtendedLocationPicker = React.forwardRef<
     >
       <Box width={"100%"}>
         <TextField
-          label={"Location"}
+          label={lang("location-label")}
           variant="standard"
           fullWidth
           InputProps={{
@@ -146,7 +148,7 @@ const ExtendedLocationPicker = React.forwardRef<
           multiline
           value={
             fetchLocation.status === RequestStatus.INCHING
-              ? "Loading..."
+              ? lang("loading...")
               : fetchLocation.location?.name
           }
         />
@@ -178,12 +180,12 @@ const ExtendedLocationPicker = React.forwardRef<
                     onCloseClick={handleOpenInfo}
                   >
                     <Box sx={{ width: 200 }}>
-                      <span>Vị trí đã chọn</span>
+                      <span>{lang("selected-location")}</span>
                       <Button
                         sx={{ width: "100%", textAlign: "center" }}
                         onClick={handleSetLocation}
                       >
-                        Đặt vị trí
+                        {lang("set-location")}
                       </Button>
                     </Box>
                   </InfoWindowF>
@@ -199,7 +201,7 @@ const ExtendedLocationPicker = React.forwardRef<
                 position={homeLocation.coordinates}
               >
                 <InfoWindowF position={homeLocation.coordinates}>
-                  <Box sx={{ width: 200 }}>Nhà của bạn</Box>
+                  <Box sx={{ width: 200 }}>{lang("your-home")}</Box>
                 </InfoWindowF>
               </MarkerF>
             )}
@@ -222,7 +224,7 @@ const ExtendedLocationPicker = React.forwardRef<
         </Tooltip>
       </IconButton>
       <Chip
-        label={"Locate Me"}
+        label={lang("locate-me-label")}
         sx={{
           position: "absolute",
           bottom: 80,
@@ -245,7 +247,7 @@ const ExtendedLocationPicker = React.forwardRef<
         icon={<CenterFocusStrongOutlined color="inherit" />}
       />
       <Chip
-        label={"Set Location"}
+        label={lang("set-location")}
         sx={{
           position: "absolute",
           bottom: 40,

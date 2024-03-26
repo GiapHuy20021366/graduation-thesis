@@ -273,5 +273,19 @@
         "notification-title": "Thông báo",
         "search-food-title": "Tìm kiếm thực phẩm",
         "people-around-title": "Mọi người xung quanh"
+    },
+    "ExtendedLocationPicker": {
+        "location-label": "Vị trí",
+        "loading...": "Đang tìm kiếm",
+        "selected-location": "Vị trí đã chọn",
+        "set-location": "Đặt vị trí",
+        "your-home": "Nhà của bạn",
+        "locate-me-label": "Vị trí của tôi"
+    },
+    "LocationExposed": {
+        "your-home": "Nhà của bạn",
+        "your-current-location": "Vị trí hiện tại của bạn",
+        "target-current-location": "Vị trí của mục tiêu",
+        "your-home-location": "Vị trí nhà của tôi"
     }
 }

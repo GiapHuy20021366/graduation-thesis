@@ -20,7 +20,7 @@ import {
   MenuButtonBulletedList,
   RichTextEditorRef,
 } from "mui-tiptap";
-import { useI18nContext } from "../../../hooks";
+import { useComponentLanguage } from "../../../hooks";
 
 type ExtendedEditorProps = BoxProps & {
   defaultHTML?: string;
@@ -49,8 +49,7 @@ const ExtendedEditor = React.forwardRef<HTMLDivElement, ExtendedEditorProps>(
       ...rest
     } = props;
     const [editable, setEditable] = useState<EditMode>(EditMode.EDIT);
-    const i18n = useI18nContext();
-    const lang = i18n.of(ExtendedEditor);
+    const lang = useComponentLanguage("ExtendedEditor");
 
     return (
       <Box
