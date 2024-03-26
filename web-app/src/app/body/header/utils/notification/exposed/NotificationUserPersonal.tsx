@@ -2,6 +2,7 @@ import React from "react";
 import { Avatar, Stack, StackProps, Typography } from "@mui/material";
 import { INotificationGroup } from "../../../../../../data";
 import SquareContainer from "../../../../../common/custom/SquareContainer";
+import { useComponentLanguage } from "../../../../../../hooks";
 
 type NotificationdUserPersonalProps = StackProps & {
   group: INotificationGroup;
@@ -12,6 +13,7 @@ const NotificationdUserPersonal = React.forwardRef<
   NotificationdUserPersonalProps
 >((props, ref) => {
   const { group, ...rest } = props;
+  const lang = useComponentLanguage("NotificationExposed");
   return (
     <Stack
       ref={ref}
@@ -27,10 +29,7 @@ const NotificationdUserPersonal = React.forwardRef<
       <SquareContainer size={"12%"}>
         <Avatar sx={{ width: "100%", height: "100%" }} />
       </SquareContainer>
-      <Typography>
-        Cập nhật thông tin cá nhân ngay để chúng tôi có thể gợi ý những thực
-        phẩm tốt nhất cho bạn
-      </Typography>
+      <Typography>{lang("user-personal")}</Typography>
     </Stack>
   );
 });

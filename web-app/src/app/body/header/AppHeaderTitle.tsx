@@ -1,52 +1,38 @@
 import { Box } from "@mui/material";
 import { Route, Routes } from "react-router-dom";
+import { I18Resolver } from "../../I18nContext";
+import { useComponentLanguage } from "../../../hooks";
 
-function HomeTitle() {
-  return <span>Nhà</span>;
+interface ILanguageProps {
+  lang: I18Resolver;
 }
 
-function LevelTitle() {
-  return <span>Level</span>;
+function HomeTitle({ lang }: ILanguageProps) {
+  return <span>{lang("home")}</span>;
 }
 
-function ProfileTitle() {
-  return <span>Profile</span>;
+function AccountTitle({ lang }: ILanguageProps) {
+  return <span>{lang("account")}</span>;
 }
 
-function AccountTitle() {
-  return <span>Account</span>;
+function LocationTitle({ lang }: ILanguageProps) {
+  return <span>{lang("location")}</span>;
 }
 
-function LocationTitle() {
-  return <span>Vị trí</span>;
+function SettingTitle({ lang }: ILanguageProps) {
+  return <span>{lang("setting")}</span>;
 }
 
-function HelpTitle() {
-  return <span>Help</span>;
+function FoodTitle({ lang }: ILanguageProps) {
+  return <span>{lang("food")}</span>;
 }
 
-function SettingTitle() {
-  return <span>Cài đặt</span>;
-}
-
-function FoodTitle() {
-  return <span>Thực phẩm</span>;
-}
-
-function SearchTitle() {
-  return <span>Tìm kiếm</span>;
-}
-
-function AroundTitle() {
-  return (
-    <Routes>
-      <Route path="/food/*" element={<span>Thực phẩm</span>} />
-      <Route path="/users/*" element={<span>Người dùng</span>} />
-    </Routes>
-  );
+function SearchTitle({ lang }: ILanguageProps) {
+  return <span>{lang("search")}</span>;
 }
 
 export default function AppHeaderTitle() {
+  const lang = useComponentLanguage("AppHeaderTitle");
   return (
     <Box
       sx={{
@@ -55,17 +41,13 @@ export default function AppHeaderTitle() {
       }}
     >
       <Routes>
-        <Route path="/" element={<HomeTitle />} />
-        <Route path="/home/*" element={<HomeTitle />} />
-        <Route path="/level/*" element={<LevelTitle />} />
-        <Route path="/profile/*" element={<ProfileTitle />} />
-        <Route path="/account/*" element={<AccountTitle />} />
-        <Route path="/location/*" element={<LocationTitle />} />
-        <Route path="/around/*" element={<AroundTitle />} />
-        <Route path="/help/*" element={<HelpTitle />} />
-        <Route path="/setting/*" element={<SettingTitle />} />
-        <Route path="/food/*" element={<FoodTitle />} />
-        <Route path="/search/*" element={<SearchTitle />} />
+        <Route path="/" element={<HomeTitle lang={lang} />} />
+        <Route path="/home/*" element={<HomeTitle lang={lang} />} />
+        <Route path="/account/*" element={<AccountTitle lang={lang} />} />
+        <Route path="/location/*" element={<LocationTitle lang={lang} />} />
+        <Route path="/setting/*" element={<SettingTitle lang={lang} />} />
+        <Route path="/food/*" element={<FoodTitle lang={lang} />} />
+        <Route path="/search/*" element={<SearchTitle lang={lang} />} />
       </Routes>
     </Box>
   );

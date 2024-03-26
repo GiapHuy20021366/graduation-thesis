@@ -37,7 +37,7 @@ const NotificationButtonAction = React.forwardRef<
           ml: "auto",
           ...(props.sx ?? {}),
         }}
-        aria-controls={open ? "place-viewer-context-menu" : undefined}
+        aria-controls={open ? "notification-action-context-menu" : undefined}
         aria-haspopup="true"
         aria-expanded={open ? "true" : undefined}
         onClick={handleOpen}
@@ -57,7 +57,7 @@ const NotificationButtonAction = React.forwardRef<
         </Badge>
       </IconButton>
       <Popover
-        id={"place-viewer-context-menu"}
+        id={"notification-action-context-menu"}
         open={open}
         anchorEl={anchorEl}
         onClose={handleClose}

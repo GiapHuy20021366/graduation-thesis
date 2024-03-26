@@ -7,6 +7,7 @@ import {
 } from "@mui/icons-material";
 import StyledLink from "../../common/navigate/StyledLink";
 import NotificationButtonAction from "./utils/notification/NotificationButtonAction";
+import { applicationPages, useComponentLanguage } from "../../../hooks";
 
 export default function AppHeaderUtil() {
   const iconStyle: SxProps<Theme> = {
@@ -17,6 +18,8 @@ export default function AppHeaderUtil() {
       color: "gray",
     },
   };
+
+  const lang = useComponentLanguage("AppHeaderUtil");
   return (
     <Stack
       direction={"row"}
@@ -26,8 +29,8 @@ export default function AppHeaderUtil() {
       }}
     >
       <SideBarOpener />
-      <Tooltip arrow title={"Add food"}>
-        <StyledLink to={"/food/sharing"}>
+      <Tooltip arrow title={lang("add-food-title")}>
+        <StyledLink to={applicationPages.FOOD_SHARING}>
           <IconButton
             sx={{
               color: "black",
@@ -37,11 +40,11 @@ export default function AppHeaderUtil() {
           </IconButton>
         </StyledLink>
       </Tooltip>
-      <Tooltip arrow title={"Notification"}>
+      <Tooltip arrow title={lang("notification-title")}>
         <NotificationButtonAction />
       </Tooltip>
-      {/* <Tooltip arrow title={"Location"}>
-        <StyledLink to={"/user/around"}>
+      {/* <Tooltip arrow title={lang("people-around-title")}>
+        <StyledLink to={applicationPages.USER_AROUND}>
           <IconButton
             sx={{
               color: "black",
@@ -51,8 +54,8 @@ export default function AppHeaderUtil() {
           </IconButton>
         </StyledLink>
       </Tooltip> */}
-      <Tooltip arrow title={"Search"}>
-        <StyledLink to={"/food/search"}>
+      <Tooltip arrow title={lang("search-food-title")}>
+        <StyledLink to={applicationPages.FOOD_SEARCH}>
           <IconButton
             sx={{
               color: "black",

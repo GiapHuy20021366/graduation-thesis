@@ -5,6 +5,7 @@ import {
   LanguageComponent,
   getLanguage,
 } from "../store";
+import { I18nReactComponent } from "../store/i18n/components";
 
 interface II18nContextProviderProps {
   children: React.ReactNode;
@@ -15,7 +16,9 @@ export type I18Resolver = (key: string, ...params: any[]) => string;
 interface II18nContext {
   language: Language;
   switchLanguage(code: LanguageCode): void;
-  of(...components: (string | React.ComponentType<any>)[]): I18Resolver;
+  of(
+    ...components: (I18nReactComponent | React.ComponentType<any>)[]
+  ): I18Resolver;
 }
 
 export const I18nContext = createContext<II18nContext>({
@@ -39,7 +42,6 @@ export default function I18nContextProvider({
   const dictRef = useRef<{ [key: string]: string }>({});
 
   const switchLanguage = (code: LanguageCode | null): void => {
-    if (code === language.code) return;
     getLanguage(code)
       .then((value: Language) => {
         setLanguage(value);
@@ -57,7 +59,7 @@ export default function I18nContextProvider({
   };
 
   const of = (
-    ...components: (string | React.ComponentType<any>)[]
+    ...components: (I18nReactComponent | React.ComponentType<any>)[]
   ): I18Resolver => {
     const keyToLang: { [key: string]: string } = { ...dictRef.current };
     for (let i = 0; i < components.length; ++i) {

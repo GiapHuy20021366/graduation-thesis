@@ -2,6 +2,7 @@ import React from "react";
 import { Avatar, Stack, StackProps, Typography } from "@mui/material";
 import { INotificationGroup } from "../../../../../../data";
 import SquareContainer from "../../../../../common/custom/SquareContainer";
+import { useComponentLanguage } from "../../../../../../hooks";
 
 type NotificationPlaceReportProps = StackProps & {
   group: INotificationGroup;
@@ -30,6 +31,7 @@ const NotificationPlaceReport = React.forwardRef<
   NotificationPlaceReportProps
 >((props, ref) => {
   const { group, ...rest } = props;
+  const lang = useComponentLanguage("NotificationExposed");
   const data = toExposed(group);
   return (
     <Stack
@@ -46,9 +48,7 @@ const NotificationPlaceReport = React.forwardRef<
       <SquareContainer size={"12%"}>
         <Avatar sx={{ width: "100%", height: "100%" }} />
       </SquareContainer>
-      <Typography>
-        {data.users.length} người vừa báo cáo một địa điểm của bạn
-      </Typography>
+      <Typography>{lang("place-report", data.users.length)}</Typography>
     </Stack>
   );
 });

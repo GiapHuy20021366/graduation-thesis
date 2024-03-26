@@ -2,6 +2,7 @@ import React from "react";
 import { Avatar, Stack, StackProps, Typography } from "@mui/material";
 import { INotificationGroup } from "../../../../../../data";
 import SquareContainer from "../../../../../common/custom/SquareContainer";
+import { useComponentLanguage } from "../../../../../../hooks";
 
 type NotificationFoodLikeProps = StackProps & {
   group: INotificationGroup;
@@ -30,6 +31,7 @@ const NotificationFoodLike = React.forwardRef<
   NotificationFoodLikeProps
 >((props, ref) => {
   const { group, ...rest } = props;
+  const lang = useComponentLanguage("NotificationExposed");
   const data = toExposed(group);
   return (
     <Stack
@@ -46,9 +48,7 @@ const NotificationFoodLike = React.forwardRef<
       <SquareContainer size={"12%"}>
         <Avatar sx={{ width: "100%", height: "100%" }} />
       </SquareContainer>
-      <Typography>
-        {data.users.length} người vừa thích một thực phẩm mà bạn chia sẻ
-      </Typography>
+      <Typography>{lang("food-like", data.users.length)}</Typography>
     </Stack>
   );
 });

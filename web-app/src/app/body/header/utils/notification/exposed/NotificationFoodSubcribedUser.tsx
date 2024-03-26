@@ -2,6 +2,7 @@ import React from "react";
 import { Avatar, Stack, StackProps, Typography } from "@mui/material";
 import { INotificationGroup } from "../../../../../../data";
 import SquareContainer from "../../../../../common/custom/SquareContainer";
+import { useComponentLanguage } from "../../../../../../hooks";
 
 type NotificationFoodSubcribedUserProps = StackProps & {
   group: INotificationGroup;
@@ -32,6 +33,7 @@ const NotificationFoodSubcribedUser = React.forwardRef<
   NotificationFoodSubcribedUserProps
 >((props, ref) => {
   const { group, ...rest } = props;
+  const lang = useComponentLanguage("NotificationExposed");
   const data = toExposed(group);
   return (
     <Stack
@@ -48,9 +50,7 @@ const NotificationFoodSubcribedUser = React.forwardRef<
       <SquareContainer size={"12%"}>
         <Avatar sx={{ width: "100%", height: "100%" }} />
       </SquareContainer>
-      <Typography>
-        {data.foods.length} thực phẩm vừa được những người bạn theo dõi chia sẻ
-      </Typography>
+      <Typography>{lang("food-subcribed-user", data.foods.length)}</Typography>
     </Stack>
   );
 });

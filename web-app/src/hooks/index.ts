@@ -39,3 +39,4 @@ export {
 export { useDirty } from "./useDirty";
 export { useNotificationContext } from "./useNotificationContext";
 export { useThemeContext } from "./useThemeContext";
+export { useComponentLanguage } from "./useComponentLanguage";

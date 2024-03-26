@@ -2,6 +2,7 @@ import React from "react";
 import { Avatar, Stack, StackProps, Typography } from "@mui/material";
 import { INotificationGroup } from "../../../../../../data";
 import SquareContainer from "../../../../../common/custom/SquareContainer";
+import { useComponentLanguage } from "../../../../../../hooks";
 
 type NotificationFoodExpiredProps = StackProps & {
   group: INotificationGroup;
@@ -30,6 +31,7 @@ const NotificationFoodExpired = React.forwardRef<
   NotificationFoodExpiredProps
 >((props, ref) => {
   const { group, ...rest } = props;
+  const lang = useComponentLanguage("NotificationExposed");
   const data = toExposed(group);
   return (
     <Stack
@@ -46,9 +48,7 @@ const NotificationFoodExpired = React.forwardRef<
       <SquareContainer size={"12%"}>
         <Avatar sx={{ width: "100%", height: "100%" }} />
       </SquareContainer>
-      <Typography>
-        Bạn có {data.foods.length} thực phẩm đã hết hạn trong ngày hôm nay
-      </Typography>
+      <Typography>{lang("food-expire", data.foods.length)}</Typography>
     </Stack>
   );
 });

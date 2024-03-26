@@ -2,6 +2,7 @@ import React from "react";
 import { Avatar, Stack, StackProps, Typography } from "@mui/material";
 import { INotificationGroup } from "../../../../../../data";
 import SquareContainer from "../../../../../common/custom/SquareContainer";
+import { useComponentLanguage } from "../../../../../../hooks";
 
 type NotificationPlaceInactiveProps = StackProps & {
   group: INotificationGroup;
@@ -12,6 +13,7 @@ const NotificationPlaceInactive = React.forwardRef<
   NotificationPlaceInactiveProps
 >((props, ref) => {
   const { group, ...rest } = props;
+  const lang = useComponentLanguage("NotificationExposed");
   return (
     <Stack
       ref={ref}
@@ -27,9 +29,7 @@ const NotificationPlaceInactive = React.forwardRef<
       <SquareContainer size={"12%"}>
         <Avatar sx={{ width: "100%", height: "100%" }} />
       </SquareContainer>
-      <Typography>
-        Một địa điểm của bạn đã bị khóa do vi phạm các chính sách về cộng đồng
-      </Typography>
+      <Typography>{lang("place-inactive")}</Typography>
     </Stack>
   );
 });

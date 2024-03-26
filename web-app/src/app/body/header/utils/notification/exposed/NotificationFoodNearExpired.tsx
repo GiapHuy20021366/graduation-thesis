@@ -2,6 +2,7 @@ import React from "react";
 import { Avatar, Stack, StackProps, Typography } from "@mui/material";
 import { INotificationGroup } from "../../../../../../data";
 import SquareContainer from "../../../../../common/custom/SquareContainer";
+import { useComponentLanguage } from "../../../../../../hooks";
 
 type NotificationFoodNearExpiredProps = StackProps & {
   group: INotificationGroup;
@@ -11,7 +12,9 @@ interface NotificationFoodNearExpiredMerge extends INotificationGroup {
   foods: string[];
 }
 
-const toExposed = (group: INotificationGroup): NotificationFoodNearExpiredMerge => {
+const toExposed = (
+  group: INotificationGroup
+): NotificationFoodNearExpiredMerge => {
   const foods: string[] = [];
   group.datas.forEach((d) => {
     const typedFoods = d.typedFoods;
@@ -30,6 +33,7 @@ const NotificationFoodNearExpired = React.forwardRef<
   NotificationFoodNearExpiredProps
 >((props, ref) => {
   const { group, ...rest } = props;
+  const lang = useComponentLanguage("NotificationExposed");
   const data = toExposed(group);
   return (
     <Stack
@@ -46,9 +50,7 @@ const NotificationFoodNearExpired = React.forwardRef<
       <SquareContainer size={"12%"}>
         <Avatar sx={{ width: "100%", height: "100%" }} />
       </SquareContainer>
-      <Typography>
-        Bạn có {data.foods.length} thực phẩm sắp hết hạn trong ngày hôm nay
-      </Typography>
+      <Typography>{lang("food-near-expired", data.foods.length)}</Typography>
     </Stack>
   );
 });

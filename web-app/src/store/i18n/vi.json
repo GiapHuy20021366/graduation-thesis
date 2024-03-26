@@ -226,5 +226,52 @@
     },
     "FoodSearchItem": {
         "l-free": "Miễn phí"
+    },
+    "AppTabs": {
+        "home-title": "Nhà",
+        "home-label": "Nhà",
+        "food-around-title": "Thực phẩm xung quanh",
+        "food-around-label": "Thực phẩm",
+        "people-title": "Mọi người",
+        "people-label": "Mọi người",
+        "place-title": "Địa điểm",
+        "place-label": "Địa điểm"
+    },
+    "AvatarButtonAction": {
+        "logout": "Đăng xuất"
+    },
+    "NotificationExposed": {
+        "food-expire": "Bạn có {0} thực phẩm đã hết hạn trong ngày hôm nay",
+        "food-like": "{0} người vừa thích một thực phẩm mà bạn chia sẻ",
+        "food-near-expired": "Bạn có {0} thực phẩm sắp hết hạn trong ngày hôm nay",
+        "food-subcribed-place": "{0} thực phẩm vừa được chia sẻ trên những địa điểm mà bạn theo dõi",
+        "food-subcribed-user": "{0} thực phẩm vừa được những người bạn theo dõi chia sẻ",
+        "food-suggested-around": "{0} thực phẩm vừa được chia sẻ xung quanh bạn",
+        "food-suggested-category": "Tìm thấy {0} thực phẩm phù hợp với sở thích của bạn",
+        "place-inactive": " Một địa điểm của bạn đã bị khóa do vi phạm các chính sách về cộng đồng",
+        "place-rating": "{0} người vừa đánh giá một địa điểm của bạn",
+        "place-report": "{0} người vừa báo cáo một địa điểm của bạn",
+        "user-personal": "Cập nhật thông tin cá nhân ngay để chúng tôi có thể gợi ý những thực phẩm tốt nhất cho bạn",
+        "user-welcome": "Chào mừng bạn tham gia. Hãy cập nhật thông tin cá nhân để có những trải nghiệm tốt nhất."
+    },
+    "NotifocationSystemExposed": {
+        "notification": "Thông báo",
+        "read-all": "Đọc hết",
+        "all-label": "Tất cả",
+        "not-read-label": "Chưa đọc"
+    },
+    "AppHeaderTitle": {
+        "home": "Nhà",
+        "account": "Tài khoản",
+        "location": "Vị trí",
+        "setting": "Cài đặt",
+        "food": "Thực phẩm",
+        "search": "Tìm kiếm"
+    },
+    "AppHeaderUtil": {
+        "add-food-title": "Chia sẻ thực phẩm",
+        "notification-title": "Thông báo",
+        "search-food-title": "Tìm kiếm thực phẩm",
+        "people-around-title": "Mọi người xung quanh"
     }
 }

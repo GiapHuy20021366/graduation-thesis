@@ -1,5 +1,8 @@
 import { Box, Button, Chip, Divider, Stack, Typography } from "@mui/material";
-import { useNotificationContext } from "../../../../../hooks";
+import {
+  useComponentLanguage,
+  useNotificationContext,
+} from "../../../../../hooks";
 import NotificationItemExposed from "./NotificationItemExposed";
 import ListEnd from "../../../../common/viewer/data/ListEnd";
 import ErrorRetry from "../../../../common/viewer/data/ErrorRetry";
@@ -16,6 +19,8 @@ export default function NotifocationSystemExposed() {
     readAll,
   } = notificationContext;
   const [isAll, setIsAll] = useState<boolean>(true);
+  const lang = useComponentLanguage("NotifocationSystemExposed");
+
   const unreadCount = notificationContext.groups.reduce((cur, group) => {
     if (!group.read) cur += 1;
     return cur;
@@ -35,7 +40,9 @@ export default function NotifocationSystemExposed() {
         m={1}
       >
         <Stack direction={"row"} justifyItems={"center"}>
-          <Typography sx={{ fontSize: "1.3em" }}>Thông báo</Typography>
+          <Typography sx={{ fontSize: "1.3em" }}>
+            {lang("notification")}
+          </Typography>
           <Button
             variant="text"
             disabled={unreadCount === 0}
@@ -46,18 +53,18 @@ export default function NotifocationSystemExposed() {
             }}
             onClick={() => readAll()}
           >
-            Đọc hết
+            {lang("read-all")}
           </Button>
         </Stack>
         <Stack direction={"row"} gap={1} mt={0.5}>
           <Chip
-            label="Tất cả"
+            label={lang("all-label")}
             color={isAll ? "secondary" : "default"}
             sx={{ cursor: "pointer" }}
             onClick={() => setIsAll(true)}
           />
           <Chip
-            label="Chưa đọc"
+            label={lang("not-read-label")}
             color={!isAll ? "secondary" : "default"}
             sx={{ cursor: "pointer" }}
             onClick={() => setIsAll(false)}

@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
-import { useAuthContext } from "../../../../../hooks";
+import { useAuthContext, useComponentLanguage } from "../../../../../hooks";
 import { deepOrange } from "@mui/material/colors";
 
 type AvatarActionProps = IconButtonProps;
@@ -19,6 +19,7 @@ const AvatarButtonAction = React.forwardRef<
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const authContext = useAuthContext();
   const { account } = authContext;
+  const lang = useComponentLanguage("AvatarButtonAction");
 
   const logout = () => {
     authContext.setAccount(undefined);
@@ -77,7 +78,7 @@ const AvatarButtonAction = React.forwardRef<
       >
         <MenuItem onClick={handleClose}>
           <Typography onClick={() => logout()} textAlign="center">
-            Đăng xuất
+            {lang("logout")}
           </Typography>
         </MenuItem>
       </Menu>
