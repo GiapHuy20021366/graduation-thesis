@@ -38,3 +38,4 @@ export {
 } from "./usePageResolver";
 export { useDirty } from "./useDirty";
 export { useNotificationContext } from "./useNotificationContext";
+export { useThemeContext } from "./useThemeContext";

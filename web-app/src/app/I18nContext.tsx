@@ -39,9 +39,11 @@ export default function I18nContextProvider({
   const dictRef = useRef<{ [key: string]: string }>({});
 
   const switchLanguage = (code: LanguageCode | null): void => {
+    if (code === language.code) return;
     getLanguage(code)
       .then((value: Language) => {
         setLanguage(value);
+        dictRef.current = {};
         Object.values(value.value).forEach((component) =>
           Object.entries(component).forEach(
             ([key, val]) => (dictRef.current[key] = val)
@@ -93,6 +95,7 @@ export default function I18nContextProvider({
   useEffect(() => {
     const code = localStorage.getItem(i18nKey) as LanguageCode | null;
     switchLanguage(code);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

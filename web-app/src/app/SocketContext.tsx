@@ -4,7 +4,7 @@ import { useAuthContext } from "../hooks";
 import { VITE_MESSAGE_SOCKET_URL } from "../env";
 
 interface ISocketContextProviderProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 interface ISocketContext {

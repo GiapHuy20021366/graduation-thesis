@@ -26,21 +26,27 @@ export const readNotifications = async (
   sockets: Socket[]
 ) => {
   if (notificationIds.length > 0) {
-    const notifications = await Notification.find({
-      _id: {
-        $in: notificationIds,
-      },
-      reads: {
-        $nin: [userId],
-      },
-    });
-    notifications.forEach((n) => n.reads.push(userId));
-    Promise.all(notifications.map((n) => n.save()));
+    // const notifications = await Notification.find({
+    //   _id: {
+    //     $in: notificationIds,
+    //   },
+    //   reads: {
+    //     $nin: [userId],
+    //   },
+    // });
+    // notifications.forEach((n) => n.reads.push(userId));
+    // Promise.all(notifications.map((n) => n.save()));
+    // sockets.forEach((s) =>
+    //   s.emit(
+    //     socketNotificationEmitKey.READ_NOTIFICATION,
+    //     notifications.map((n) => n._id.toString())
+    //   )
+    // );
+    /**
+     * Temp
+     */
     sockets.forEach((s) =>
-      s.emit(
-        socketNotificationEmitKey.READ_NOTIFICATION,
-        notifications.map((n) => n._id.toString())
-      )
+      s.emit(socketNotificationEmitKey.READ_NOTIFICATION, notificationIds)
     );
   }
 };

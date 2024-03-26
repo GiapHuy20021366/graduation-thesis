@@ -28,8 +28,6 @@ const NotificationButtonAction = React.forwardRef<
     setAnchorEl(null);
   };
 
-  console.log(notificationContext);
-
   return (
     <>
       <IconButton

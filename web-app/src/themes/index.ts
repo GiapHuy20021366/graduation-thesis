@@ -1,1 +1,7 @@
-export { globalTheme, type BreakPoint, breakPoints } from "./global-theme";
+export {
+  breakPointsOptions,
+  darkThemeOptions,
+  whiteThemeOptions,
+  type BreakPoint,
+  breakPoints,
+} from "./theme";

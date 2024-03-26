@@ -20,10 +20,10 @@ export default function SettingLanguage() {
         width: "100%",
       }}
     >
-      <InputLabel id="select-label">{lang("choose")}</InputLabel>
+      <InputLabel id="select-label-language">{lang("choose")}</InputLabel>
       <Select
-        labelId="select-label"
-        id="select"
+        labelId="select-label-language"
+        id="select-language"
         value={languageContext.language.code}
         label={lang("choose-one")}
         onChange={(event) => onChange(event)}
