@@ -1,5 +1,6 @@
 import { Button, Stack, StackProps, Typography } from "@mui/material";
 import React from "react";
+import { useComponentLanguage } from "../../../../hooks";
 
 type SearchMoreProps = StackProps & {
   onSearchMore?: () => void;
@@ -9,6 +10,7 @@ type SearchMoreProps = StackProps & {
 const SearchMore = React.forwardRef<HTMLDivElement, SearchMoreProps>(
   (props, ref) => {
     const { onSearchMore, active, ...rest } = props;
+    const lang = useComponentLanguage("ViewerData");
     return (
       <Stack
         ref={ref}
@@ -18,9 +20,9 @@ const SearchMore = React.forwardRef<HTMLDivElement, SearchMoreProps>(
         {...rest}
         display={active ? "flex" : "none"}
       >
-        <Typography>Bạn đã tìm kiếm hết</Typography>
+        <Typography>{lang("you-found-all")}</Typography>
         <Button onClick={() => onSearchMore && onSearchMore()}>
-          Tìm kiếm thêm
+          {lang("search-more")}
         </Button>
       </Stack>
     );

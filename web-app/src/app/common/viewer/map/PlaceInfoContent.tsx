@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, BoxProps } from "@mui/material";
+import { useComponentLanguage } from "../../../../hooks";
 
 type PlaceInfoContentProps = BoxProps;
 
@@ -7,6 +8,7 @@ const PlaceInfoContent = React.forwardRef<
   HTMLDivElement,
   PlaceInfoContentProps
 >((props, ref) => {
+  const lang = useComponentLanguage("ViewerData");
   return (
     <Box
       ref={ref}
@@ -16,7 +18,7 @@ const PlaceInfoContent = React.forwardRef<
         ...(props.sx ?? {}),
       }}
     >
-      Vị trí của địa điểm
+      {lang("place-location")}
     </Box>
   );
 });

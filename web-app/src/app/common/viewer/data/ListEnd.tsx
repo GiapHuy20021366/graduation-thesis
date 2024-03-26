@@ -1,5 +1,6 @@
 import { Button, Stack, StackProps, Typography } from "@mui/material";
 import React from "react";
+import { useComponentLanguage } from "../../../../hooks";
 
 type ListEndProps = StackProps & {
   active: boolean;
@@ -8,6 +9,7 @@ type ListEndProps = StackProps & {
 
 const ListEnd = React.forwardRef<HTMLDivElement, ListEndProps>((props, ref) => {
   const { active, onRetry, ...rest } = props;
+  const lang = useComponentLanguage("ViewerData");
   return (
     <Stack
       ref={ref}
@@ -17,8 +19,8 @@ const ListEnd = React.forwardRef<HTMLDivElement, ListEndProps>((props, ref) => {
       {...rest}
       display={active ? "flex" : "none"}
     >
-      <Typography>Đã hết</Typography>
-      {onRetry && <Button onClick={() => onRetry()}>Thử lại</Button>}
+      <Typography>{lang("end")}</Typography>
+      {onRetry && <Button onClick={() => onRetry()}>{lang("retry")}</Button>}
     </Stack>
   );
 });

@@ -3,7 +3,7 @@ import {
   applicationPages,
   useAppContentContext,
   useAuthContext,
-  useI18nContext,
+  useComponentLanguage,
   usePageResolver,
 } from "../../../hooks";
 import {
@@ -14,6 +14,7 @@ import {
   MenuItem,
   MenuList,
   Stack,
+  Typography,
 } from "@mui/material";
 import {
   HomeOutlined,
@@ -23,7 +24,6 @@ import {
   People,
   LunchDiningOutlined,
 } from "@mui/icons-material";
-import SideBarItemText from "./SideBarItemText";
 import SideBarOpener from "./SideBarOpener";
 import StyledLink from "../navigate/StyledLink";
 
@@ -31,8 +31,7 @@ export default function SideBar() {
   const appContentContext = useAppContentContext();
   const isActive = appContentContext.menuSide.active;
   const authContext = useAuthContext();
-  const languageContext = useI18nContext();
-  const lang = languageContext.of(SideBar);
+  const lang = useComponentLanguage("SideBar");
 
   const page = usePageResolver();
 
@@ -56,7 +55,7 @@ export default function SideBar() {
               margin: "1rem 0",
             }}
           />
-          <SideBarItemText text={authContext.account?.firstName ?? ""} />
+          <Typography>{authContext.account?.firstName ?? ""}</Typography>
           <Stack
             sx={{
               justifyContent: "center",
@@ -71,7 +70,7 @@ export default function SideBar() {
           onClick={() => appContentContext.setMenuSideActive(false)}
         >
           {/* Home */}
-          <StyledLink to={"/home"}>
+          <StyledLink to={applicationPages.HOME}>
             <MenuItem selected={page.is(applicationPages.HOME)}>
               <ListItemIcon>
                 <HomeOutlined fontSize="medium" />
@@ -81,7 +80,7 @@ export default function SideBar() {
           </StyledLink>
 
           {/* User */}
-          <StyledLink to={"/user"}>
+          <StyledLink to={applicationPages.USER}>
             <MenuItem selected={page.is(applicationPages.USER)}>
               <ListItemIcon>
                 <SentimentSatisfiedAltOutlined fontSize="medium" />
@@ -91,7 +90,7 @@ export default function SideBar() {
           </StyledLink>
 
           {/* User */}
-          <StyledLink to={"/place"}>
+          <StyledLink to={applicationPages.PLACE}>
             <MenuItem selected={page.is(applicationPages.PLACE)}>
               <ListItemIcon>
                 <SentimentSatisfiedAltOutlined fontSize="medium" />
@@ -101,7 +100,7 @@ export default function SideBar() {
           </StyledLink>
 
           {/* Location */}
-          <StyledLink to={"/location"}>
+          <StyledLink to={applicationPages.SET_LOCATION}>
             <MenuItem selected={page.is(applicationPages.SET_LOCATION)}>
               <ListItemIcon>
                 <RoomOutlined fontSize="medium" />

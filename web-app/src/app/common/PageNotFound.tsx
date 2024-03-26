@@ -1,14 +1,16 @@
 import "../../styles/PageNotFound.scss";
 import { Link as MuiLink } from "@mui/material";
 import { Link as ReactRouterLink } from "react-router-dom";
+import { useComponentLanguage } from "../../hooks";
 
 export default function PageNotFound() {
+  const lang = useComponentLanguage("ViewerData");
   return (
     <div className="page-not-found-container">
-      <h1>Maybe you go to lost page</h1>
+      <h1>{lang("lost-page")}</h1>
       <div className="link-container">
         <MuiLink component={ReactRouterLink} to={"/"}>
-          Turn back to Home
+          {lang("turn-back-home")}
         </MuiLink>
       </div>
       <section className="error-container">

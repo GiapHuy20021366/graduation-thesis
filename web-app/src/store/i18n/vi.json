@@ -287,5 +287,27 @@
         "your-current-location": "Vị trí hiện tại của bạn",
         "target-current-location": "Vị trí của mục tiêu",
         "your-home-location": "Vị trí nhà của tôi"
+    },
+    "SideBarOpener": {
+        "open-title": "Mở menu",
+        "close-title": "Đóng menu"
+    },
+    "ViewerData": {
+        "error-occured": "Đã có lỗi xả ra",
+        "retry": "Thử lại",
+        "end": "Đã hết",
+        "you-found-all": "Bạn đã tìm kiếm hết",
+        "search-more": "Tìm kiếm thêm",
+        "added-at": "Được thêm vào",
+        "will-expired-at": "Sẽ hết hạn vào",
+        "expired-at": "Đã hết hạn vào",
+        "admin-create-from": "Quản trị viên tạo trang từ",
+        "subcriber-from": "Theo dõi trang từ",
+        "become-admin-from": "Trở thành quản trị viên từ",
+        "become-member-from": "Trở thành thành viên từ",
+        "place-location": "Vị trí của địa điểm",
+        "user-location": "Vị trí của người dùng",
+        "lost-page": "Có vẻ như bạn đang truy cập trang không tồn tại",
+        "turn-back-home": "Quay trở lại nhà"
     }
 }

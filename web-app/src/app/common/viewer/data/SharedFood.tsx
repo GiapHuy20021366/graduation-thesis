@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { Person } from "@mui/icons-material";
 import { IFoodPostExposed, SystemSide } from "../../../../data";
 import TimeExposed from "../../custom/TimeExposed";
+import { useComponentLanguage } from "../../../../hooks";
 
 type SharedFoodProps = StackProps & {
   data: IFoodPostExposed;
@@ -63,6 +64,7 @@ const toNavigate = (data: IFoodPostExposed, source?: SystemSide) => {
 const SharedFood = React.forwardRef<HTMLDivElement, SharedFoodProps>(
   (props, ref) => {
     const { data, source, onBeforeNavigate, ...rest } = props;
+    const lang = useComponentLanguage("ViewerData");
     const navigate = useNavigate();
 
     const isExpired = Date.now() - new Date(data.duration).getTime() < 0;
@@ -104,10 +106,10 @@ const SharedFood = React.forwardRef<HTMLDivElement, SharedFoodProps>(
             <Typography>{navigateAction.name}</Typography>
           </Stack>
           <Typography>
-            Được thêm vào <TimeExposed time={data.createdAt} />
+            {lang("added-at")} <TimeExposed time={data.createdAt} />
           </Typography>
           <Typography>
-            {isExpired ? "Sẽ hết hạn vào " : "Đã hết hạn vào "}
+            {isExpired ? lang("will-expired-at") : lang("expired-at")}
             <TimeExposed time={data.duration} />
           </Typography>
         </Stack>

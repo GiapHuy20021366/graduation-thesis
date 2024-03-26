@@ -1,12 +1,16 @@
 import { MenuOutlined, MenuOpen } from "@mui/icons-material";
-import { useAppContentContext } from "../../../hooks";
+import { useAppContentContext, useComponentLanguage } from "../../../hooks";
 import { IconButton, Tooltip } from "@mui/material";
 
 export default function SideBarOpener() {
   const appContentContext = useAppContentContext();
   const isActive = appContentContext.menuSide.active;
+  const lang = useComponentLanguage("SideBarOpener");
   return (
-    <Tooltip arrow title={`${isActive ? "Close" : "Open"} Menu`}>
+    <Tooltip
+      arrow
+      title={`${isActive ? lang("close-title") : lang("open-title")}`}
+    >
       <IconButton
         sx={{
           color: "black",

@@ -1,5 +1,6 @@
 import { Button, Stack, StackProps, Typography } from "@mui/material";
 import React from "react";
+import { useComponentLanguage } from "../../../../hooks";
 
 type ErrorRetryProps = StackProps & {
   active: boolean;
@@ -9,6 +10,7 @@ type ErrorRetryProps = StackProps & {
 const ErrorRetry = React.forwardRef<HTMLDivElement, ErrorRetryProps>(
   (props, ref) => {
     const { active, onRetry, ...rest } = props;
+    const lang = useComponentLanguage("ViewerData");
     return (
       <Stack
         ref={ref}
@@ -23,8 +25,8 @@ const ErrorRetry = React.forwardRef<HTMLDivElement, ErrorRetryProps>(
         {...rest}
         display={active ? "flex" : "none"}
       >
-        <Typography> Có lỗi xảy ra</Typography>
-        <Button onClick={() => onRetry && onRetry()}>Thử lại</Button>
+        <Typography>{lang("error-occured")}</Typography>
+        <Button onClick={() => onRetry && onRetry()}>{lang("retry")}</Button>
       </Stack>
     );
   }
