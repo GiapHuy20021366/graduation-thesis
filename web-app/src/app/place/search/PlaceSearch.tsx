@@ -13,9 +13,7 @@ export default function PlaceSearch() {
         position={"sticky"}
         top={0}
         zIndex={1000}
-        sx={{
-          backgroundColor: "white",
-        }}
+        boxShadow={1}
       />
       <PlaceSearchContent />
       {isFetching && <PlaceSearchItemHolder />}

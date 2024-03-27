@@ -50,6 +50,8 @@ export default function ThemeContextProvider({
     localStorage.setItem(THEME_STORAGE_KEY, mode);
   }, [mode]);
 
+  console.log(theme);
+
   return (
     <ThemeContext.Provider value={{ mode, setMode }}>
       <ThemeProvider theme={theme}>{children}</ThemeProvider>

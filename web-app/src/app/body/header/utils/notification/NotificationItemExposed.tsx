@@ -31,11 +31,12 @@ const NotificationItemExposed = React.forwardRef<
       {...props}
       sx={{
         width: "100%",
-        ...(rest.sx ?? {}),
+        ...rest.sx,
+        gap: 1,
+        backgroundColor: read ? "inherit" : "action.hover",
         ":hover": {
-          boxShadow: 1,
+          backgroundColor: "action.hover",
         },
-        backgroundColor: read ? "white" : "#F2F6FC",
         cursor: "pointer",
       }}
     >
