@@ -1,19 +1,29 @@
-import { Box } from "@mui/material";
-import AppTabs from "./AppTabs";
+import { AppBar, AppBarProps, Toolbar } from "@mui/material";
+import AppTabs from "../footer/AppTabs";
+import React from "react";
 
-export default function AppFooter() {
-  return (
-    <Box
-      sx={{
-        width: "100%",
-        padding: 0,
-        margin: 0,
-        boxSizing: "border-box",
-        display: ["block", "none"],
-        boxShadow: 1,
-      }}
-    >
-      <AppTabs sx={{ display: "flex", justifyContent: "center" }} />
-    </Box>
-  );
-}
+type AppFooterProps = AppBarProps;
+
+const AppFooter = React.forwardRef<HTMLDivElement, AppFooterProps>(
+  (props, ref) => {
+    return (
+      <AppBar
+        ref={ref}
+        {...props}
+        sx={{
+          position: "relative",
+          boxSizing: "border-box",
+          width: "100%",
+          ...props.sx,
+        }}
+        color="default"
+      >
+        <Toolbar>
+          <AppTabs />
+        </Toolbar>
+      </AppBar>
+    );
+  }
+);
+
+export default AppFooter;

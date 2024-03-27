@@ -478,7 +478,6 @@ export default function FoodSearchBody() {
             width: "100%",
             padding: "5px",
             boxSizing: "border-box",
-            backgroundColor: "white",
             zIndex: 100,
           }}
         >

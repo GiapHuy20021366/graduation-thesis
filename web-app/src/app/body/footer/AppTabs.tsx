@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, BoxProps, Tab, Tabs, Tooltip } from "@mui/material";
+import { Tab, Tabs, TabsProps, Tooltip } from "@mui/material";
 import {
   HomeOutlined,
   FoodBankOutlined,
@@ -22,7 +22,7 @@ const AppTab = {
 
 type AppTab = (typeof AppTab)[keyof typeof AppTab];
 
-type AppTabsProps = BoxProps;
+type AppTabsProps = TabsProps;
 
 const appTabs: ITabOption[] = [
   {
@@ -60,50 +60,50 @@ const AppTabs = React.forwardRef<HTMLDivElement, AppTabsProps>((props, ref) => {
   const lang = useComponentLanguage("AppTabs");
 
   return (
-    <Box
+    <Tabs
       ref={ref}
-      {...props}
-      sx={{
-        width: "100%",
-        ...(props.sx ?? {}),
+      value={tabNavigate.tab}
+      variant="scrollable"
+      scrollButtons
+      allowScrollButtonsMobile
+      textColor="inherit"
+      TabIndicatorProps={{
+        style: {
+          backgroundColor: "#D97D54",
+          height: "0.2em",
+        },
       }}
+      {...props}
     >
-      <Tabs
-        value={tabNavigate.tab}
-        variant="scrollable"
-        scrollButtons
-        allowScrollButtonsMobile
-      >
-        <Tooltip title={lang("home-title")} arrow>
-          <Tab
-            icon={<HomeOutlined />}
-            label={lang("home-label")}
-            onClick={() => tabNavigate.setTab(AppTab.HOME)}
-          />
-        </Tooltip>
-        <Tooltip title={lang("food-around-title")} arrow>
-          <Tab
-            icon={<FoodBankOutlined />}
-            label={lang("food-around-label")}
-            onClick={() => tabNavigate.setTab(AppTab.FOOD)}
-          />
-        </Tooltip>
-        <Tooltip title={lang("people-title")} arrow>
-          <Tab
-            icon={<PeopleAltOutlined />}
-            label={lang("people-label")}
-            onClick={() => tabNavigate.setTab(AppTab.PEOPLE_AROUND)}
-          />
-        </Tooltip>
-        <Tooltip title={lang("place-title")} arrow>
-          <Tab
-            icon={<PlaceOutlined />}
-            label={lang("place-label")}
-            onClick={() => tabNavigate.setTab(AppTab.PLACE)}
-          />
-        </Tooltip>
-      </Tabs>
-    </Box>
+      <Tooltip title={lang("home-title")} arrow>
+        <Tab
+          icon={<HomeOutlined sx={{ width: "1.5em", height: "1.5em" }} />}
+          // label={lang("home-label")}
+          onClick={() => tabNavigate.setTab(AppTab.HOME)}
+        />
+      </Tooltip>
+      <Tooltip title={lang("food-around-title")} arrow>
+        <Tab
+          icon={<FoodBankOutlined sx={{ width: "1.5em", height: "1.5em" }} />}
+          // label={lang("food-around-label")}
+          onClick={() => tabNavigate.setTab(AppTab.FOOD)}
+        />
+      </Tooltip>
+      <Tooltip title={lang("people-title")} arrow>
+        <Tab
+          icon={<PeopleAltOutlined sx={{ width: "1.5em", height: "1.5em" }} />}
+          // label={lang("people-label")}
+          onClick={() => tabNavigate.setTab(AppTab.PEOPLE_AROUND)}
+        />
+      </Tooltip>
+      <Tooltip title={lang("place-title")} arrow>
+        <Tab
+          icon={<PlaceOutlined sx={{ width: "1.5em", height: "1.5em" }} />}
+          // label={lang("place-label")}
+          onClick={() => tabNavigate.setTab(AppTab.PLACE)}
+        />
+      </Tooltip>
+    </Tabs>
   );
 });
 

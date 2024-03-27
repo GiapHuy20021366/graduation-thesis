@@ -16,12 +16,19 @@ export default function AppContent() {
         p={0}
         sx={{
           overflowX: "hidden",
-          overflowY: "hidden"
+          overflowY: "hidden",
+          backgroundColor: "background.default",
+          color: "text.primary"
         }}
+        boxSizing={"border-box"}
       >
         <AppHeader />
         <AppMain />
-        <AppFooter />
+        <AppFooter
+          sx={{
+            display: ["flex", "none"],
+          }}
+        />
       </Stack>
       <Box>
         <SideBar />

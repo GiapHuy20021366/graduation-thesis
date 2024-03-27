@@ -7,7 +7,7 @@ import {
   usePageResolver,
 } from "../../../hooks";
 import {
-  Box,
+  Avatar,
   Divider,
   ListItemIcon,
   ListItemText,
@@ -26,14 +26,18 @@ import {
 } from "@mui/icons-material";
 import SideBarOpener from "./SideBarOpener";
 import StyledLink from "../navigate/StyledLink";
+import SquareContainer from "../custom/SquareContainer";
 
 export default function SideBar() {
   const appContentContext = useAppContentContext();
   const isActive = appContentContext.menuSide.active;
   const authContext = useAuthContext();
+  const { account } = authContext;
   const lang = useComponentLanguage("SideBar");
 
   const page = usePageResolver();
+
+  const exposedName = account?.firstName ?? "" + account?.lastName ?? "";
 
   return (
     <Drawer
@@ -42,31 +46,22 @@ export default function SideBar() {
       onClose={() => appContentContext.setMenuSideActive(false)}
       variant="temporary"
     >
-      <Stack p={1} gap={1}>
-        <Stack direction="row">
-          <Box
-            component="img"
-            alt={lang("avatar")}
-            src={authContext.account?.avatar}
-            sx={{
-              width: "25%",
-              height: "auto",
-              borderRadius: "50%",
-              margin: "1rem 0",
-            }}
-          />
-          <Typography>{authContext.account?.firstName ?? ""}</Typography>
-          <Stack
-            sx={{
-              justifyContent: "center",
-            }}
-          >
-            <SideBarOpener />
-          </Stack>
+      <Stack sx={{ overflow: "hidden" }}>
+        <Stack direction="row" gap={1} p={1} alignItems={"center"}>
+          <SquareContainer size={"4em"}>
+            <Avatar
+              src={account?.avatar}
+              sx={{ width: "100%", height: "100%" }}
+            >
+              {exposedName[0] ?? ""}
+            </Avatar>
+          </SquareContainer>
+          <Typography>{exposedName}</Typography>
+          <SideBarOpener />
         </Stack>
-        <Divider />
+        <Divider sx={{ backgroundColor: "inherit" }} />
         <MenuList
-          sx={{ gap: 2 }}
+          sx={{ gap: 2, overflowY: "auto" }}
           onClick={() => appContentContext.setMenuSideActive(false)}
         >
           {/* Home */}
@@ -129,7 +124,8 @@ export default function SideBar() {
             </MenuItem>
           </StyledLink>
 
-          <Divider />
+          <Divider sx={{ backgroundColor: "inherit", my: 1 }} />
+
           {/* Setting */}
           <StyledLink to={"/setting"}>
             <MenuItem selected={page.is(applicationPages.SETTING)}>

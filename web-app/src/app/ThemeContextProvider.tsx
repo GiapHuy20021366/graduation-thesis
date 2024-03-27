@@ -3,6 +3,7 @@ import React, {
   Dispatch,
   SetStateAction,
   createContext,
+  useEffect,
   useState,
 } from "react";
 import { darkThemeOptions, whiteThemeOptions } from "../themes";
@@ -21,10 +22,20 @@ export const ThemeContext = createContext<IThemeContext>({
   setMode: () => {},
 });
 
+const THEME_STORAGE_KEY = "theme";
+
+const getTheme = (): PaletteMode => {
+  const item = localStorage.getItem(THEME_STORAGE_KEY);
+  if (item === "light" || item === "dark") {
+    return item as PaletteMode;
+  }
+  return "light";
+};
+
 export default function ThemeContextProvider({
   children,
 }: IThemeContextProviderProps) {
-  const [mode, setMode] = useState<PaletteMode>("light");
+  const [mode, setMode] = useState<PaletteMode>(getTheme());
 
   const theme = React.useMemo(() => {
     switch (mode) {
@@ -35,7 +46,9 @@ export default function ThemeContextProvider({
     }
   }, [mode]);
 
-  console.log(theme);
+  useEffect(() => {
+    localStorage.setItem(THEME_STORAGE_KEY, mode);
+  }, [mode]);
 
   return (
     <ThemeContext.Provider value={{ mode, setMode }}>

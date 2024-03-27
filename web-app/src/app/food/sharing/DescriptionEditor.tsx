@@ -36,12 +36,20 @@ export default function DescriptionEditor() {
   const { description, setDescription } = form;
 
   return (
-    <Box spellCheck={false}>
+    <Box
+      spellCheck={false}
+      sx={{
+        border: "1px solid #bdbdbd",
+        borderRadius: "4px",
+        width: "100%",
+        boxSizing: "border-box",
+      }}
+    >
       <Accordion>
         <AccordionSummary
           expandIcon={<ExpandMore />}
           sx={{
-            paddingLeft: 0,
+            paddingLeft: "8px",
             ">.MuiAccordionSummary-content": {
               margin: 0,
               ">.Mui-expanded": {
@@ -56,7 +64,7 @@ export default function DescriptionEditor() {
         </AccordionSummary>
         <AccordionDetails
           sx={{
-            paddingLeft: 0,
+            p: 0
           }}
         >
           <RichTextEditor

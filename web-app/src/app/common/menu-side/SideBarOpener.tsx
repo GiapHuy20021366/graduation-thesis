@@ -1,38 +1,44 @@
 import { MenuOutlined, MenuOpen } from "@mui/icons-material";
 import { useAppContentContext, useComponentLanguage } from "../../../hooks";
-import { IconButton, Tooltip } from "@mui/material";
+import {
+  IconButton,
+  IconButtonProps,
+  SxProps,
+  Theme,
+  Tooltip,
+} from "@mui/material";
 
-export default function SideBarOpener() {
-  const appContentContext = useAppContentContext();
-  const isActive = appContentContext.menuSide.active;
-  const lang = useComponentLanguage("SideBarOpener");
-  return (
-    <Tooltip
-      arrow
-      title={`${isActive ? lang("close-title") : lang("open-title")}`}
-    >
-      <IconButton
-        sx={{
-          color: "black",
-        }}
-        onClick={() => appContentContext.setMenuSideActive(!isActive)}
+import React from "react";
+
+type SideBarOpenerProps = IconButtonProps & {
+  IconPropsSx?: SxProps<Theme>;
+};
+
+const SideBarOpener = React.forwardRef<HTMLButtonElement, SideBarOpenerProps>(
+  (props, ref) => {
+    const { IconPropsSx, ...rest } = props;
+    const appContentContext = useAppContentContext();
+    const isActive = appContentContext.menuSide.active;
+    const lang = useComponentLanguage("SideBarOpener");
+    return (
+      <Tooltip
+        arrow
+        title={`${isActive ? lang("close-title") : lang("open-title")}`}
       >
-        {isActive ? (
-          <MenuOpen
-            sx={{
-              width: "1.3em",
-              height: "1.3em",
-            }}
-          />
-        ) : (
-          <MenuOutlined
-            sx={{
-              width: "1.3em",
-              height: "1.3em",
-            }}
-          />
-        )}
-      </IconButton>
-    </Tooltip>
-  );
-}
+        <IconButton
+          ref={ref}
+          {...rest}
+          onClick={() => appContentContext.setMenuSideActive(!isActive)}
+        >
+          {isActive ? (
+            <MenuOpen sx={{ ...IconPropsSx }} />
+          ) : (
+            <MenuOutlined sx={{ ...IconPropsSx }} />
+          )}
+        </IconButton>
+      </Tooltip>
+    );
+  }
+);
+
+export default SideBarOpener;

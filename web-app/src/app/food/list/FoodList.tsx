@@ -64,19 +64,14 @@ export default function FoodList() {
   };
 
   return (
-    <Box
-      width={"100%"}
-      boxSizing={"border-box"}
-      boxShadow={1}
-      // position={"relative"}
-    >
+    <Box width={"100%"} boxSizing={"border-box"}>
       <Stack
         width="100%"
         direction={"row"}
         position={"sticky"}
         top={0}
-        sx={{ backgroundColor: "white" }}
         zIndex={1000}
+        boxShadow={1}
       >
         <Tabs
           value={tabNavigate.tab}
@@ -88,24 +83,34 @@ export default function FoodList() {
               textTransform: "initial",
             },
           }}
+          textColor="inherit"
         >
           <Tab
             label={lang("Của tôi")}
             onClick={onTabMyFoodClick}
             icon={<HomeOutlined />}
             iconPosition="start"
+            sx={{
+              color: "primary.main",
+            }}
           />
           <Tab
             label={lang("Gần đây")}
             icon={<PeopleAltOutlined />}
             iconPosition="start"
             onClick={onTabNearFoodClick}
+            sx={{
+              color: "primary.main",
+            }}
           />
           <Tab
             label={lang("Đã yêu thích")}
             icon={<FavoriteOutlined />}
             iconPosition="start"
             onClick={onTabLovedFoodClick}
+            sx={{
+              color: "secondary.main",
+            }}
           />
         </Tabs>
       </Stack>

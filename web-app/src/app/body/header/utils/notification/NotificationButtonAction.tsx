@@ -1,15 +1,26 @@
 import { NotificationsOutlined } from "@mui/icons-material";
-import { Badge, IconButton, IconButtonProps, Popover } from "@mui/material";
+import {
+  Badge,
+  IconButton,
+  IconButtonProps,
+  Popover,
+  SxProps,
+  Theme,
+} from "@mui/material";
 import React from "react";
 import NotificationSystemExposed from "./NotificationSystemExposed";
 import { useNotificationContext } from "../../../../../hooks";
 
-type NotificationButtonActionProps = IconButtonProps;
+type NotificationButtonActionProps = IconButtonProps & {
+  IconPropsSx?: SxProps<Theme>;
+};
 
 const NotificationButtonAction = React.forwardRef<
   HTMLButtonElement,
   NotificationButtonActionProps
 >((props, ref) => {
+  const { IconPropsSx, ...rest } = props;
+
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const notificationContext = useNotificationContext();
   const unreadCount = notificationContext.groups.reduce((cur, group) => {
@@ -32,7 +43,7 @@ const NotificationButtonAction = React.forwardRef<
     <>
       <IconButton
         ref={ref}
-        {...props}
+        {...rest}
         sx={{
           ml: "auto",
           ...(props.sx ?? {}),
@@ -43,17 +54,7 @@ const NotificationButtonAction = React.forwardRef<
         onClick={handleOpen}
       >
         <Badge badgeContent={unreadCount} color="secondary" max={9}>
-          <NotificationsOutlined
-            sx={{
-              width: "1.3em",
-              height: "1.3em",
-              cursor: "pointer",
-              ":hover": {
-                color: "gray",
-              },
-              color: "black",
-            }}
-          />
+          <NotificationsOutlined sx={{ ...IconPropsSx }} />
         </Badge>
       </IconButton>
       <Popover

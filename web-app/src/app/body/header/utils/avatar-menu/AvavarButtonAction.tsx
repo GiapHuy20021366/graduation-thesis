@@ -7,8 +7,14 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
-import { useAuthContext, useComponentLanguage } from "../../../../../hooks";
+import {
+  useAuthContext,
+  useComponentLanguage,
+  useThemeContext,
+} from "../../../../../hooks";
 import { deepOrange } from "@mui/material/colors";
+import ThemeSwitch from "../../../../common/custom/ThemeSwitch";
+import { LogoutOutlined } from "@mui/icons-material";
 
 type AvatarActionProps = IconButtonProps;
 
@@ -19,6 +25,7 @@ const AvatarButtonAction = React.forwardRef<
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const authContext = useAuthContext();
   const { account } = authContext;
+  const theme = useThemeContext();
   const lang = useComponentLanguage("AvatarButtonAction");
 
   const logout = () => {
@@ -76,7 +83,23 @@ const AvatarButtonAction = React.forwardRef<
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
+        <MenuItem>
+          <ThemeSwitch
+            checked={theme.mode === "dark"}
+            onChange={(_event, checked) => {
+              theme.setMode(checked ? "dark" : "light");
+            }}
+            sx={{ mr: 1, ml: -1 }}
+          />
+          <Typography onClick={() => logout()} textAlign="center">
+            {theme.mode === "dark" ? lang("dark") : lang("white")}
+          </Typography>
+        </MenuItem>
         <MenuItem onClick={handleClose}>
+          <LogoutOutlined
+            sx={{ marginRight: 1, width: "1.3em", height: "1.3em" }}
+            color="secondary"
+          />
           <Typography onClick={() => logout()} textAlign="center">
             {lang("logout")}
           </Typography>

@@ -80,18 +80,13 @@ export default function PlaceList() {
   };
 
   return (
-    <Stack
-      width={"100%"}
-      boxSizing={"border-box"}
-      boxShadow={1}
-      height={"100%"}
-    >
+    <Stack width={"100%"} boxSizing={"border-box"} height={"100%"}>
       <Stack
         width="100%"
         direction={"row"}
         position={"sticky"}
         top={0}
-        sx={{ backgroundColor: "white" }}
+        boxShadow={1}
         zIndex={1000}
       >
         <Tabs
@@ -104,6 +99,7 @@ export default function PlaceList() {
               textTransform: "initial",
             },
           }}
+          textColor="inherit"
         >
           <Tab
             label={lang("Của tôi")}

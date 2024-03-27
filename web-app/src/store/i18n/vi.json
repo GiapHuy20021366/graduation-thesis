@@ -56,7 +56,8 @@
     },
     "SettingContent": {
         "title": "Cài đặt",
-        "language": "Ngôn ngữ"
+        "language": "Ngôn ngữ",
+        "theme": "Chủ đề"
     },
     "SettingLanguage": {
         "choose": "Lựa chọn",
@@ -238,7 +239,9 @@
         "place-label": "Địa điểm"
     },
     "AvatarButtonAction": {
-        "logout": "Đăng xuất"
+        "logout": "Đăng xuất",
+        "dark": "Tối",
+        "light": "Sáng"
     },
     "NotificationExposed": {
         "food-expire": "Bạn có {0} thực phẩm đã hết hạn trong ngày hôm nay",

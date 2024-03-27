@@ -1,65 +1,48 @@
-import { Box, Divider, Stack } from "@mui/material";
-import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
-import AppHeaderTitle from "./AppHeaderTitle";
+import { AppBar, AppBarProps, Divider, Stack, Toolbar } from "@mui/material";
 import AppHeaderUtil from "./AppHeaderUtil";
 import AppTabs from "../footer/AppTabs";
 import AvatarButtonAction from "./utils/avatar-menu/AvavarButtonAction";
+import React from "react";
 
-export default function AppHeader() {
-  return (
-    <Box
-      sx={{
-        width: "100%",
-        padding: 0,
-        margin: 0,
-        boxSizing: "border-box",
-        boxShadow: 1,
-      }}
-    >
-      <Grid2
-        container
-        spacing={1}
+type AppHeaderProps = AppBarProps;
+
+const AppHeader = React.forwardRef<HTMLDivElement, AppHeaderProps>(
+  (props, ref) => {
+    return (
+      <AppBar
+        ref={ref}
+        {...props}
         sx={{
-          display: "flex",
-          alignItems: "center",
+          position: "relative",
+          boxSizing: "border-box",
+          width: "100%",
+          ...props.sx,
         }}
+        color="primary"
       >
-        <Grid2 mobile tablet laptop desktop>
-          <Stack direction={"row"} width={"100%"} alignItems={"center"} gap={1}>
+        <Toolbar sx={{ pl: 2, pr: 0 }}>
+          <Stack direction={"row"} width={"auto"}>
             <AppHeaderUtil />
-            <Divider orientation="vertical" flexItem />
-            {/* <Box display={["none", "none", "block"]}>
-              <AppHeaderTitle />
-            </Box> */}
+            <Divider
+              orientation="vertical"
+              flexItem
+              sx={{ borderColor: "inherit" }}
+            />
           </Stack>
-        </Grid2>
-        <Grid2 display={["none", "block", "block"]}>
-          <AppTabs sx={{ display: "flex", justifyContent: "center" }} />
-        </Grid2>
-        <Grid2
-          mobile
-          tablet
-          laptop
-          desktop
-          sx={{
-            display: ["flex", "none"],
-            justifyContent: "end",
-          }}
-        >
-          <AppHeaderTitle />
-        </Grid2>
-        <Grid2
-          mobile
-          tablet
-          laptop
-          desktop
-          sx={{
-            display: ["none", "flex"],
-          }}
-        >
-          <AvatarButtonAction sx={{ ml: "auto", mr: 1 }} />
-        </Grid2>
-      </Grid2>
-    </Box>
-  );
-}
+          <Stack
+            flex={1}
+            alignItems={"center"}
+            display={["none", "flex"]}
+          >
+            <AppTabs />
+          </Stack>
+          <Stack direction={"row"} width={"auto"} ml={"auto"}>
+            <AvatarButtonAction />
+          </Stack>
+        </Toolbar>
+      </AppBar>
+    );
+  }
+);
+
+export default AppHeader;

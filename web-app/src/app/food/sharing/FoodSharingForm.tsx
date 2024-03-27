@@ -214,6 +214,7 @@ export default function FoodSharingForm() {
           activeStep={activeStep}
           sx={{
             width: "100%",
+            backgroundColor: "background.paper",
           }}
         >
           {steps.map((label, index) => {
@@ -312,7 +313,6 @@ export default function FoodSharingForm() {
             direction="row"
             sx={{
               borderBottom: "1px solid #bdbdbd",
-              borderRadius: "4px",
               width: "100%",
               boxSizing: "border-box",
               flexWrap: "wrap",
