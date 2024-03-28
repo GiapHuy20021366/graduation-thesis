@@ -33,6 +33,9 @@ export interface IFetchLocationStates {
   ) => Promise<ILocation | undefined>;
   setLocation: Dispatch<SetStateAction<ILocation | undefined>>;
   status: RequestStatus;
+  fetcheds: ILocation[];
+  hasPrev: boolean;
+  hasNext: boolean;
 }
 
 export function useFetchLocation({
@@ -43,6 +46,9 @@ export function useFetchLocation({
     defaultLocation
   );
   const lastFetchTime = useRef<number>(0);
+  const [fetcheds, setFetcheds] = useState<ILocation[]>(
+    defaultLocation ? [defaultLocation] : []
+  );
 
   const fetch = (
     coordinates: ICoordinates,
@@ -91,6 +97,11 @@ export function useFetchLocation({
 
           lastFetchTime.current = Date.now();
           setStatus(RequestStatus.SUCCESS);
+
+          const _fetcheds = fetcheds.slice();
+          _fetcheds.push(newLocation);
+          setFetcheds(_fetcheds);
+
           onSuccess && onSuccess(newLocation);
           return Promise.resolve(newLocation);
         } else {
@@ -121,6 +132,8 @@ export function useFetchLocation({
     setStatus(RequestStatus.INITIAL);
   };
 
+  const index = location ? fetcheds.indexOf(location) : -1;
+
   return {
     status,
     refreshStatus,
@@ -128,5 +141,8 @@ export function useFetchLocation({
     location,
     setLocation,
     fetchIfNotAbsent,
+    fetcheds,
+    hasPrev: location != null && 0 < index,
+    hasNext: location != null && 0 <= index && index < fetcheds.length - 1,
   };
 }

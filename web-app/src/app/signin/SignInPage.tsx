@@ -11,6 +11,8 @@ export default function SignInPage() {
         alignItems: "center",
         padding: "1rem",
         textAlign: "center",
+        backgroundColor: "background.default",
+        color: "text.primary",
       }}
     >
       <Stack>

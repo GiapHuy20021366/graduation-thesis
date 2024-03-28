@@ -16,7 +16,7 @@ declare module "@mui/material/styles" {
 
 export const breakPoints = {
   mobile: 0,
-  tablet: 640,
+  tablet: 680,
   laptop: 1024,
   desktop: 1280,
 } as const;

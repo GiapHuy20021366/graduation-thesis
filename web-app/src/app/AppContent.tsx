@@ -11,15 +11,13 @@ export default function AppContent() {
     <AppContentContextProvider>
       <Stack
         direction={"column"}
-        height={"100svh"}
-        m="0px -8px"
+        m={0}
         p={0}
         sx={{
           overflowX: "hidden",
           overflowY: "hidden",
-          backgroundColor: "background.default",
-          color: "text.primary"
         }}
+        height={"100svh"}
         boxSizing={"border-box"}
       >
         <AppHeader />

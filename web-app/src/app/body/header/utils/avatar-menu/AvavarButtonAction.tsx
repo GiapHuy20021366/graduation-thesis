@@ -29,9 +29,8 @@ const AvatarButtonAction = React.forwardRef<
   const lang = useComponentLanguage("AvatarButtonAction");
 
   const logout = () => {
-    authContext.setAccount(undefined);
-    authContext.setToken(undefined);
     sessionStorage.clear();
+    authContext.logout();
   };
 
   const open = Boolean(anchorEl);
@@ -44,6 +43,8 @@ const AvatarButtonAction = React.forwardRef<
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  console.log(authContext);
 
   return (
     <>
@@ -91,7 +92,7 @@ const AvatarButtonAction = React.forwardRef<
             }}
             sx={{ mr: 1, ml: -1 }}
           />
-          <Typography onClick={() => logout()} textAlign="center">
+          <Typography textAlign="center">
             {theme.mode === "dark" ? lang("dark") : lang("white")}
           </Typography>
         </MenuItem>

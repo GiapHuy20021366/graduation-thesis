@@ -20,7 +20,7 @@ const AppHeader = React.forwardRef<HTMLDivElement, AppHeaderProps>(
         }}
         color="primary"
       >
-        <Toolbar sx={{ pl: 2, pr: 0 }}>
+        <Toolbar sx={{ pl: 0, pr: 0 }}>
           <Stack direction={"row"} width={"auto"}>
             <AppHeaderUtil />
             <Divider
@@ -29,11 +29,7 @@ const AppHeader = React.forwardRef<HTMLDivElement, AppHeaderProps>(
               sx={{ borderColor: "inherit" }}
             />
           </Stack>
-          <Stack
-            flex={1}
-            alignItems={"center"}
-            display={["none", "flex"]}
-          >
+          <Stack flex={1} alignItems={"center"} display={["none", "flex"]}>
             <AppTabs />
           </Stack>
           <Stack direction={"row"} width={"auto"} ml={"auto"}>

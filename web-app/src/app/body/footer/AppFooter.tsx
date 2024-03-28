@@ -18,7 +18,7 @@ const AppFooter = React.forwardRef<HTMLDivElement, AppFooterProps>(
         }}
         color="default"
       >
-        <Toolbar>
+        <Toolbar sx={{ justifyContent: "center" }}>
           <AppTabs />
         </Toolbar>
       </AppBar>

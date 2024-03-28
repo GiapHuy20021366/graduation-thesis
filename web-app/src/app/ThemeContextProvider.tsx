@@ -1,4 +1,4 @@
-import { PaletteMode, ThemeProvider, createTheme } from "@mui/material";
+import { Box, PaletteMode, ThemeProvider, createTheme } from "@mui/material";
 import React, {
   Dispatch,
   SetStateAction,
@@ -54,7 +54,17 @@ export default function ThemeContextProvider({
 
   return (
     <ThemeContext.Provider value={{ mode, setMode }}>
-      <ThemeProvider theme={theme}>{children}</ThemeProvider>
+      <ThemeProvider theme={theme}>
+        <Box
+          sx={{
+            minHeight: "100svh",
+            backgroundColor: "background.default",
+            color: "text.primary",
+          }}
+        >
+          {children}
+        </Box>
+      </ThemeProvider>
     </ThemeContext.Provider>
   );
 }

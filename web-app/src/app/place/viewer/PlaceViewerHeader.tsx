@@ -50,7 +50,6 @@ const PlaceViewerHeader = React.forwardRef<
           fullHeightHover
           navButtonsAlwaysVisible
           sx={{
-            backgroundColor: "white",
             width: "100%",
             height: "230px",
           }}

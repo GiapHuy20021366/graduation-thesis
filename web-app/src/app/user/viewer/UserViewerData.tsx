@@ -1,4 +1,4 @@
-import { Stack } from "@mui/material";
+import { SpeedDial, Stack, Tooltip } from "@mui/material";
 import { useState } from "react";
 import { UserViewerTab } from "./user-viewer-tab";
 import UserViewerTabs from "./UserViewerTabs";
@@ -7,6 +7,9 @@ import UserViewerIntroduction from "./UserViewerIntroduction";
 import UserViewerShared from "./UserViewerShared";
 import UserViewerSubcribed from "./UserViewerSubcribed";
 import UserViewerPlace from "./UserViewerPlace";
+import { Add } from "@mui/icons-material";
+import StyledLink from "../../common/navigate/StyledLink";
+import { applicationPages } from "../../../hooks";
 
 export default function UserViewerData() {
   const [tab, setTab] = useState<UserViewerTab>(0);
@@ -19,7 +22,6 @@ export default function UserViewerData() {
           position: "sticky",
           top: 1,
           zIndex: 1000,
-          backgroundColor: "white",
         }}
       />
       {/* Tabs display */}
@@ -32,12 +34,14 @@ export default function UserViewerData() {
 
         <UserViewerSubcribed active={tab === UserViewerTab.SUBCRIBED} />
       </>
-      {/* <SpeedDial
-        icon={<Add />}
-        ariaLabel={"Add food"}
-        sx={{ position: "absolute", bottom: 76, right: 26 }}
-        onClick={() => navigate("/food/sharing?target=place&id=" + data._id)}
-      /> */}
+      <Tooltip arrow title="Thêm thực phẩm">
+        <StyledLink
+          to={applicationPages.FOOD_SHARING}
+          style={{ position: "absolute", bottom: 76, right: 26 }}
+        >
+          <SpeedDial icon={<Add />} ariaLabel={"Add food"} />
+        </StyledLink>
+      </Tooltip>
     </Stack>
   );
 }

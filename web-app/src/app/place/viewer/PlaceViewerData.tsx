@@ -27,7 +27,7 @@ export default function PlaceViewerData({ data }: PlaceViewerDataProps) {
           position: "sticky",
           top: 1,
           zIndex: 1000,
-          backgroundColor: "white",
+          boxShadow: 1
         }}
       />
       {/* Tabs display */}
