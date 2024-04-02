@@ -10,8 +10,8 @@ export default function HomePage() {
           position: "sticky",
           top: 0,
           zIndex: 1000,
-          pt: 3,
-          ml: 1,
+          pt: 2,
+          pl: 1,
           backgroundColor: "background.default",
         }}
       />

@@ -4,28 +4,32 @@ import { toLeftTime } from "../../../data";
 import { useI18nContext } from "../../../hooks";
 
 interface ICountDownProps {
-  time: number | string;
+  time: number | string | Date;
   sx?: SxProps<Theme>;
+  enable?: boolean;
+  second?: boolean;
 }
 
-export default function CountDown({ time, sx }: ICountDownProps) {
+export default function CountDown({
+  time,
+  sx,
+  enable,
+  second,
+}: ICountDownProps) {
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const i18n = useI18nContext();
   const lang = i18n.of(CountDown);
 
   useEffect(() => {
+    if (!enable) return;
     const timeout = setInterval(() => {
-      if (typeof time === "string") {
-        const nTime = new Date(time).getTime();
-        setTimeLeft(nTime - Date.now());
-      } else {
-        setTimeLeft(time - Date.now());
-      }
+      const _time = new Date(time);
+      setTimeLeft(_time.getTime() - Date.now());
     }, 1000);
     return () => {
       clearInterval(timeout);
     };
-  }, [time]);
+  }, [enable, time]);
 
   const { days, hours, minutes, seconds } = toLeftTime(Math.max(0, timeLeft));
 
@@ -33,8 +37,12 @@ export default function CountDown({ time, sx }: ICountDownProps) {
     <Stack sx={sx}>
       {days < 10 ? `0${days}` : days} {lang("days")}{" "}
       {hours < 10 ? `0${hours}` : hours}:
-      {minutes < 10 ? `0${minutes}` : minutes}:
-      {seconds < 10 ? `0${seconds}` : seconds} {lang("left")}
+      {minutes < 10 ? `0${minutes}` : minutes}
+      {second !== false && (
+        <>
+          :{seconds < 10 ? `0${seconds}` : seconds} {lang("left")}
+        </>
+      )}
     </Stack>
   );
 }

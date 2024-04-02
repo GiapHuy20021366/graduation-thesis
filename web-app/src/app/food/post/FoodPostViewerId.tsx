@@ -3,15 +3,15 @@ import { useParams } from "react-router";
 import { useAuthContext, useLoading } from "../../../hooks";
 import { useEffect, useState } from "react";
 import { foodFetcher } from "../../../api";
-import FoodPostInfoDataDisplay from "./FoodPostInfoDataDisplay";
-import FoodPostInfoReplacer from "./FoodPostInfoReplacer";
+import FoodPostViewerData from "./FoodPostViewerData";
+import FoodPostViewerHolder from "./FoodPostViewerHolder";
 import { IFoodPostExposedWithLike } from "../../../data";
 
 interface IFoodPostInfoProps {
-  foodId?: string;
+  id?: string;
 }
 
-export default function FoodPostInfo({ foodId }: IFoodPostInfoProps) {
+export default function FoodPostViewerId({ id }: IFoodPostInfoProps) {
   const params = useParams();
   const authContext = useAuthContext();
   const loading = useLoading();
@@ -39,7 +39,7 @@ export default function FoodPostInfo({ foodId }: IFoodPostInfoProps) {
   };
 
   useEffect(() => {
-    const foodPostId = foodId ?? params.id;
+    const foodPostId = id ?? params.id;
     if (foodPostId != null) {
       fetchingFood(foodPostId);
     }
@@ -49,8 +49,8 @@ export default function FoodPostInfo({ foodId }: IFoodPostInfoProps) {
   return (
     <>
       {params.id == null || (params.id === "" && <PageNotFound />)}
-      {loading.isActice && <FoodPostInfoReplacer />}
-      {data && <FoodPostInfoDataDisplay data={data} />}
+      {loading.isActice && <FoodPostViewerHolder />}
+      {data && <FoodPostViewerData data={data} />}
       {!found && <PageNotFound />}
     </>
   );

@@ -1,7 +1,7 @@
 import { Skeleton, Stack } from "@mui/material";
 import Carousel from "react-material-ui-carousel";
 
-export default function FoodPostInfoReplacer() {
+export default function FoodPostViewerHolder() {
   return (
     <Stack>
       <Carousel autoPlay indicators swipe>

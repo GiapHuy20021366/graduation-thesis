@@ -1,5 +1,5 @@
 import React, { createContext, useState } from "react";
-import { ITabNavigateStates, useLoader, useTabNavigate } from "../../hooks";
+import { useLoader, useTabNavigate } from "../../hooks";
 import { HomeTab, homeTabOptions } from "./home-tabs";
 import { IFoodPostExposed } from "../../data";
 import { IUseLoaderStates } from "../../hooks/useLoader";
@@ -8,7 +8,7 @@ interface IHomeViewerContextProviderProps {
   children?: React.ReactNode;
 }
 
-interface IFoodPostTagged extends IFoodPostExposed {
+export interface IFoodPostTagged extends IFoodPostExposed {
   tags: ("REGISTED" | "AROUND" | "SUGGESTED")[];
 }
 

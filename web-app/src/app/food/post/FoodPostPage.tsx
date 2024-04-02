@@ -1,5 +1,5 @@
-import FoodPostInfo from "./FoodPostInfo";
+import FoodPostViewerId from "./FoodPostViewerId";
 
 export default function FoodPostPage() {
-  return <FoodPostInfo />;
+  return <FoodPostViewerId />;
 }

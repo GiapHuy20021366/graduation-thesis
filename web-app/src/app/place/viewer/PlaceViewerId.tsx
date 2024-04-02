@@ -15,7 +15,7 @@ interface PlaceViewerProps {
   id?: string;
 }
 
-export default function PlaceViewer({ id }: PlaceViewerProps) {
+export default function PlaceViewerId({ id }: PlaceViewerProps) {
   const [data, setData] = useState<IPlaceExposed>();
   const [isNotFound, setIsNotFound] = useState<boolean>(false);
   const authContext = useAuthContext();

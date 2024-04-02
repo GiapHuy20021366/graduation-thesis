@@ -11,7 +11,6 @@ import {
   useI18nContext,
 } from "../../../hooks";
 import { useState } from "react";
-import FullWidthBox from "../../common/custom/FullWidthBox";
 import Carousel from "react-material-ui-carousel";
 import {
   Avatar,
@@ -63,12 +62,12 @@ const toUserExposedName = (post: IFoodPostExposedWithLike): string => {
   return user.firstName + " " + user.lastName;
 };
 
-export default function FoodPostInfoDataDisplay({
+export default function FoodPostViewerData({
   data,
 }: IFoodPostInfoDataDisplayProps) {
   const i18n = useI18nContext();
   const lang = i18n.of(
-    FoodPostInfoDataDisplay,
+    FoodPostViewerData,
     "Commons",
     "Categories",
     "Quantities"
@@ -94,7 +93,7 @@ export default function FoodPostInfoDataDisplay({
   const userExposedName = toUserExposedName(data);
 
   return (
-    <FullWidthBox>
+    <Box width={"100%"}>
       <Carousel
         indicators
         swipe
@@ -102,16 +101,13 @@ export default function FoodPostInfoDataDisplay({
         animation="slide"
         cycleNavigation
         fullHeightHover
-        sx={{
-          backgroundColor: "white",
-        }}
       >
         {data.images.map((url) => {
           return (
             <Box
               sx={{
                 width: "100%",
-                height: "260px",
+                height: ["200px", "260px"],
               }}
               key={url}
             >
@@ -122,8 +118,9 @@ export default function FoodPostInfoDataDisplay({
       </Carousel>
       <Stack
         sx={{
-          backgroundColor: "white",
+          backgroundColor: "background.default",
           my: 2,
+          borderRadius: 2,
         }}
         gap={0.5}
         p={1}
@@ -144,14 +141,7 @@ export default function FoodPostInfoDataDisplay({
           </Typography>
           <LocalOfferOutlined color="secondary" sx={{ ml: 1 }} />
           <Stack direction="row" marginLeft={"auto"}>
-            <IconButton
-              sx={{
-                color: liked ? "red" : "gray",
-                ":hover": {
-                  color: "red",
-                },
-              }}
-            >
+            <IconButton color={liked ? "error" : "default"}>
               <Badge
                 badgeContent={<span>{toLikeCount(data, liked)}</span>}
                 anchorOrigin={{
@@ -209,7 +199,12 @@ export default function FoodPostInfoDataDisplay({
           <Typography>{data.location.name}</Typography>
         </Stack>
       </Stack>
-      <Stack sx={{ backgroundColor: "white", my: 2 }} minHeight={100} p={1}>
+      <Stack
+        sx={{ backgroundColor: "background.default", my: 2 }}
+        minHeight={100}
+        p={1}
+        borderRadius={2}
+      >
         <Box component={"h4"}>{lang("category")}</Box>
         <Divider />
         {data.categories.length === 0 && (
@@ -228,7 +223,13 @@ export default function FoodPostInfoDataDisplay({
         </Stack>
       </Stack>
 
-      <Stack sx={{ backgroundColor: "white" }} my={2} p={1} direction={"row"}>
+      <Stack
+        sx={{ backgroundColor: "background.default" }}
+        my={2}
+        p={1}
+        direction={"row"}
+        borderRadius={2}
+      >
         <Stack direction={"row"} alignItems={"center"} gap={2} width={"100%"}>
           <Avatar
             alt={userExposedName}
@@ -264,7 +265,12 @@ export default function FoodPostInfoDataDisplay({
         </Stack>
       </Stack>
 
-      <Stack sx={{ backgroundColor: "white" }} minHeight={100} p={1}>
+      <Stack
+        sx={{ backgroundColor: "background.default" }}
+        minHeight={100}
+        p={1}
+        borderRadius={2}
+      >
         <Box component={"h4"}>{lang("description")}</Box>
         <Divider />
         {data.description ? (
@@ -277,6 +283,6 @@ export default function FoodPostInfoDataDisplay({
           <Typography>{lang("no-description")}</Typography>
         )}
       </Stack>
-    </FullWidthBox>
+    </Box>
   );
 }

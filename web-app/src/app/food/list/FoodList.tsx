@@ -72,6 +72,9 @@ export default function FoodList() {
         top={0}
         zIndex={1000}
         boxShadow={1}
+        sx={{
+          backgroundColor: "background.default",
+        }}
       >
         <Tabs
           value={tabNavigate.tab}
