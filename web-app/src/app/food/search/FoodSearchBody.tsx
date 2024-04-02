@@ -473,12 +473,12 @@ export default function FoodSearchBody() {
         <Box
           sx={{
             position: "sticky",
-            top: 1,
-            mt: 1,
+            top: 0,
             width: "100%",
             padding: "5px",
             boxSizing: "border-box",
             zIndex: 100,
+            backgroundColor: "background.default",
           }}
         >
           <Autocomplete
@@ -608,7 +608,6 @@ export default function FoodSearchBody() {
             overflowY: "auto",
             width: "100%",
             boxSizing: "border-box",
-            minHeight: "80vh",
           }}
         >
           {foods.map((food, index) => {

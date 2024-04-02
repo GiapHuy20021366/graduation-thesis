@@ -44,8 +44,6 @@ const AvatarButtonAction = React.forwardRef<
     setAnchorEl(null);
   };
 
-  console.log(authContext);
-
   return (
     <>
       <IconButton

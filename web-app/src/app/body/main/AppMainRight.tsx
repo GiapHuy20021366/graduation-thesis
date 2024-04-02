@@ -10,8 +10,6 @@ export default function AppMainRight() {
       display={["none", "block"]}
       sx={{ height: "100%" }}
       boxSizing={"border-box"}
-      boxShadow={1}
-      // border={"1px solid red"}
     ></Grid2>
   );
 }

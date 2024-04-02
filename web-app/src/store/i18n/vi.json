@@ -312,5 +312,11 @@
         "user-location": "Vị trí của người dùng",
         "lost-page": "Có vẻ như bạn đang truy cập trang không tồn tại",
         "turn-back-home": "Quay trở lại nhà"
+    },
+    "HomeHeader": {
+        "l-all": "Tất cả",
+        "l-registed": "Đăng ký",
+        "l-around": "Gần bạn",
+        "l-suggested": "Sở thích"
     }
 }

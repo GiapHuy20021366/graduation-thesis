@@ -11,4 +11,5 @@ export type I18nReactComponent =
   | "StarterKitEditor"
   | "SideBar"
   | "SideBarOpener"
-  | "ViewerData";
+  | "ViewerData"
+  | "HomeHeader";

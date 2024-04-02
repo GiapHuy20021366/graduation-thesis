@@ -25,7 +25,7 @@ export const defaultResolver = (
   return 0;
 };
 
-interface ITabNavigateStates {
+export interface ITabNavigateStates {
   tab: number | null;
   setTab: (tab: number) => void;
 }

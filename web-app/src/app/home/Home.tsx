@@ -1,5 +1,10 @@
 import HomePage from "./HomePage";
+import HomeViewerContextProvider from "./HomeViewerContext";
 
 export default function Home() {
-  return <HomePage/>;
+  return (
+    <HomeViewerContextProvider>
+      <HomePage />
+    </HomeViewerContextProvider>
+  );
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-interface IUseLoaderStates {
+export interface IUseLoaderStates {
   isFetching: boolean;
   setIsFetching: React.Dispatch<React.SetStateAction<boolean>>;
   isEnd: boolean;

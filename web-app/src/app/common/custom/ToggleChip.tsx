@@ -1,4 +1,4 @@
-import { Chip, ChipProps, SxProps, Theme, alpha } from "@mui/material";
+import { Chip, ChipProps } from "@mui/material";
 import React from "react";
 
 type IToggleChipProps = ChipProps & {
@@ -26,20 +26,15 @@ const ToggleChip = React.forwardRef<HTMLDivElement, IToggleChipProps>(
       onClickValue && value !== undefined && onClickValue(value);
     };
 
-    const sx: SxProps<Theme> | undefined = !active
-      ? {
-          ...props.sx,
-        }
-      : {
-          ...props.sx,
-          backgroundColor: "#A020F0",
-          color: "white",
-          ":hover": {
-            backgroundColor: alpha("#A020F0", 1) + "!important",
-          },
-        };
-
-    return <Chip onClick={handleClick} ref={ref} {...rest} sx={sx} />;
+    return (
+      <Chip
+        onClick={handleClick}
+        ref={ref}
+        color={active ? "secondary" : "default"}
+        {...rest}
+        variant="filled"
+      />
+    );
   }
 );
 

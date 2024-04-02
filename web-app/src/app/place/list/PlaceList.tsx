@@ -88,6 +88,9 @@ export default function PlaceList() {
         top={0}
         boxShadow={1}
         zIndex={1000}
+        sx={{
+          backgroundColor: "background.default",
+        }}
       >
         <Tabs
           value={tabNavigate.tab}
