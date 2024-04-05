@@ -159,7 +159,6 @@ export default function FoodPostViewerData({
             <IconButton
               color="success"
               onClick={() => {
-                console.log("Clicked");
                 conversationContext.doBeginConversationWith(userId);
               }}
             >
@@ -250,14 +249,14 @@ export default function FoodPostViewerData({
                       user.location?.coordinates,
                       appContentContext.currentLocation
                     ) + "km"
-                  : lang("Không địa chỉ")}
+                  : lang("no-address")}
               </Typography>
             )}
             <Stack direction={"row"} width={"100%"}>
               <LocationOnOutlined color="info" />
               {typeof user === "object" && (
                 <Typography>
-                  {user.location?.name ?? lang("Không địa chỉ")}
+                  {user.location?.name ?? lang("no-address")}
                 </Typography>
               )}
             </Stack>

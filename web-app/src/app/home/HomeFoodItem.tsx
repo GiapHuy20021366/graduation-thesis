@@ -23,10 +23,10 @@ import {
 } from "@mui/icons-material";
 import TimeExposed from "../common/custom/TimeExposed";
 import Carousel from "react-material-ui-carousel";
-import FoodAvatars from "./FoodAvatars";
 import { toDistance } from "../../data";
 import { useAppContentContext } from "../../hooks";
 import CountDown from "../common/util/CountDown";
+import FoodAvatars from "../common/viewer/data/FoodAvatars";
 
 type HomeFoodItemProps = CardProps & {
   onExpandFood?: () => void;

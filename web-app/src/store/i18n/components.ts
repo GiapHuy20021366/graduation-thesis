@@ -12,4 +12,16 @@ export type I18nReactComponent =
   | "SideBar"
   | "SideBarOpener"
   | "ViewerData"
-  | "HomeHeader";
+  | "HomeHeader"
+  | "FoodSearchItem"
+  | "Categories"
+  | "Quantities"
+  | "Commons"
+  | "FoodSharingForm"
+  | "Durations"
+  | "FoodMapPicker"
+  | "FoodList"
+  | "LovedFood"
+  | "FoodPostButtonWithMenu"
+  | "DayValues"
+  | "Toasts";

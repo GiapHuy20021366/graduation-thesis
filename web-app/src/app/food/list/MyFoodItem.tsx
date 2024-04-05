@@ -1,7 +1,6 @@
 import { Box, Chip, Divider, Rating, Stack, Typography } from "@mui/material";
 import { IFoodPostExposed, toQuantityType } from "../../../data";
 import { useI18nContext } from "../../../hooks";
-import { useNavigate } from "react-router";
 import {
   LocalOfferOutlined,
   LocationOnOutlined,
@@ -9,6 +8,7 @@ import {
   TimelapseOutlined,
 } from "@mui/icons-material";
 import FoodItemDuration from "../search/FoodItemDuration";
+import StyledLink from "../../common/navigate/StyledLink";
 
 interface IFoodSearchItemProps {
   item: IFoodPostExposed;
@@ -19,17 +19,9 @@ export default function MyFoodItem({
   item,
   onBeforeNavigate,
 }: IFoodSearchItemProps) {
-  const navigate = useNavigate();
   const i18n = useI18nContext();
   const lang = i18n.of(MyFoodItem, "Categories", "Quantities");
   const quantityType = toQuantityType(item.quantity);
-
-  const handleNavigate = () => {
-    if (onBeforeNavigate != null) {
-      onBeforeNavigate();
-    }
-    navigate(`/food/${item._id}`);
-  };
 
   return (
     <Stack
@@ -44,27 +36,32 @@ export default function MyFoodItem({
       gap={1}
     >
       <Stack direction="row" gap={3}>
-        <img
-          src={item.images[0]}
-          style={{
-            maxWidth: "20%",
-            height: "auto",
-            objectFit: "cover",
-            cursor: "pointer",
-          }}
-          onClick={handleNavigate}
-        />
-        <Box flex={1}>
-          <Box
-            component="h3"
-            textTransform={"capitalize"}
-            sx={{
-              cursor: "pointer",
-            }}
-            onClick={handleNavigate}
+        <Box sx={{ width: "30%" }}>
+          <StyledLink
+            to={`/food/${item._id}`}
+            onBeforeNavigate={onBeforeNavigate}
           >
-            {item.title}
-          </Box>
+            <img
+              src={item.images[0]}
+              style={{
+                maxWidth: "100%",
+                height: "100%",
+                objectFit: "cover",
+              }}
+            />
+          </StyledLink>
+        </Box>
+
+        <Box flex={1}>
+          <StyledLink
+            to={`/food/${item._id}`}
+            onBeforeNavigate={onBeforeNavigate}
+          >
+            <Box component="h3" textTransform={"capitalize"}>
+              {item.title}
+            </Box>
+          </StyledLink>
+
           <Stack direction={"row"} alignItems={"center"} gap={1}>
             <TimelapseOutlined color="info" />{" "}
             <FoodItemDuration duration={item.duration} />
@@ -110,7 +107,7 @@ export default function MyFoodItem({
           );
         })}
         {item.categories.length === 0 && (
-          <Typography>{lang("Không có loại thực phẩm được mô tả")}</Typography>
+          <Typography>{lang("no-category")}</Typography>
         )}
       </Box>
     </Stack>

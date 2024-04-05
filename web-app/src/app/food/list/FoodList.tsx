@@ -1,6 +1,12 @@
 import { Box, SpeedDial, Stack, Tab, Tabs, Tooltip } from "@mui/material";
-import { ITabOption, useI18nContext, useTabNavigate } from "../../../hooks";
 import {
+  ITabOption,
+  applicationPages,
+  useI18nContext,
+  useTabNavigate,
+} from "../../../hooks";
+import {
+  AddOutlined,
   FavoriteOutlined,
   HomeOutlined,
   PeopleAltOutlined,
@@ -10,7 +16,7 @@ import {
 import MyFood from "./MyFood";
 import NearFood from "./NearFood";
 import LovedFood from "./LovedFood";
-import { useNavigate } from "react-router";
+import StyledLink from "../../common/navigate/StyledLink";
 
 const FoodPageTab = {
   MY_FOOD: 0,
@@ -40,9 +46,7 @@ export default function FoodList() {
   const tab = tabNavigate.tab;
 
   const i18nContext = useI18nContext();
-  const lang = i18nContext.of(FoodList);
-
-  const navigate = useNavigate();
+  const lang = i18nContext.of("FoodList");
 
   const onTabMyFoodClick = () => {
     //
@@ -89,7 +93,7 @@ export default function FoodList() {
           textColor="inherit"
         >
           <Tab
-            label={lang("Của tôi")}
+            label={lang("my-label")}
             onClick={onTabMyFoodClick}
             icon={<HomeOutlined />}
             iconPosition="start"
@@ -98,7 +102,7 @@ export default function FoodList() {
             }}
           />
           <Tab
-            label={lang("Gần đây")}
+            label={lang("near-label")}
             icon={<PeopleAltOutlined />}
             iconPosition="start"
             onClick={onTabNearFoodClick}
@@ -107,7 +111,7 @@ export default function FoodList() {
             }}
           />
           <Tab
-            label={lang("Đã yêu thích")}
+            label={lang("loved-label")}
             icon={<FavoriteOutlined />}
             iconPosition="start"
             onClick={onTabLovedFoodClick}
@@ -123,25 +127,48 @@ export default function FoodList() {
       <NearFood active={tab === FoodPageTab.NEAR_FOOD} />
       <LovedFood active={tab === FoodPageTab.LOVED_FOOD} />
 
-      <Tooltip
-        arrow
-        children={
-          <SpeedDial
-            icon={<PlaceOutlined />}
-            sx={{ position: "absolute", bottom: 136, right: 26 }}
-            ariaLabel={"Around"}
-            onClick={() => navigate("/food/around")}
-          />
-        }
-        title="Thực phẩm xung quanh"
-        placement="left"
-      />
-      <SpeedDial
-        icon={<SearchOutlined />}
-        ariaLabel={"search"}
-        sx={{ position: "absolute", bottom: 76, right: 26 }}
-        onClick={() => navigate("/food/search")}
-      />
+      <StyledLink to={applicationPages.FOOD_SHARING}>
+        <Tooltip
+          arrow
+          children={
+            <SpeedDial
+              icon={<AddOutlined />}
+              ariaLabel={"search"}
+              sx={{ position: "absolute", bottom: 196, right: 26 }}
+            />
+          }
+          title={lang("sharing-label")}
+          placement="left"
+        />
+      </StyledLink>
+      <StyledLink to={applicationPages.FOOD_AROUND}>
+        <Tooltip
+          arrow
+          children={
+            <SpeedDial
+              icon={<PlaceOutlined />}
+              sx={{ position: "absolute", bottom: 136, right: 26 }}
+              ariaLabel={lang("around-label")}
+            />
+          }
+          title={lang("around-label")}
+          placement="left"
+        />
+      </StyledLink>
+      <StyledLink to={applicationPages.FOOD_SEARCH}>
+        <Tooltip
+          arrow
+          children={
+            <SpeedDial
+              icon={<SearchOutlined />}
+              ariaLabel={lang("search-label")}
+              sx={{ position: "absolute", bottom: 76, right: 26 }}
+            />
+          }
+          title={lang("search-label")}
+          placement="left"
+        />
+      </StyledLink>
     </Box>
   );
 }

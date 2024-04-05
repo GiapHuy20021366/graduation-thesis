@@ -81,6 +81,7 @@ export default function FoodSharingForm() {
     description,
     editDataRef,
     place,
+    isEditable,
   } = formContext;
 
   const [hover, setHover] = useState<number>(-1);
@@ -88,7 +89,7 @@ export default function FoodSharingForm() {
     DurationType.UNTIL_MIDNIGHT
   );
   const languageContext = useI18nContext();
-  const lang = languageContext.of(FoodSharingForm, "Quantities", "Durations");
+  const lang = languageContext.of("FoodSharingForm", "Quantities", "Durations");
   const authContext = useAuthContext();
   const auth = authContext.auth;
   const navigate = useNavigate();
@@ -143,7 +144,7 @@ export default function FoodSharingForm() {
       promise
         .then((data) => navigate(`/food/${data.data?._id}`, { replace: true }))
         .catch(() => {
-          toast.error("Không thể chia sẻ thực phẩm vào lúc này");
+          toast.error(lang("can-not-sharing-now"));
         })
         .finally(() => {
           callingApi.deactive();
@@ -346,7 +347,7 @@ export default function FoodSharingForm() {
 
       {activeStep === FormPage.PAGE_SECOND && (
         <Stack spacing={2}>
-          <FoodPlacePicker />
+          <FoodPlacePicker disabled={isEditable} />
 
           <FoodCategoryPicker
             categories={categories}
@@ -364,25 +365,10 @@ export default function FoodSharingForm() {
             }}
             fullWidth
           >
-            {editDataRef?.current == null
-              ? lang("share-now")
-              : lang("update-now")}
+            {!isEditable ? lang("share-now") : lang("update-now")}
           </Button>
         </Stack>
       )}
-
-      {/* {activeStep === FormPage.PAGE_SUBMIT && (
-        <Button
-          type="submit"
-          variant="contained"
-          sx={{
-            marginBottom: "1em",
-          }}
-          fullWidth
-        >
-          Share now!
-        </Button>
-      )} */}
     </Box>
   );
 }

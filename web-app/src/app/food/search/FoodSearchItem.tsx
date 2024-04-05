@@ -1,16 +1,6 @@
-import {
-  Avatar,
-  Box,
-  Chip,
-  Divider,
-  Rating,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, Chip, Divider, Rating, Stack, Typography } from "@mui/material";
 import { IFoodPostExposed, toDistance, toQuantityType } from "../../../data";
 import { useAppContentContext, useI18nContext } from "../../../hooks";
-import { deepOrange } from "@mui/material/colors";
-import { useNavigate } from "react-router";
 import {
   LocalOfferOutlined,
   LocationOnOutlined,
@@ -19,6 +9,8 @@ import {
   TimelapseOutlined,
 } from "@mui/icons-material";
 import FoodItemDuration from "./FoodItemDuration";
+import FoodAvatars from "../../common/viewer/data/FoodAvatars";
+import StyledLink from "../../common/navigate/StyledLink";
 
 interface IFoodSearchItemProps {
   item: IFoodPostExposed;
@@ -29,25 +21,15 @@ export default function FoodSearchItem({
   item,
   onBeforeNavigate,
 }: IFoodSearchItemProps) {
-  const navigate = useNavigate();
   const i18n = useI18nContext();
-  const lang = i18n.of(FoodSearchItem, "Categories", "Quantities");
+  const lang = i18n.of("FoodSearchItem", "Categories", "Quantities");
   const quantityType = toQuantityType(item.quantity);
   const appContentContext = useAppContentContext();
-
-  const handleNavigate = () => {
-    if (onBeforeNavigate != null) {
-      onBeforeNavigate();
-    }
-    navigate(`/food/${item._id}`);
-  };
 
   const exposedUser =
     typeof item.user === "string"
       ? "H"
       : item.user.firstName + " " + item.user.lastName;
-
-  const userId = typeof item.user === "string" ? item.user : item.user._id;
 
   return (
     <Stack
@@ -61,60 +43,80 @@ export default function FoodSearchItem({
       }}
       gap={1}
     >
-      <Stack direction="row" gap={3}>
-        <img
-          src={item.images[0]}
-          style={{
-            maxWidth: "20%",
-            height: "auto",
-            objectFit: "cover",
-            cursor: "pointer",
-          }}
-          onClick={handleNavigate}
-        />
-        <Box flex={1}>
-          <Box
-            component="h3"
-            textTransform={"capitalize"}
-            sx={{
-              cursor: "pointer",
-            }}
-            onClick={handleNavigate}
+      <Stack direction="row" gap={[1, 2]}>
+        <Box width={"30%"}>
+          <StyledLink
+            to={`/food/${item._id}`}
+            onBeforeNavigate={onBeforeNavigate}
           >
-            {item.title}
-          </Box>
-          <Stack direction={"row"} alignItems={"center"} gap={1}>
-            <TimelapseOutlined color="info" />{" "}
-            <FoodItemDuration duration={item.duration} />
-          </Stack>
-          <Stack direction={"row"} gap={1} mt={1}>
-            <LocalOfferOutlined color="secondary" />
-            <Typography>
-              {item.price ? `${item.price} VNĐ` : lang("l-free")}
-            </Typography>
-          </Stack>
-          <Stack direction="row" alignItems={"center"} gap={1}>
-            <ProductionQuantityLimitsOutlined color="info" />
-            <Rating
-              value={item.quantity}
-              sx={{
-                width: "fit-content",
+            <img
+              src={item.images[0]}
+              style={{
+                maxWidth: "100%",
+                height: "100%",
+                objectFit: "cover",
               }}
-              size="small"
-              readOnly
             />
-            <Typography component="legend">{lang(quantityType)}</Typography>
+          </StyledLink>
+        </Box>
+
+        <Box flex={1}>
+          <StyledLink
+            to={`/food/${item._id}`}
+            onBeforeNavigate={onBeforeNavigate}
+          >
+            <Box component="h3" textTransform={"capitalize"}>
+              {item.title}
+            </Box>
+          </StyledLink>
+
+          <Stack
+            direction={"row"}
+            justifyContent={"space-between"}
+            pr={[0, 1, 3, 5]}
+            alignItems={"center"}
+          >
+            <Stack direction={"row"} alignItems={"center"} gap={1}>
+              <TimelapseOutlined color="info" />{" "}
+              <FoodItemDuration duration={item.duration} />
+            </Stack>
+            <Stack mt={1} direction={"row"} gap={1}>
+              <SocialDistanceOutlined color="info" />
+              <Typography>
+                {toDistance(
+                  item.location.coordinates,
+                  appContentContext.currentLocation
+                ) * 1000}{" "}
+                m
+              </Typography>
+            </Stack>
           </Stack>
-          <Stack mt={1} direction={"row"} gap={1}>
-            <SocialDistanceOutlined color="info" />
-            <Typography>
-              {toDistance(
-                item.location.coordinates,
-                appContentContext.currentLocation
-              ) * 1000}{" "}
-              m
-            </Typography>
+          <Stack
+            direction={"row"}
+            justifyContent={"space-between"}
+            pr={[0, 1, 3, 5]}
+            alignItems={"center"}
+          >
+            <Stack direction="row" alignItems={"center"} gap={1}>
+              <ProductionQuantityLimitsOutlined color="info" />
+              <Rating
+                value={item.quantity}
+                sx={{
+                  width: "fit-content",
+                }}
+                size="small"
+                readOnly
+              />
+              <Typography component="legend">{lang(quantityType)}</Typography>
+            </Stack>
+            <Stack direction={"row"} gap={1} mt={1}>
+              <LocalOfferOutlined color="secondary" />
+              <Typography>
+                {item.price ? `${item.price} VNĐ` : lang("l-free")}
+              </Typography>
+            </Stack>
           </Stack>
+
           <Stack direction={"row"} gap={1} mt={1}>
             <LocationOnOutlined color="info" />
             <Typography>{item.location.name}</Typography>
@@ -129,15 +131,11 @@ export default function FoodSearchItem({
             alignItems: "center",
           }}
         >
-          <Avatar
-            alt={exposedUser}
-            sx={{ bgcolor: deepOrange[500], cursor: "pointer" }}
-            onClick={() => {
-              navigate(`/profile/${userId}`);
-            }}
-          >
-            {exposedUser[0]}
-          </Avatar>
+          <FoodAvatars
+            food={item}
+            navigate={true}
+            onBeforeNavigate={onBeforeNavigate}
+          />
           <Box component="h5" width={"fit-content"} mt={1} mb={0}>
             {exposedUser}
           </Box>
@@ -159,6 +157,16 @@ export default function FoodSearchItem({
               />
             );
           })}
+          {item.categories.length === 0 && (
+            <Chip
+              label={lang("no-category")}
+              sx={{
+                my: 0.5,
+                mx: 0.5,
+                width: "fit-content",
+              }}
+            />
+          )}
         </Box>
       </Stack>
     </Stack>

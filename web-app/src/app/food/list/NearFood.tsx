@@ -1,14 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Box,
-  Button,
-  SpeedDial,
-  Stack,
-  StackProps,
-  Typography,
-} from "@mui/material";
-import { AddOutlined } from "@mui/icons-material";
-import { useNavigate } from "react-router";
+import { Stack, StackProps } from "@mui/material";
 import {
   IFoodPostExposed,
   IFoodSearchParams,
@@ -27,6 +18,8 @@ import {
 import { foodFetcher } from "../../../api";
 import MyFoodItemHolder from "./MyFoodItemHolder";
 import FoodSearchItem from "../search/FoodSearchItem";
+import ErrorRetry from "../../common/viewer/data/ErrorRetry";
+import ListEnd from "../../common/viewer/data/ListEnd";
 
 type NearFoodProps = StackProps & {
   active?: boolean;
@@ -43,7 +36,6 @@ const NearFood = React.forwardRef<HTMLDivElement, NearFoodProps>(
   (props, ref) => {
     const { active, ...rest } = props;
 
-    const navigate = useNavigate();
     const [data, setData] = useState<IFoodPostExposed[]>([]);
     const appContentContext = useAppContentContext();
     const authContext = useAuthContext();
@@ -157,6 +149,7 @@ const NearFood = React.forwardRef<HTMLDivElement, NearFoodProps>(
       if (account == null) return;
       if (!active) return;
       if (!dirtyRef.current) {
+        dirtyRef.current = true;
         // At begining
         const snapshot = loadFromSessionStorage<INearFoodSnapshotData>({
           key: NEAR_FOOD_STORAGE_KEY,
@@ -176,11 +169,22 @@ const NearFood = React.forwardRef<HTMLDivElement, NearFoodProps>(
             }, 300);
           }
         } else {
-          doSearch();
+          const current = distances.currentLocation?.coordinates;
+          if (current) {
+            doSearch();
+          } else {
+            dirtyRef.current = false;
+          }
         }
-        dirtyRef.current = true;
       }
-    }, [account, active, appContentContext.mainRef, doSearch, loader]);
+    }, [
+      account,
+      active,
+      appContentContext.mainRef,
+      distances.currentLocation,
+      doSearch,
+      loader,
+    ]);
 
     return (
       <Stack
@@ -203,24 +207,9 @@ const NearFood = React.forwardRef<HTMLDivElement, NearFoodProps>(
         })}
 
         {loader.isFetching && <MyFoodItemHolder />}
-        {loader.isEnd && !loader.isError && (
-          <Box textAlign={"center"} mt={2}>
-            <Typography>Bạn đã tìm kiếm hết</Typography>
-            <Button onClick={() => doSearch()}>Tìm kiếm thêm</Button>
-          </Box>
-        )}
-        {loader.isError && (
-          <Box textAlign={"center"} mt={2}>
-            <Typography>Có lỗi xảy ra</Typography>
-            <Button onClick={() => doSearch()}>Thử lại</Button>
-          </Box>
-        )}
-        <SpeedDial
-          icon={<AddOutlined />}
-          ariaLabel={"search"}
-          sx={{ position: "absolute", bottom: 196, right: 26 }}
-          onClick={() => navigate("/food/sharing")}
-        />
+        <ListEnd active={loader.isEnd && !loader.isError} onRetry={doSearch} />
+
+        <ErrorRetry active={loader.isError} onRetry={doSearch} />
       </Stack>
     );
   }

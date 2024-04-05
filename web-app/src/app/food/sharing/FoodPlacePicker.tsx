@@ -23,13 +23,15 @@ import {
 } from "../../../hooks";
 import { userFetcher } from "../../../api";
 
-type FoodPlacePickerProps = StackProps;
+type FoodPlacePickerProps = StackProps & {
+  disabled?: boolean;
+};
 
 const PERSONAL_PAGE = "PERSONAL_PAGE";
 
 const FoodPlacePicker = React.forwardRef<HTMLDivElement, FoodPlacePickerProps>(
   (props, ref) => {
-    const { ...rest } = props;
+    const { disabled, ...rest } = props;
     const [places, setPlaces] = useState<IPlaceExposed[]>([]);
     const sharingContext = useFoodSharingFormContext();
     const { place, setPlace } = sharingContext;
@@ -113,6 +115,7 @@ const FoodPlacePicker = React.forwardRef<HTMLDivElement, FoodPlacePickerProps>(
             flex: 1,
             mt: 1,
           }}
+          disabled={disabled}
         >
           <MenuItem value={PERSONAL_PAGE}>Trang cá nhân của bạn</MenuItem>
           {places.map((place) => {

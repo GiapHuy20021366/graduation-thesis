@@ -1,7 +1,7 @@
 import { toTimeInfo } from "../../../data";
 
 interface IFoodItemDurationProps {
-  duration?: number;
+  duration?: number | string | Date;
 }
 
 const toPad = (num: number): string => {

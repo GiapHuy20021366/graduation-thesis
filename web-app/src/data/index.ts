@@ -44,7 +44,7 @@ export { OrderState, toNextOrderState } from "./order-state";
 export { ItemAddedBy } from "./item-added-by";
 export { ItemAvailable } from "./item-available";
 export { type IPagination } from "./pagination";
-export { type ILocation } from "./location";
+export { type ILocation, isDiffLocation } from "./location";
 export { UserRole } from "./user-role";
 export { PlaceType, toPlaceTypeLabel } from "./place-type";
 export { type IPlace } from "./place";

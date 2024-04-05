@@ -1,14 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Box,
-  Button,
-  SpeedDial,
-  Stack,
-  StackProps,
-  Typography,
-} from "@mui/material";
-import { AddOutlined } from "@mui/icons-material";
-import { useNavigate } from "react-router";
+import { Stack, StackProps } from "@mui/material";
 import {
   IFoodPostExposedWithLike,
   IPagination,
@@ -20,11 +11,12 @@ import {
   useAuthContext,
   usePageProgessContext,
   useLoader,
-  useDistanceCalculation,
 } from "../../../hooks";
 import { foodFetcher } from "../../../api";
 import MyFoodItemHolder from "./MyFoodItemHolder";
 import FoodSearchItem from "../search/FoodSearchItem";
+import ListEnd from "../../common/viewer/data/ListEnd";
+import ErrorRetry from "../../common/viewer/data/ErrorRetry";
 
 type LovedFoodProps = StackProps & {
   active?: boolean;
@@ -35,13 +27,12 @@ interface ILovedFoodSnapshotData {
   scrollTop?: number;
 }
 
-const LOVED_FOOD_STORAGE_KEY = "near.food";
+const LOVED_FOOD_STORAGE_KEY = "loved.food";
 
 const LovedFood = React.forwardRef<HTMLDivElement, LovedFoodProps>(
   (props, ref) => {
     const { active, ...rest } = props;
 
-    const navigate = useNavigate();
     const [data, setData] = useState<IFoodPostExposedWithLike[]>([]);
     const appContentContext = useAppContentContext();
     const authContext = useAuthContext();
@@ -49,7 +40,6 @@ const LovedFood = React.forwardRef<HTMLDivElement, LovedFoodProps>(
     const progessContext = usePageProgessContext();
     const loader = useLoader();
     const dirtyRef = useRef<boolean>(false);
-    const distances = useDistanceCalculation();
 
     const doSaveStorage = () => {
       const snapshot: ILovedFoodSnapshotData = {
@@ -68,8 +58,6 @@ const LovedFood = React.forwardRef<HTMLDivElement, LovedFoodProps>(
 
     const doSearch = useCallback(() => {
       if (auth == null || account == null) return;
-      const current = distances.currentLocation?.coordinates;
-      if (current == null) return;
       if (loader.isFetching || !active) return;
 
       const pagination: IPagination = {
@@ -102,15 +90,7 @@ const LovedFood = React.forwardRef<HTMLDivElement, LovedFoodProps>(
           progessContext.end();
           loader.setIsFetching(false);
         });
-    }, [
-      auth,
-      account,
-      distances.currentLocation,
-      loader,
-      active,
-      data,
-      progessContext,
-    ]);
+    }, [auth, account, loader, active, data, progessContext]);
 
     useEffect(() => {
       const main = appContentContext.mainRef?.current;
@@ -186,24 +166,10 @@ const LovedFood = React.forwardRef<HTMLDivElement, LovedFoodProps>(
         })}
 
         {loader.isFetching && <MyFoodItemHolder />}
-        {loader.isEnd && !loader.isError && (
-          <Box textAlign={"center"} mt={2}>
-            <Typography>Bạn đã tìm kiếm hết</Typography>
-            <Button onClick={() => doSearch()}>Tìm kiếm thêm</Button>
-          </Box>
-        )}
-        {loader.isError && (
-          <Box textAlign={"center"} mt={2}>
-            <Typography>Có lỗi xảy ra</Typography>
-            <Button onClick={() => doSearch()}>Thử lại</Button>
-          </Box>
-        )}
-        <SpeedDial
-          icon={<AddOutlined />}
-          ariaLabel={"search"}
-          sx={{ position: "absolute", bottom: 196, right: 26 }}
-          onClick={() => navigate("/food/sharing")}
-        />
+
+        <ListEnd active={loader.isEnd && !loader.isError} onRetry={doSearch} />
+
+        <ErrorRetry active={loader.isError} onRetry={doSearch} />
       </Stack>
     );
   }

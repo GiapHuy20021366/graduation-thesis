@@ -1,14 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Box,
-  Button,
-  SpeedDial,
-  Stack,
-  StackProps,
-  Typography,
-} from "@mui/material";
-import { AddOutlined } from "@mui/icons-material";
-import { useNavigate } from "react-router";
+import { Stack, StackProps } from "@mui/material";
 import {
   IFoodPostExposed,
   IFoodSearchParams,
@@ -26,6 +17,8 @@ import {
 import { foodFetcher } from "../../../api";
 import MyFoodItemHolder from "./MyFoodItemHolder";
 import MyFoodItem from "./MyFoodItem";
+import ErrorRetry from "../../common/viewer/data/ErrorRetry";
+import ListEnd from "../../common/viewer/data/ListEnd";
 
 type MyFoodProps = StackProps & {
   active?: boolean;
@@ -41,7 +34,6 @@ const MY_FOOD_STORAGE_KEY = "my.food";
 const MyFood = React.forwardRef<HTMLDivElement, MyFoodProps>((props, ref) => {
   const { active, ...rest } = props;
 
-  const navigate = useNavigate();
   const [data, setData] = useState<IFoodPostExposed[]>([]);
   const appContentContext = useAppContentContext();
   const authContext = useAuthContext();
@@ -185,24 +177,9 @@ const MyFood = React.forwardRef<HTMLDivElement, MyFoodProps>((props, ref) => {
       })}
 
       {loader.isFetching && <MyFoodItemHolder />}
-      {loader.isEnd && !loader.isError && (
-        <Box textAlign={"center"} mt={2}>
-          <Typography>Bạn đã tìm kiếm hết</Typography>
-          <Button onClick={() => doSearch()}>Tìm kiếm thêm</Button>
-        </Box>
-      )}
-      {loader.isError && (
-        <Box textAlign={"center"} mt={2}>
-          <Typography>Có lỗi xảy ra</Typography>
-          <Button onClick={() => doSearch()}>Thử lại</Button>
-        </Box>
-      )}
-      <SpeedDial
-        icon={<AddOutlined />}
-        ariaLabel={"search"}
-        sx={{ position: "absolute", bottom: 196, right: 26 }}
-        onClick={() => navigate("/food/sharing")}
-      />
+      <ListEnd active={loader.isEnd && !loader.isError} onRetry={doSearch} />
+
+      <ErrorRetry active={loader.isError} onRetry={doSearch} />
     </Stack>
   );
 });

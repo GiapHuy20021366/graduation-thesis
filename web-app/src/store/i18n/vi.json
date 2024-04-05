@@ -318,5 +318,26 @@
         "l-registed": "Đăng ký",
         "l-around": "Gần bạn",
         "l-suggested": "Sở thích"
+    },
+    "FoodList": {
+        "my-label": "Của tôi",
+        "near-label": "Gần đây",
+        "loved-label": "Đã thích",
+        "around-label": "Thực phẩm xung quanh",
+        "search-label": "Tìm kiếm thực phẩm"
+    },
+    "LovedFood": {
+        "sharing-label": "Chia sẻ thực phẩm"
+    },
+    "FoodPostButtonWithMenu": {
+        "setting-label": "Thêm",
+        "edit": "Chỉnh sửa",
+        "report": "Báo cáo"
+    },
+    "Others": {
+        "no-address": "Không địa chỉ"
+    },
+    "Toasts": {
+        "can-not-sharing-now": "Không thể chia sẻ thực phẩm vào lúc này"
     }
 }

@@ -6,7 +6,13 @@ import {
 } from "@react-google-maps/api";
 import { GOOGLE_MAP_API_KEY } from "../../env";
 import { useCallback, useEffect, useState } from "react";
-import { ICoordinates, ILocation, RequestStatus, mapIcons } from "../../data";
+import {
+  ICoordinates,
+  ILocation,
+  RequestStatus,
+  isDiffLocation,
+  mapIcons,
+} from "../../data";
 import {
   Box,
   Button,
@@ -29,11 +35,6 @@ import {
   useFetchLocation,
   useToastContext,
 } from "../../hooks";
-
-const isDiffLocation = (pos1: ICoordinates, pos2?: ICoordinates): boolean => {
-  if (pos2 == null) return true;
-  return pos1.lat !== pos2.lat || pos1.lng !== pos2.lng;
-};
 
 export default function LocationPage() {
   const { isLoaded } = useJsApiLoader({

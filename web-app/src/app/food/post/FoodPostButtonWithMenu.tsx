@@ -7,6 +7,7 @@ import { Edit, MoreVert, ReportGmailerrorred } from "@mui/icons-material";
 import { ListItemIcon } from "@mui/material";
 import { useNavigate } from "react-router";
 import { IFoodPostExposed } from "../../../data";
+import { applicationPages, useComponentLanguage } from "../../../hooks";
 
 interface IFoodPostButtonWithMenuProps {
   data?: IFoodPostExposed;
@@ -20,6 +21,7 @@ export default function FoodPostButtonWithMenu({
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
+  const lang = useComponentLanguage("FoodPostButtonWithMenu");
 
   const navigate = useNavigate();
 
@@ -32,13 +34,13 @@ export default function FoodPostButtonWithMenu({
     handleClose();
 
     if (data?._id != null) {
-      navigate("/food/sharing", { state: data });
+      navigate(applicationPages.FOOD_SHARING, { state: data });
     }
   };
 
   return (
     <>
-      <Tooltip arrow title="Account settings">
+      <Tooltip arrow title={lang("setting-label")}>
         <IconButton
           onClick={handleClick}
           size="small"
@@ -91,13 +93,13 @@ export default function FoodPostButtonWithMenu({
           <ListItemIcon>
             <Edit fontSize="small" />
           </ListItemIcon>
-          Edit
+          {lang("edit")}
         </MenuItem>
         <MenuItem onClick={handleClose}>
           <ListItemIcon>
             <ReportGmailerrorred fontSize="small" />
           </ListItemIcon>
-          Report
+          {lang("report")}
         </MenuItem>
       </Menu>
     </>
