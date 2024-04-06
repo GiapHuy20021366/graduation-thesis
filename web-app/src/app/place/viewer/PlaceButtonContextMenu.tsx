@@ -8,14 +8,21 @@ import {
 } from "@mui/material";
 import { FollowType, IAccountExposed, IPlaceExposed } from "../../../data";
 import { Edit, MoreVert, ReportGmailerrorred } from "@mui/icons-material";
-import { useNavigate } from "react-router";
-import { useAuthContext } from "../../../hooks";
+import {
+  applicationPages,
+  useAuthContext,
+  useComponentLanguage,
+} from "../../../hooks";
+import StyledLink from "../../common/navigate/StyledLink";
 
 type PlaceButtonContextMenuProps = IconButtonProps & {
   data: IPlaceExposed;
 };
 
-const isPermitEdit = (place: IPlaceExposed, account?: IAccountExposed): boolean => {
+const isPermitEdit = (
+  place: IPlaceExposed,
+  account?: IAccountExposed
+): boolean => {
   if (account == null) return false;
   if (place.userFollow == null) return false;
   if (
@@ -32,6 +39,7 @@ const PlaceContextMenu = React.forwardRef<
 >((props, ref) => {
   const { data, ...rest } = props;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const lang = useComponentLanguage();
 
   const authContext = useAuthContext();
   const account = authContext.account;
@@ -46,21 +54,9 @@ const PlaceContextMenu = React.forwardRef<
     setAnchorEl(event.currentTarget);
   };
 
-  const navigate = useNavigate();
-
   const handleClose = () => {
     setAnchorEl(null);
   };
-
-  const navigateToEdit = () => {
-    // Close menu
-    handleClose();
-
-    if (data?._id != null) {
-      navigate("/place/update", { state: data });
-    }
-  };
-
   return (
     <>
       <IconButton
@@ -115,18 +111,20 @@ const PlaceContextMenu = React.forwardRef<
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
         {canEdit && (
-          <MenuItem onClick={navigateToEdit}>
-            <ListItemIcon>
-              <Edit fontSize="small" />
-            </ListItemIcon>
-            Edit
-          </MenuItem>
+          <StyledLink to={applicationPages.PLACE_UPDATE} state={data}>
+            <MenuItem>
+              <ListItemIcon>
+                <Edit fontSize="small" />
+              </ListItemIcon>
+              {lang("edit")}
+            </MenuItem>
+          </StyledLink>
         )}
         <MenuItem onClick={handleClose}>
           <ListItemIcon>
             <ReportGmailerrorred fontSize="small" />
           </ListItemIcon>
-          Report
+          {lang("report")}
         </MenuItem>
       </Menu>
     </>

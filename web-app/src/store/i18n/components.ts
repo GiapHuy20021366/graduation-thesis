@@ -24,4 +24,11 @@ export type I18nReactComponent =
   | "LovedFood"
   | "FoodPostButtonWithMenu"
   | "DayValues"
-  | "Toasts";
+  | "Toasts"
+  | "PlaceList"
+  | "MyPlace"
+  | "PlaceViewerExposedType"
+  | "PlaceCategories"
+  | "PlaceEditForm"
+  | "DescriptionEditor"
+  | "PlaceSearchFilter";

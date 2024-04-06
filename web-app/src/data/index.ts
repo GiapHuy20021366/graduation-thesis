@@ -49,7 +49,11 @@ export { UserRole } from "./user-role";
 export { PlaceType, toPlaceTypeLabel } from "./place-type";
 export { type IPlace } from "./place";
 export { type IRating } from "./rating";
-export { type IPlaceAuthorExposed, type IPlaceExposed } from "./place-exposed";
+export {
+  type IPlaceAuthorExposed,
+  type IPlaceExposed,
+  type IPlaceExposedFollower,
+} from "./place-exposed";
 export {
   FollowRole,
   FollowType,
@@ -170,3 +174,10 @@ export {
   toNotificationTypeGroups,
 } from "./notification-exposed";
 export { durations } from "./durations";
+export {
+  type IPlaceSearchAuthor,
+  type IPlaceSearchDistance,
+  type IPlaceSearchOrder,
+  type IPlaceSearchParams,
+  type IPlaceSearchRating,
+} from "./place-search-params";

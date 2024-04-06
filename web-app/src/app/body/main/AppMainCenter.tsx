@@ -5,7 +5,6 @@ import Location from "../../location/Location";
 import PageNotFound from "../../common/PageNotFound";
 import Setting from "../../setting/Setting";
 import Food from "../../food/Food";
-import Search from "../../search/Search";
 import Place from "../../place/Place";
 import Conversation from "../../conversation/Conversation";
 import User from "../../user/User";
@@ -23,7 +22,6 @@ export default function AppMainCenter() {
         <Route path="/conversation/*" element={<Conversation />} />
 
         <Route path="/setting/*" element={<Setting />} />
-        <Route path="/search/*" element={<Search />} />
         <Route path="/*" element={<PageNotFound />} />
       </Routes>
     </Grid2>

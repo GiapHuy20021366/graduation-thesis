@@ -45,7 +45,7 @@ export const toPlaceSearchDistance = (
 ): IPlaceSearchDistance | undefined => {
   if (typeof value !== "object") return;
   const { max, current } = value;
-  if (!isNumber(max) || !isCoordinates(current)) return;
+  if (!isNumber(max) || !isCoordinates(current) || max <= 0) return;
   return {
     current: current,
     max: max,

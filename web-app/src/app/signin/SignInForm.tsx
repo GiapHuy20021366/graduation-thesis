@@ -121,11 +121,10 @@ export default function SignInForm() {
       .googleOAuthLogin(response.credential)
       .then((response) => {
         const account = response.data;
-        console.log(account);
         auth.setAccount(account);
         auth.setToken(account?.token);
       })
-      .catch((error) => {
+      .catch(() => {
         toastContext.error("Cannot login at this time", {
           autoClose: 4000,
           hideProgressBar: false,
@@ -135,7 +134,6 @@ export default function SignInForm() {
           progress: undefined,
           theme: "light",
         });
-        console.log(error);
       })
       .finally(() => {
         progessContext.end();
@@ -152,6 +150,7 @@ export default function SignInForm() {
       { theme: "outline", size: "large" }
     );
     window.google.accounts.id.prompt();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

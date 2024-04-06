@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Box, Button, SpeedDial, Stack, StackProps, Typography } from "@mui/material";
-import { AddOutlined } from "@mui/icons-material";
-import { useNavigate } from "react-router";
+import { Stack, StackProps } from "@mui/material";
 import {
   useAppContentContext,
   useAuthContext,
@@ -17,6 +15,9 @@ import {
 } from "../../../data";
 import SubcribedItem from "./SubcribedPlaceItem";
 import { userFetcher } from "../../../api";
+import ListEnd from "../../common/viewer/data/ListEnd";
+import ErrorRetry from "../../common/viewer/data/ErrorRetry";
+import PlaceSearchItemHolder from "../search/PlaceSearchItemHolder";
 
 interface ISubcribedPlaceSnapshotData {
   data: IPlaceExposedCooked[];
@@ -31,7 +32,6 @@ type SubcribedPlaceProps = StackProps & {
 
 const SubcribedPlace = React.forwardRef<HTMLDivElement, SubcribedPlaceProps>(
   (props, ref) => {
-    const navigate = useNavigate();
     const { active, ...rest } = props;
 
     const [data, setData] = useState<IPlaceExposedCooked[]>([]);
@@ -193,24 +193,10 @@ const SubcribedPlace = React.forwardRef<HTMLDivElement, SubcribedPlaceProps>(
             />
           );
         })}
-        <SpeedDial
-          icon={<AddOutlined />}
-          sx={{ position: "absolute", bottom: 136, right: 26 }}
-          ariaLabel={"Create"}
-          onClick={() => navigate("/place/update")}
-        />
-        {isEnd && !isError && (
-          <Box textAlign={"center"} mt={2}>
-            <Typography>Bạn đã tìm kiếm hết</Typography>
-            <Button onClick={() => doSearch()}>Tìm kiếm thêm</Button>
-          </Box>
-        )}
-        {isError && (
-          <Box textAlign={"center"} mt={2}>
-            <Typography>Có lỗi xảy ra</Typography>
-            <Button onClick={() => doSearch()}>Thử lại</Button>
-          </Box>
-        )}
+
+        {isFetching && <PlaceSearchItemHolder />}
+        <ListEnd active={isEnd && !isError} onRetry={doSearch} />
+        <ErrorRetry active={isError} onRetry={doSearch} />
       </Stack>
     );
   }

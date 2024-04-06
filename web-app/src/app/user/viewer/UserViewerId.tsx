@@ -39,7 +39,6 @@ export default function UserViewerId({ id }: IUserViewerIdProps) {
       .then((res) => {
         const datas = res.data;
         if (datas != null) {
-          console.log(datas);
           setData(datas);
         } else {
           setIsNotFound(true);

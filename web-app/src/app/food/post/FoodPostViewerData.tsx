@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import {
   IFoodPostExposedWithLike,
   toDistance,
@@ -13,7 +12,6 @@ import {
 import { useState } from "react";
 import Carousel from "react-material-ui-carousel";
 import {
-  Avatar,
   Badge,
   Box,
   Chip,
@@ -21,6 +19,7 @@ import {
   IconButton,
   Rating,
   Stack,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import {
@@ -28,15 +27,17 @@ import {
   LocalOfferOutlined,
   LocationOnOutlined,
   MapsUgcOutlined,
+  ProductionQuantityLimitsOutlined,
   Share,
+  SocialDistanceOutlined,
   TimelapseOutlined,
 } from "@mui/icons-material";
-import { deepOrange } from "@mui/material/colors";
 import { foodFetcher } from "../../../api";
 import CountDown from "../../common/util/CountDown";
 import FoodPostButtonWithMenu from "./FoodPostButtonWithMenu";
 import { RichTextReadOnly } from "mui-tiptap";
 import StarterKit from "@tiptap/starter-kit";
+import FoodAvatars from "../../common/viewer/data/FoodAvatars";
 
 interface IFoodPostInfoDataDisplayProps {
   data: IFoodPostExposedWithLike;
@@ -73,7 +74,6 @@ export default function FoodPostViewerData({
     "Quantities"
   );
   const appContentContext = useAppContentContext();
-  const navigate = useNavigate();
   const authContext = useAuthContext();
   const conversationContext = useConversationContext();
 
@@ -125,22 +125,34 @@ export default function FoodPostViewerData({
         gap={0.5}
         p={1}
       >
-        <Box component={"h4"} textTransform={"capitalize"} sx={{ mb: 2 }}>
+        <Box component={"h3"} textTransform={"capitalize"} sx={{ mb: 2 }}>
           {data.title || lang("no-title")}
         </Box>
-        {/* <FoodPostMenu /> */}
-        <FoodPostButtonWithMenu data={data} />
+        <Stack direction={"row"} justifyContent={"space-between"}>
+          <Stack direction={"row"} alignItems={"center"}>
+            <TimelapseOutlined
+              color="info"
+              sx={{
+                marginLeft: "auto",
+              }}
+            />
+            <CountDown time={data.duration} sx={{ ml: 1 }} />
+          </Stack>
+          <FoodPostButtonWithMenu data={data} />
+        </Stack>
 
-        <Stack direction="row">
-          <Typography>
-            {toDistance(
-              data.location.coordinates,
-              appContentContext.currentLocation
-            )}{" "}
-            kms
-          </Typography>
-          <LocalOfferOutlined color="secondary" sx={{ ml: 1 }} />
-          <Stack direction="row" marginLeft={"auto"}>
+        <Stack direction="row" justifyContent={"space-between"}>
+          <Stack direction={"row"} gap={1}>
+            <SocialDistanceOutlined color="info" />
+            <Typography>
+              {toDistance(
+                data.location.coordinates,
+                appContentContext.currentLocation
+              )}{" "}
+              kms
+            </Typography>
+          </Stack>
+          <Stack direction="row">
             <IconButton color={liked ? "error" : "default"}>
               <Badge
                 badgeContent={<span>{toLikeCount(data, liked)}</span>}
@@ -150,11 +162,15 @@ export default function FoodPostViewerData({
                 }}
                 color="secondary"
               >
-                <Favorite onClick={() => handleLikeOrUnlike()} />
+                <Tooltip title={lang("favorite-label")}>
+                  <Favorite onClick={() => handleLikeOrUnlike()} />
+                </Tooltip>
               </Badge>
             </IconButton>
             <IconButton color="info">
-              <Share />
+              <Tooltip title={lang("share-label")}>
+                <Share />
+              </Tooltip>
             </IconButton>
             <IconButton
               color="success"
@@ -162,36 +178,34 @@ export default function FoodPostViewerData({
                 conversationContext.doBeginConversationWith(userId);
               }}
             >
-              <MapsUgcOutlined />
+              <Tooltip title={lang("message-label")}>
+                <MapsUgcOutlined />
+              </Tooltip>
             </IconButton>
           </Stack>
         </Stack>
-        <Stack direction={"row"} alignItems={"center"}>
-          <Typography>
-            {data.price ? `đ ${data.price}` : lang("free")}
-          </Typography>
-          <TimelapseOutlined
-            color="info"
-            sx={{
-              marginLeft: "auto",
-            }}
-          />
-          <CountDown time={data.duration} sx={{ ml: 1 }} />
-        </Stack>
-        <Stack direction="row" alignItems={"center"}>
-          <Typography>{lang("quantity")}: </Typography>
-          <Rating
-            value={data.quantity}
-            sx={{
-              width: "fit-content",
-              ml: 1,
-            }}
-            size="small"
-            readOnly
-          />
-          <Typography component="legend" sx={{ ml: 2 }}>
-            {lang(toQuantityType(data.quantity))}
-          </Typography>
+        <Stack direction={"row"} justifyContent={"space-between"}>
+          <Stack direction="row" alignItems={"center"}>
+            <ProductionQuantityLimitsOutlined color="info" />
+            <Rating
+              value={data.quantity}
+              sx={{
+                width: "fit-content",
+                ml: 1,
+              }}
+              size="small"
+              readOnly
+            />
+            <Typography component="legend" sx={{ ml: 2 }}>
+              {lang(toQuantityType(data.quantity))}
+            </Typography>
+          </Stack>
+          <Stack direction={"row"} pr={1} gap={1}>
+            <LocalOfferOutlined color="secondary" />
+            <Typography>
+              {data.price ? `${data.price} VNĐ` : lang("free")}
+            </Typography>
+          </Stack>
         </Stack>
         <Stack direction={"row"} gap={1} mt={1}>
           <LocationOnOutlined color="info" />
@@ -229,30 +243,27 @@ export default function FoodPostViewerData({
         direction={"row"}
         borderRadius={2}
       >
-        <Stack direction={"row"} alignItems={"center"} gap={2} width={"100%"}>
-          <Avatar
-            alt={userExposedName}
-            sx={{ bgcolor: deepOrange[500], cursor: "pointer" }}
-            onClick={() => {
-              navigate(`/profile/${userId}`);
-            }}
-          >
-            {userExposedName[0]}
-          </Avatar>
-          <Stack direction={"column"} flex={1}>
+        <Stack gap={2} width={"100%"}>
+          <Stack direction={"row"} gap={2}>
+            <FoodAvatars food={data} navigate={true} />
             <Typography>{userExposedName}</Typography>
-
+          </Stack>
+          <Divider />
+          <Stack direction={"column"}>
             {typeof user === "object" && (
-              <Typography>
-                {user.location?.name
-                  ? toDistance(
-                      user.location?.coordinates,
-                      appContentContext.currentLocation
-                    ) + "km"
-                  : lang("no-address")}
-              </Typography>
+              <Stack direction={"row"} gap={3}>
+                <SocialDistanceOutlined color="info" />
+                <Typography>
+                  {user.location?.name
+                    ? toDistance(
+                        user.location?.coordinates,
+                        appContentContext.currentLocation
+                      ) + "km"
+                    : lang("no-address")}
+                </Typography>
+              </Stack>
             )}
-            <Stack direction={"row"} width={"100%"}>
+            <Stack direction={"row"} width={"100%"} gap={3}>
               <LocationOnOutlined color="info" />
               {typeof user === "object" && (
                 <Typography>

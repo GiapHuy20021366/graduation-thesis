@@ -9,24 +9,23 @@ import React, {
 } from "react";
 import {
   IPlaceExposedCooked,
+  IPlaceSearchOrder,
+  IPlaceSearchParams,
   OrderState,
   PlaceType,
   loadFromLocalStorage,
   saveToSessionStorage,
   toPlaceExposedCooked,
 } from "../../../data";
-import {
-  IPlaceSearchOrder,
-  IPlaceSearchParams,
-  userFetcher,
-} from "../../../api";
+import { userFetcher } from "../../../api";
 import {
   useAppContentContext,
   useAuthContext,
   useDistanceCalculation,
-  useToastContext,
+  useLoader,
 } from "../../../hooks";
 import { placeSearchTabs } from "./place-search-tab";
+import { IUseLoaderStates } from "../../../hooks/useLoader";
 
 interface IPlaceSearchContextSnapshotData {
   query?: string;
@@ -65,16 +64,15 @@ export interface IPlaceSearchContext {
   doSearchRating: (order?: OrderState, options?: IFetchOptions) => void;
   doSearchQuery: (query?: string, options?: IFetchOptions) => void;
   doSearchFilter: (filter: any, options?: IFetchOptions) => void;
+  doSearch: () => void;
   doSaveStorage: () => void;
 
-  isEnd: boolean;
-  setIsEnd: Dispatch<SetStateAction<boolean>>;
-  isFetching: boolean;
+  loader: IUseLoaderStates;
 }
 
 interface IFetchOptions {
   update?: boolean; // Push or clear
-  refresh?: boolean; // refresh isEnd status
+  refresh?: boolean; // refresh loader.isEnd status
   force?: boolean; // Force fetch if there already a fetching
 }
 
@@ -104,12 +102,11 @@ export const PlaceSearchContext = createContext<IPlaceSearchContext>({
   doSearchRating: () => {},
   doSearchFilter: () => {},
   doSearchQuery: () => {},
+  doSearch: () => {},
 
   doSaveStorage: () => {},
 
-  isEnd: false,
-  setIsEnd: () => {},
-  isFetching: false,
+  loader: {} as IUseLoaderStates,
 });
 
 const PLACE_SEARCH_KEY = "place.search.context.state";
@@ -132,8 +129,7 @@ export default function PlaceSearchContextProvider({
   const [tab, setTab] = useState<number>(0);
 
   const [data, setData] = useState<IPlaceExposedCooked[]>([]);
-  const [isEnd, setIsEnd] = useState<boolean>(false);
-  const [isFetching, setIsFetching] = useState<boolean>(false);
+  const loader = useLoader();
 
   const appContentContext = useAppContentContext();
   const authContext = useAuthContext();
@@ -141,7 +137,6 @@ export default function PlaceSearchContextProvider({
   const account = authContext.account;
   const distances = useDistanceCalculation();
   // const progessContext = usePageProgessContext();
-  const toastContext = useToastContext();
 
   // Recover at begining or fetch at begining
   const dirtyRef = useRef<boolean>(false);
@@ -176,12 +171,12 @@ export default function PlaceSearchContextProvider({
   const doSearchAll = useCallback(
     (params: IPlaceSearchParams, options?: IFetchOptions) => {
       if (auth == null) return;
-      if (isFetching && !options?.force) return;
+      if (loader.isFetching && !options?.force) return;
 
-      if (isEnd && !options?.refresh) {
+      if (loader.isEnd && !options?.refresh) {
         return;
       } else {
-        setIsEnd(false);
+        loader.setIsEnd(false);
       }
 
       const pagination = {
@@ -197,7 +192,9 @@ export default function PlaceSearchContextProvider({
 
       params.pagination = pagination;
 
-      setIsFetching(true);
+      loader.setIsFetching(true);
+      loader.setIsError(false);
+
       // progessContext.start();
       userFetcher
         .searchPlace(params, auth)
@@ -213,38 +210,34 @@ export default function PlaceSearchContextProvider({
               );
               setData(cookedData);
               if (data.length < pagination.limit) {
-                setIsEnd(true);
+                loader.setIsEnd(true);
               }
-              setIsFetching(false);
+              loader.setIsFetching(false);
             }, 500);
           }
         })
         .catch(() => {
-          toastContext.error("Có lỗi xảy ra, vui lòng thử lại");
+          loader.setIsError(true);
         })
         .finally(() => {
-          setIsFetching(false);
+          loader.setIsFetching(false);
           // progessContext.end();
         });
     },
-    [
-      account?.location,
-      auth,
-      data,
-      distances.currentLocation,
-      isEnd,
-      isFetching,
-      toastContext,
-    ]
+    [account?.location, auth, data.length, distances.currentLocation, loader]
   );
 
   const doSearchRelative = useCallback(
     (options?: IFetchOptions) => {
+      const current = distances.currentLocation?.coordinates;
+      if (current == null) return;
       doSearchAll(
         {
           query: query,
-          currentLocation: distances.currentLocation?.coordinates,
-          maxDistance: maxDistance,
+          distance: {
+            current: current,
+            max: maxDistance,
+          },
           types: types,
         },
         options
@@ -261,11 +254,15 @@ export default function PlaceSearchContextProvider({
 
   const doSearchDistance = useCallback(
     (order?: OrderState, options?: IFetchOptions) => {
+      const current = distances.currentLocation?.coordinates;
+      if (current == null) return;
       doSearchAll(
         {
           query: query,
-          currentLocation: distances.currentLocation?.coordinates,
-          maxDistance: maxDistance,
+          distance: {
+            current: current,
+            max: maxDistance,
+          },
           types: types,
           order: {
             distance: order,
@@ -279,11 +276,15 @@ export default function PlaceSearchContextProvider({
 
   const doSearchRating = useCallback(
     (order?: OrderState, options?: IFetchOptions) => {
+      const current = distances.currentLocation?.coordinates;
+      if (current == null) return;
       doSearchAll(
         {
           query: query,
-          currentLocation: distances.currentLocation?.coordinates,
-          maxDistance: maxDistance,
+          distance: {
+            current: current,
+            max: maxDistance,
+          },
           types: types,
           order: {
             distance: order,
@@ -311,6 +312,8 @@ export default function PlaceSearchContextProvider({
 
   const doSearchQuery = useCallback(
     (query?: string, options?: IFetchOptions) => {
+      const current = distances.currentLocation?.coordinates;
+      if (current == null) return;
       let _order: undefined | IPlaceSearchOrder = undefined;
       switch (tab) {
         case placeSearchTabs.RALATIVE: {
@@ -332,8 +335,10 @@ export default function PlaceSearchContextProvider({
       doSearchAll(
         {
           query: query,
-          currentLocation: distances.currentLocation?.coordinates,
-          maxDistance: maxDistance,
+          distance: {
+            current: current,
+            max: maxDistance,
+          },
           types: types,
           order: _order,
         },
@@ -345,6 +350,8 @@ export default function PlaceSearchContextProvider({
 
   const doSearchFilter = useCallback(
     (filter: any, options?: IFetchOptions) => {
+      const current = distances.currentLocation?.coordinates;
+      if (current == null) return;
       let _order: undefined | IPlaceSearchOrder = undefined;
       switch (tab) {
         case placeSearchTabs.RALATIVE: {
@@ -366,8 +373,10 @@ export default function PlaceSearchContextProvider({
       doSearchAll(
         {
           query: query,
-          currentLocation: distances.currentLocation?.coordinates,
-          maxDistance: maxDistance,
+          distance: {
+            current: current,
+            max: maxDistance,
+          },
           types: types,
           order: _order,
           ...filter,
@@ -386,6 +395,24 @@ export default function PlaceSearchContextProvider({
     ]
   );
 
+  const doSearch = () => {
+    const options = {
+      update: true,
+      refresh: true,
+    };
+    switch (tab) {
+      case placeSearchTabs.RALATIVE:
+        doSearchRelative(options);
+        break;
+      case placeSearchTabs.DISTANCE:
+        doSearchDistance(order?.distance, options);
+        break;
+      case placeSearchTabs.RATING:
+        doSearchRating(order?.rating, options);
+        break;
+    }
+  };
+
   useEffect(() => {
     const main = appContentContext.mainRef?.current;
     let listener: any;
@@ -396,7 +423,7 @@ export default function PlaceSearchContextProvider({
         const isAtBottom =
           element.scrollTop + element.clientHeight === element.scrollHeight;
 
-        if (isAtBottom && !isEnd) {
+        if (isAtBottom && !loader.isEnd) {
           doSearchMore();
         }
       };
@@ -407,12 +434,13 @@ export default function PlaceSearchContextProvider({
         main.removeEventListener("scroll", listener);
       }
     };
-  }, [appContentContext.mainRef, doSearchMore, isEnd]);
+  }, [appContentContext.mainRef, doSearchMore, loader.isEnd]);
 
   // Recover result
   useEffect(() => {
     if (account == null) return;
     if (!dirtyRef.current) {
+      dirtyRef.current = true;
       // At begining
       const snapshot = loadFromLocalStorage<IPlaceSearchContextSnapshotData>({
         key: PLACE_SEARCH_KEY,
@@ -434,14 +462,20 @@ export default function PlaceSearchContextProvider({
           }, 300);
         }
       } else {
-        doSearchAll({
-          query: query,
-          currentLocation: distances.currentLocation?.coordinates,
-          maxDistance: maxDistance,
-          types: types,
-        });
+        const current = distances.currentLocation?.coordinates;
+        if (current == null) {
+          dirtyRef.current = false;
+        } else {
+          doSearchAll({
+            query: query,
+            distance: {
+              current: current,
+              max: maxDistance,
+            },
+            types: types,
+          });
+        }
       }
-      dirtyRef.current = true;
     }
   }, [
     account,
@@ -471,15 +505,14 @@ export default function PlaceSearchContextProvider({
         setTab,
 
         data,
-        isEnd,
-        setIsEnd,
-        isFetching,
+        loader,
 
         doSearchDistance,
         doSearchRelative,
         doSearchRating,
         doSearchQuery,
         doSearchFilter,
+        doSearch,
 
         doSaveStorage,
       }}

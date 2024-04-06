@@ -16,6 +16,7 @@ const ListEnd = React.forwardRef<HTMLDivElement, ListEndProps>((props, ref) => {
       width={"100%"}
       boxSizing={"border-box"}
       textAlign={"center"}
+      mt={2}
       {...rest}
       display={active ? "flex" : "none"}
     >

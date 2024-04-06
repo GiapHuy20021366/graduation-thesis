@@ -290,7 +290,25 @@ export const searchPlaces = async (params: IPlaceSearchParams) => {
 
   // author
   if (author) {
-    options["author"] = author;
+    const { exclude, include } = author;
+    const authorOption: any = {};
+    if (exclude != null) {
+      if (typeof exclude === "string") {
+        authorOption.$ne = exclude;
+      } else {
+        authorOption.$nin = exclude;
+      }
+    }
+    if (include != null) {
+      if (typeof include === "string") {
+        authorOption.$eq = include;
+      } else {
+        authorOption.$in = include;
+      }
+    }
+    if (Object.keys(authorOption).length !== 0) {
+      options["author"] = authorOption;
+    }
   }
 
   if (types != null && types.length > 0) {

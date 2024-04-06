@@ -24,7 +24,7 @@ const PlaceSearchFilter = React.forwardRef<
   PlaceSearchFilterProps
 >((props, ref) => {
   const i18nContext = useI18nContext();
-  const lang = i18nContext.of(PlaceSearchFilter);
+  const lang = i18nContext.of("PlaceSearchFilter");
 
   const searchContext = usePlaceSearchContext();
   const {

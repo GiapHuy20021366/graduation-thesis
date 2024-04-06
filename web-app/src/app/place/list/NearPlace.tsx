@@ -1,14 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Box,
-  Button,
-  SpeedDial,
-  Stack,
-  StackProps,
-  Typography,
-} from "@mui/material";
-import { AddOutlined } from "@mui/icons-material";
-import { useNavigate } from "react-router";
+import { Stack, StackProps } from "@mui/material";
 import {
   useAppContentContext,
   useAuthContext,
@@ -26,6 +17,8 @@ import {
 import PlaceSearchItemHolder from "../search/PlaceSearchItemHolder";
 import PlaceSearchItem from "../search/PlaceSearchItem";
 import { userFetcher } from "../../../api";
+import ListEnd from "../../common/viewer/data/ListEnd";
+import ErrorRetry from "../../common/viewer/data/ErrorRetry";
 
 interface INearPlaceSnapshotData {
   data: IPlaceExposedCooked[];
@@ -40,7 +33,6 @@ type NearPlaceProps = StackProps & {
 
 const NearPlace = React.forwardRef<HTMLDivElement, NearPlaceProps>(
   (props, ref) => {
-    const navigate = useNavigate();
     const { active, ...rest } = props;
 
     const [data, setData] = useState<IPlaceExposedCooked[]>([]);
@@ -77,6 +69,8 @@ const NearPlace = React.forwardRef<HTMLDivElement, NearPlaceProps>(
     const doSearch = useCallback(() => {
       if (auth == null) return;
       if (isFetching || !active) return;
+      const current = distances.currentLocation?.coordinates;
+      if (current == null) return;
       const pagination: IPagination = {
         skip: data.length,
         limit: 24,
@@ -90,7 +84,10 @@ const NearPlace = React.forwardRef<HTMLDivElement, NearPlaceProps>(
       userFetcher
         .searchPlace(
           {
-            currentLocation: distances.currentLocation?.coordinates,
+            distance: {
+              current: current,
+              max: Number.MAX_SAFE_INTEGER,
+            },
             order: {
               distance: OrderState.INCREASE,
             },
@@ -161,6 +158,7 @@ const NearPlace = React.forwardRef<HTMLDivElement, NearPlaceProps>(
       if (account == null) return;
       if (!active) return;
       if (!dirtyRef.current) {
+        dirtyRef.current = true;
         // At begining
         const snapshot = loadFromSessionStorage<INearPlaceSnapshotData>({
           key: NEAR_PLACE_STORAGE_KEY,
@@ -181,11 +179,21 @@ const NearPlace = React.forwardRef<HTMLDivElement, NearPlaceProps>(
             }, 300);
           }
         } else {
-          doSearch();
+          const current = distances.currentLocation?.coordinates;
+          if (current == null) {
+            dirtyRef.current = false;
+          } else {
+            doSearch();
+          }
         }
-        dirtyRef.current = true;
       }
-    }, [account, active, appContentContext.mainRef, doSearch]);
+    }, [
+      account,
+      active,
+      appContentContext.mainRef,
+      distances.currentLocation,
+      doSearch,
+    ]);
 
     return (
       <Stack
@@ -207,25 +215,10 @@ const NearPlace = React.forwardRef<HTMLDivElement, NearPlaceProps>(
             />
           );
         })}
-        <SpeedDial
-          icon={<AddOutlined />}
-          sx={{ position: "absolute", bottom: 136, right: 26 }}
-          ariaLabel={"Create"}
-          onClick={() => navigate("/place/update")}
-        />
+
         {isFetching && <PlaceSearchItemHolder />}
-        {isEnd && !isError && (
-          <Box textAlign={"center"} mt={2}>
-            <Typography>Bạn đã tìm kiếm hết</Typography>
-            <Button onClick={() => doSearch()}>Tìm kiếm thêm</Button>
-          </Box>
-        )}
-        {isError && (
-          <Box textAlign={"center"} mt={2}>
-            <Typography>Có lỗi xảy ra</Typography>
-            <Button onClick={() => doSearch()}>Thử lại</Button>
-          </Box>
-        )}
+        <ListEnd active={isEnd && !isError} onRetry={doSearch} />
+        <ErrorRetry active={isError} onRetry={doSearch} />
       </Stack>
     );
   }

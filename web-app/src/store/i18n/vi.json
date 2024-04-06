@@ -335,9 +335,104 @@
         "report": "Báo cáo"
     },
     "Others": {
-        "no-address": "Không địa chỉ"
+        "no-address": "Không địa chỉ",
+        "share-label": "Chia sẻ",
+        "message-label": "Nhắn tin",
+        "favorite-label": "Yêu thích",
+        "place-search-label": "Tìm kiếm địa điểm",
+        "add-place-label": "Thêm địa điểm",
+        "created-at": "Đã tạo vào",
+        "rated-point": "{0} lượt, đánh giá {1}/{2}",
+        "rated-at": "Đã đánh giá {0}/{1} vào ",
+        "subcribed-from": "{0} từ ",
+        "input-your-place-name": "Nhập tên địa điểm của bạn",
+        "add-label": "Thêm",
+        "remove-label": "Xóa",
+        "categories": "Các loại thực phẩm",
+        "place-no-categories": "Trang này chưa miêu tả cụ thể loại thực phẩm muốn chia sẻ",
+        "place-add-food-label": "Thêm thực phẩm",
+        "place-no-description": "Trang này hiện chưa được mô tả",
+        "n-subcribed": "{0} đang theo dõi",
+        "see-more": "Xem thêm",
+        "see-location": "Xem vị trí",
+        "from-home": "{0} {1} (Nhà của bạn)",
+        "from-current": "{0} {1} (Vị trí hiện tại)",
+        "cannot-rating-now": "Không thể đánh giá vào lúc này",
+        "locate-me": "Vị trí của tôi",
+        "use-this-location": "Sử dụng địa điểm này"
     },
     "Toasts": {
-        "can-not-sharing-now": "Không thể chia sẻ thực phẩm vào lúc này"
+        "can-not-sharing-now": "Không thể chia sẻ thực phẩm vào lúc này",
+        "can-not-upload-image-now": "Không thể thêm ảnh vào lúc này",
+        "please-input-place-name": "Vui lòng nhập tên địa điểm",
+        "please-choose-location": "Vui lòng chọn vị trí",
+        "cannot-create-place": "Không thể tạo địa điểm vào lúc này",
+        "cannot-update-place": "Không thể cập nhật địa điểm vào lúc này",
+        "cannot-subcribe-place-now": "Không thể theo dõi địa điểm vào lúc này",
+        "cannot-unsubcribe-place-now": "Không thể hủy theo dõi địa điểm vào lúc này",
+        "subcribed": "Đã theo dõi",
+        "confirm-unsubcribed": "Bạn chắn chắn muốn hủy theo dõi địa điểm này",
+        "agree": "Đồng ý",
+        "not-agree": "Không đồng ý"
+    },
+    "PlaceList": {
+        "my-label": "Của tôi",
+        "near-label": "Gần đây",
+        "favorite-label": "Yêu thích",
+        "subcribed-label": "Theo dõi",
+        "rating-label": "Đánh giá"
+    },
+    "MyPlace": {
+        "add-place-label": "Thêm địa điểm"
+    },
+    "PlaceViewerExposedType": {
+        "PERSONAL": "Địa điểm cá nhân",
+        "VOLUNTEER": "Địa điểm tình nguyện",
+        "EATERY": "Quán ăn",
+        "RESTAURANT": "Nhà hàng",
+        "SUPERMARKET": "Siêu thị",
+        "GROCERY": "Tạp hóa",
+        "UNKNOWN": "Không xác định"
+    },
+    "FollowTypes": {
+        "subcribe": "Theo dõi",
+        "ADMIN": "Quản trị viên",
+        "SUB_ADMIN": "Quản trị viên",
+        "SUBCRIBER": "Người theo dõi",
+        "MEMBER": "Thành viên"
+    },
+    "PlaceCategories": {
+        "food-category": "Loại thực phẩm",
+        "help-by-provide-category": "Giúp mọi người tìm hiểu về loại thực phẩm mà địa điểm này cung cấp"
+    },
+    "PlaceEditForm": {
+        "update-now": "Cập nhật ngay bây giờ",
+        "create-now": "Tạo trang ngay bây giờ",
+        "l-place-type": "Loại địa điểm",
+        "your-place-are": "Trang của bạn là",
+        "description": "Mô tả",
+        "l-expose-name": "Tên hiển thị",
+        "expose-name-placeholder": "Nhập tên hiển thị"
+    },
+    "PlaceSearch": {
+        "search-filter": "Tìm kiếm nâng cao",
+        "place-type": "Loại địa điểm",
+        "l-personal": "Cá nhân",
+        "l-volunteer": "Tình nguyện",
+        "l-eatery": "Quán ăn",
+        "l-grocery": "Tạp hóa",
+        "l-restaurant": "Nhà hàng",
+        "l-supermarket": "Siêu thị",
+        "place-search-placeholder": "Nhập tên địa điểm bạn muốn tìm kiếm",
+        "l-search": "Tìm kiếm",
+        "l-advance-search": "Nâng cao",
+        "l-rating": "Đánh giá"
+    },
+    "RatingLabels": {
+        "useless": "Thấp",
+        "poor": "Tạm ổn",
+        "ok": "Được",
+        "good": "Tốt",
+        "excellent": "Xuất sắc"
     }
 }

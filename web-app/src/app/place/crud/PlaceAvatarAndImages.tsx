@@ -5,12 +5,14 @@ import {
   BoxProps,
   SpeedDial,
   Stack,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import Carousel from "react-material-ui-carousel";
 import PlaceImageHolder from "./PlaceImageHolder";
 import {
   useAuthContext,
+  useComponentLanguage,
   usePlaceEditContext,
   useSaveImage,
   useToastContext,
@@ -27,6 +29,7 @@ const PlaceavatarAndImages = React.forwardRef<
   const editContext = usePlaceEditContext();
   const { images, setImages, avatar, setavatar, exposeName } = editContext;
   const [index, setIndex] = useState<number>(0);
+  const lang = useComponentLanguage();
 
   const inputImageAddRef = useRef<HTMLInputElement>(null);
   const inputAvatarRef = useRef<HTMLInputElement>(null);
@@ -62,7 +65,7 @@ const PlaceavatarAndImages = React.forwardRef<
             setImages(nImages);
           },
           onError: () => {
-            toast.error("Không thể thực hiện hành động bây giờ");
+            toast.error(lang("can-not-upload-image-now"));
           },
         },
         auth
@@ -90,7 +93,7 @@ const PlaceavatarAndImages = React.forwardRef<
             setIndex(nImages.length);
           },
           onError: () => {
-            toast.error("Không thể thực hiện hành động bây giờ");
+            toast.error(lang("can-not-upload-image-now"));
           },
         },
         auth
@@ -123,7 +126,7 @@ const PlaceavatarAndImages = React.forwardRef<
             setavatar(image.url);
           },
           onError: () => {
-            toast.error("Không thể thực hiện hành động bây giờ");
+            toast.error(lang("can-not-upload-image-now"));
           },
         },
         auth
@@ -149,7 +152,7 @@ const PlaceavatarAndImages = React.forwardRef<
           fullHeightHover
           navButtonsAlwaysVisible
           sx={{
-            backgroundColor: "white",
+            backgroundColor: "background.default",
             width: "100%",
             height: "230px",
           }}
@@ -194,19 +197,23 @@ const PlaceavatarAndImages = React.forwardRef<
 
         {images.length > 0 && (
           <>
-            <SpeedDial
-              icon={<EditOutlined />}
-              sx={{ position: "absolute", bottom: 16, right: 76 }}
-              ariaLabel={"Add"}
-              onClick={() => inputImageUpdateRef.current?.click()}
-            />
+            <Tooltip arrow title={lang("add-label")} placement="bottom">
+              <SpeedDial
+                icon={<EditOutlined />}
+                sx={{ position: "absolute", bottom: 16, right: 76 }}
+                ariaLabel={lang("add-label")}
+                onClick={() => inputImageUpdateRef.current?.click()}
+              />
+            </Tooltip>
 
-            <SpeedDial
-              icon={<CloseOutlined />}
-              sx={{ position: "absolute", bottom: 16, right: 136 }}
-              ariaLabel={"Add"}
-              onClick={handleImageRemove}
-            />
+            <Tooltip arrow title={lang("remove-label")}>
+              <SpeedDial
+                icon={<CloseOutlined />}
+                sx={{ position: "absolute", bottom: 16, right: 136 }}
+                ariaLabel={lang("remove-label")}
+                onClick={handleImageRemove}
+              />
+            </Tooltip>
           </>
         )}
       </Box>
@@ -227,6 +234,7 @@ const PlaceavatarAndImages = React.forwardRef<
             zIndex: 1000,
             cursor: "pointer",
             boxShadow: 5,
+            ml: 1,
           }}
           onClick={() => handleClickAvatar()}
           src={avatar}
@@ -234,7 +242,7 @@ const PlaceavatarAndImages = React.forwardRef<
           H
         </Avatar>
         <Typography sx={{ fontWeight: 500, fontSize: "1.3rem", mt: 2 }}>
-          {exposeName ? exposeName : "Nhập tên địa điểm của bạn"}
+          {exposeName ? exposeName : lang("input-your-place-name")}
         </Typography>
       </Stack>
     </Box>

@@ -18,7 +18,7 @@ import {
   RichTextEditor,
 } from "mui-tiptap";
 import { useState } from "react";
-import { useFoodSharingFormContext, useI18nContext } from "../../../hooks";
+import { useI18nContext } from "../../../hooks";
 
 const EditMode = {
   HIDE: "HIDE",
@@ -28,12 +28,18 @@ const EditMode = {
 
 export type EditMode = (typeof EditMode)[keyof typeof EditMode];
 
-export default function DescriptionEditor() {
+interface IDescriptionEditorProps {
+  description: string;
+  setDescription: (html: string) => void;
+}
+
+export default function DescriptionEditor({
+  description,
+  setDescription,
+}: IDescriptionEditorProps) {
   const [editable, setEditable] = useState<EditMode>(EditMode.EDIT);
   const i18n = useI18nContext();
-  const lang = i18n.of(DescriptionEditor);
-  const form = useFoodSharingFormContext();
-  const { description, setDescription } = form;
+  const lang = i18n.of("DescriptionEditor");
 
   return (
     <Box
@@ -64,7 +70,7 @@ export default function DescriptionEditor() {
         </AccordionSummary>
         <AccordionDetails
           sx={{
-            p: 0
+            p: 0,
           }}
         >
           <RichTextEditor

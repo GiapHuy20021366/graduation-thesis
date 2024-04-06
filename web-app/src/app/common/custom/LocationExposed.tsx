@@ -1,5 +1,5 @@
-import React, { ReactNode, useEffect, useRef, useState } from "react";
-import { Box, Chip, Stack, StackProps } from "@mui/material";
+import React, { useEffect, useRef, useState } from "react";
+import { Box, Chip, Stack, StackProps, Typography } from "@mui/material";
 import {
   GoogleMap,
   InfoWindowF,
@@ -15,7 +15,6 @@ type LocationExposedProps = StackProps & {
   targetLocation?: ILocation;
   homeLocation?: ILocation;
   currentLocation?: ILocation;
-  infoContent?: ReactNode;
   iconTargetUrl?: string;
 };
 
@@ -24,7 +23,6 @@ const LocationExposed = React.forwardRef<HTMLDivElement, LocationExposedProps>(
     const {
       targetLocation,
       currentLocation,
-      infoContent,
       homeLocation,
       iconTargetUrl,
       ...rest
@@ -98,7 +96,10 @@ const LocationExposed = React.forwardRef<HTMLDivElement, LocationExposedProps>(
                   position={homeLocation.coordinates}
                 >
                   <InfoWindowF position={homeLocation.coordinates}>
-                    <Box>{lang("your-home")}</Box>
+                    <Box color={"black"} maxWidth={"300px"}>
+                      <Typography>{lang("your-home")}:</Typography>
+                      <Typography>{homeLocation.name}</Typography>
+                    </Box>
                   </InfoWindowF>
                 </MarkerF>
               )}
@@ -111,7 +112,10 @@ const LocationExposed = React.forwardRef<HTMLDivElement, LocationExposedProps>(
                   position={currentLocation.coordinates}
                 >
                   <InfoWindowF position={currentLocation.coordinates}>
-                    <Box>{lang("your-current-location")}</Box>
+                    <Box color={"black"} maxWidth={"300px"}>
+                      <Typography>{lang("your-current-location")}:</Typography>
+                      <Typography>{currentLocation.name}</Typography>
+                    </Box>
                   </InfoWindowF>
                 </MarkerF>
               )}
@@ -124,11 +128,12 @@ const LocationExposed = React.forwardRef<HTMLDivElement, LocationExposedProps>(
                   position={targetLocation.coordinates}
                 >
                   <InfoWindowF position={targetLocation.coordinates}>
-                    {infoContent ? (
-                      infoContent
-                    ) : (
-                      <Box>{lang("target-current-location")}</Box>
-                    )}
+                    <Box color={"black"} maxWidth={"300px"}>
+                      <Typography>
+                        {lang("target-current-location")}:
+                      </Typography>
+                      <Typography>{targetLocation.name}</Typography>
+                    </Box>
                   </InfoWindowF>
                 </MarkerF>
               )}
@@ -141,20 +146,14 @@ const LocationExposed = React.forwardRef<HTMLDivElement, LocationExposedProps>(
             position: "absolute",
             bottom: 80,
             zIndex: 1000,
-            backgroundColor: "purple",
             width: "fit-content",
             px: 5,
             fontWeight: 600,
             fontSize: "1.3rem",
-            color: "white",
             left: "50%",
             transform: "translateX(-50%)",
-            cursor: "pointer",
-            ":hover": {
-              backgroundColor: "white",
-              color: "black",
-            },
           }}
+          color="primary"
           onClick={handleLocateMe}
           icon={<CenterFocusStrongOutlined color="inherit" />}
         />
@@ -164,20 +163,14 @@ const LocationExposed = React.forwardRef<HTMLDivElement, LocationExposedProps>(
             position: "absolute",
             bottom: 40,
             zIndex: 1000,
-            backgroundColor: "purple",
             width: "fit-content",
             px: 5,
             fontWeight: 600,
             fontSize: "1.3rem",
-            color: "white",
             left: "50%",
             transform: "translateX(-50%)",
-            cursor: "pointer",
-            ":hover": {
-              backgroundColor: "white",
-              color: "black",
-            },
           }}
+          color="primary"
           onClick={handleLocateMyHome}
         />
       </Stack>

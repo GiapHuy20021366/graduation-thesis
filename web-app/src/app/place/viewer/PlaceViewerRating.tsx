@@ -8,7 +8,11 @@ import {
   Typography,
 } from "@mui/material";
 import { IPlaceExposed, IRating } from "../../../data";
-import { useAuthContext, useToastContext } from "../../../hooks";
+import {
+  useAuthContext,
+  useComponentLanguage,
+  useToastContext,
+} from "../../../hooks";
 import { Star } from "@mui/icons-material";
 import { userFetcher } from "../../../api";
 
@@ -17,16 +21,11 @@ type PlaceViewerRatingProps = StackProps & {
 };
 
 const ratingLables: { [index: string]: string } = {
-  0.5: "Useless",
-  1: "Useless+",
-  1.5: "Poor",
-  2: "Poor+",
-  2.5: "Ok",
-  3: "Ok+",
-  3.5: "Good",
-  4: "Good+",
-  4.5: "Excellent",
-  5: "Excellent+",
+  1: "useless",
+  2: "poor",
+  3: "ok",
+  4: "good",
+  5: "excellent",
 };
 
 function getLabelText(value: number) {
@@ -48,6 +47,7 @@ const PlaceViewerRating = React.forwardRef<
   const authContext = useAuthContext();
   const { account, auth } = authContext;
   const toastContext = useToastContext();
+  const lang = useComponentLanguage();
 
   useEffect(() => {
     if (rating == null) {
@@ -71,7 +71,7 @@ const PlaceViewerRating = React.forwardRef<
         }
       })
       .catch(() => {
-        toastContext.error("Không thể đánh giá vào lúc này");
+        toastContext.error(lang("cannot-rating-now"));
       });
   };
 
@@ -129,7 +129,12 @@ const PlaceViewerRating = React.forwardRef<
       </Box>
       <Stack>
         <Typography>
-          {ratingExpose.count} lượt, đánh giá {ratingExpose.mean.toFixed(1)}/5.0
+          {lang(
+            "rated-point",
+            ratingExpose.count,
+            ratingExpose.mean.toFixed(1),
+            "5.0"
+          )}
         </Typography>
         <Box
           sx={{
@@ -141,7 +146,6 @@ const PlaceViewerRating = React.forwardRef<
           <Rating
             name="hover-feedback"
             value={rating}
-            precision={0.5}
             getLabelText={getLabelText}
             onChange={(_event, newValue) => {
               ratingPlace(newValue);
@@ -153,7 +157,7 @@ const PlaceViewerRating = React.forwardRef<
           />
           {rating !== null && (
             <Box sx={{ ml: 2 }}>
-              {ratingLables[hover !== -1 ? hover : rating]}
+              {lang(ratingLables[hover !== -1 ? hover : rating])}
             </Box>
           )}
         </Box>

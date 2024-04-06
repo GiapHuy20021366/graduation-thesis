@@ -18,7 +18,11 @@ import {
   IPlaceExposed,
   IFoodPostExposedUser,
 } from "../../../data";
-import { useAuthContext, useToastContext } from "../../../hooks";
+import {
+  useAuthContext,
+  useComponentLanguage,
+  useToastContext,
+} from "../../../hooks";
 import { DoneOutlined } from "@mui/icons-material";
 import { userFetcher } from "../../../api";
 
@@ -34,7 +38,10 @@ type SubcribeChipActionProps = ChipProps & {
   onUnFollowed?: () => void;
 };
 
-const isSubcribed = (place: IPlaceExposed, account?: IAccountExposed): boolean => {
+const isSubcribed = (
+  place: IPlaceExposed,
+  account?: IAccountExposed
+): boolean => {
   if (account == null) return false;
   if (place.userFollow == null) return false;
   if (place.userFollow.subcriber !== account._id) return false;
@@ -88,6 +95,7 @@ const SubcribeChipAction = React.forwardRef<
   const authContext = useAuthContext();
   const { account, auth } = authContext;
   const toastContext = useToastContext();
+  const lang = useComponentLanguage();
 
   const canSubcribe = isPermitSubcribe(data, account);
 
@@ -108,7 +116,7 @@ const SubcribeChipAction = React.forwardRef<
         onFollowed && onFollowed();
       })
       .catch(() => {
-        toastContext.error("Không thể theo dõi vào lúc này");
+        toastContext.error(lang("cannot-subcribe-place-now"));
       });
   };
 
@@ -121,7 +129,7 @@ const SubcribeChipAction = React.forwardRef<
         onUnFollowed && onUnFollowed();
       })
       .catch(() => {
-        toastContext.error("Không thể hủy theo dõi vào lúc này");
+        toastContext.error(lang("cannot-unsubcribe-place-now"));
       });
   };
 
@@ -144,7 +152,7 @@ const SubcribeChipAction = React.forwardRef<
       <Chip
         ref={ref}
         icon={subcribed ? subcribedIcon ?? <DoneOutlined /> : unSubcribedIcon}
-        label={subcribed ? "Đã theo dõi" : "Theo dõi"}
+        label={subcribed ? lang("subcribed") : lang("subcribe")}
         color={subcribed ? "info" : "default"}
         {...rest}
         sx={{
@@ -154,9 +162,9 @@ const SubcribeChipAction = React.forwardRef<
         onClick={handleChipClick}
       />
       <Dialog open={openConfirm} onClose={() => setOpenConfirm(false)}>
-        <DialogTitle>Bạn chắc chắn muốn hủy theo dõi trang này</DialogTitle>
+        <DialogTitle>{lang("confirm-unsubcribed")}</DialogTitle>
         <DialogActions>
-          <Button variant="contained">Không đồng ý</Button>
+          <Button variant="contained">{lang("not-agree")}</Button>
           <Button
             variant="contained"
             onClick={() => {
@@ -164,7 +172,7 @@ const SubcribeChipAction = React.forwardRef<
               unfollowPlace();
             }}
           >
-            Đồng ý
+            {lang("agree")}
           </Button>
         </DialogActions>
       </Dialog>

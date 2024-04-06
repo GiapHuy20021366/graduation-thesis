@@ -1,4 +1,4 @@
-import { SpeedDial, Stack } from "@mui/material";
+import { SpeedDial, Stack, Tooltip } from "@mui/material";
 import PlaceViewerHeader from "./PlaceViewerHeader";
 import { IPlaceExposed } from "../../../data";
 import PlaceViewerTabs from "./PlaceViewerTabs";
@@ -8,7 +8,8 @@ import PlaceViewerIntroduction from "./PlaceViewerIntroduction";
 import PlaceViewerSubcribed from "./PlaceViewerSubcribed";
 import PlaceViewerShared from "./PlaceViewerShared";
 import { Add } from "@mui/icons-material";
-import { useNavigate } from "react-router";
+import StyledLink from "../../common/navigate/StyledLink";
+import { useComponentLanguage } from "../../../hooks";
 
 interface PlaceViewerDataProps {
   data: IPlaceExposed;
@@ -16,7 +17,7 @@ interface PlaceViewerDataProps {
 
 export default function PlaceViewerData({ data }: PlaceViewerDataProps) {
   const [tab, setTab] = useState<PlaceViewerTab>(0);
-  const navigate = useNavigate();
+  const lang = useComponentLanguage();
   return (
     <Stack width={"100%"} boxSizing={"border-box"} boxShadow={1} gap={2} px={1}>
       <PlaceViewerHeader place={data} />
@@ -27,7 +28,7 @@ export default function PlaceViewerData({ data }: PlaceViewerDataProps) {
           position: "sticky",
           top: 1,
           zIndex: 1000,
-          boxShadow: 1
+          boxShadow: 1,
         }}
       />
       {/* Tabs display */}
@@ -44,12 +45,21 @@ export default function PlaceViewerData({ data }: PlaceViewerDataProps) {
           place={data}
         />
       </>
-      <SpeedDial
-        icon={<Add />}
-        ariaLabel={"Add food"}
-        sx={{ position: "absolute", bottom: 76, right: 26 }}
-        onClick={() => navigate(`/food/sharing?place=${data._id}`)}
-      />
+
+      <StyledLink to={`/food/sharing?place=${data._id}`}>
+        <Tooltip
+          arrow
+          children={
+            <SpeedDial
+              icon={<Add />}
+              ariaLabel={lang("place-add-food-label")}
+              sx={{ position: "absolute", bottom: 76, right: 26 }}
+            />
+          }
+          title={lang("place-add-food-label")}
+          placement="left"
+        />
+      </StyledLink>
     </Stack>
   );
 }

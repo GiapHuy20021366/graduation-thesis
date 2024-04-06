@@ -10,6 +10,10 @@ export interface IPlaceAuthorExposed {
   _id: string;
 }
 
+export interface IPlaceExposedFollower extends IPlaceFollower {
+  time: number;
+}
+
 export interface IPlaceExposed extends Omit<IPlace, "author"> {
   author: string | IPlaceAuthorExposed;
   _id: string;
@@ -18,6 +22,6 @@ export interface IPlaceExposed extends Omit<IPlace, "author"> {
   createdAt: Date;
   updatedAt: Date;
   userRating?: IPlaceRating;
-  userFollow?: IPlaceFollower;
+  userFollow?: IPlaceExposedFollower;
   subcribers?: number;
 }

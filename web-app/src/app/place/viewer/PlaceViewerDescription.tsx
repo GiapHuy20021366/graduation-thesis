@@ -1,16 +1,23 @@
 import React from "react";
 import { Box, BoxProps, Button, Stack, Typography } from "@mui/material";
-import { useAuthContext } from "../../../hooks";
+import {
+  applicationPages,
+  useAuthContext,
+  useComponentLanguage,
+} from "../../../hooks";
 import { FollowType, IAccountExposed, IPlaceExposed } from "../../../data";
 import { RichTextReadOnly } from "mui-tiptap";
 import StarterKit from "@tiptap/starter-kit";
-import { useNavigate } from "react-router";
+import StyledLink from "../../common/navigate/StyledLink";
 
 type PlaceViewerDescriptionProps = BoxProps & {
   data: IPlaceExposed;
 };
 
-const isEditPermit = (data: IPlaceExposed, account?: IAccountExposed): boolean => {
+const isEditPermit = (
+  data: IPlaceExposed,
+  account?: IAccountExposed
+): boolean => {
   if (account == null) return false;
 
   const follower = data.userFollow;
@@ -35,8 +42,7 @@ const PlaceViewerDescription = React.forwardRef<
   const account = authContext.account;
 
   const editable = isEditPermit(data, account);
-
-  const navigate = useNavigate();
+  const lang = useComponentLanguage();
 
   return (
     <Box
@@ -47,17 +53,15 @@ const PlaceViewerDescription = React.forwardRef<
         ...(props.sx ?? {}),
       }}
     >
-      <h4>Mô tả</h4>
+      <h4>{lang("description")}</h4>
       {(data.description == null || data.description === "") && (
         <Stack alignItems={"center"} flex={1}>
-          <Typography>Trang này hiện chưa được mô tả</Typography>
+          <Typography>{lang("place-no-description")}</Typography>
           {editable && (
             <Stack gap={1}>
-              <Button
-                onClick={() => navigate("/place/update", { state: data })}
-              >
-                Chỉnh sửa ngay
-              </Button>
+              <StyledLink to={applicationPages.PLACE_UPDATE} state={data}>
+                <Button>{lang("edit")}</Button>
+              </StyledLink>
             </Stack>
           )}
         </Stack>

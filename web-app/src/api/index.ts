@@ -7,8 +7,6 @@ export {
   type UserResponse,
   type UserResponseError,
   type IPlaceData,
-  type IPlaceSearchOrder,
-  type IPlaceSearchParams,
 } from "./user";
 
 export {

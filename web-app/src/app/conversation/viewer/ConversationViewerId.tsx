@@ -31,7 +31,6 @@ export default function ConversationViewerId({
             loading.deactive();
             if (conversation == null) {
               setIsError(true);
-              console.log("error");
             }
           }
         );

@@ -28,9 +28,8 @@ export default function FoodPostViewerId({ id }: IFoodPostInfoProps) {
           setFound(true);
           setData(data.data);
         })
-        .catch((err) => {
+        .catch(() => {
           setFound(false);
-          console.log(err);
         })
         .finally(() => {
           loading.deactive();

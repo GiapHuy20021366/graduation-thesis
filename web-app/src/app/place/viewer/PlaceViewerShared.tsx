@@ -167,7 +167,6 @@ const PlaceViewerShared = React.forwardRef<
   return (
     <Stack
       ref={ref}
-      minHeight={"60vh"}
       {...rest}
       sx={{
         width: "100%",

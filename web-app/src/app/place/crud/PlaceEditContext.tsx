@@ -35,7 +35,7 @@ const defaultPlaceEditContext: IPlaceEditContext = {
   categories: [],
   exposeName: "",
   images: [],
-  type: PlaceType.PERSONAL,
+  type: PlaceType.VOLUNTEER,
 
   setavatar: () => {},
   setCategories: () => {},

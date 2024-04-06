@@ -17,6 +17,7 @@ const SearchMore = React.forwardRef<HTMLDivElement, SearchMoreProps>(
         width={"100%"}
         boxSizing={"border-box"}
         textAlign={"center"}
+        mt={2}
         {...rest}
         display={active ? "flex" : "none"}
       >

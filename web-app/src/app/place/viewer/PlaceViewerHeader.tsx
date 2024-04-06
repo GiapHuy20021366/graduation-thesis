@@ -16,6 +16,7 @@ import { NotificationsActiveOutlined } from "@mui/icons-material";
 import SubcribeChipAction from "./SubcribeChipAction";
 import PlaceViewerRating from "./PlaceViewerRating";
 import PlaceViewerExposedType from "./PlaceViewerExposedType";
+import { useComponentLanguage } from "../../../hooks";
 
 type PlaceViewerHeaderProps = BoxProps & {
   place: IPlaceExposed;
@@ -27,6 +28,7 @@ const PlaceViewerHeader = React.forwardRef<
 >((props, ref) => {
   const { place, ...rest } = props;
   const { images, exposeName } = place;
+  const lang = useComponentLanguage();
 
   const [subribedCount, setSubcribedCount] = useState<number>(
     place.subcribers ?? 0
@@ -92,7 +94,7 @@ const PlaceViewerHeader = React.forwardRef<
             <IconButton color="success">
               <NotificationsActiveOutlined />
             </IconButton>
-            <Typography>{subribedCount} đang theo dõi</Typography>
+            <Typography>{lang("n-subcribed", subribedCount)}</Typography>
             <SubcribeChipAction
               onFollowed={() => setSubcribedCount(subribedCount + 1)}
               onUnFollowed={() =>
@@ -102,7 +104,7 @@ const PlaceViewerHeader = React.forwardRef<
               sx={{ ml: 2 }}
             />
             <Box ml={"auto"}>
-              <Tooltip arrow title="Xem thêm">
+              <Tooltip arrow title={lang("see-more")}>
                 <PlaceButtonContextMenu
                   data={place}
                   sx={{ flex: 1 }}

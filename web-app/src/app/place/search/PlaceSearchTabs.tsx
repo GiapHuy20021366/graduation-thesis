@@ -29,7 +29,6 @@ const PlaceSearchTabs = React.forwardRef<HTMLDivElement, PlaceSearchTabsProps>(
       _event: React.SyntheticEvent<Element, Event>,
       value: any
     ) => {
-      console.log(value);
       setTab(value);
     };
 
@@ -91,19 +90,19 @@ const PlaceSearchTabs = React.forwardRef<HTMLDivElement, PlaceSearchTabsProps>(
           }}
         >
           <Tab
-            label={lang("Liên quan")}
+            label={lang("l-relative")}
             icon={<HomeOutlined />}
             iconPosition="start"
             onClick={onTabRelativeClick}
           />
           <Tab
-            label={lang("Khoảng cách")}
+            label={lang("l-distance")}
             icon={<OrderIcon order={order?.distance} />}
             iconPosition="end"
             onClick={onTabDistanceClick}
           />
           <Tab
-            label={lang("Đánh giá")}
+            label={lang("l-rating")}
             icon={<OrderIcon order={order?.rating} />}
             iconPosition="end"
             onClick={onTabRatingClick}

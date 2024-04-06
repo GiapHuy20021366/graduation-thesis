@@ -69,7 +69,7 @@ const HomeContent = React.forwardRef<HTMLDivElement, HomeContentProps>(
       >
         {samples.map((sample, index) => {
           return (
-            <LazyLoad key={index} height={"350px"}>
+            <LazyLoad key={index} height={"380px"}>
               <HomeFoodItem
                 item={sample}
                 onExpandFood={() => setOpenFood(sample._id)}

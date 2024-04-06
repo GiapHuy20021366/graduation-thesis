@@ -21,10 +21,11 @@ const PlaceViewerCategories = React.forwardRef<
       {...rest}
       sx={{
         width: "100%",
+        mb: 3,
         ...(props.sx ?? {}),
       }}
     >
-      <h4>Các loại thực phẩm </h4>
+      <h4>{lang("categories")}</h4>
       {categories.length > 0 && (
         <Box padding={"1rem 0"}>
           {categories.map((category, index) => {
@@ -34,9 +35,7 @@ const PlaceViewerCategories = React.forwardRef<
       )}
 
       {categories.length === 0 && (
-        <Typography>
-          Trang này chưa miêu tả cụ thể loại thực phẩm muốn chia sẻ
-        </Typography>
+        <Typography>{lang("place-no-categories")}</Typography>
       )}
     </Box>
   );

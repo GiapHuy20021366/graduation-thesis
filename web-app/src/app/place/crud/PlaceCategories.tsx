@@ -57,22 +57,9 @@ const PlaceCategories = React.forwardRef<HTMLDivElement, PlaceCategoriesProps>(
           ...(props.sx ?? {}),
         }}
       >
-        <h4>Loại thực phẩm</h4>
-        <Typography>
-          Giúp mọi người tìm hiểu về loại thực phẩm mà địa điểm này cung cấp
-        </Typography>
+        <h4>{lang("food-category")}</h4>
+        <Typography>{lang("help-by-provide-category")}</Typography>
         <Divider />
-        <Box padding={"1rem 0"}>
-          {categories.map((category, index) => {
-            return (
-              <CategoryPiece
-                text={lang(category)}
-                onRemove={() => handleRemoveCategory(index)}
-                key={index}
-              />
-            );
-          })}
-        </Box>
         <Autocomplete
           options={options}
           value={categoryValue}
@@ -103,6 +90,17 @@ const PlaceCategories = React.forwardRef<HTMLDivElement, PlaceCategoriesProps>(
             />
           )}
         />
+        <Box padding={"1rem 0"}>
+          {categories.map((category, index) => {
+            return (
+              <CategoryPiece
+                text={lang(category)}
+                onRemove={() => handleRemoveCategory(index)}
+                key={index}
+              />
+            );
+          })}
+        </Box>
       </Box>
     );
   }

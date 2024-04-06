@@ -14,7 +14,6 @@ import {
   FollowType,
   IPlaceFollower,
   IRating,
-  OrderState,
   IPlaceFollowerExposed,
   IUserSearchParams,
   IUserExposedWithFollower,
@@ -24,7 +23,7 @@ import {
   IPersonalDataUpdate,
   IFollowerExposed,
   Paginationed,
-  Queried,
+  IPlaceSearchParams,
 } from "../data";
 
 export const userEndpoints = {
@@ -107,20 +106,6 @@ export interface IPlaceData {
   avatar?: string;
   images: string[];
   type: PlaceType;
-}
-
-export interface IPlaceSearchOrder {
-  distance?: OrderState;
-  rating?: OrderState;
-}
-
-export interface IPlaceSearchParams extends Paginationed, Queried {
-  author?: string;
-  maxDistance?: number;
-  minRating?: number;
-  order?: IPlaceSearchOrder;
-  currentLocation?: ICoordinates;
-  types?: PlaceType[];
 }
 
 export interface IGetPlacesByFollowParams extends Paginationed {

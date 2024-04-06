@@ -91,7 +91,7 @@ const AvatarButtonAction = React.forwardRef<
             sx={{ mr: 1, ml: -1 }}
           />
           <Typography textAlign="center">
-            {theme.mode === "dark" ? lang("dark") : lang("white")}
+            {theme.mode === "dark" ? lang("dark") : lang("light")}
           </Typography>
         </MenuItem>
         <MenuItem onClick={handleClose}>

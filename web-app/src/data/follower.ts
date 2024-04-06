@@ -33,7 +33,7 @@ export const toFollowTypeLabel = (type?: FollowType): string | undefined => {
     case FollowType.ADMIN:
       return "ADMIN";
     case FollowType.SUB_ADMIN:
-      return "ADMIN";
+      return "SUB_ADMIN";
     case FollowType.SUBCRIBER:
       return "SUBCRIBER";
     case FollowType.MEMBER:

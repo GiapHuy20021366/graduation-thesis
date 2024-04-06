@@ -8,7 +8,11 @@ import {
   Typography,
 } from "@mui/material";
 import { IPlaceExposed } from "../../../data";
-import { useAuthContext, useDistanceCalculation } from "../../../hooks";
+import {
+  useAuthContext,
+  useComponentLanguage,
+  useDistanceCalculation,
+} from "../../../hooks";
 import {
   LocationOnOutlined,
   NearMeOutlined,
@@ -29,6 +33,7 @@ const PlaceViewerLocation = React.forwardRef<
   const authContext = useAuthContext();
   const account = authContext.account;
   const distances = useDistanceCalculation({ targetLocation: data.location });
+  const lang = useComponentLanguage();
 
   const [openMap, setOpenMap] = useState<boolean>(false);
 
@@ -50,7 +55,7 @@ const PlaceViewerLocation = React.forwardRef<
       }}
     >
       <Stack direction={"row"} gap={1} alignItems={"center"}>
-        <h4>Vị trí</h4>
+        <h4>{lang("description")}</h4>
         <Tooltip
           arrow
           children={
@@ -58,7 +63,7 @@ const PlaceViewerLocation = React.forwardRef<
               <NearMeOutlined />
             </IconButton>
           }
-          title={"Xem vị trí"}
+          title={lang("see-location")}
         />
       </Stack>
       <Stack direction={"row"} gap={1}>
@@ -68,14 +73,16 @@ const PlaceViewerLocation = React.forwardRef<
       {homeToTartgetDistance != null && (
         <Stack direction={"row"} gap={1}>
           <SocialDistanceOutlined color="info" />
-          <Typography>{homeToTartgetDistance + " km (Nhà của bạn)"}</Typography>
+          <Typography>
+            {lang("from-home", homeToTartgetDistance, "Km")}
+          </Typography>
         </Stack>
       )}
       {currentToTargetDistance != null && (
         <Stack direction={"row"} gap={1}>
           <SocialDistanceOutlined color="info" />
           <Typography>
-            {currentToTargetDistance + " km (Vị trí hiện tại)"}
+            {lang("from-current", currentToTargetDistance, "Km")}
           </Typography>
         </Stack>
       )}

@@ -21,7 +21,7 @@ const PlaceViewerExposedType = React.forwardRef<
 >((props, ref) => {
   const { placeType, ...rest } = props;
   const i18nContext = useI18nContext();
-  const lang = i18nContext.of(PlaceViewerExposedType);
+  const lang = i18nContext.of("PlaceViewerExposedType");
   return (
     <Stack
       ref={ref}

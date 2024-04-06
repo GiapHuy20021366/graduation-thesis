@@ -1,12 +1,4 @@
-import {
-  Box,
-  Button,
-  MenuItem,
-  Select,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Button, MenuItem, Select, Stack, TextField } from "@mui/material";
 import PlaceAvatarAndImages from "./PlaceAvatarAndImages";
 import {
   useAuthContext,
@@ -15,27 +7,19 @@ import {
   usePlaceEditContext,
   useToastContext,
 } from "../../../hooks";
-import ExtendedEditor from "../../common/custom/ExtendedEditor";
 import { PlaceType } from "../../../data";
 import PlaceLocation from "./PlaceLocation";
 import PlaceCategories from "./PlaceCategories";
 import { IPlaceData, userFetcher } from "../../../api";
 import { useNavigate } from "react-router-dom";
+import PlaceDescriptionEditor from "./PlaceDescriptionEditor";
 
 export default function PlaceEditForm() {
   const i18nContext = useI18nContext();
-  const lang = i18nContext.of(PlaceEditForm);
+  const lang = i18nContext.of("PlaceEditForm");
   const editContext = usePlaceEditContext();
-  const {
-    exposeName,
-    setExposeName,
-    description,
-    setDescription,
-    type,
-    setType,
-    isEditable,
-    location,
-  } = editContext;
+  const { exposeName, setExposeName, type, setType, isEditable, location } =
+    editContext;
 
   const toastContext = useToastContext();
   const authContext = useAuthContext();
@@ -48,11 +32,11 @@ export default function PlaceEditForm() {
     if (auth == null) return;
 
     if (exposeName === "") {
-      toastContext.error("Vui lòng nhập tên");
+      toastContext.error(lang("please-input-place-name"));
       return;
     }
     if (location == null) {
-      toastContext.error("Vui lòng chọn địa điểm");
+      toastContext.error(lang("please-choose-location"));
       return;
     }
     const datas: IPlaceData = {
@@ -80,10 +64,9 @@ export default function PlaceEditForm() {
           navigate(`/place/${place._id}`);
         }
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(() => {
         toastContext.error(
-          `Không thể ${isEditable ? "cập nhật" : "tạo"} trang vào lúc này`
+          lang(isEditable ? "cannot-update-place" : "cannot-create-place")
         );
       })
       .finally(() => {
@@ -104,14 +87,10 @@ export default function PlaceEditForm() {
         spellCheck={"false"}
       />
 
-      <ExtendedEditor
-        sumaryElement={<Typography>Description</Typography>}
-        defaultHTML={description}
-        onHTMLChange={(html) => setDescription(html)}
-      />
+      <PlaceDescriptionEditor />
 
-      <Box>
-        <Typography>Trang của bạn là</Typography>
+      <Box boxShadow={1}>
+        <h4>{lang("your-place-are")}</h4>
         <Select
           variant="standard"
           disableUnderline={true}
@@ -121,7 +100,7 @@ export default function PlaceEditForm() {
           label={lang("l-place-type")}
           onChange={(event) => setType(+event.target.value as PlaceType)}
         >
-          <MenuItem value={PlaceType.PERSONAL}>{lang("PERSONAL")}</MenuItem>
+          {/* <MenuItem value={PlaceType.PERSONAL}>{lang("PERSONAL")}</MenuItem> */}
           <MenuItem value={PlaceType.VOLUNTEER}>{lang("VOLUNTEER")}</MenuItem>
           <MenuItem value={PlaceType.EATERY}>{lang("EATERY")}</MenuItem>
           <MenuItem value={PlaceType.GROCERY}>{lang("GROCERY")}</MenuItem>
@@ -134,8 +113,8 @@ export default function PlaceEditForm() {
 
       <PlaceLocation />
       <PlaceCategories />
-      <Button onClick={handleCreatePlace}>
-        {isEditable ? "Cập nhật ngay bây giờ" : "Tạo trang ngay bây giờ"}
+      <Button onClick={handleCreatePlace} variant="contained">
+        {lang(isEditable ? "update-now" : "create-now")}
       </Button>
     </Stack>
   );

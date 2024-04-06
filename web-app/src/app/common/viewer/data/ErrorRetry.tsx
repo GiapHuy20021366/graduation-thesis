@@ -22,6 +22,7 @@ const ErrorRetry = React.forwardRef<HTMLDivElement, ErrorRetryProps>(
         alignContent={"center"}
         alignItems={"center"}
         justifyContent={"center"}
+        mt={2}
         {...rest}
         display={active ? "flex" : "none"}
       >

@@ -43,6 +43,7 @@ import {
   foodFetcher,
 } from "../../../api/food";
 import OrderIcon from "../../common/custom/OrderIcon";
+import { useScrollListener } from "../../../hooks/useScrollListenter";
 
 const SearchTab = {
   RELATED: 0,

@@ -1,6 +1,12 @@
-import { SpeedDial, Stack, Tab, Tabs } from "@mui/material";
-import { ITabOption, useI18nContext, useTabNavigate } from "../../../hooks";
+import { SpeedDial, Stack, Tab, Tabs, Tooltip } from "@mui/material";
 import {
+  ITabOption,
+  applicationPages,
+  useI18nContext,
+  useTabNavigate,
+} from "../../../hooks";
+import {
+  AddOutlined,
   FavoriteOutlined,
   GradeOutlined,
   HomeOutlined,
@@ -13,7 +19,7 @@ import NearPlace from "./NearPlace";
 import FavoritePlace from "./FavoritePlace";
 import SubcribedPlace from "./SubcribedPlace";
 import RatingPlace from "./RatedPlace";
-import { useNavigate } from "react-router";
+import StyledLink from "../../common/navigate/StyledLink";
 
 const PlacePageTab = {
   MY_PLACE: 0,
@@ -51,10 +57,9 @@ const tabs: ITabOption[] = [
 export default function PlaceList() {
   const tabNavigate = useTabNavigate({ tabOptions: tabs });
   const tab = tabNavigate.tab;
-  const navigate = useNavigate();
 
   const i18nContext = useI18nContext();
-  const lang = i18nContext.of(PlaceList);
+  const lang = i18nContext.of("PlaceList");
 
   const onTabMyPlaceClick = () => {
     //
@@ -105,31 +110,31 @@ export default function PlaceList() {
           textColor="inherit"
         >
           <Tab
-            label={lang("Của tôi")}
+            label={lang("my-label")}
             onClick={onTabMyPlaceClick}
             icon={<HomeOutlined />}
             iconPosition="start"
           />
           <Tab
-            label={lang("Gần đây")}
+            label={lang("near-label")}
             icon={<PeopleAltOutlined />}
             iconPosition="start"
             onClick={onTabNearPlaceClick}
           />
           <Tab
-            label={lang("Được yêu thích")}
+            label={lang("favorite-label")}
             icon={<FavoriteOutlined />}
             iconPosition="start"
             onClick={onTabFavoriteClick}
           />
           <Tab
-            label={lang("Đã theo dõi")}
+            label={lang("subcribed-label")}
             icon={<NotificationsActiveOutlined />}
             iconPosition="start"
             onClick={onTabViewClick}
           />
           <Tab
-            label={lang("Đã đánh giá")}
+            label={lang("rating-label")}
             icon={<GradeOutlined />}
             iconPosition="start"
             onClick={onTabViewClick}
@@ -149,12 +154,35 @@ export default function PlaceList() {
       <SubcribedPlace active={tab === PlacePageTab.SUBCRIBED} />
       <RatingPlace active={tab === PlacePageTab.RATING} />
 
-      <SpeedDial
-        icon={<SearchOutlined />}
-        ariaLabel={"search"}
-        sx={{ position: "absolute", bottom: 76, right: 26 }}
-        onClick={() => navigate("/place/search")}
-      />
+      <StyledLink to={applicationPages.PLACE_UPDATE}>
+        <Tooltip
+          arrow
+          children={
+            <SpeedDial
+              icon={<AddOutlined />}
+              sx={{ position: "absolute", bottom: 136, right: 26 }}
+              ariaLabel={lang("add-place-label")}
+            />
+          }
+          title={lang("add-place-label")}
+          placement="left"
+        />
+      </StyledLink>
+
+      <StyledLink to={applicationPages.PLACE_SEARCH}>
+        <Tooltip
+          arrow
+          children={
+            <SpeedDial
+              icon={<SearchOutlined />}
+              ariaLabel={"search"}
+              sx={{ position: "absolute", bottom: 76, right: 26 }}
+            />
+          }
+          title={lang("place-search-label")}
+          placement="left"
+        />
+      </StyledLink>
     </Stack>
   );
 }

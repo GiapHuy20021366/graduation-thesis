@@ -37,7 +37,7 @@ import {
   convertStringToDate,
 } from "../../../data";
 import { useNavigate } from "react-router";
-import DescriptionEditor from "./DescriptionEditor";
+import FoodDescriptionEditor from "./FoodDescriptionEditor";
 import FoodCategoryPicker from "./FoodCategoryPicker";
 import FoodMapPicker from "./FoodMapPicker";
 import FoodSharingNavigator from "./FoodSharingNavigator";
@@ -265,7 +265,7 @@ export default function FoodSharingForm() {
             spellCheck={"false"}
           />
 
-          <DescriptionEditor />
+          <FoodDescriptionEditor />
 
           <FoodMapPicker />
 

@@ -16,7 +16,7 @@ import {
 } from "../data";
 
 export const foodEndpoints = {
-  uploadImages: "/images",
+  uploadImages: "/foods/images",
   uploadFood: "/foods",
   updateFood: "/foods/:id",
   findFoodPost: "/foods/:id",

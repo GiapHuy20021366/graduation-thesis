@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, BoxProps, Typography } from "@mui/material";
 import { IPlaceExposed } from "../../../data";
+import { useComponentLanguage } from "../../../hooks";
 
 type PlaceRatingProps = BoxProps & {
   data: IPlaceExposed;
@@ -9,6 +10,7 @@ type PlaceRatingProps = BoxProps & {
 const PlaceRating = React.forwardRef<HTMLDivElement, PlaceRatingProps>(
   (props, ref) => {
     const { data, ...rest } = props;
+    const lang = useComponentLanguage();
 
     return (
       <Box
@@ -20,8 +22,12 @@ const PlaceRating = React.forwardRef<HTMLDivElement, PlaceRatingProps>(
         }}
       >
         <Typography>
-          {" "}
-          {data.rating.count} lượt, đánh giá {data.rating.mean}/5.0{" "}
+          {lang(
+            "rated-point",
+            data.rating.count,
+            data.rating.mean.toFixed(1),
+            "5.0"
+          )}
         </Typography>
       </Box>
     );

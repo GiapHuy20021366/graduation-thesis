@@ -1,8 +1,8 @@
 import React from "react";
 import { Avatar, Stack, StackProps, Typography } from "@mui/material";
 import { FollowType, IFollowerExposed, toTimeInfo } from "../../../../data";
-import { useNavigate } from "react-router";
 import { useComponentLanguage } from "../../../../hooks";
+import StyledLink from "../../navigate/StyledLink";
 
 type SubciberExposedProps = StackProps & {
   data: IFollowerExposed;
@@ -33,18 +33,10 @@ const toSubcriberNameAndavatar = (
 const SubcriberExposed = React.forwardRef<HTMLDivElement, SubciberExposedProps>(
   (props, ref) => {
     const { data, onBeforeNavigate, ...rest } = props;
-    const navigate = useNavigate();
     const lang = useComponentLanguage("ViewerData");
     const times = toTimeInfo(data.updatedAt);
 
-    const handleNavigateClick = (
-      event: React.MouseEvent<HTMLDivElement, MouseEvent>
-    ) => {
-      props.onClick && props.onClick(event);
-      onBeforeNavigate && onBeforeNavigate();
-      const subcriberId = toSubcriberId(data);
-      navigate("/user/" + subcriberId);
-    };
+    const subcriberId = toSubcriberId(data);
 
     const nameAndavatar = toSubcriberNameAndavatar(data);
 
@@ -56,14 +48,25 @@ const SubcriberExposed = React.forwardRef<HTMLDivElement, SubciberExposedProps>(
         {...rest}
         sx={{
           width: "100%",
-          cursor: "pointer",
           ...(props.sx ?? {}),
         }}
-        onClick={handleNavigateClick}
       >
-        <Avatar src={nameAndavatar.avatar}>{nameAndavatar.name[0]}</Avatar>
+        <StyledLink
+          to={`/user/${subcriberId}`}
+          onBeforeNavigate={onBeforeNavigate}
+        >
+          <Avatar src={nameAndavatar.avatar}>{nameAndavatar.name[0]}</Avatar>
+        </StyledLink>
         <Stack>
-          <Typography sx={{ fontWeight: 450 }}>{nameAndavatar.name}</Typography>
+          <StyledLink
+            to={`/user/${subcriberId}`}
+            onBeforeNavigate={onBeforeNavigate}
+          >
+            <Typography sx={{ fontWeight: 450 }}>
+              {nameAndavatar.name}
+            </Typography>
+          </StyledLink>
+
           <Typography>
             {[data.type].map((followType) => {
               switch (followType) {
