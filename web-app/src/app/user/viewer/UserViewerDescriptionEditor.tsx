@@ -11,6 +11,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { userFetcher } from "../../../api";
 import {
   useAuthContext,
+  useComponentLanguage,
   useLoader,
   useToastContext,
   useUserViewerContext,
@@ -40,6 +41,7 @@ const UserViewerDescriptionEditor = React.forwardRef<
   const [description, setDescription] = useState<string | undefined>();
   const editorRef = useRef<RichTextEditorRef>(null);
   const toast = useToastContext();
+  const lang = useComponentLanguage();
 
   const dirtyRef = useRef<boolean>(false);
 
@@ -89,7 +91,7 @@ const UserViewerDescriptionEditor = React.forwardRef<
       })
       .catch(() => {
         loader.setIsError(true);
-        toast.error("Không thể thực hiện hành động bây giờ");
+        toast.error(lang("cannot-action-now"));
       })
       .finally(() => {
         loader.setIsFetching(false);
@@ -101,14 +103,16 @@ const UserViewerDescriptionEditor = React.forwardRef<
   };
   return (
     <Dialog ref={ref} {...rest}>
-      <DialogTitle>Chỉnh sửa</DialogTitle>
-      <DialogContent>
+      <DialogTitle sx={{ p: 2 }}>{lang("edit")}</DialogTitle>
+      <DialogContent sx={{ p: 0 }}>
         <Stack
-          gap={1}
+          gap={2}
           flex={1}
           sx={{
-            width: ["100vw", "60vw", "50vw", "40vw"],
+            minWidth: ["78vw", "60vw", "50vw", "40vw"],
+            height: "100%",
           }}
+          p={1}
         >
           <StarterKitEditor
             editorRef={editorRef}
@@ -124,7 +128,7 @@ const UserViewerDescriptionEditor = React.forwardRef<
           onClick={handleOnClickCancel}
           disabled={loader.isFetching}
         >
-          Hủy bỏ
+          {lang("cancel")}
         </Button>
         <Button
           color="success"
@@ -132,7 +136,7 @@ const UserViewerDescriptionEditor = React.forwardRef<
           onClick={handleOnClickOk}
           disabled={loader.isFetching}
         >
-          Đồng ý
+          {lang("agree")}
         </Button>
       </DialogActions>
     </Dialog>

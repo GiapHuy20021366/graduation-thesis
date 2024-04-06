@@ -86,7 +86,9 @@ const UserViewerPlace = React.forwardRef<HTMLDivElement, UserViewerPlaceProps>(
       userFetcher
         .searchPlace(
           {
-            author: _id,
+            author: {
+              include: [_id],
+            },
             pagination: pagination,
           },
           auth
@@ -180,14 +182,7 @@ const UserViewerPlace = React.forwardRef<HTMLDivElement, UserViewerPlaceProps>(
           doSearch();
         }
       }
-    }, [
-      account,
-      active,
-      appContentContext.mainRef,
-      doSearch,
-      loader,
-      _id,
-    ]);
+    }, [account, active, appContentContext.mainRef, doSearch, loader, _id]);
 
     return (
       <Stack

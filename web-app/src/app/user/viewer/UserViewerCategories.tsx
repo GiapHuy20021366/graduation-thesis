@@ -52,7 +52,7 @@ const UserViewerCategories = React.forwardRef<
         )}
       </Stack>
       {categories.length > 0 && (
-        <Box padding={"1rem 0"}>
+        <Box py={0} px={0}>
           {categories.map((category, index) => {
             return <CategoryPiece text={lang(category)} key={index} />;
           })}
@@ -60,10 +60,7 @@ const UserViewerCategories = React.forwardRef<
       )}
 
       {categories.length === 0 && (
-        <Typography>
-          Người dùng chưa miêu tả cụ thể loại thực phẩm quan tâm hoặc muốn chia
-          sẻ
-        </Typography>
+        <Typography>{lang("user-no-categories")}</Typography>
       )}
 
       <UserViewerCategoriesEditor

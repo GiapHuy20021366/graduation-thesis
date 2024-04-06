@@ -54,22 +54,22 @@ const UserViewerTabs = React.forwardRef<HTMLDivElement, UserViewerTabsProps>(
           }}
         >
           <Tab
-            label={lang("Giới thiệu")}
+            label={lang("introduction")}
             icon={<TipsAndUpdatesOutlined />}
             iconPosition="start"
           />
           <Tab
-            label={lang("Đã chia sẻ")}
+            label={lang("shared")}
             icon={<LunchDiningOutlined />}
             iconPosition="start"
           />
           <Tab
-            label={lang("Địa điểm")}
+            label={lang("place")}
             icon={<LunchDiningOutlined />}
             iconPosition="start"
           />
           <Tab
-            label={lang("Người theo dõi")}
+            label={lang("subcriber")}
             icon={<NotificationsActiveOutlined />}
             iconPosition="start"
           />

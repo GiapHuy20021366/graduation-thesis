@@ -8,7 +8,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { useUserViewerContext } from "../../../hooks";
+import { useComponentLanguage, useUserViewerContext } from "../../../hooks";
 import { RichTextReadOnly } from "mui-tiptap";
 import StarterKit from "@tiptap/starter-kit";
 import { EditOutlined } from "@mui/icons-material";
@@ -24,6 +24,7 @@ const UserViewerDescription = React.forwardRef<
   const viewerContext = useUserViewerContext();
   const { isEditable, description } = viewerContext;
   const [openEditor, setOpenEditor] = useState<boolean>(false);
+  const lang = useComponentLanguage();
 
   return (
     <Box
@@ -35,7 +36,7 @@ const UserViewerDescription = React.forwardRef<
       }}
     >
       <Stack direction={"row"} gap={1} alignItems={"center"}>
-        <h4>Mô tả </h4>
+        <h4>{lang("description")} </h4>
         {isEditable && (
           <Tooltip
             arrow
@@ -44,17 +45,17 @@ const UserViewerDescription = React.forwardRef<
                 <EditOutlined />
               </IconButton>
             }
-            title={"Chỉnh sửa"}
+            title={lang("edit")}
           />
         )}
       </Stack>
       {(description == null || description === "") && (
         <Stack alignItems={"center"} flex={1}>
-          <Typography>Người dùng chưa mô tả</Typography>
+          <Typography>{lang("user-no-description")}</Typography>
           {isEditable && (
             <Stack gap={1}>
               <Button onClick={() => setOpenEditor(true)}>
-                Chỉnh sửa ngay
+                {lang("edit")}
               </Button>
             </Stack>
           )}

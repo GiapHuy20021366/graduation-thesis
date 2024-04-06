@@ -7,6 +7,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import { MoreVert, ReportGmailerrorred } from "@mui/icons-material";
+import { useComponentLanguage } from "../../../hooks";
 
 type UserButtonContextMenuProps = IconButtonProps;
 
@@ -16,6 +17,7 @@ const UserContextMenu = React.forwardRef<
 >((props, ref) => {
   const { ...rest } = props;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const lang = useComponentLanguage();
 
   const open = Boolean(anchorEl);
 
@@ -87,7 +89,7 @@ const UserContextMenu = React.forwardRef<
           <ListItemIcon>
             <ReportGmailerrorred fontSize="small" />
           </ListItemIcon>
-          Report
+          {lang("report")}
         </MenuItem>
       </Menu>
     </>

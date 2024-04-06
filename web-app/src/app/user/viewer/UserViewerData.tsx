@@ -34,7 +34,7 @@ export default function UserViewerData() {
 
         <UserViewerSubcribed active={tab === UserViewerTab.SUBCRIBED} />
       </>
-      <Tooltip arrow title="Thêm thực phẩm">
+      <Tooltip arrow title="Thêm thực phẩm" placement="left">
         <StyledLink
           to={applicationPages.FOOD_SHARING}
           style={{ position: "absolute", bottom: 76, right: 26 }}

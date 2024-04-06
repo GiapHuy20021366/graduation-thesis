@@ -12,6 +12,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { userFetcher } from "../../../api";
 import {
   useAuthContext,
+  useComponentLanguage,
   useLoader,
   useSaveImage,
   useToastContext,
@@ -43,6 +44,7 @@ const UserViewerAvatarEditor = React.forwardRef<
   const inputAvatarRef = useRef<HTMLInputElement>(null);
   const saveImage = useSaveImage();
   const toast = useToastContext();
+  const lang = useComponentLanguage();
 
   const dirtyRef = useRef<boolean>(false);
 
@@ -122,7 +124,7 @@ const UserViewerAvatarEditor = React.forwardRef<
             setAvatar(image.url);
           },
           onError: () => {
-            toast.error("Không thể thực hiện hành động bây giờ");
+            toast.error(lang("can-not-upload-image-now"));
           },
         },
         auth
@@ -175,7 +177,7 @@ const UserViewerAvatarEditor = React.forwardRef<
           onClick={handleOnClickCancel}
           disabled={loader.isFetching}
         >
-          Hủy bỏ
+          {lang("cancel")}
         </Button>
         <Button
           color="success"
@@ -183,7 +185,7 @@ const UserViewerAvatarEditor = React.forwardRef<
           onClick={handleOnClickOk}
           disabled={loader.isFetching}
         >
-          Đồng ý
+          {lang("agree")}
         </Button>
       </DialogActions>
     </Dialog>

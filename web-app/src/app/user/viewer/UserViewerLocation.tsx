@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import {
   useAuthContext,
+  useComponentLanguage,
   useDistanceCalculation,
   useUserViewerContext,
 } from "../../../hooks";
@@ -37,6 +38,7 @@ const UserViewerLocation = React.forwardRef<
 
   const [openMap, setOpenMap] = useState<boolean>(false);
   const [openEditor, setOpenEditor] = useState<boolean>(false);
+  const lang = useComponentLanguage();
 
   useEffect(() => {
     distances.setTargetLocation(location);
@@ -63,7 +65,7 @@ const UserViewerLocation = React.forwardRef<
       }}
     >
       <Stack direction={"row"} gap={1} alignItems={"center"}>
-        <h4>Vị trí</h4>
+        <h4>{lang("location")}</h4>
         {isEditable && (
           <Tooltip
             arrow
@@ -72,7 +74,7 @@ const UserViewerLocation = React.forwardRef<
                 <EditOutlined />
               </IconButton>
             }
-            title={"Chỉnh sửa"}
+            title={lang("edit")}
           />
         )}
         {isLocated && (
@@ -87,7 +89,7 @@ const UserViewerLocation = React.forwardRef<
                 <NearMeOutlined />
               </IconButton>
             }
-            title={"Xem vị trí"}
+            title={lang("see-location")}
           />
         )}
         <UserViewerLocationEditor
@@ -100,20 +102,22 @@ const UserViewerLocation = React.forwardRef<
       <Stack direction={"row"} gap={1}>
         <LocationOnOutlined color="info" />
         <Typography>
-          {isLocated ? location!.name : "Người dùng ẩn vị trí"}
+          {isLocated ? location!.name : lang("user-hide-location")}
         </Typography>
       </Stack>
       {homeToTartgetDistance != null && (
         <Stack direction={"row"} gap={1}>
           <SocialDistanceOutlined color="info" />
-          <Typography>{homeToTartgetDistance + " km (Nhà của bạn)"}</Typography>
+          <Typography>
+            {lang("from-home", homeToTartgetDistance, "Km")}
+          </Typography>
         </Stack>
       )}
       {currentToTargetDistance != null && (
         <Stack direction={"row"} gap={1}>
           <SocialDistanceOutlined color="info" />
           <Typography>
-            {currentToTargetDistance + " km (Vị trí hiện tại)"}
+            {lang("from-current", currentToTargetDistance, "km")}
           </Typography>
         </Stack>
       )}

@@ -24,6 +24,7 @@
     "SignUpForm": {
         "l-firstname": "Tên",
         "l-lastname": "Họ",
+        "l-exposedname": "Tên hiển thị",
         "l-email": "Email",
         "l-password": "Mật khẩu",
         "login-now": "Đăng nhập",
@@ -311,7 +312,10 @@
         "place-location": "Vị trí của địa điểm",
         "user-location": "Vị trí của người dùng",
         "lost-page": "Có vẻ như bạn đang truy cập trang không tồn tại",
-        "turn-back-home": "Quay trở lại nhà"
+        "turn-back-home": "Quay trở lại nhà",
+        "introduction": "Giới thiệu",
+        "shared": "Đã chia sẻ",
+        "subcriber": "Người theo dõi"
     },
     "HomeHeader": {
         "l-all": "Tất cả",
@@ -359,7 +363,10 @@
         "from-current": "{0} {1} (Vị trí hiện tại)",
         "cannot-rating-now": "Không thể đánh giá vào lúc này",
         "locate-me": "Vị trí của tôi",
-        "use-this-location": "Sử dụng địa điểm này"
+        "use-this-location": "Sử dụng địa điểm này",
+        "join-at": "Tham gia vào ",
+        "user-hide-location": "Người dùng ẩn vị trí",
+        "unkown-location": "Vị khí không xác định"
     },
     "Toasts": {
         "can-not-sharing-now": "Không thể chia sẻ thực phẩm vào lúc này",
@@ -371,9 +378,15 @@
         "cannot-subcribe-place-now": "Không thể theo dõi địa điểm vào lúc này",
         "cannot-unsubcribe-place-now": "Không thể hủy theo dõi địa điểm vào lúc này",
         "subcribed": "Đã theo dõi",
-        "confirm-unsubcribed": "Bạn chắn chắn muốn hủy theo dõi địa điểm này",
+        "confirm-unsubcribed": "Bạn chắn chắn muốn hủy theo dõi",
         "agree": "Đồng ý",
-        "not-agree": "Không đồng ý"
+        "not-agree": "Không đồng ý",
+        "cannot-subcribe-user-now": "Không thể theo dõi người dùng vào lúc này",
+        "cannot-unsubcribe-user-now": "Không thể hủy theo dõi người dùng vào lúc này",
+        "cancel": "Hủy bỏ",
+        "user-no-categories": "Người dùng chưa miêu tả cụ thể loại thực phẩm quan tâm hoặc muốn chia sẻ",
+        "cannot-action-now": "Không thể thực hiện hành động này bây giờ",
+        "user-no-description": "Người dùng không mô tả"
     },
     "PlaceList": {
         "my-label": "Của tôi",

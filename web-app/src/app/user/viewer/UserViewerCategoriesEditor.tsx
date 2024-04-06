@@ -98,7 +98,7 @@ const UserViewerCategoriesEditor = React.forwardRef<
       })
       .catch(() => {
         loader.setIsError(true);
-        toast.error("Không thể thực hiện hành động bây giờ");
+        toast.error(lang("cannot-action-now"));
       })
       .finally(() => {
         loader.setIsFetching(false);
@@ -117,13 +117,14 @@ const UserViewerCategoriesEditor = React.forwardRef<
 
   return (
     <Dialog ref={ref} {...rest}>
-      <DialogTitle>Chỉnh sửa</DialogTitle>
-      <DialogContent>
+      <DialogTitle sx={{ p: 2 }}>{lang("edit")}</DialogTitle>
+      <DialogContent sx={{ p: 0 }}>
         <Stack
-          gap={1}
+          gap={2}
           flex={1}
           sx={{
-            width: ["100vw", "60vw", "50vw", "40vw"],
+            minWidth: ["78vw", "60vw", "50vw", "40vw"],
+            height: "100%",
           }}
         >
           <Autocomplete
@@ -176,7 +177,7 @@ const UserViewerCategoriesEditor = React.forwardRef<
           onClick={handleOnClickCancel}
           disabled={loader.isFetching}
         >
-          Hủy bỏ
+          {lang("cancel")}
         </Button>
         <Button
           color="success"
@@ -184,7 +185,7 @@ const UserViewerCategoriesEditor = React.forwardRef<
           onClick={handleOnClickOk}
           disabled={loader.isFetching}
         >
-          Đồng ý
+          {lang("agree")}
         </Button>
       </DialogActions>
     </Dialog>

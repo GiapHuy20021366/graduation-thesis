@@ -19,7 +19,11 @@ import {
 import UserSubcribeChipAction from "./SubcribedChipAction";
 import UserContextMenu from "./UserButtonContextMenu";
 import TimeExposed from "../../common/custom/TimeExposed";
-import { useConversationContext, useUserViewerContext } from "../../../hooks";
+import {
+  useComponentLanguage,
+  useConversationContext,
+  useUserViewerContext,
+} from "../../../hooks";
 import UserViewerAvatarEditor from "./UserViewerAvatarEditor";
 import UserViewerNameEditor from "./UserViewerNameEditor";
 
@@ -45,6 +49,7 @@ const UserViewerHeader = React.forwardRef<
 
   const [openAvatarEditor, setOpenAvatarEditor] = useState<boolean>(false);
   const [openNameEditor, setOpenNameEditor] = useState<boolean>(false);
+  const lang = useComponentLanguage();
 
   const conversationContext = useConversationContext();
 
@@ -104,7 +109,7 @@ const UserViewerHeader = React.forwardRef<
                     <EditOutlined />
                   </IconButton>
                 }
-                title={"Chỉnh sửa"}
+                title={lang("edit")}
               />
             )}
             <UserViewerNameEditor
@@ -119,14 +124,14 @@ const UserViewerHeader = React.forwardRef<
             <IconButton color="success">
               <NotificationsActiveOutlined />
             </IconButton>
-            <Typography>{subcribers ?? 0} đang theo dõi</Typography>
+            <Typography>{lang("n-subcribed", subcribers ?? 0)}</Typography>
             <UserSubcribeChipAction
               onFollowed={() => setSubcribers((subcribers ?? 0) + 1)}
               onUnFollowed={() => setSubcribers((subcribers ?? 1) - 1)}
               sx={{ ml: 2 }}
             />
             <Box ml={"auto"}>
-              <Tooltip arrow title="Xem thêm">
+              <Tooltip arrow title={lang("see-more")}>
                 <UserContextMenu sx={{ flex: 1 }} color="primary" />
               </Tooltip>
             </Box>
@@ -136,7 +141,8 @@ const UserViewerHeader = React.forwardRef<
               <AccessTimeOutlined />
             </IconButton>
             <Typography>
-              Tham gia vào <TimeExposed time={createdAt} hour={false} />
+              {lang("join-at")}
+              <TimeExposed time={createdAt} hour={false} />
             </Typography>
             <IconButton color="info" sx={{ ml: "auto" }}>
               <Share />

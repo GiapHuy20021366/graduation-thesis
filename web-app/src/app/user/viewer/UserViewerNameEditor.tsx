@@ -138,7 +138,7 @@ const UserViewerNameEditor = React.forwardRef<
       })
       .catch(() => {
         loader.setIsError(true);
-        toast.error("Không thể thay đổi vào lúc này");
+        toast.error(lang("cannot-action-now"));
       })
       .finally(() => {
         loader.setIsFetching(false);
@@ -154,19 +154,21 @@ const UserViewerNameEditor = React.forwardRef<
         onSubmit: handleSubmit(onSubmit),
       }}
     >
-      <DialogTitle>Chỉnh sửa</DialogTitle>
+      <DialogTitle sx={{ p: 2 }}>{lang("edit")}</DialogTitle>
 
-      <DialogContent>
+      <DialogContent sx={{ p: 0 }}>
         <Stack
-          gap={1}
+          gap={2}
           flex={1}
           sx={{
-            width: ["100vw", "60vw", "50vw", "40vw"],
+            minWidth: ["78vw", "60vw", "50vw", "40vw"],
+            height: "100%",
           }}
           alignItems={"center"}
+          p={1}
         >
           <TextField
-            label={lang("l-firstName")}
+            label={lang("l-firstname")}
             type="text"
             {...register("firstName")}
             error={!!errors.firstName}
@@ -174,7 +176,7 @@ const UserViewerNameEditor = React.forwardRef<
             fullWidth
           />
           <TextField
-            label={lang("l-lastName")}
+            label={lang("l-lastname")}
             type="lastName"
             {...register("lastName")}
             error={!!errors.lastName}
@@ -182,7 +184,7 @@ const UserViewerNameEditor = React.forwardRef<
             fullWidth
           />
           <TextField
-            label={lang("l-exposedName")}
+            label={lang("l-exposedname")}
             type="text"
             {...register("exposedName")}
             error={!!errors.exposedName}
@@ -198,7 +200,7 @@ const UserViewerNameEditor = React.forwardRef<
           onClick={handleOnClickCancel}
           disabled={loader.isFetching}
         >
-          Hủy bỏ
+          {lang("cancel")}
         </Button>
         <Button
           color="success"
@@ -206,7 +208,7 @@ const UserViewerNameEditor = React.forwardRef<
           disabled={loader.isFetching}
           type="submit"
         >
-          Đồng ý
+          {lang("agree")}
         </Button>
       </DialogActions>
     </Dialog>

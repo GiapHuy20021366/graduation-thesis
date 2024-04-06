@@ -13,6 +13,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { userFetcher } from "../../../api";
 import {
   useAuthContext,
+  useComponentLanguage,
   useDistanceCalculation,
   useFetchLocation,
   useLoader,
@@ -54,6 +55,7 @@ const UserViewerLocationEditor = React.forwardRef<
   const [selected, setSelected] = useState<ICoordinates | undefined>(
     viewerLocation?.coordinates
   );
+  const lang = useComponentLanguage();
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -122,7 +124,7 @@ const UserViewerLocationEditor = React.forwardRef<
       })
       .catch(() => {
         loader.setIsError(true);
-        toast.error("Không thể thực hiện hành động bây giờ");
+        toast.error(lang("cannot-action-now"));
       })
       .finally(() => {
         loader.setIsFetching(false);
@@ -178,13 +180,13 @@ const UserViewerLocationEditor = React.forwardRef<
         },
       }}
     >
-      <DialogTitle>Chỉnh sửa</DialogTitle>
-      <DialogContent sx={{ p: 0, m: 0, width: "100%", height: "100%" }}>
+      <DialogTitle>{lang("edit")}</DialogTitle>
+      <DialogContent sx={{ p: 0, m: 0, width: "100%", height: "80vh" }}>
         {isLoaded && (
           <Box
             position={"relative"}
-            height={"80svh"}
-            width={"1005"}
+            height={"100%"}
+            width={"100%"}
             boxSizing={"border-box"}
           >
             <GoogleMap
@@ -209,10 +211,11 @@ const UserViewerLocationEditor = React.forwardRef<
                   position={selected}
                 >
                   <InfoWindowF position={selected}>
-                    <Box sx={{ width: 200, zIndex: 1000 }}>
-                      <span>Vị trí đã chọn</span>
+                    <Box sx={{ width: 200, zIndex: 1000, color: "black" }}>
+                      <span>{lang("selected-location")}</span>
                       <Typography>
-                        {fetchLocation.location?.name ?? "Vị trí không biết"}
+                        {fetchLocation.location?.name ??
+                          lang("unknown-location")}
                       </Typography>
                     </Box>
                   </InfoWindowF>
@@ -227,10 +230,10 @@ const UserViewerLocationEditor = React.forwardRef<
                   position={viewerLocation.coordinates}
                 >
                   <InfoWindowF position={viewerLocation.coordinates}>
-                    <Box sx={{ width: 200, zIndex: 1000 }}>
-                      <span>Nhà của bạn</span>
+                    <Box sx={{ width: 200, zIndex: 1000, color: "black" }}>
+                      <span>{lang("your-home")}</span>
                       <Typography>
-                        {viewerLocation?.name ?? "Vị trí không biết"}
+                        {viewerLocation?.name ?? lang("unkown-location")}
                       </Typography>
                     </Box>
                   </InfoWindowF>
@@ -239,25 +242,19 @@ const UserViewerLocationEditor = React.forwardRef<
             </GoogleMap>
 
             <Chip
-              label={"Locate Me"}
+              label={lang("locate-me")}
               sx={{
                 position: "absolute",
                 bottom: 40,
                 zIndex: 1000,
-                backgroundColor: "purple",
                 width: "fit-content",
                 px: 5,
                 fontWeight: 600,
                 fontSize: "1.3rem",
-                color: "white",
                 left: "50%",
                 transform: "translateX(-50%)",
-                cursor: "pointer",
-                ":hover": {
-                  backgroundColor: "white",
-                  color: "black",
-                },
               }}
+              color="primary"
               onClick={handleLocateMe}
               icon={<CenterFocusStrongOutlined color="inherit" />}
             />
@@ -271,7 +268,7 @@ const UserViewerLocationEditor = React.forwardRef<
           onClick={handleOnClickCancel}
           disabled={loader.isFetching}
         >
-          Hủy bỏ
+          {lang("cancel")}
         </Button>
         <Button
           color="success"
@@ -279,7 +276,7 @@ const UserViewerLocationEditor = React.forwardRef<
           onClick={handleOnClickOk}
           disabled={loader.isFetching}
         >
-          Đồng ý
+          {lang("agree")}
         </Button>
       </DialogActions>
     </Dialog>
