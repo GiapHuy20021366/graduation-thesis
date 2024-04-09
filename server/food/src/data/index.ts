@@ -53,6 +53,8 @@ export {
   IRpcGetUserByIdPayload,
   IRpcGetDictPlacePayload,
   IRpcGetPlaceByIdPayload,
+  IRpcGetRegistersPayload,
+  IRpcGetRatedScoresPayload,
 } from "./rpc-action";
 export { RpcQueueName } from "./rpc-queue-name";
 export { RpcSource } from "./rpc-source";
@@ -100,3 +102,10 @@ export {
   Edited,
   Paginationed,
 } from "./schemad";
+export {
+  IUserCached,
+  IUserCachedFavorite,
+  IUserCachedFavoriteScore,
+  IUserCachedRegister,
+  IUserCachedRegisterData,
+} from "./user-cached";

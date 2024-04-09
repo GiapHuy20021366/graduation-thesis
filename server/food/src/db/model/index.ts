@@ -5,3 +5,4 @@ export {
   FoodSeachHistory,
   IFoodSearchHistorySchema,
 } from "./food-search-history";
+export { IUserCachedSchema, UserCached } from "./user-cached";

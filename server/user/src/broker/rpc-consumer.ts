@@ -4,6 +4,8 @@ import {
   rpcGetPlaceById,
   rpcGetUserById,
   rpcGetUserInfo,
+  rpcGetRegistersByUserId,
+  rpcGetRatedScoresByUserId,
 } from "../services";
 import { RpcAction, RpcRequest, RpcResponse } from "../data";
 
@@ -29,6 +31,14 @@ export interface IRpcGetPlaceByIdPayload {
 export interface IRpcGetDictPlacePayload {
   _ids: string[];
   select?: string | string[];
+}
+
+export interface IRpcGetRegistersPayload {
+  userId: string;
+}
+
+export interface IRpcGetRatedScoresPayload {
+  userId: string;
 }
 
 export default async function consum(
@@ -97,6 +107,34 @@ export default async function consum(
       try {
         const { _ids, select } = userRequest.payload;
         response.data = await rpcGetDictPlaceByListId(_ids, select);
+      } catch (error) {
+        response.err = {
+          code: 500,
+          reason: "unknown",
+          target: "unknown",
+        };
+      }
+      break;
+    }
+    case RpcAction.USER_RPC_GET_REGISTERS_BY_USER_ID: {
+      const userRequest = request as RpcRequest<IRpcGetRegistersPayload>;
+      try {
+        const { userId } = userRequest.payload;
+        response.data = await rpcGetRegistersByUserId(userId);
+      } catch (error) {
+        response.err = {
+          code: 500,
+          reason: "unknown",
+          target: "unknown",
+        };
+      }
+      break;
+    }
+    case RpcAction.USER_RPC_GET_RATED_SCORES_BY_USER_ID: {
+      const userRequest = request as RpcRequest<IRpcGetRatedScoresPayload>;
+      try {
+        const { userId } = userRequest.payload;
+        response.data = await rpcGetRatedScoresByUserId(userId);
       } catch (error) {
         response.err = {
           code: 500,

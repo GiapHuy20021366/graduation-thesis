@@ -24,4 +24,15 @@ export {
   rpcGetDictUser,
   rpcGetPlace,
   rpcGetUser,
+  rpcGetRegisters,
+  ICategories,
+  IdAndLocationAndCategories,
+  rpcGetRatedScores,
 } from "./rpc";
+
+export {
+  IUserCachedUpdateOptions,
+  getRatedCategoryScore,
+  getUserCached,
+  updateUserCached,
+} from "./cached";

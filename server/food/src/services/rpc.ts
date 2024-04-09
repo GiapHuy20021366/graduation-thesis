@@ -1,8 +1,11 @@
 import { RPCRequest } from "../broker";
 import {
+  ILocation,
   IRpcGetDictPlacePayload,
   IRpcGetDictUserPayload,
   IRpcGetPlaceByIdPayload,
+  IRpcGetRatedScoresPayload,
+  IRpcGetRegistersPayload,
   IRpcGetUserByIdPayload,
   PlaceType,
   RpcAction,
@@ -18,6 +21,14 @@ export interface IPlaceIdAndType {
 
 export interface Id {
   _id: string;
+}
+
+export interface ICategories {
+  categories: string[];
+}
+
+export interface IdAndLocationAndCategories extends Id, ICategories {
+  location?: ILocation;
 }
 
 export const rpcGetUser = async <T>(
@@ -85,6 +96,34 @@ export const rpcGetDictUser = async <T>(
     payload: {
       _ids: users,
       select: select,
+    },
+  };
+  const response = await RPCRequest<T>(RpcQueueName.RPC_USER, rpcPlaceRequest);
+  if (response == null || response.data == null) return null;
+  return response.data;
+};
+
+export const rpcGetRegisters = async <T>(userId: string): Promise<T | null> => {
+  const rpcPlaceRequest: RpcRequest<IRpcGetRegistersPayload> = {
+    source: RpcSource.FOOD,
+    action: RpcAction.USER_RPC_GET_REGISTERS_BY_USER_ID,
+    payload: {
+      userId: userId,
+    },
+  };
+  const response = await RPCRequest<T>(RpcQueueName.RPC_USER, rpcPlaceRequest);
+  if (response == null || response.data == null) return null;
+  return response.data;
+};
+
+export const rpcGetRatedScores = async <T>(
+  userId: string
+): Promise<T | null> => {
+  const rpcPlaceRequest: RpcRequest<IRpcGetRatedScoresPayload> = {
+    source: RpcSource.FOOD,
+    action: RpcAction.USER_RPC_GET_RATED_SCORES_BY_USER_ID,
+    payload: {
+      userId: userId,
     },
   };
   const response = await RPCRequest<T>(RpcQueueName.RPC_USER, rpcPlaceRequest);

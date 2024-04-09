@@ -15,6 +15,11 @@ export {
   rpcGetDictPlaceByListId,
   rpcGetDictUserByListId,
   rpcGetPlaceById,
+  IUserCachedRegister,
+  IUserCachedRegisterData,
+  rpcGetRegistersByUserId,
+  IUserCachedFavoriteScore,
+  rpcGetRatedScoresByUserId,
 } from "./rpc";
 
 export { setUserLocation } from "./location";

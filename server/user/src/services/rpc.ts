@@ -1,6 +1,6 @@
-import { Ided } from "~/data";
-import { Place, User } from "../db/model";
-import { IUserPersonal } from "~/data/user";
+import mongoose from "mongoose";
+import { FollowRole, FollowType, IUserPersonal, Ided } from "../data";
+import { Follower, Place, PlaceRating, User } from "../db/model";
 
 export interface RPCGetUserInfoReturn
   extends Ided,
@@ -84,4 +84,100 @@ export const rpcGetDictPlaceByListId = async (
     });
   }
   return result;
+};
+
+export interface IUserCachedRegisterData {
+  _id: string;
+  time: Date;
+}
+
+export interface IUserCachedRegister {
+  users: IUserCachedRegisterData[];
+  places: IUserCachedRegisterData[];
+}
+
+// Get users and places that this user follow
+export const rpcGetRegistersByUserId = async (
+  userId: string
+): Promise<IUserCachedRegister> => {
+  const follows = await Follower.find({
+    subcriber: userId,
+  });
+  const result: IUserCachedRegister = {
+    users: [],
+    places: [],
+  };
+  follows.forEach((f) => {
+    const type = f.type;
+    const role = f.role;
+    if (type === FollowType.SUBCRIBER) {
+      switch (role) {
+        case FollowRole.USER: {
+          result.users.push({
+            _id: f.user.toString(),
+            time: f.updatedAt,
+          });
+          break;
+        }
+        case FollowRole.PLACE: {
+          result.users.push({
+            _id: f.place.toString(),
+            time: f.updatedAt,
+          });
+          break;
+        }
+      }
+    }
+  });
+
+  return result;
+};
+
+export interface IUserCachedFavoriteScore {
+  category: string;
+  score: number;
+}
+
+// Get categories with score from rated place
+export const rpcGetRatedScoresByUserId = async (
+  userId: string
+): Promise<IUserCachedFavoriteScore[]> => {
+  return await PlaceRating.aggregate<IUserCachedFavoriteScore>([
+    {
+      $match: {
+        user: new mongoose.Types.ObjectId(userId),
+        score: { $gt: 3 },
+      },
+    },
+    {
+      $lookup: {
+        from: "places",
+        localField: "place",
+        foreignField: "_id",
+        as: "place",
+      },
+    },
+    {
+      $unwind: "$place",
+    },
+    {
+      $unwind: "$place.categories",
+    },
+    {
+      $group: {
+        _id: "$place.categories",
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        category: "$_id",
+        score: "$score",
+      },
+    },
+    {
+      $sort: { count: -1 },
+    },
+  ]);
 };
