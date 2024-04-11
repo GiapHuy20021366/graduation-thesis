@@ -38,6 +38,8 @@ export {
   isItemAvailable,
   isPagination,
   isPlaceType,
+  isOrderState,
+  num,
 } from "./data-validate";
 export {
   throwErrorIfInvalidFormat,

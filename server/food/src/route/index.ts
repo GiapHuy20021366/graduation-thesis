@@ -10,6 +10,7 @@ import {
   updateFoodPost,
   uploadImages,
 } from "../controllers";
+import { getFavoriteFoods, getRegisteredFoods } from "../controllers";
 
 const foodRouter = express.Router();
 
@@ -25,6 +26,9 @@ export const initUserRouters = (app: Express): void => {
   foodRouter.put("/:id/like", tokenParser, likeOrUnlikeFoodPost);
 
   foodRouter.get("/like/users/:userId", tokenParser, getLikedFoodPost);
+
+  foodRouter.get("/register/users/:id", tokenParser, getRegisteredFoods);
+  foodRouter.get("/favorite/users/:id", tokenParser, getFavoriteFoods);
 
   foodRouter.use(errorHandler);
   app.use("/foods/", foodRouter);

@@ -35,11 +35,9 @@ const userCachedSchema = new Schema<
     coordinates: {
       lat: {
         type: Number,
-        required: true,
       },
       lng: {
         type: Number,
-        require: true,
       },
     },
     two_array: {

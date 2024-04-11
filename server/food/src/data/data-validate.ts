@@ -82,3 +82,17 @@ export const isItemAvailable = (value: any): value is ItemAvailable => {
 export const isOrderState = (value: any): value is OrderState => {
   return Object.values(OrderState).includes(value);
 };
+
+export const num = (
+  value?: string,
+  origin?: number,
+  checker?: (v: any) => boolean
+): number => {
+  if (checker == null) {
+    checker = (v: any) => {
+      return !isNaN(+v);
+    };
+  }
+  if (value == null) return origin ?? 0;
+  return checker(value) ? +value : origin ?? 0;
+};

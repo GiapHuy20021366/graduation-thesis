@@ -1,4 +1,4 @@
-import mongoose, { HydratedDocument } from "mongoose";
+import { HydratedDocument } from "mongoose";
 import {
   IUserCached,
   IUserCachedFavorite,
@@ -13,7 +13,7 @@ import {
   rpcGetRegisters,
   rpcGetUser,
 } from "./rpc";
-import { USER_TO_REGISTERED_MAX_DURATION } from "~/config";
+import { USER_TO_REGISTERED_MAX_DURATION } from "../config";
 
 export interface IUserCachedUpdateOptions {
   favorite?: boolean;
@@ -39,7 +39,6 @@ export const updateUserCached = async (
     cached.location = user.location;
     cached.categories = user.categories;
     cached.updatedAt = new Date();
-    await cached.save();
   }
 
   if (options?.register !== false) {
@@ -51,7 +50,6 @@ export const updateUserCached = async (
     cached.register.users = registerData.users;
     cached.register.places = registerData.places;
     cached.register.updatedAt = new Date();
-    await cached.save();
   }
 
   if (options?.favorite !== false) {
@@ -69,8 +67,20 @@ export const updateUserCached = async (
     cached.favorite.loveds = lovedDatas.loveds;
 
     cached.favorite.updatedAt = new Date();
-    await cached.save();
   }
+
+  await UserCached.updateOne(
+    { _id: cached._id.toString() },
+    {
+      $set: {
+        location: cached.location,
+        categories: cached.categories,
+        favorite: cached.favorite,
+        register: cached.register,
+        updatedAt: cached.updatedAt,
+      },
+    }
+  );
 
   return cached;
 };
@@ -82,13 +92,16 @@ export const getRatedCategoryScore = async (
     loveds: [],
   };
 
-  const datas = await FoodUserLike.aggregate<IUserCachedFavoriteScore>([
+  const datas = await FoodUserLike.aggregate<{
+    _id: string;
+    count: number;
+  }>([
     {
-      $match: { user: new mongoose.Types.ObjectId(userId) },
+      $match: { user: userId },
     },
     {
       $lookup: {
-        from: "foods",
+        from: "food-posts",
         localField: "foodPost",
         foreignField: "_id",
         as: "food",
@@ -107,18 +120,11 @@ export const getRatedCategoryScore = async (
       },
     },
     {
-      $project: {
-        _id: 0,
-        category: "$_id",
-        score: "$score",
-      },
-    },
-    {
       $sort: { count: -1 },
     },
-  ]);
+  ]).exec();
 
-  result.loveds = datas;
+  result.loveds = datas.map((d) => ({ category: d._id, score: d.count }));
   return result;
 };
 
@@ -144,6 +150,7 @@ export const getUserCached = async (
         users: [],
       },
     });
+    await userCached.save();
     await updateUserCached(userCached, options);
     result = {
       categories: userCached.categories,

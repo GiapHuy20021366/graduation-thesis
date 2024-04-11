@@ -24,6 +24,10 @@ export const foodEndpoints = {
   searchHistory: "/foods/search/history",
   likeFood: "/foods/:id/like",
   getLikedFood: "/foods/like/users/:userId",
+
+  // personal
+  favorite: "/foods/favorite/users/:userId",
+  registerd: "/foods/register/users/:userId",
 } as const;
 
 export interface FoodResponseError
@@ -96,6 +100,18 @@ export interface FoodFetcher {
     auth: IAuthInfo,
     pagination?: IPagination
   ): Promise<FoodResponse<IFoodPostExposedWithLike[]>>;
+
+  getFavoriteFoods(
+    userId: string,
+    auth: IAuthInfo,
+    pagination?: IPagination
+  ): Promise<FoodResponse<IFoodPostExposed[]>>;
+
+  getRegisteredFoods(
+    userId: string,
+    auth: IAuthInfo,
+    pagination?: IPagination
+  ): Promise<FoodResponse<IFoodPostExposed[]>>;
 }
 
 export const foodFetcher: FoodFetcher = {
@@ -194,6 +210,46 @@ export const foodFetcher: FoodFetcher = {
     params.set("limit", String(pagination?.limit ?? 0));
     return foodInstance.get(
       foodEndpoints.getLikedFood.replace(":userId", userId) +
+        "?" +
+        params.toString(),
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
+  },
+
+  getFavoriteFoods: (
+    userId: string,
+    auth: IAuthInfo,
+    pagination?: IPagination
+  ): Promise<FoodResponse<IFoodPostExposed[]>> => {
+    const params = new URLSearchParams();
+    params.set("skip", String(pagination?.skip ?? 0));
+    params.set("limit", String(pagination?.limit ?? 0));
+    return foodInstance.get(
+      foodEndpoints.favorite.replace(":userId", userId) +
+        "?" +
+        params.toString(),
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
+  },
+
+  getRegisteredFoods: (
+    userId: string,
+    auth: IAuthInfo,
+    pagination?: IPagination
+  ): Promise<FoodResponse<IFoodPostExposed[]>> => {
+    const params = new URLSearchParams();
+    params.set("skip", String(pagination?.skip ?? 0));
+    params.set("limit", String(pagination?.limit ?? 0));
+    return foodInstance.get(
+      foodEndpoints.registerd.replace(":userId", userId) +
         "?" +
         params.toString(),
       {

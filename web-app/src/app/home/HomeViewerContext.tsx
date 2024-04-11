@@ -1,15 +1,23 @@
-import React, { createContext, useState } from "react";
-import { useLoader, useTabNavigate } from "../../hooks";
-import { HomeTab, homeTabOptions } from "./home-tabs";
-import { IFoodPostExposed } from "../../data";
+import React, { createContext, useCallback, useEffect, useState } from "react";
+import {
+  useAppContentContext,
+  useAuthContext,
+  useDirty,
+  useLoader,
+  useTabNavigate,
+} from "../../hooks";
+import { HomeTab, homeTabOptions, homeTabs } from "./home-tabs";
+import { IFoodPostExposed, IPagination } from "../../data";
 import { IUseLoaderStates } from "../../hooks/useLoader";
+import { foodFetcher } from "../../api";
 
 interface IHomeViewerContextProviderProps {
   children?: React.ReactNode;
 }
 
+export type FoodPostTag = "REGISTED" | "AROUND" | "SUGGESTED";
 export interface IFoodPostTagged extends IFoodPostExposed {
-  tags: ("REGISTED" | "AROUND" | "SUGGESTED")[];
+  tags: FoodPostTag[];
 }
 
 interface IHomeViewerContext {
@@ -22,8 +30,10 @@ interface IHomeViewerContext {
   suggestedFoods: IFoodPostTagged[];
   displayedFoods: IFoodPostTagged[];
 
-  load: (tab?: HomeTab) => void;
-  loader: IUseLoaderStates;
+  load: (tab: HomeTab) => void;
+  aroundLoader: IUseLoaderStates;
+  favoriteLoader: IUseLoaderStates;
+  registeredLoader: IUseLoaderStates;
 }
 
 export const HomeViewerContext = createContext<IHomeViewerContext>({
@@ -34,15 +44,25 @@ export const HomeViewerContext = createContext<IHomeViewerContext>({
   registedFoods: [],
   suggestedFoods: [],
   displayedFoods: [],
-  loader: {} as IUseLoaderStates,
   setTab: () => {},
+
+  aroundLoader: {} as IUseLoaderStates,
+  favoriteLoader: {} as IUseLoaderStates,
+  registeredLoader: {} as IUseLoaderStates,
 });
 
 export default function HomeViewerContextProvider({
   children,
 }: IHomeViewerContextProviderProps) {
   const tabNavigate = useTabNavigate({ tabOptions: homeTabOptions });
-  const loader = useLoader();
+
+  const registeredLoader = useLoader();
+  const aroundLoader = useLoader();
+  const favoriteLoader = useLoader();
+  const authContext = useAuthContext();
+  const { auth, account } = authContext;
+  const appContentContext = useAppContentContext();
+  const { currentLocation } = appContentContext;
 
   const [allFoods, setAllFoods] = useState<IFoodPostTagged[]>([]);
   const [aroundFoods, setAroundFoods] = useState<IFoodPostTagged[]>([]);
@@ -50,11 +70,221 @@ export default function HomeViewerContextProvider({
   const [suggestedFoods, setSuggestedFoods] = useState<IFoodPostTagged[]>([]);
   const [displayedFoods, setDisplayedFoods] = useState<IFoodPostTagged[]>([]);
 
-  const load = (tab?: HomeTab) => {};
+  const addFoods = useCallback(
+    (tag: FoodPostTag, ...foods: IFoodPostExposed[]): number => {
+      const _foods = allFoods.slice();
+      let num = 0;
+      foods.forEach((food) => {
+        const _food = _foods.find((f) => f._id === food._id);
+        if (_food == null) {
+          _foods.push({
+            ...food,
+            tags: [tag],
+          });
+          ++num;
+        } else {
+          if (!_food.tags.includes(tag)) {
+            _food.tags.push(tag);
+          }
+        }
+      });
+      setAllFoods(_foods);
+      return num;
+    },
+    [allFoods]
+  );
+
+  const loadRegisteredFoods = useCallback(() => {
+    if (auth == null || account == null) return null;
+
+    const pagination: IPagination = {
+      skip: registedFoods.length,
+      limit: 24,
+    };
+
+    registeredLoader.setIsEnd(false);
+    registeredLoader.setIsError(false);
+    registeredLoader.setIsFetching(true);
+
+    foodFetcher
+      .getRegisteredFoods(account._id, auth, pagination)
+      .then((res) => {
+        const datas = res.data;
+        if (datas != null) {
+          const added = addFoods("REGISTED", ...datas);
+          if (added < 24) {
+            registeredLoader.setIsEnd(true);
+          }
+        }
+      })
+      .catch(() => {
+        registeredLoader.setIsError(true);
+      })
+      .finally(() => {
+        registeredLoader.setIsFetching(false);
+      });
+  }, [account, addFoods, auth, registedFoods.length, registeredLoader]);
+
+  const loadSuggestedFoods = useCallback(() => {
+    if (auth == null || account == null) return null;
+
+    const pagination: IPagination = {
+      skip: suggestedFoods.length,
+      limit: 24,
+    };
+
+    favoriteLoader.setIsEnd(false);
+    favoriteLoader.setIsError(false);
+    favoriteLoader.setIsFetching(true);
+
+    foodFetcher
+      .getFavoriteFoods(account._id, auth, pagination)
+      .then((res) => {
+        const datas = res.data;
+        if (datas != null) {
+          const added = addFoods("SUGGESTED", ...datas);
+          if (added < 24) {
+            favoriteLoader.setIsEnd(true);
+          }
+        }
+      })
+      .catch(() => {
+        favoriteLoader.setIsError(true);
+      })
+      .finally(() => {
+        favoriteLoader.setIsFetching(false);
+      });
+  }, [account, addFoods, auth, favoriteLoader, suggestedFoods.length]);
+
+  const loadAroundFoods = useCallback(() => {
+    if (auth == null || account == null || currentLocation == null) return null;
+
+    const pagination: IPagination = {
+      skip: aroundFoods.length,
+      limit: 24,
+    };
+
+    aroundLoader.setIsEnd(false);
+    aroundLoader.setIsError(false);
+    aroundLoader.setIsFetching(true);
+
+    foodFetcher
+      .searchFood(
+        {
+          user: {
+            exclude: [account._id],
+          },
+          distance: {
+            current: currentLocation,
+            max: 50,
+          },
+          active: true,
+          pagination: pagination,
+        },
+        auth
+      )
+      .then((res) => {
+        const datas = res.data;
+        if (datas != null) {
+          const added = addFoods("AROUND", ...datas);
+          if (added < 24) {
+            aroundLoader.setIsEnd(true);
+          }
+        }
+      })
+      .catch(() => {
+        aroundLoader.setIsError(true);
+      })
+      .finally(() => {
+        aroundLoader.setIsFetching(false);
+      });
+  }, [
+    account,
+    addFoods,
+    aroundFoods.length,
+    aroundLoader,
+    auth,
+    currentLocation,
+  ]);
+
+  const updateFoods = useCallback(() => {
+    const _registeds: IFoodPostTagged[] = [];
+    const _suggesteds: IFoodPostTagged[] = [];
+    const _arounds: IFoodPostTagged[] = [];
+    allFoods.forEach((f) => {
+      const tags = f.tags;
+      if (tags.includes("AROUND")) {
+        _arounds.push(f);
+      }
+      if (tags.includes("SUGGESTED")) {
+        _suggesteds.push(f);
+      }
+      if (tags.includes("REGISTED")) {
+        _registeds.push(f);
+      }
+    });
+    setRegistedFoods(_registeds);
+    setSuggestedFoods(_suggesteds);
+    setAroundFoods(_arounds);
+    switch (tabNavigate.tab) {
+      case homeTabs.ALL: {
+        setDisplayedFoods(allFoods);
+        break;
+      }
+      case homeTabs.AROUND: {
+        setDisplayedFoods(_arounds);
+        break;
+      }
+      case homeTabs.REGISTED: {
+        setDisplayedFoods(_registeds);
+        break;
+      }
+      case homeTabs.SUGGESTED: {
+        setDisplayedFoods(_suggesteds);
+        break;
+      }
+    }
+  }, [allFoods, tabNavigate.tab]);
+
+  const load = useCallback(
+    (tab: HomeTab) => {
+      switch (tab) {
+        case homeTabs.ALL: {
+          loadAroundFoods();
+          loadSuggestedFoods();
+          loadRegisteredFoods();
+          break;
+        }
+        case homeTabs.AROUND: {
+          loadAroundFoods();
+          break;
+        }
+        case homeTabs.REGISTED: {
+          loadRegisteredFoods();
+          break;
+        }
+        case homeTabs.SUGGESTED: {
+          loadSuggestedFoods();
+          break;
+        }
+      }
+      updateFoods();
+    },
+    [loadAroundFoods, loadRegisteredFoods, loadSuggestedFoods, updateFoods]
+  );
 
   const setTab = (tab: HomeTab) => {
     tabNavigate.setTab(tab);
   };
+
+  const dirty = useDirty();
+  useEffect(() => {
+    if (auth != null && currentLocation != null && account != null) {
+      dirty.perform(() => {
+        load(homeTabs.ALL);
+      });
+    }
+  }, [account, auth, currentLocation, dirty, load]);
 
   return (
     <HomeViewerContext.Provider
@@ -63,11 +293,13 @@ export default function HomeViewerContextProvider({
         setTab,
         allFoods,
         aroundFoods,
-        load,
-        loader,
         registedFoods,
         suggestedFoods,
         displayedFoods,
+        aroundLoader,
+        favoriteLoader,
+        load,
+        registeredLoader,
       }}
     >
       {children}

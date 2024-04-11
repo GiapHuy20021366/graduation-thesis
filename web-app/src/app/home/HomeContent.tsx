@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { Stack, StackProps } from "@mui/material";
-import { useQueryDevice } from "../../hooks";
+import { useHomeViewerContext, useQueryDevice } from "../../hooks";
 import ListEnd from "../common/viewer/data/ListEnd";
-import { IFoodPostTagged } from "./HomeViewerContext";
-import { FoodCategory } from "../../data";
 import HomeFoodItem from "./HomeFoodItem";
 import LazyLoad from "react-lazy-load";
 import FoodViewerDialog from "../common/viewer/dialog/FoodViewerDialog";
@@ -12,41 +10,6 @@ import UserViewerDialog from "../common/viewer/dialog/UserViewerDialog";
 
 type HomeContentProps = StackProps;
 
-const sample: IFoodPostTagged = {
-  _id: "65e464e35b41520a0eb2e1b1",
-  active: true,
-  categories: [FoodCategory.BEVERAGES],
-  createdAt: new Date(),
-  duration: new Date(),
-  images: [
-    "http://res.cloudinary.com/dalvsnhwg/image/upload/v1702987092/jjbixsc6hf1ojhltvlwb.jpg",
-  ],
-  isEdited: true,
-  likeCount: 4,
-  location: {
-    name: "Địa điểm",
-    coordinates: {
-      lat: 0,
-      lng: 0,
-    },
-  },
-  price: 0,
-  quantity: 5,
-  tags: ["AROUND", "REGISTED", "SUGGESTED"],
-  title: "Thực phẩm sạch cho mọi nhà",
-  updatedAt: new Date(),
-  user: "6560def1a9bedeba29494e76",
-  description: "123",
-  place: "65c23fe0e1108a5e08d91acb",
-};
-
-const samples: IFoodPostTagged[] = [];
-for (let i = 0; i < 100; ++i) {
-  samples.push({
-    ...sample,
-  });
-}
-
 const HomeContent = React.forwardRef<HTMLDivElement, HomeContentProps>(
   (props, ref) => {
     const [openFood, setOpenFood] = useState<string | undefined>();
@@ -54,6 +17,8 @@ const HomeContent = React.forwardRef<HTMLDivElement, HomeContentProps>(
     const [openPlace, setOpenPlace] = useState<string | undefined>();
 
     const device = useQueryDevice();
+    const homeContext = useHomeViewerContext();
+    const { displayedFoods } = homeContext;
 
     return (
       <Stack
@@ -67,14 +32,14 @@ const HomeContent = React.forwardRef<HTMLDivElement, HomeContentProps>(
           ...(props.sx ?? {}),
         }}
       >
-        {samples.map((sample, index) => {
+        {displayedFoods.map((food) => {
           return (
-            <LazyLoad key={index} height={"380px"}>
+            <LazyLoad key={food._id} height={"380px"}>
               <HomeFoodItem
-                item={sample}
-                onExpandFood={() => setOpenFood(sample._id)}
+                item={food}
+                onExpandFood={() => setOpenFood(food._id)}
                 onExpandAuthor={() => {
-                  const author = sample.user;
+                  const author = food.user;
                   if (typeof author === "object") {
                     setOpenAuthor(author._id);
                   } else {
@@ -82,7 +47,7 @@ const HomeContent = React.forwardRef<HTMLDivElement, HomeContentProps>(
                   }
                 }}
                 onExpandPlace={() => {
-                  const place = sample.place;
+                  const place = food.place;
                   if (typeof place === "object") {
                     setOpenPlace(place._id);
                   } else {

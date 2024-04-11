@@ -142,7 +142,10 @@ export interface IUserCachedFavoriteScore {
 export const rpcGetRatedScoresByUserId = async (
   userId: string
 ): Promise<IUserCachedFavoriteScore[]> => {
-  return await PlaceRating.aggregate<IUserCachedFavoriteScore>([
+  const datas =  await PlaceRating.aggregate<{
+    _id: string;
+    count: number;
+  }>([
     {
       $match: {
         user: new mongoose.Types.ObjectId(userId),
@@ -170,14 +173,9 @@ export const rpcGetRatedScoresByUserId = async (
       },
     },
     {
-      $project: {
-        _id: 0,
-        category: "$_id",
-        score: "$score",
-      },
-    },
-    {
       $sort: { count: -1 },
     },
-  ]);
+  ]).exec();
+
+  return datas.map((d) => ({ category: d._id, score: d.count }));
 };

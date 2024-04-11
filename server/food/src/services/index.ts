@@ -9,13 +9,13 @@ export {
   IPostFoodData,
   IPostFoodResponse,
   getLikedFood,
-} from "./food-post";
+} from "./food";
 
 export {
   getQueryHistoryByUserId,
   saveSearchHistory,
   searchHistory,
-} from "./food-search-history";
+} from "./history";
 
 export {
   IPlaceIdAndType,
@@ -36,3 +36,5 @@ export {
   getUserCached,
   updateUserCached,
 } from "./cached";
+
+export { getRegisteredFoods, getFavoriteFoods } from "./personal";
