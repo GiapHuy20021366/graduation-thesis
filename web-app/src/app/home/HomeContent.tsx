@@ -18,7 +18,7 @@ const HomeContent = React.forwardRef<HTMLDivElement, HomeContentProps>(
 
     const device = useQueryDevice();
     const homeContext = useHomeViewerContext();
-    const { displayedFoods } = homeContext;
+    const { displayedFoods, load } = homeContext;
 
     return (
       <Stack
@@ -86,7 +86,7 @@ const HomeContent = React.forwardRef<HTMLDivElement, HomeContentProps>(
           />
         )}
 
-        <ListEnd active={true} onRetry={() => {}} mt={3} />
+        <ListEnd active={true} onRetry={() => load()} mt={3} />
       </Stack>
     );
   }

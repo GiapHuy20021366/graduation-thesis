@@ -30,7 +30,7 @@ interface IHomeViewerContext {
   suggestedFoods: IFoodPostTagged[];
   displayedFoods: IFoodPostTagged[];
 
-  load: (tab: HomeTab) => void;
+  load: (tab?: HomeTab) => void;
   aroundLoader: IUseLoaderStates;
   favoriteLoader: IUseLoaderStates;
   registeredLoader: IUseLoaderStates;
@@ -70,6 +70,48 @@ export default function HomeViewerContextProvider({
   const [suggestedFoods, setSuggestedFoods] = useState<IFoodPostTagged[]>([]);
   const [displayedFoods, setDisplayedFoods] = useState<IFoodPostTagged[]>([]);
 
+  const updateFoods = useCallback(
+    (allFoods: IFoodPostTagged[], tab?: number) => {
+      const _registeds: IFoodPostTagged[] = [];
+      const _suggesteds: IFoodPostTagged[] = [];
+      const _arounds: IFoodPostTagged[] = [];
+      allFoods.forEach((f) => {
+        const tags = f.tags;
+        if (tags.includes("AROUND")) {
+          _arounds.push(f);
+        }
+        if (tags.includes("SUGGESTED")) {
+          _suggesteds.push(f);
+        }
+        if (tags.includes("REGISTED")) {
+          _registeds.push(f);
+        }
+      });
+      setRegistedFoods(_registeds);
+      setSuggestedFoods(_suggesteds);
+      setAroundFoods(_arounds);
+      switch (tab ?? tabNavigate.tab) {
+        case homeTabs.ALL: {
+          setDisplayedFoods(allFoods);
+          break;
+        }
+        case homeTabs.AROUND: {
+          setDisplayedFoods(_arounds);
+          break;
+        }
+        case homeTabs.REGISTED: {
+          setDisplayedFoods(_registeds);
+          break;
+        }
+        case homeTabs.SUGGESTED: {
+          setDisplayedFoods(_suggesteds);
+          break;
+        }
+      }
+    },
+    [tabNavigate.tab]
+  );
+
   const addFoods = useCallback(
     (tag: FoodPostTag, ...foods: IFoodPostExposed[]): number => {
       const _foods = allFoods.slice();
@@ -89,9 +131,10 @@ export default function HomeViewerContextProvider({
         }
       });
       setAllFoods(_foods);
+      updateFoods(_foods);
       return num;
     },
-    [allFoods]
+    [allFoods, updateFoods]
   );
 
   const loadRegisteredFoods = useCallback(() => {
@@ -176,10 +219,11 @@ export default function HomeViewerContextProvider({
           },
           distance: {
             current: currentLocation,
-            max: 50,
+            max: Number.MAX_SAFE_INTEGER,
           },
           active: true,
           pagination: pagination,
+          available: "ALL",
         },
         auth
       )
@@ -207,48 +251,9 @@ export default function HomeViewerContextProvider({
     currentLocation,
   ]);
 
-  const updateFoods = useCallback(() => {
-    const _registeds: IFoodPostTagged[] = [];
-    const _suggesteds: IFoodPostTagged[] = [];
-    const _arounds: IFoodPostTagged[] = [];
-    allFoods.forEach((f) => {
-      const tags = f.tags;
-      if (tags.includes("AROUND")) {
-        _arounds.push(f);
-      }
-      if (tags.includes("SUGGESTED")) {
-        _suggesteds.push(f);
-      }
-      if (tags.includes("REGISTED")) {
-        _registeds.push(f);
-      }
-    });
-    setRegistedFoods(_registeds);
-    setSuggestedFoods(_suggesteds);
-    setAroundFoods(_arounds);
-    switch (tabNavigate.tab) {
-      case homeTabs.ALL: {
-        setDisplayedFoods(allFoods);
-        break;
-      }
-      case homeTabs.AROUND: {
-        setDisplayedFoods(_arounds);
-        break;
-      }
-      case homeTabs.REGISTED: {
-        setDisplayedFoods(_registeds);
-        break;
-      }
-      case homeTabs.SUGGESTED: {
-        setDisplayedFoods(_suggesteds);
-        break;
-      }
-    }
-  }, [allFoods, tabNavigate.tab]);
-
   const load = useCallback(
-    (tab: HomeTab) => {
-      switch (tab) {
+    (tab?: HomeTab) => {
+      switch (tab ?? tabNavigate.tab) {
         case homeTabs.ALL: {
           loadAroundFoods();
           loadSuggestedFoods();
@@ -268,13 +273,13 @@ export default function HomeViewerContextProvider({
           break;
         }
       }
-      updateFoods();
     },
-    [loadAroundFoods, loadRegisteredFoods, loadSuggestedFoods, updateFoods]
+    [loadAroundFoods, loadRegisteredFoods, loadSuggestedFoods, tabNavigate.tab]
   );
 
   const setTab = (tab: HomeTab) => {
     tabNavigate.setTab(tab);
+    updateFoods(allFoods, tab);
   };
 
   const dirty = useDirty();
