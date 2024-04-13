@@ -4,6 +4,7 @@ import {
   IFoodPost,
   IFoodSearchParams,
   IPagination,
+  IPostFoodData,
   InvalidDataError,
   isAllNotEmptyString,
   isLocation,
@@ -15,16 +16,7 @@ import {
   toFoodSearchParams,
   toResponseSuccessData,
 } from "../data";
-import {
-  postFood as postFoodService,
-  findFoodPostById,
-  searchFood as searchFoodService,
-  saveSearchHistory,
-  userLikeOrUnlikeFoodPost,
-  IPostFoodData,
-  updateFoodPost as updateFoodPostService,
-  getLikedFood as getLikedFoodPostService,
-} from "../services";
+import * as services from "../services";
 
 interface IPostFoodUploadData
   extends Omit<Partial<IFoodPost>, "place" | "user"> {
@@ -86,7 +78,8 @@ export const postFood = async (
   };
   try {
     if (validatePostFoodBody(valData)) {
-      postFoodService(valData)
+      services
+        .postFood(valData)
         .then((data) => res.status(200).json(toResponseSuccessData(data)))
         .catch(next);
     }
@@ -121,7 +114,8 @@ export const updateFoodPost = async (
   };
   try {
     if (validatePostFoodBody(valData)) {
-      updateFoodPostService(id, valData)
+      services
+        .updateFoodPost(id, valData)
         .then((data) => res.status(200).json(toResponseSuccessData(data)))
         .catch(next);
     }
@@ -151,7 +145,8 @@ export const findFoodPost = async (
 
   const auth = req.authContext as AuthLike;
 
-  findFoodPostById(id, auth._id)
+  services
+    .findFoodPostById(id, auth._id)
     .then((data) => res.status(200).send(toResponseSuccessData(data)))
     .catch(next);
 };
@@ -164,12 +159,13 @@ export const searchFoodPost = async (
   const params = req.body;
   const auth = req.authContext as AuthLike;
   const paramsToSearch = toFoodSearchParams(params);
-  searchFoodService(paramsToSearch)
+  services
+    .searchFood(paramsToSearch)
     .then((data) => {
       res.status(200).json(toResponseSuccessData(data));
 
       // Save the history
-      saveSearchHistory(auth._id, paramsToSearch);
+      services.saveSearchHistory(auth._id, paramsToSearch);
     })
     .catch(next);
 };
@@ -193,7 +189,8 @@ export const likeOrUnlikeFoodPost = (
   }
   const action = req.query.action ?? "LIKE";
   const auth = req.authContext as AuthLike;
-  userLikeOrUnlikeFoodPost(auth._id, foodId!, action === "LIKE")
+  services
+    .userLikeOrUnlikeFoodPost(auth._id, foodId!, action === "LIKE")
     .then((data) => res.status(200).json(toResponseSuccessData(data)))
     .catch(next);
 };
@@ -229,7 +226,25 @@ export const getLikedFoodPost = (
     limit: isNaN(_limit) ? 0 : _limit,
   };
 
-  getLikedFoodPostService(user, pagination)
+  services
+    .getLikedFoods(user, pagination)
+    .then((data) => res.status(200).json(toResponseSuccessData(data)))
+    .catch(next);
+};
+
+export const resolveFood = (
+  req: Request<{ id: string }, {}, {}, { resolvedBy?: string }>,
+  res: Response,
+  next: NextFunction
+) => {
+  const auth = req.authContext as AuthLike;
+  const foodId = req.params.id;
+  if (!isObjectId(foodId)) {
+    return next(new InvalidDataError());
+  }
+  const resolvedBy = req.query.resolvedBy ?? null;
+  services
+    .resolveFood(auth._id, foodId, resolvedBy)
     .then((data) => res.status(200).json(toResponseSuccessData(data)))
     .catch(next);
 };

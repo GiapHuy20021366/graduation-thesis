@@ -13,6 +13,7 @@ import {
   IFoodSearchParams,
   IPagination,
   Queried,
+  IFoodResolved,
 } from "../data";
 
 export const foodEndpoints = {
@@ -28,6 +29,7 @@ export const foodEndpoints = {
   // personal
   favorite: "/foods/favorite/users/:userId",
   registerd: "/foods/register/users/:userId",
+  resolveFood: "/foods/:id/resolve",
 } as const;
 
 export interface FoodResponseError
@@ -112,6 +114,12 @@ export interface FoodFetcher {
     auth: IAuthInfo,
     pagination?: IPagination
   ): Promise<FoodResponse<IFoodPostExposed[]>>;
+
+  resolveFood(
+    foodId: string,
+    auth: IAuthInfo,
+    resolveBy?: string
+  ): Promise<FoodResponse<Partial<IFoodResolved>>>;
 }
 
 export const foodFetcher: FoodFetcher = {
@@ -250,6 +258,27 @@ export const foodFetcher: FoodFetcher = {
     params.set("limit", String(pagination?.limit ?? 0));
     return foodInstance.get(
       foodEndpoints.registerd.replace(":userId", userId) +
+        "?" +
+        params.toString(),
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
+  },
+
+  resolveFood: (
+    foodId: string,
+    auth: IAuthInfo,
+    resolveBy?: string
+  ): Promise<FoodResponse<Partial<IFoodResolved>>> => {
+    const params = new URLSearchParams();
+    if (resolveBy) {
+      params.set("resolveBy", resolveBy);
+    }
+    return foodInstance.put(
+      foodEndpoints.resolveFood.replace(":id", foodId) +
         "?" +
         params.toString(),
       {

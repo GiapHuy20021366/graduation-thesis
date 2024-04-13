@@ -48,6 +48,8 @@ export interface IFoodSearchUser extends IIncludeAndExclude {}
 
 export interface IFoodSearchPlace extends IIncludeAndExclude {}
 
+export interface IFoodPostResolveBy extends IIncludeAndExclude {}
+
 export interface IFoodSearchPopulate {
   user?: boolean;
   place?: boolean;
@@ -68,6 +70,8 @@ export interface IFoodSearchParams
   available?: ItemAvailable;
   order?: IFoodSeachOrder;
   populate?: IFoodSearchPopulate;
+  resolved?: boolean;
+  resolveBy?: IFoodPostResolveBy;
 }
 
 export const toFoodSearchParams = (value: any): IFoodSearchParams => {
@@ -76,6 +80,12 @@ export const toFoodSearchParams = (value: any): IFoodSearchParams => {
 
   result.user = toIncludeAndExclude(value.user);
   result.place = toIncludeAndExclude(value.place);
+  result.resolveBy = toIncludeAndExclude(value.resolveBy);
+
+  const resolved = value.resolved;
+  if (resolved == null || typeof resolved === "boolean") {
+    result.resolved = resolved;
+  }
 
   const query = value.query;
   if (typeof query === "string" && query.trim().length > 0) {

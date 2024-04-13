@@ -20,7 +20,12 @@ export { IImage } from "./image";
 export { ImageRourceType, imageResourceTypes } from "./image-source-type";
 export { IImageExposed } from "./image-exposed";
 export { ICoordinates } from "./coordinates";
-export { IFoodPost, IFoodPostLocation } from "./food-post";
+export {
+  IFoodPost,
+  IFoodPostLocation,
+  IFoodPostPlace,
+  IPostFoodData,
+} from "./food-post";
 export {
   isObjectId,
   isAllObjectId,
@@ -87,11 +92,18 @@ export {
   toHistorySearchParams,
 } from "./history-search-params";
 export { IFoodUserLike } from "./food-user-like";
+export {
+  IFoodUserLikeExposed,
+  toFoodUserLikeExposed,
+} from "./food-user-like-exposed";
 export { toDistance } from "./to-distance";
 export {
   IFoodPostExposed,
   IFoodPostExposedPlace,
   IFoodPostExposedUser,
+  IFoodPostExposedLike,
+  IFoodPostExposedWithLike,
+  toFoodPostExposed,
 } from "./food-post-exposed";
 export { PlaceType } from "./place-type";
 export { ILocation } from "./location";
@@ -103,6 +115,8 @@ export {
   Actived,
   Edited,
   Paginationed,
+  Queried,
+  Resolved,
 } from "./schemad";
 export {
   IUserCached,
@@ -111,3 +125,13 @@ export {
   IUserCachedRegister,
   IUserCachedRegisterData,
 } from "./user-cached";
+export {
+  addIncExcQuery,
+  IMinMax,
+  addMaxQuery,
+  addMinMaxQuery,
+  addMinQuery,
+  addArrayQuery,
+  addValueQuery,
+  QueryBuilder,
+} from "./query-buider";

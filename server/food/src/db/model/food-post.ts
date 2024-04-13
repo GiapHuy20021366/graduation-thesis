@@ -1,8 +1,20 @@
 import { Model, Schema, model } from "mongoose";
 import collections from "../collections";
-import { IImage, IFoodPost, Timed, Actived, Edited } from "../../data";
+import {
+  IImage,
+  IFoodPost,
+  Timed,
+  Actived,
+  Edited,
+  Resolved,
+} from "../../data";
 
-export interface IFoodPostSchema extends IFoodPost, Timed, Actived, Edited {
+export interface IFoodPostSchema
+  extends IFoodPost,
+    Timed,
+    Actived,
+    Edited,
+    Partial<Resolved> {
   likeCount: number;
 }
 
@@ -78,10 +90,28 @@ const foodPostSchema = new Schema<
     require: true,
     index: "descending",
   },
+
+  likeCount: {
+    type: Number,
+    default: 0,
+  },
+
   isEdited: {
     type: Boolean,
     default: false,
   },
+  active: {
+    type: Boolean,
+    default: true,
+  },
+
+  resolved: Boolean,
+  resolveBy: {
+    type: String,
+    index: true,
+  },
+  resolveTime: Date,
+
   createdAt: {
     type: Date,
     default: Date.now,
@@ -89,14 +119,6 @@ const foodPostSchema = new Schema<
   updatedAt: {
     type: Date,
     default: Date.now,
-  },
-  likeCount: {
-    type: Number,
-    default: 0,
-  },
-  active: {
-    type: Boolean,
-    default: true,
   },
 });
 

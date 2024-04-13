@@ -105,6 +105,8 @@ export {
   type IFoodPostExposed,
   type IFoodPostExposedPlace,
   type IFoodPostExposedUser,
+  type IFoodResolved,
+  type IFoodPostExposedLike,
 } from "./food-post-exposed";
 export {
   type IFoodSeachOrder,

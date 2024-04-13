@@ -1,7 +1,7 @@
 import express, { Express } from "express";
 import { PORT, PROXY_URL } from "./src/config";
 import { connectDB } from "./src/db";
-import { initUserRouters } from "./src/route";
+import { initRouter } from "./src/route";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { consoleLogger } from "./src/config";
@@ -21,7 +21,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // init endpoints
-initUserRouters(app);
+initRouter(app);
 
 app.listen(PORT, () => {
   consoleLogger.info(`Food sevice is Listening to Port ${PORT}`)

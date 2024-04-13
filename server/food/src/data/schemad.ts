@@ -30,3 +30,9 @@ export interface Queried {
 }
 
 export interface Schemad extends Ided, Timed {}
+
+export interface Resolved {
+  resolved: boolean;
+  resolveTime: Date;
+  resolveBy: string;
+}

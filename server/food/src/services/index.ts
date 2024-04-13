@@ -6,9 +6,8 @@ export {
   searchFood,
   userLikeOrUnlikeFoodPost,
   updateFoodPost,
-  IPostFoodData,
-  IPostFoodResponse,
-  getLikedFood,
+  getLikedFoods,
+  resolveFood,
 } from "./food";
 
 export {

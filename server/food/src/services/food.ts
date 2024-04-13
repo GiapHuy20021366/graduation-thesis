@@ -1,18 +1,27 @@
+import { HydratedDocument } from "mongoose";
 import {
-  IFoodPost,
   IFoodPostExposed,
   IFoodPostExposedPlace,
   IFoodPostExposedUser,
+  IFoodPostExposedWithLike,
   IFoodPostLocation,
   IFoodSearchParams,
+  IFoodUserLikeExposed,
   IPagination,
+  IPostFoodData,
   InternalError,
   OrderState,
   PlaceType,
+  Queried,
+  QueryBuilder,
+  Resolved,
   ResourceNotExistedError,
+  UnauthorizationError,
   isArrayPlaceTypes,
+  toFoodPostExposed,
+  toFoodUserLikeExposed,
 } from "../data";
-import { FoodPost, FoodUserLike } from "../db/model";
+import { FoodPost, FoodUserLike, IFoodPostSchema } from "../db/model";
 import {
   IPlaceIdAndType,
   Id,
@@ -22,16 +31,22 @@ import {
   rpcGetUser,
 } from "./rpc";
 
-export interface IPostFoodData extends Omit<IFoodPost, "place"> {
-  place?: string;
-}
+export interface IPostFoodResponse
+  extends Pick<
+    IFoodPostExposed,
+    "_id" | "createdAt" | "active" | "updatedAt"
+  > {}
 
-export interface IPostFoodResponse {
-  _id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  active: boolean;
-}
+const toFoodPostResponse = (
+  data: HydratedDocument<IFoodPostSchema>
+): IPostFoodResponse => {
+  return {
+    _id: data._id.toString(),
+    active: data.active,
+    createdAt: data.createdAt,
+    updatedAt: data.updatedAt,
+  };
+};
 
 export const postFood = async (
   data: IPostFoodData
@@ -73,12 +88,7 @@ export const postFood = async (
 
   await foodPost.save();
 
-  return {
-    _id: foodPost._id.toString(),
-    createdAt: foodPost.createdAt,
-    updatedAt: foodPost.updatedAt,
-    active: foodPost.active,
-  };
+  return toFoodPostResponse(foodPost);
 };
 
 export const updateFoodPost = async (
@@ -127,17 +137,8 @@ export const updateFoodPost = async (
   foodPost.price = data.price;
 
   await foodPost.save();
-  return {
-    _id: foodPost._id.toString(),
-    createdAt: foodPost.createdAt,
-    updatedAt: foodPost.updatedAt,
-    active: foodPost.active,
-  };
+  return toFoodPostResponse(foodPost);
 };
-
-interface IFoodPostExposedWithLike extends IFoodPostExposed {
-  liked?: boolean;
-}
 
 export const findFoodPostById = async (
   id: string,
@@ -153,23 +154,10 @@ export const findFoodPostById = async (
       },
     });
   }
+
   const result: IFoodPostExposedWithLike = {
-    _id: foodPost._id.toString(),
-    active: foodPost.active,
-    categories: foodPost.categories,
-    createdAt: foodPost.createdAt,
-    description: foodPost.description,
-    duration: foodPost.duration,
-    images: foodPost.images,
-    isEdited: foodPost.isEdited,
-    likeCount: foodPost.likeCount,
-    location: foodPost.location,
-    price: foodPost.price,
-    quantity: foodPost.quantity,
-    title: foodPost.title,
-    updatedAt: foodPost.updatedAt,
-    user: foodPost.user,
-    place: foodPost.place?._id,
+    ...toFoodPostExposed(foodPost, { description: true }),
+    liked: false,
   };
 
   const [user, place] = await Promise.all([
@@ -209,32 +197,53 @@ export const findFoodPostById = async (
   return result;
 };
 
-const toFoodSearchCommonOptions = (
-  params: IFoodSearchParams
-): Record<string, any> => {
-  const options: Record<string, any> = {};
-  const {
-    active,
-    addedBy,
-    available,
-    category,
-    maxDuration,
-    minQuantity,
-    place,
-    price,
-    user,
-  } = params;
-
-  if (active != null) {
-    options.active = active;
+const toFoodSearchBuilder = (params: IFoodSearchParams): QueryBuilder => {
+  const builder = new QueryBuilder();
+  buildFoodSearchBaseOptions(builder, params);
+  const query = params.query;
+  if (query) {
+    buildFoodQueryOptions(builder, {
+      ...params,
+      query,
+    });
+  } else {
+    buildFoodAroundOptions(builder, params);
   }
+
+  // order
+  const order = params.order;
+  builder.order("location.two_array", order?.distance);
+  builder.order("createdAt", order?.time);
+  builder.order("price", order?.price);
+  builder.order("quantity", order?.quantity);
+
+  return builder;
+};
+
+const buildFoodSearchBaseOptions = (
+  builder: QueryBuilder,
+  params: IFoodSearchParams
+): void => {
+  const { addedBy, available, maxDuration, pagination } = params;
+
+  builder.pagination(pagination);
+
+  builder
+    .value("active", params.active)
+    .value("resolved", params.resolved)
+    .array("categories", params.category)
+    .min("quantity", params.minQuantity)
+    .minMax("price", params.price)
+    .incAndExc("resolveBy", params.resolveBy)
+    .incAndExc("user", params.user)
+    .incAndExc("place._id", params.place);
 
   if (addedBy != null) {
     if (typeof addedBy === "number") {
       if (addedBy === PlaceType.PERSONAL) {
-        options["place.type"] = null;
+        builder.value("place.type", null);
       } else {
-        options["place.type"] = addedBy;
+        builder.value("place.type", addedBy);
       }
     } else if (isArrayPlaceTypes(addedBy)) {
       const isPersonalIncluded = addedBy.includes(PlaceType.PERSONAL);
@@ -245,13 +254,13 @@ const toFoodSearchCommonOptions = (
         }
       });
       if (isPersonalIncluded) {
-        options["place.type"] = {
+        builder.value("place.type", {
           $or: [null, { $in: types }],
-        };
+        });
       } else {
-        options["place.type"] = {
+        builder.value("place.type", {
           $in: addedBy,
-        };
+        });
       }
     }
   }
@@ -261,196 +270,87 @@ const toFoodSearchCommonOptions = (
       case "ALL":
         break;
       case "AVAILABLE_ONLY":
-        options["duration"] = {
-          $gte: Date.now(),
-        };
+        builder.min("duration", Date.now());
         break;
       case "JUST_GONE":
-        options["duration"] = {
-          $lte: Date.now(),
-        };
+        builder.max("duration", Date.now());
         break;
     }
   }
 
-  if (category != null) {
-    if (typeof category === "string") {
-      options["categories"] = {
-        $in: [category],
-      };
-    } else {
-      options["categories"] = {
-        $in: category,
-      };
-    }
+  if (maxDuration != null && available !== "JUST_GONE") {
+    builder.min("duration", Date.now() + maxDuration * 24 * 60 * 60 * 1000);
+  }
+};
+
+export const buildFoodAroundOptions = (
+  builder: QueryBuilder,
+  params: Omit<IFoodSearchParams, "query">
+): void => {
+  const { distance } = params;
+
+  if (distance != null) {
+    builder.value("location.two_array", {
+      $near: {
+        $geometry: {
+          type: "Point",
+          coordinates: distance.current,
+        },
+        $maxDistance:
+          distance.max === Number.MAX_SAFE_INTEGER
+            ? distance.max
+            : distance.max * 1000,
+      },
+    });
+  }
+};
+
+export const buildFoodQueryOptions = (
+  builder: QueryBuilder,
+  params: Omit<IFoodSearchParams, "query"> & Required<Queried>
+): void => {
+  const { distance, query } = params;
+
+  builder.value("$text", {
+    $search: query,
+  });
+
+  // max distance on location
+  if (distance != null) {
+    const { max, current } = distance;
+    builder.value("location.two_array", {
+      $geoWithin: {
+        $centerSphere: [[current.lng, current.lat], max / 6371],
+      },
+    });
   }
 
-  if (maxDuration != null) {
-    options["duration"] = {
-      $gte: Date.now() + maxDuration * 24 * 60 * 60 * 1000, // days to miliseconds
-    };
-  }
-
-  if (minQuantity != null) {
-    options["quantity"] = {
-      $gte: minQuantity,
-    };
-  }
-
-  if (price != null) {
-    const priceOption: any = {};
-    if (price.min != null) {
-      priceOption.$gte = price.min;
-    }
-    if (price.max != null) {
-      priceOption.$lte = price.max;
-    }
-    if (Object.keys(priceOption).length > 0) {
-      options["price"] = priceOption;
-    }
-  }
-
-  if (place != null) {
-    const include = place.include;
-    const placeIdOption: any = {};
-
-    if (typeof include === "string") {
-      placeIdOption.$eq = include;
-    } else if (Array.isArray(include)) {
-      placeIdOption.$in = include;
-    }
-
-    const exclude = place.exclude;
-    if (typeof exclude === "string") {
-      placeIdOption.$ne = exclude;
-    } else if (Array.isArray(exclude)) {
-      placeIdOption.$nin = exclude;
-    }
-
-    if (Object.keys(placeIdOption).length > 0) {
-      options["place._id"] = placeIdOption;
-    }
-  }
-
-  if (user != null) {
-    const include = user.include;
-    const userOption: any = {};
-
-    if (typeof include === "string") {
-      userOption.$eq = include;
-    } else if (Array.isArray(include)) {
-      userOption.$in = include;
-    }
-
-    const exclude = user.exclude;
-    if (typeof exclude === "string") {
-      userOption.$ne = exclude;
-    } else if (Array.isArray(exclude)) {
-      userOption.$nin = exclude;
-    }
-
-    if (Object.keys(userOption).length > 0) {
-      options["user"] = userOption;
-    }
-  }
-
-  return options;
+  builder.order("score", {
+    $meta: "textScore",
+  });
+  builder.me("score", {
+    $meta: "textScore",
+  });
 };
 
 export const searchFood = async (
   params: IFoodSearchParams
 ): Promise<IFoodPostExposed[]> => {
-  const commonOptions = toFoodSearchCommonOptions(params);
-  const { distance, order, pagination, populate, query } = params;
-  const options: any = {};
-  const meta: any = {};
-  const sort: any = {};
-
-  if (query && query.length > 0) {
-    options["$text"] = {
-      $search: query,
-    };
-  }
-
-  // max distance on location
-  if (distance != null) {
-    const { max, current } = distance;
-    options["location.two_array"] = {
-      $geoWithin: {
-        $centerSphere: [[current.lng, current.lat], max / 6371],
-      },
-    };
-  }
-
-  if (order) {
-    if (order.distance) {
-      sort["location.two_array"] = order.distance;
-    }
-    if (order.time) {
-      sort["createdAt"] = order.time;
-    }
-    if (order.price) {
-      sort["price"] = order.price;
-    }
-    if (order.quantity) {
-      sort["quantity"] = order.quantity;
-    }
-  }
-
-  // score final
-  if (query && query.length > 0) {
-    sort["score"] = {
-      $meta: "textScore",
-    };
-    meta["score"] = {
-      $meta: "textScore",
-    };
-  }
-
-  const queryBuilder = FoodPost.find(
-    {
-      ...options,
-      ...commonOptions,
-    },
-    meta
-  ).sort(sort);
-
-  // console.log(
-  //   params,
-  //   {
-  //     ...options,
-  //     ...commonOptions,
-  //   },
-  //   sort
-  // );
-
-  // Pagination
-  queryBuilder.skip(pagination?.skip ?? 0).limit(pagination?.limit ?? 24);
-
-  const posts = await queryBuilder.exec();
+  const builder = toFoodSearchBuilder(params);
+  const posts = await FoodPost.find(builder.options, builder.meta)
+    .sort(builder.sort)
+    .skip(builder.skip)
+    .limit(builder.limit)
+    .exec();
 
   if (posts == null) throw new InternalError();
 
-  const result: IFoodPostExposed[] = posts.map((post) => ({
-    _id: post._id.toString(),
-    active: post.active,
-    categories: post.categories,
-    createdAt: post.createdAt,
-    description: post.description,
-    duration: post.duration,
-    images: post.images,
-    isEdited: post.isEdited,
-    likeCount: post.likeCount,
-    location: post.location,
-    price: post.price,
-    quantity: post.quantity,
-    title: post.title,
-    updatedAt: post.updatedAt,
-    user: post.user,
-    place: post.place?._id,
-  }));
+  const result: IFoodPostExposed[] = posts.map((post) =>
+    toFoodPostExposed(post)
+  );
 
   // Populate result
+  const populate = params.populate;
   const requireUser = populate?.user !== false;
   const requirePlace = populate?.place !== false;
 
@@ -498,7 +398,7 @@ export const userLikeOrUnlikeFoodPost = async (
   userId: string,
   foodPostId: string,
   like?: boolean
-) => {
+): Promise<IFoodUserLikeExposed | null> => {
   const foodPost = await FoodPost.findById(foodPostId);
   if (foodPost == null) {
     throw new ResourceNotExistedError({
@@ -517,7 +417,7 @@ export const userLikeOrUnlikeFoodPost = async (
 
   // Like but already like
   if (liked != null && like) {
-    return liked;
+    return toFoodUserLikeExposed(liked);
   }
 
   // Like when no already like
@@ -530,12 +430,12 @@ export const userLikeOrUnlikeFoodPost = async (
     const newLikeCount = (foodPost.likeCount ?? 0) + 1;
     foodPost.likeCount = newLikeCount;
     await foodPost.save();
-    return newLike;
+    return toFoodUserLikeExposed(newLike);
   }
 
   // Unlike when has no already like
   if (liked == null && !like) {
-    return;
+    return null;
   }
 
   // Unlike and has like before
@@ -544,25 +444,28 @@ export const userLikeOrUnlikeFoodPost = async (
     const newLikeCount = Math.max((foodPost.likeCount ?? 0) - 1, 0);
     foodPost.likeCount = newLikeCount;
     await foodPost.save();
-    return liked;
+    return toFoodUserLikeExposed(liked);
   }
+
+  return null;
 };
 
-export const getLikedFood = async (
+export const getLikedFoods = async (
   userId: string,
   pagination?: IPagination
 ): Promise<IFoodPostExposedWithLike[]> => {
-  const likes = await FoodUserLike.find({
-    user: userId,
-  })
+  const builder = new QueryBuilder();
+  builder.value("user", userId);
+  builder.order("createdAt", OrderState.DECREASE);
+  builder.pagination(pagination);
+
+  const likes = await FoodUserLike.find(builder.options)
     .populate<{
-      foodPost: IFoodPostExposed;
+      foodPost: HydratedDocument<IFoodPostSchema>;
     }>("foodPost")
-    .sort({
-      createdAt: OrderState.DECREASE,
-    })
-    .skip(pagination?.skip ?? 0)
-    .limit(pagination?.limit ?? 24);
+    .sort(builder.sort)
+    .skip(builder.skip)
+    .limit(builder.limit);
 
   if (likes == null) {
     throw new InternalError();
@@ -573,29 +476,48 @@ export const getLikedFood = async (
     .map((like): IFoodPostExposedWithLike => {
       const post = like.foodPost;
       return {
-        _id: post._id,
-        active: post.active,
-        categories: post.categories,
-        createdAt: post.createdAt,
-        description: post.description,
-        duration: post.duration,
-        images: post.images,
-        isEdited: post.isEdited,
-        likeCount: post.likeCount,
-        location: post.location,
-        price: post.price,
-        quantity: post.quantity,
-        title: post.title,
-        updatedAt: post.updatedAt,
-        user: post.user,
+        ...toFoodPostExposed(post),
         liked: true,
-        place: post.place,
         like: {
           _id: like._id.toString(),
           createdAt: like.createdAt,
-          foodPost: post._id,
+          foodPost: post._id.toString(),
           user: userId,
         },
       };
     });
+};
+
+export const resolveFood = async (
+  userId: string,
+  foodId: string,
+  resolveBy: string | null
+): Promise<Partial<Resolved>> => {
+  const food = await FoodPost.findById(foodId);
+  if (food == null) {
+    throw new ResourceNotExistedError();
+  }
+  if (food.user.toString() !== userId) {
+    throw new UnauthorizationError();
+  }
+  if (resolveBy == null) {
+    food.resolveBy = undefined;
+    food.resolveTime = undefined;
+    food.resolved = false;
+    await food.save();
+    return {
+      resolved: false,
+    };
+  } else {
+    const now = new Date();
+    food.resolveBy = resolveBy;
+    food.resolved = true;
+    food.resolveTime = now;
+    await food.save();
+    return {
+      resolved: true,
+      resolveBy: resolveBy,
+      resolveTime: now,
+    };
+  }
 };

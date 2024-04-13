@@ -25,7 +25,13 @@ export interface IFoodPostExposedLike {
   foodPost: string;
 }
 
-export interface IFoodPostExposed {
+export interface IFoodResolved {
+  resolved: boolean;
+  resolveTime: Date;
+  resolveBy: string;
+}
+
+export interface IFoodPostExposed extends Partial<IFoodResolved> {
   _id: string;
   user: string | IFoodPostExposedUser;
   place?: string | IFoodPostExposedPlace;

@@ -5,6 +5,7 @@ import {
   getLikedFoodPost,
   likeOrUnlikeFoodPost,
   postFood,
+  resolveFood,
   searchFoodPost,
   searchHistory,
   updateFoodPost,
@@ -12,24 +13,25 @@ import {
 } from "../controllers";
 import { getFavoriteFoods, getRegisteredFoods } from "../controllers";
 
-const foodRouter = express.Router();
+const router = express.Router();
 
-export const initUserRouters = (app: Express): void => {
-  foodRouter.post("/images", tokenParser, uploadImages);
+export const initRouter = (app: Express): void => {
+  router.post("/images", tokenParser, uploadImages);
 
-  foodRouter.post("/", tokenParser, postFood);
-  foodRouter.put("/:id", tokenParser, updateFoodPost);
+  router.post("/", tokenParser, postFood);
+  router.put("/:id", tokenParser, updateFoodPost);
 
-  foodRouter.post("/search", tokenParser, searchFoodPost);
-  foodRouter.post("/search/history", tokenParser, searchHistory);
-  foodRouter.get("/:id", tokenParser, findFoodPost);
-  foodRouter.put("/:id/like", tokenParser, likeOrUnlikeFoodPost);
+  router.post("/search", tokenParser, searchFoodPost);
+  router.post("/search/history", tokenParser, searchHistory);
+  router.get("/:id", tokenParser, findFoodPost);
+  router.put("/:id/like", tokenParser, likeOrUnlikeFoodPost);
 
-  foodRouter.get("/like/users/:userId", tokenParser, getLikedFoodPost);
+  router.get("/like/users/:userId", tokenParser, getLikedFoodPost);
 
-  foodRouter.get("/register/users/:id", tokenParser, getRegisteredFoods);
-  foodRouter.get("/favorite/users/:id", tokenParser, getFavoriteFoods);
+  router.get("/register/users/:id", tokenParser, getRegisteredFoods);
+  router.get("/favorite/users/:id", tokenParser, getFavoriteFoods);
+  router.put("/:id/resolve", tokenParser, resolveFood);
 
-  foodRouter.use(errorHandler);
-  app.use("/foods/", foodRouter);
+  router.use(errorHandler);
+  app.use("/foods/", router);
 };

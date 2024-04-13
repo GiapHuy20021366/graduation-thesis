@@ -22,3 +22,7 @@ export interface IFoodPost {
   duration: Date;
   price: number;
 }
+
+export interface IPostFoodData extends Omit<IFoodPost, "place"> {
+  place?: string;
+}

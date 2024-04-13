@@ -1,10 +1,13 @@
-import FoodSeachHistory from "../db/model/food-search-history";
+import FoodSeachHistory, {
+  IFoodSearchHistorySchema,
+} from "../db/model/search-history";
 import {
   IFoodSearchParams,
   IHistorySearchParams,
   IPagination,
   InternalError,
 } from "../data";
+import { HydratedDocument } from "mongoose";
 
 export const getQueryHistoryByUserId = async (
   userId: string,
@@ -43,37 +46,26 @@ export const searchHistory = async (
   const skip = pagination?.skip ?? 0;
   const limit = pagination?.limit ?? 24;
 
-  const options: any = query
-    ? {
-        $text: {
-          $search: query,
-        },
-      }
-    : {};
-  const meta: any = query
-    ? {
-        score: {
-          $meta: "textScore",
-        },
-      }
-    : {};
-
-  const sort: any = query
-    ? {
-        score: { $meta: "textScore" },
-      }
-    : {};
-
-  if (users != null && users.length > 0) {
-    options["userId"] = {
-      $in: users,
-    };
-  }
-  const result = await FoodSeachHistory.find(options, meta)
-    .sort(sort)
-    .skip(skip)
-    .limit(limit)
-    .exec();
+  const result = await FoodSeachHistory.aggregate<
+    HydratedDocument<IFoodSearchHistorySchema>
+  >([
+    {
+      $match: {
+        userId:
+          users != null
+            ? {
+                $in: users,
+              }
+            : undefined,
+        $text: { $search: query ?? "" },
+      },
+    },
+    { $sort: { createdAt: -1 } },
+    { $group: { _id: "$params.query", latestRecord: { $first: "$$ROOT" } } },
+    { $replaceRoot: { newRoot: "$latestRecord" } },
+    { $skip: skip },
+    { $limit: limit },
+  ]);
 
   if (result == null) {
     throw new InternalError();
