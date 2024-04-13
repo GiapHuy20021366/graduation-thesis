@@ -5,8 +5,8 @@ export interface Ided {
 }
 
 export interface Timed {
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Named {
@@ -30,3 +30,7 @@ export interface Queried {
 }
 
 export interface Schemad extends Ided, Timed {}
+
+export interface Followed {
+  followed: boolean;
+}

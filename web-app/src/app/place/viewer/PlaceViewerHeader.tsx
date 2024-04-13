@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import Carousel from "react-material-ui-carousel";
-import { IPlaceExposed } from "../../../data";
+import { IPlaceExposedWithRatingAndFollow } from "../../../data";
 import PlaceImageHolder from "../crud/PlaceImageHolder";
 import PlaceButtonContextMenu from "./PlaceButtonContextMenu";
 import { NotificationsActiveOutlined } from "@mui/icons-material";
@@ -19,7 +19,7 @@ import PlaceViewerExposedType from "./PlaceViewerExposedType";
 import { useComponentLanguage } from "../../../hooks";
 
 type PlaceViewerHeaderProps = BoxProps & {
-  place: IPlaceExposed;
+  place: IPlaceExposedWithRatingAndFollow;
 };
 
 const PlaceViewerHeader = React.forwardRef<

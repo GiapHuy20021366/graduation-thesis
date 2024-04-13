@@ -15,7 +15,7 @@ import {
 import {
   FollowType,
   IAccountExposed,
-  IPlaceExposed,
+  IPlaceExposedWithRatingAndFollow,
   IFoodPostExposedUser,
 } from "../../../data";
 import {
@@ -27,7 +27,7 @@ import { DoneOutlined } from "@mui/icons-material";
 import { userFetcher } from "../../../api";
 
 type SubcribeChipActionProps = ChipProps & {
-  data: IPlaceExposed;
+  data: IPlaceExposedWithRatingAndFollow;
   subcribedIcon?:
     | ReactElement<any, string | JSXElementConstructor<any>>
     | undefined;
@@ -39,7 +39,7 @@ type SubcribeChipActionProps = ChipProps & {
 };
 
 const isSubcribed = (
-  place: IPlaceExposed,
+  place: IPlaceExposedWithRatingAndFollow,
   account?: IAccountExposed
 ): boolean => {
   if (account == null) return false;
@@ -53,7 +53,7 @@ const toUserId = (value: string | IFoodPostExposedUser): string => {
 };
 
 const isPermitSubcribe = (
-  place: IPlaceExposed,
+  place: IPlaceExposedWithRatingAndFollow,
   account?: IAccountExposed
 ): boolean => {
   if (account == null) return false;
@@ -70,7 +70,7 @@ const isPermitSubcribe = (
   return true;
 };
 
-const toSubcribed = (data: IPlaceExposed): boolean => {
+const toSubcribed = (data: IPlaceExposedWithRatingAndFollow): boolean => {
   const follow = data.userFollow;
   if (follow == null) return false;
   return true;

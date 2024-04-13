@@ -21,6 +21,6 @@ export interface IUserExposedFollower
     Pick<Timed, "createdAt"> {}
 
 export interface IUserExposedWithFollower extends IUserExposed {
-  subcribers?: number;
+  subcribers: number;
   userFollow?: IUserExposedFollower;
 }

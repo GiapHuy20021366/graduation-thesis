@@ -10,7 +10,6 @@ import {
   activeManualAccount,
   loginAccount,
   refreshToken,
-  searchUsersAround,
   createNewPlace,
   updatePlace,
   activePlace,
@@ -50,9 +49,6 @@ const initUserRouter = (app: Express) => {
 
   // Search user
   userRouter.post("/search", tokenParser, searchUser);
-
-  // Find users around a position
-  userRouter.post("/around", tokenParser, searchUsersAround);
 
   // Follow / Unfollow user
   userRouter.put("/:id/follow", tokenParser, followUser);

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { IPlaceExposed } from "../../../data";
+import { IPlaceExposedWithRatingAndFollow } from "../../../data";
 import PlaceViewerHolder from "./PlaceViewerHolder";
 import PlaceViewerRetry from "./PlaceViewerRetry";
 import {
@@ -16,7 +16,7 @@ interface PlaceViewerProps {
 }
 
 export default function PlaceViewerId({ id }: PlaceViewerProps) {
-  const [data, setData] = useState<IPlaceExposed>();
+  const [data, setData] = useState<IPlaceExposedWithRatingAndFollow>();
   const [isNotFound, setIsNotFound] = useState<boolean>(false);
   const authContext = useAuthContext();
   const auth = authContext.auth;

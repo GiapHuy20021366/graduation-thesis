@@ -39,7 +39,7 @@ import { IFoodSearchContext } from "./FoodSearchContext";
 import FoodItemSkeleton from "./FoodItemSkeleton";
 import {
   IFoodSearchHistoryParams,
-  IFoodSearchHistorySimple,
+  IFoodSearchHistoryExposed,
   foodFetcher,
 } from "../../../api/food";
 import OrderIcon from "../../common/custom/OrderIcon";
@@ -114,7 +114,7 @@ const toSearchParams = (
   return result;
 };
 
-type IFoodSearchHistoryAndKey = IFoodSearchHistorySimple & {
+type IFoodSearchHistoryAndKey = IFoodSearchHistoryExposed & {
   key: number | string;
 };
 
@@ -255,7 +255,7 @@ export default function FoodSearchBody() {
 
   const handleSearchQueryChange = (
     _event: React.SyntheticEvent<Element, Event>,
-    value: IFoodSearchHistorySimple | string | null
+    value: IFoodSearchHistoryExposed | string | null
   ): void => {
     const val = typeof value === "string" ? value : value?.query ?? "";
     setQuery(val);

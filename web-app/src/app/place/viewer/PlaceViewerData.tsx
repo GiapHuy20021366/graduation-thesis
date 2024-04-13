@@ -1,6 +1,6 @@
 import { SpeedDial, Stack, Tooltip } from "@mui/material";
 import PlaceViewerHeader from "./PlaceViewerHeader";
-import { IPlaceExposed } from "../../../data";
+import { IPlaceExposedWithRatingAndFollow } from "../../../data";
 import PlaceViewerTabs from "./PlaceViewerTabs";
 import { useState } from "react";
 import { PlaceViewerTab } from "./place-viewer-tab";
@@ -12,7 +12,7 @@ import StyledLink from "../../common/navigate/StyledLink";
 import { useComponentLanguage } from "../../../hooks";
 
 interface PlaceViewerDataProps {
-  data: IPlaceExposed;
+  data: IPlaceExposedWithRatingAndFollow;
 }
 
 export default function PlaceViewerData({ data }: PlaceViewerDataProps) {

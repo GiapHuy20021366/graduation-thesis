@@ -7,7 +7,7 @@ import {
   StackProps,
   Typography,
 } from "@mui/material";
-import { IPlaceExposed, IRating } from "../../../data";
+import { IPlaceExposedWithRatingAndFollow, IRating } from "../../../data";
 import {
   useAuthContext,
   useComponentLanguage,
@@ -17,7 +17,7 @@ import { Star } from "@mui/icons-material";
 import { userFetcher } from "../../../api";
 
 type PlaceViewerRatingProps = StackProps & {
-  data: IPlaceExposed;
+  data: IPlaceExposedWithRatingAndFollow;
 };
 
 const ratingLables: { [index: string]: string } = {

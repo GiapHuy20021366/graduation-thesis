@@ -5,17 +5,21 @@ import {
   useAuthContext,
   useComponentLanguage,
 } from "../../../hooks";
-import { FollowType, IAccountExposed, IPlaceExposed } from "../../../data";
+import {
+  FollowType,
+  IAccountExposed,
+  IPlaceExposedWithRatingAndFollow,
+} from "../../../data";
 import { RichTextReadOnly } from "mui-tiptap";
 import StarterKit from "@tiptap/starter-kit";
 import StyledLink from "../../common/navigate/StyledLink";
 
 type PlaceViewerDescriptionProps = BoxProps & {
-  data: IPlaceExposed;
+  data: IPlaceExposedWithRatingAndFollow;
 };
 
 const isEditPermit = (
-  data: IPlaceExposed,
+  data: IPlaceExposedWithRatingAndFollow,
   account?: IAccountExposed
 ): boolean => {
   if (account == null) return false;

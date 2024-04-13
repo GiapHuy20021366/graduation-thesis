@@ -1,4 +1,4 @@
-import { IIncludeAndExclude } from "./food-search-params";
+import { IIncludeAndExclude } from "./include-and-exclude";
 import { OrderState } from "./order-state";
 import { IPagination } from "./pagination";
 

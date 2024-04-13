@@ -4,6 +4,7 @@ import {
   InternalError,
   InvalidDataError,
   ResourceExistedError,
+  toAccountExposed,
 } from "../data";
 import { IUserSchema, User } from "../db/model";
 import { USER_SERVICE } from "../config";
@@ -14,8 +15,8 @@ import {
   signToken,
   verifyToken,
 } from "../utils";
-import { toAuthToken } from "../data";
 import { jwtDecode } from "jwt-decode";
+import { HydratedDocument } from "mongoose";
 
 interface ManualAccountRegisterInfo {
   email: string;
@@ -96,18 +97,7 @@ export const createManualAccountFromToken = async (
     password,
   });
 
-  return {
-    _id: newAccount._id.toString(),
-    firstName: newAccount.firstName,
-    lastName: newAccount.lastName,
-    email: newAccount.email,
-    avatar: newAccount.avatar,
-    token: toAuthToken({
-      email: newAccount.email,
-      _id: newAccount._id.toString(),
-    }),
-    location: newAccount.location,
-  };
+  return toAccountExposed(newAccount);
 };
 
 export const registAccountByGoogleCridential = async (
@@ -128,7 +118,7 @@ export const registAccountByGoogleCridential = async (
   const { email } = googleOAuth;
   const user = await User.findOneByEmail(email);
 
-  let responseUser: IUserSchema | undefined;
+  let responseUser: HydratedDocument<IUserSchema> | undefined;
   const newDate = new Date();
   if (user != null) {
     // update information
@@ -187,16 +177,5 @@ export const registAccountByGoogleCridential = async (
     responseUser = user;
   }
 
-  return {
-    _id: user!._id.toString(),
-    firstName: responseUser.firstName,
-    lastName: responseUser.lastName,
-    email: responseUser.email,
-    avatar: responseUser.avatar,
-    token: toAuthToken({
-      email: responseUser.email,
-      _id: user!._id.toString(),
-    }),
-    location: responseUser.location,
-  };
+  return toAccountExposed(responseUser);
 };

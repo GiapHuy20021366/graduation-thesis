@@ -12,14 +12,12 @@ export { refreshToken } from "./token";
 export { setUserLocation } from "./location";
 
 export {
-  searchUsersAround,
-  getBasicUserInfo,
   searchUser,
   followUser,
   getUserFollowers,
   getUser,
   updateUserPersonal,
-  getUsersAndPlacesFollowed
+  getUsersAndPlacesFollowed,
 } from "./user";
 
 export {

@@ -25,7 +25,7 @@ export {
 export { HttpResponseCode } from "./http-response-code";
 export { toResponseSuccessData } from "./to-response-success-data";
 export { toAuthToken, AuthLike } from "./to-auth-token";
-export { IAccountExposed } from "./account-exposed";
+export { IAccountExposed, toAccountExposed } from "./account-exposed";
 
 export { RpcAction } from "./rpc-action";
 export { RpcQueueName } from "./rpc-queue-name";
@@ -70,10 +70,15 @@ export {
   IPlaceFollower,
 } from "./follower";
 export { PlaceType } from "./place-type";
-export { IPlace, toPlace } from "./place";
+export { IPlace, toPlace, IPlaceData } from "./place";
 export { IPlaceRating } from "./place-rating";
 export { IRating } from "./rating";
-export { IPlaceAuthorExposed, IPlaceExposed } from "./place-exposed";
+export {
+  IPlaceExposedAuthor,
+  IPlaceExposed,
+  toPlaceExposed,
+  IPlaceExposedWithRatingAndFollow,
+} from "./place-exposed";
 export { OrderState } from "./order-state";
 export {
   IPlaceSearchOrder,
@@ -110,12 +115,15 @@ export {
   IUserFollowerExposed,
   isPlaceFollower,
   isUserFollower,
+  toFollowerExposed,
 } from "./follower-exposed";
 export {
   IUserExposed,
   IUserExposedFollower,
   IUserExposedSimple,
   IUserExposedWithFollower,
+  toUserExposed,
+  toUserExposedSimple,
 } from "./user-exposed";
 export {
   IPersonalDataUpdate,
@@ -147,4 +155,15 @@ export {
   Queried,
   Schemad,
   Timed,
+  Followed,
+  toId,
 } from "./schemad";
+export {
+  IMinMax,
+  QueryBuilder,
+  addArrayQuery,
+  addIncExcQuery,
+  addMaxQuery,
+  addMinMaxQuery,
+  addMinQuery,
+} from "./query-buider";

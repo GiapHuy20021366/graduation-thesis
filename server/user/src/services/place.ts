@@ -4,22 +4,23 @@ import {
   FollowType,
   ICoordinates,
   IPagination,
-  IPlace,
-  IPlaceAuthorExposed,
+  IPlaceData,
+  IPlaceExposedAuthor,
   IPlaceExposed,
-  IPlaceFollower,
-  IPlaceRating,
   IRating,
   InternalError,
   OrderState,
   PlaceType,
   ResourceNotExistedError,
   UnauthorizationError,
-  toDistance,
+  toPlaceExposed,
+  Actived,
+  Followed,
+  QueryBuilder,
+  IPlaceExposedWithRatingAndFollow,
 } from "../data";
-import { Follower, Place, PlaceRating } from "../db/model";
-
-export interface IPlaceData extends Omit<IPlace, "author"> {}
+import { Follower, IPlaceSchema, Place, PlaceRating } from "../db/model";
+import { HydratedDocument } from "mongoose";
 
 export const createNewPlace = async (data: IPlaceData, authorId: string) => {
   const dataToCreate = { ...data, authorId: authorId };
@@ -40,22 +41,7 @@ export const createNewPlace = async (data: IPlaceData, authorId: string) => {
   });
   await follower.save();
 
-  const result: IPlaceExposed = {
-    _id: newPlace._id.toString(),
-    active: newPlace.active,
-    author: authorId,
-    categories: newPlace.categories,
-    createdAt: newPlace.createdAt,
-    description: newPlace.description,
-    exposeName: newPlace.exposeName,
-    images: newPlace.images,
-    location: newPlace.location,
-    rating: newPlace.rating,
-    type: newPlace.type,
-    updatedAt: newPlace.updatedAt,
-    avatar: newPlace.avatar,
-  };
-  return result;
+  return toPlaceExposed(newPlace);
 };
 
 export const updatePlace = async (
@@ -64,7 +50,7 @@ export const updatePlace = async (
   userId: string
 ) => {
   const place = await Place.findById(placeId).populate<{
-    author: IPlaceAuthorExposed;
+    author: IPlaceExposedAuthor;
   }>("author");
   if (place == null) {
     throw new ResourceNotExistedError({
@@ -113,21 +99,10 @@ export const updatePlace = async (
   place.updatedAt = new Date();
 
   await place.save();
+  place.author;
 
   const result: IPlaceExposed = {
-    _id: place._id.toString(),
-    active: place.active,
-    author: place.author._id,
-    categories: place.categories,
-    createdAt: place.createdAt,
-    description: place.description,
-    exposeName: place.exposeName,
-    images: place.images,
-    location: place.location,
-    rating: place.rating,
-    type: place.type,
-    updatedAt: place.updatedAt,
-    avatar: place.avatar,
+    ...toPlaceExposed(place),
   };
   return result;
 };
@@ -136,7 +111,7 @@ export const activePlace = async (
   placeId: string,
   userId: string,
   active: boolean
-) => {
+): Promise<Actived> => {
   const place = await Place.findById(placeId);
   if (place == null) {
     throw new ResourceNotExistedError({
@@ -186,7 +161,7 @@ export const followPlace = async (
   placeId: string,
   userId: string,
   followType: FollowType
-) => {
+): Promise<Followed> => {
   const place = await Place.findById(placeId);
   if (place == null) {
     throw new ResourceNotExistedError({
@@ -211,18 +186,25 @@ export const followPlace = async (
       type: followType,
     });
     await newFollower.save();
-    return newFollower;
+    return {
+      followed: true,
+    };
   } else {
     if (follower.type !== followType) {
       follower.type = followType;
       follower.updatedAt = new Date();
       await follower.save();
-      return follower;
     }
+    return {
+      followed: true,
+    };
   }
 };
 
-export const unfollowPlace = async (placeId: string, userId: string) => {
+export const unfollowPlace = async (
+  placeId: string,
+  userId: string
+): Promise<Followed> => {
   const place = await Place.findById(placeId);
   if (place == null) {
     throw new ResourceNotExistedError({
@@ -243,120 +225,76 @@ export const unfollowPlace = async (placeId: string, userId: string) => {
     await follower.deleteOne();
   }
 
-  return { unfollow: true };
+  return {
+    followed: false,
+  };
+};
+
+const toPlaceSearchBuilder = (params: IPlaceSearchParams): QueryBuilder => {
+  const { author, distance, order, pagination, query, rating, types } = params;
+
+  const builder = new QueryBuilder();
+
+  // Base
+  builder
+    .pagination(pagination)
+    .minMax("rating.mean", rating)
+    .incAndExc("author", author)
+    .array("type", types);
+
+  if (query != null && query.length > 0) {
+    builder.value("$text", {
+      $search: query,
+    });
+    if (distance != null) {
+      const { max, current } = distance;
+      builder.value("location.two_array", {
+        $geoWithin: {
+          $centerSphere: [[current.lng, current.lat], max / 6371],
+        },
+      });
+    }
+
+    builder.order("score", {
+      $meta: "textScore",
+    });
+    builder.me("score", {
+      $meta: "textScore",
+    });
+  } else {
+    // Around
+    if (distance != null) {
+      const { current } = distance;
+      builder.value("location.two_array", {
+        $near: {
+          $geometry: {
+            type: "Point",
+            coordinates: [current.lng, current.lat],
+          },
+          $maxDistance:
+            distance.max === Number.MAX_SAFE_INTEGER
+              ? distance.max
+              : distance.max * 1000,
+        },
+      });
+    }
+  }
+  // order
+  builder.order("rating.mean", order?.rating);
+  builder.order("location.two_array", order?.distance);
+
+  return builder;
 };
 
 export const searchPlaces = async (params: IPlaceSearchParams) => {
-  const {
-    distance,
-    pagination,
-    order,
-    author,
-    query: searchQuery,
-    rating,
-    types,
-  } = params;
-  const maxDistance = distance?.max;
-  const minRating = rating?.min;
-  const currentLocation = distance?.current;
-
-  const options: any = {};
-  const meta: any = {};
-  const sort: any = {};
-
-  if (searchQuery != null && searchQuery.length > 0) {
-    options["$text"] = {
-      $search: searchQuery,
-    };
-  }
-
-  // max distance on location
-  if (currentLocation) {
-    const maxDis =
-      maxDistance != undefined ? maxDistance : Number.MAX_SAFE_INTEGER;
-    options["location.two_array"] = {
-      $geoWithin: {
-        $center: [[currentLocation.lng, currentLocation.lat], maxDis],
-      },
-    };
-  }
-
-  // Quantity
-  if (minRating) {
-    options["rating.mean"] = {
-      $gte: minRating,
-    };
-  }
-
-  // author
-  if (author) {
-    const { exclude, include } = author;
-    const authorOption: any = {};
-    if (exclude != null) {
-      if (typeof exclude === "string") {
-        authorOption.$ne = exclude;
-      } else {
-        authorOption.$nin = exclude;
-      }
-    }
-    if (include != null) {
-      if (typeof include === "string") {
-        authorOption.$eq = include;
-      } else {
-        authorOption.$in = include;
-      }
-    }
-    if (Object.keys(authorOption).length !== 0) {
-      options["author"] = authorOption;
-    }
-  }
-
-  if (types != null && types.length > 0) {
-    options["type"] = {
-      $in: types,
-    };
-  }
-
-  // score final
-  if (searchQuery != null && searchQuery.length > 0) {
-    sort["score"] = {
-      $meta: "textScore",
-    };
-    meta["score"] = {
-      $meta: "textScore",
-    };
-  }
-
-  if (order) {
-    if (order.rating) {
-      sort["rating.mean"] = order.rating;
-    }
-  }
-
-  const query = Place.find(options, meta).sort(sort);
-
-  // Pagination
-  if (pagination) {
-    query.skip(pagination.skip).limit(pagination.limit);
-  }
-
-  const result = await query.exec();
+  const builder = toPlaceSearchBuilder(params);
+  const result = await Place.find(builder.options, builder.meta)
+    .sort(builder.sort)
+    .skip(builder.skip)
+    .limit(builder.limit)
+    .exec();
   if (result == null) throw new InternalError();
 
-  // Sort follow location
-  if (order) {
-    if (currentLocation && order.distance) {
-      result.sort((f1, f2) => {
-        const pos1 = f1.location.coordinates;
-        const pos2 = f2.location.coordinates;
-        const delta =
-          toDistance(pos1, currentLocation) - toDistance(pos2, currentLocation);
-        if (order.distance === OrderState.INCREASE) return delta;
-        return -delta;
-      });
-      sort["location.two_array"] = order.distance;
-    }
-  }
   return result;
 };
 
@@ -364,7 +302,7 @@ export const ratingPlace = async (
   placeId: string,
   userId: string,
   score: number | undefined
-) => {
+): Promise<IRating> => {
   const place = await Place.findById(placeId);
   if (place == null) {
     throw new ResourceNotExistedError({
@@ -436,19 +374,14 @@ export const ratingPlace = async (
     }
   }
   return {
-    ...ratingAfter,
+    count: ratingAfter.count,
+    mean: ratingAfter.mean,
   };
 };
 
-interface IPlaceInfo extends Omit<IPlaceExposed, "author"> {
-  userRating?: IPlaceRating & { time: number | string };
-  userFollow?: IPlaceFollower & { time: number | string };
-  author: string | IPlaceAuthorExposed;
-}
-
 export const getPlaceInfo = async (placeId: string, userId?: string) => {
   const place = await Place.findById(placeId).populate<{
-    author: IPlaceAuthorExposed;
+    author: IPlaceExposedAuthor;
   }>("author", "firstName lastName _id email");
   if (place == null) {
     throw new ResourceNotExistedError({
@@ -459,21 +392,15 @@ export const getPlaceInfo = async (placeId: string, userId?: string) => {
       },
     });
   }
-  const result: IPlaceInfo = {
-    _id: place._id.toString(),
-    active: place.active,
-    author: place.author,
-    categories: place.categories,
-    createdAt: place.createdAt,
-    exposeName: place.exposeName,
-    images: place.images,
-    location: place.location,
-    rating: place.rating,
-    type: place.type,
-    updatedAt: place.updatedAt,
-    avatar: place.avatar,
-    description: place.description,
-  };
+  const result: IPlaceExposedWithRatingAndFollow = toPlaceExposed(
+    place,
+    {
+      author: place.author,
+    },
+    {
+      description: true,
+    }
+  );
   if (userId != null) {
     const follower = await Follower.findOne({
       role: FollowRole.PLACE,
@@ -486,7 +413,8 @@ export const getPlaceInfo = async (placeId: string, userId?: string) => {
         role: FollowRole.PLACE,
         subcriber: userId,
         type: follower.type,
-        time: follower.updatedAt.getTime(),
+        createdAt: follower.createdAt,
+        updatedAt: follower.updatedAt,
       };
     }
 
@@ -500,7 +428,8 @@ export const getPlaceInfo = async (placeId: string, userId?: string) => {
         place: placeId,
         score: rating.score,
         user: userId,
-        time: rating.updatedAt.getTime(),
+        createdAt: rating.createdAt,
+        updatedAt: rating.updatedAt,
       };
     }
 
@@ -534,28 +463,23 @@ export const getPlacesByUserFollow = async (
   followTypes?: FollowType[],
   placeTypes?: PlaceType[],
   pagination?: IPagination
-): Promise<IPlaceInfo[]> => {
-  const options: any = {
-    subcriber: user,
-    role: FollowRole.PLACE,
-  };
-  if (placeTypes != null) {
-    options["place.type"] = {
-      $in: placeTypes,
-    };
-  }
-  if (followTypes != null) {
-    options["type"] = {
-      $in: followTypes,
-    };
-  }
-  const followers = await Follower.find(options)
-    .populate<{ place: IPlaceExposed; subcriber: string }>("place")
-    .sort({
-      createdAt: OrderState.DECREASE,
-    })
-    .skip(pagination?.skip ?? 0)
-    .limit(pagination?.limit ?? 24)
+): Promise<IPlaceExposedWithRatingAndFollow[]> => {
+  const buider = new QueryBuilder();
+  buider
+    .pagination(pagination)
+    .value("subcriber", user)
+    .value("role", FollowRole.PLACE)
+    .array("place.type", placeTypes)
+    .array("type", followTypes)
+    .order("createdAt", OrderState.DECREASE);
+
+  const followers = await Follower.find(buider.options)
+    .populate<{ place: HydratedDocument<IPlaceSchema>; subcriber: string }>(
+      "place"
+    )
+    .sort(buider.sort)
+    .skip(buider.skip)
+    .limit(buider.limit)
     .exec();
 
   if (followers == null) {
@@ -564,28 +488,16 @@ export const getPlacesByUserFollow = async (
 
   return followers
     .filter((f) => f.place != null)
-    .map((follower): IPlaceInfo => {
+    .map((follower): IPlaceExposedWithRatingAndFollow => {
       return {
-        _id: follower.place._id,
-        active: follower.place.active,
-        author: follower.place.author,
-        categories: follower.place.categories,
-        createdAt: follower.place.createdAt,
-        exposeName: follower.place.exposeName,
-        images: follower.place.images,
-        location: follower.place.location,
-        rating: follower.place.rating,
-        type: follower.place.type,
-        updatedAt: follower.place.updatedAt,
-        avatar: follower.place.avatar,
-        description: follower.place.description,
-        subcribers: follower.place.subcribers,
+        ...toPlaceExposed(follower.place),
         userFollow: {
-          place: follower.place._id,
+          place: follower.place._id.toString(),
           role: follower.role,
           subcriber: follower.subcriber,
-          time: follower.updatedAt.getTime(),
           type: follower.type,
+          createdAt: follower.createdAt,
+          updatedAt: follower.updatedAt,
         },
       };
     });
@@ -622,23 +534,7 @@ export const getPlacesAround = async (
 
   if (places == null) throw new InternalError();
 
-  return places.map(
-    (place): IPlaceInfo => ({
-      _id: place._id.toString(),
-      active: place.active,
-      author: place.author.toString(),
-      categories: place.categories,
-      createdAt: place.createdAt,
-      exposeName: place.exposeName,
-      images: place.images,
-      location: place.location,
-      rating: place.rating,
-      type: place.type,
-      updatedAt: place.updatedAt,
-      avatar: place.avatar,
-      description: place.description,
-    })
-  );
+  return places.map((place): IPlaceExposed => toPlaceExposed(place));
 };
 
 export const getPlacesRankByFavorite = async (
@@ -661,38 +557,23 @@ export const getPlacesRankByFavorite = async (
     },
   ]).exec();
   if (places == null) throw new InternalError();
-  return places.map(
-    (place): IPlaceInfo => ({
-      _id: place._id.toString(),
-      active: place.active,
-      author: place.author.toString(),
-      categories: place.categories,
-      createdAt: place.createdAt,
-      exposeName: place.exposeName,
-      images: place.images,
-      location: place.location,
-      rating: place.rating,
-      type: place.type,
-      updatedAt: place.updatedAt,
-      avatar: place.avatar,
-      description: place.description,
-    })
-  );
+  return places.map((place): IPlaceExposed => toPlaceExposed(place));
 };
 
 export const getPlacesRatedByUser = async (
   user: string,
   pagination?: IPagination
-): Promise<IPlaceInfo[]> => {
-  const ratings = await PlaceRating.find({
-    user: user,
-  })
-    .populate<{ place: IPlaceExposed }>("place")
-    .sort({
-      updatedAt: OrderState.DECREASE,
-    })
-    .skip(pagination?.skip ?? 0)
-    .limit(pagination?.limit ?? 24)
+): Promise<IPlaceExposedWithRatingAndFollow[]> => {
+  const builder = new QueryBuilder();
+  builder
+    .pagination(pagination)
+    .value("user", user)
+    .order("updatedAt", OrderState.DECREASE);
+  const ratings = await PlaceRating.find(builder.options)
+    .populate<{ place: HydratedDocument<IPlaceSchema> }>("place")
+    .sort(builder.sort)
+    .skip(builder.skip)
+    .limit(builder.limit)
     .exec();
   if (ratings == null) {
     throw new InternalError();
@@ -700,27 +581,16 @@ export const getPlacesRatedByUser = async (
 
   return ratings
     .filter((r) => r.place != null)
-    .map((rating): IPlaceInfo => {
+    .map((rating): IPlaceExposedWithRatingAndFollow => {
       const place = rating.place;
       return {
-        _id: place._id,
-        active: place.active,
-        author: place.author,
-        categories: place.categories,
-        createdAt: place.createdAt,
-        exposeName: place.exposeName,
-        images: place.images,
-        location: place.location,
-        rating: place.rating,
-        type: place.type,
-        updatedAt: place.updatedAt,
-        avatar: place.avatar,
-        description: place.description,
+        ...toPlaceExposed(place),
         userRating: {
-          place: place._id,
+          place: place._id.toString(),
           score: rating.score,
-          time: rating.updatedAt.getTime(),
           user: rating.user.toString(),
+          createdAt: rating.createdAt,
+          updatedAt: rating.updatedAt,
         },
       };
     });

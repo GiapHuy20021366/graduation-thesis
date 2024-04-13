@@ -11,7 +11,6 @@ export interface IUserSearchDistance {
 export interface IUserSearchOrder {
   time?: OrderState;
   distance?: OrderState;
-  like?: OrderState;
 }
 
 export interface IUserSearchParams extends Paginationed, Queried {
@@ -60,10 +59,6 @@ export const toUserSearchParams = (value: any): IUserSearchParams => {
     const distance = order.distance;
     if (isOrderState(distance) && distance !== OrderState.NONE) {
       _order.distance = distance;
-    }
-    const like = order.like;
-    if (isOrderState(like) && like !== OrderState.NONE) {
-      _order.like = like;
     }
   }
 

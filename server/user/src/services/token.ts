@@ -4,6 +4,7 @@ import {
   AuthLike,
   ResourceNotExistedError,
   toAuthToken,
+  toAccountExposed,
 } from "../data";
 
 export const refreshToken = async (
@@ -21,20 +22,7 @@ export const refreshToken = async (
         },
       });
     }
-    return {
-      _id: user._id.toString(),
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      token: toAuthToken({
-        email: user.email,
-        _id: user._id.toString(),
-      }),
-      avatar: user.avatar,
-      location: user.location,
-      active: user.active,
-      exposedName: user.exposedName,
-    };
+    return toAccountExposed(user);
   } else {
     return {
       _id: auth._id,

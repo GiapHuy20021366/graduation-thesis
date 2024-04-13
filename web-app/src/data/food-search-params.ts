@@ -38,6 +38,11 @@ export interface IFoodSearchPopulate {
   place?: boolean;
 }
 
+export interface IFoodPostResolveBy {
+  include?: string[];
+  exclude?: string[];
+}
+
 export interface IFoodSearchParams extends Queried, Paginationed {
   user?: IFoodSearchUser;
   place?: IFoodSearchPlace;
@@ -51,4 +56,6 @@ export interface IFoodSearchParams extends Queried, Paginationed {
   active?: boolean;
   order?: IFoodSeachOrder;
   populate?: IFoodSearchPopulate;
+  resolved?: boolean;
+  resolveBy?: IFoodPostResolveBy;
 }

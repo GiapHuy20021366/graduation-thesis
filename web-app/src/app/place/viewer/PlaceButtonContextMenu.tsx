@@ -6,7 +6,11 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import { FollowType, IAccountExposed, IPlaceExposed } from "../../../data";
+import {
+  FollowType,
+  IAccountExposed,
+  IPlaceExposedWithRatingAndFollow,
+} from "../../../data";
 import { Edit, MoreVert, ReportGmailerrorred } from "@mui/icons-material";
 import {
   applicationPages,
@@ -16,11 +20,11 @@ import {
 import StyledLink from "../../common/navigate/StyledLink";
 
 type PlaceButtonContextMenuProps = IconButtonProps & {
-  data: IPlaceExposed;
+  data: IPlaceExposedWithRatingAndFollow;
 };
 
 const isPermitEdit = (
-  place: IPlaceExposed,
+  place: IPlaceExposedWithRatingAndFollow,
   account?: IAccountExposed
 ): boolean => {
   if (account == null) return false;

@@ -1,6 +1,7 @@
 import { FoodCategory } from "./food-category";
 import { ILocation } from "./location";
 import { PlaceType } from "./place-type";
+import { Actived, Timed } from "./schemad";
 
 export interface IFoodPostExposedUser {
   _id: string;
@@ -31,7 +32,10 @@ export interface IFoodResolved {
   resolveBy: string;
 }
 
-export interface IFoodPostExposed extends Partial<IFoodResolved> {
+export interface IFoodPostExposed
+  extends Partial<IFoodResolved>,
+    Actived,
+    Timed {
   _id: string;
   user: string | IFoodPostExposedUser;
   place?: string | IFoodPostExposedPlace;
@@ -43,10 +47,7 @@ export interface IFoodPostExposed extends Partial<IFoodResolved> {
   duration: string | Date;
   price: number;
   isEdited: boolean;
-  createdAt: string | Date;
-  updatedAt: string | Date;
   likeCount: number;
-  active: boolean;
   location: ILocation;
 }
 

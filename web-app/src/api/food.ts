@@ -14,13 +14,15 @@ import {
   IPagination,
   Queried,
   IFoodResolved,
+  Ided,
+  Timed,
 } from "../data";
 
 export const foodEndpoints = {
   uploadImages: "/foods/images",
   uploadFood: "/foods",
   updateFood: "/foods/:id",
-  findFoodPost: "/foods/:id",
+  getFoodPost: "/foods/:id",
   searchFood: "/foods/search",
   searchHistory: "/foods/search/history",
   likeFood: "/foods/:id/like",
@@ -49,21 +51,30 @@ foodInstance.interceptors.response.use(
   (error) => Promise.reject(error?.response?.data?.error)
 );
 
-export interface IFoodUploadResponseData {
-  _id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  active: boolean;
-}
+export interface IPostFoodResponse
+  extends Pick<
+    IFoodPostExposed,
+    "_id" | "createdAt" | "active" | "updatedAt"
+  > {}
 
 export interface IFoodSearchHistoryParams extends Queried {
   users?: string[];
 }
 
-export interface IFoodSearchHistorySimple {
+export interface IFoodSearchHistoryExposed {
   userId: string;
   query: string;
 }
+
+export interface IFoodUserLike {
+  user: string;
+  foodPost: string;
+}
+
+export interface IFoodUserLikeExposed
+  extends IFoodUserLike,
+    Ided,
+    Pick<Timed, "createdAt"> {}
 
 export interface FoodFetcher {
   uploadImage(
@@ -74,29 +85,29 @@ export interface FoodFetcher {
   uploadFood(
     data: IFoodUploadData,
     auth: IAuthInfo
-  ): Promise<FoodResponse<IFoodUploadResponseData>>;
+  ): Promise<FoodResponse<IPostFoodResponse>>;
   updateFood(
     id: string,
     data: IFoodUploadData,
     auth: IAuthInfo
-  ): Promise<FoodResponse<IFoodUploadResponseData>>;
+  ): Promise<FoodResponse<IPostFoodResponse>>;
   searchFood(
     data: IFoodSearchParams,
     auth: IAuthInfo
   ): Promise<FoodResponse<IFoodPostExposed[]>>;
-  findFoodPost(
+  getFoodPost(
     id: string,
     auth: IAuthInfo
   ): Promise<FoodResponse<IFoodPostExposedWithLike>>;
   searchHistory(
     params: IFoodSearchHistoryParams,
     auth: IAuthInfo
-  ): Promise<FoodResponse<IFoodSearchHistorySimple[]>>;
+  ): Promise<FoodResponse<IFoodSearchHistoryExposed[]>>;
   likeFood(
     foodId: string,
     action: "LIKE" | "UNLIKE" | undefined,
     auth: IAuthInfo
-  ): Promise<FoodResponse<void>>;
+  ): Promise<FoodResponse<IFoodPostExposedWithLike | null>>;
   getLikedFood(
     userId: string,
     auth: IAuthInfo,
@@ -143,7 +154,7 @@ export const foodFetcher: FoodFetcher = {
   uploadFood: async (
     data: IFoodUploadData,
     auth: IAuthInfo
-  ): Promise<FoodResponse<IFoodUploadResponseData>> => {
+  ): Promise<FoodResponse<IPostFoodResponse>> => {
     return foodInstance.post(foodEndpoints.uploadFood, data, {
       headers: {
         Authorization: auth.token,
@@ -154,7 +165,7 @@ export const foodFetcher: FoodFetcher = {
     id: string,
     data: IFoodUploadData,
     auth: IAuthInfo
-  ): Promise<FoodResponse<IFoodUploadResponseData>> => {
+  ): Promise<FoodResponse<IPostFoodResponse>> => {
     return foodInstance.put(foodEndpoints.updateFood.replace(":id", id), data, {
       headers: {
         Authorization: auth.token,
@@ -171,11 +182,11 @@ export const foodFetcher: FoodFetcher = {
       },
     });
   },
-  findFoodPost: async (
+  getFoodPost: async (
     id: string,
     auth: IAuthInfo
   ): Promise<FoodResponse<IFoodPostExposedWithLike>> => {
-    return foodInstance.get(foodEndpoints.findFoodPost.replace(":id", id), {
+    return foodInstance.get(foodEndpoints.getFoodPost.replace(":id", id), {
       headers: {
         Authorization: auth.token,
       },
@@ -184,7 +195,7 @@ export const foodFetcher: FoodFetcher = {
   searchHistory: async (
     params: IFoodSearchHistoryParams,
     auth: IAuthInfo
-  ): Promise<FoodResponse<IFoodSearchHistorySimple[]>> => {
+  ): Promise<FoodResponse<IFoodSearchHistoryExposed[]>> => {
     return foodInstance.post(foodEndpoints.searchHistory, params, {
       headers: {
         Authorization: auth.token,
@@ -195,7 +206,7 @@ export const foodFetcher: FoodFetcher = {
     foodId: string,
     action: "LIKE" | "UNLIKE" | undefined,
     auth: IAuthInfo
-  ): Promise<FoodResponse<void>> => {
+  ): Promise<FoodResponse<IFoodPostExposedWithLike | null>> => {
     return foodInstance.put(
       foodEndpoints.likeFood.replace(":id", foodId),
       {

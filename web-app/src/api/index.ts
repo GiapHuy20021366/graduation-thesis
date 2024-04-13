@@ -16,7 +16,9 @@ export {
   type FoodFetcher,
   type FoodResponse,
   type FoodResponseError,
-  type IFoodUploadResponseData,
+  type IFoodSearchHistoryParams,
+  type IFoodSearchHistoryExposed,
+  type IPostFoodResponse,
 } from "./food";
 
 export { geocodeMapFindAddess } from "./map";

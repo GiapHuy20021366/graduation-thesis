@@ -4,7 +4,7 @@ import { User } from "../db/model";
 export const setUserLocation = async (
   userId: string,
   location: ILocation
-): Promise<void> => {
+): Promise<ILocation> => {
   const user = await User.findById(userId);
   if (user == null) {
     throw new ResourceNotExistedError({
@@ -21,5 +21,5 @@ export const setUserLocation = async (
   };
   user.location = locationToSet;
   await user.save();
-  return;
+  return location;
 };

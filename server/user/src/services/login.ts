@@ -1,8 +1,8 @@
 import {
   ResourceNotExistedError,
   UnauthorizationError,
-  toAuthToken,
   IAccountExposed,
+  toAccountExposed,
 } from "../data";
 import { User } from "../db/model";
 import { compareHash } from "../utils";
@@ -32,18 +32,5 @@ export const loginAccountByManual = async (
     });
   }
 
-  return {
-    _id: user._id.toString(),
-    email: user.email,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    token: toAuthToken({
-      email: user.email,
-      _id: user._id.toString(),
-    }),
-    avatar: user.avatar,
-    location: user.location,
-    active: user.active,
-    exposedName: user.exposedName,
-  };
+  return toAccountExposed(user);
 };

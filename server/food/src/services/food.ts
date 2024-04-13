@@ -12,7 +12,6 @@ import {
   InternalError,
   OrderState,
   PlaceType,
-  Queried,
   QueryBuilder,
   Resolved,
   ResourceNotExistedError,
@@ -198,37 +197,21 @@ export const findFoodPostById = async (
 };
 
 const toFoodSearchBuilder = (params: IFoodSearchParams): QueryBuilder => {
+  const {
+    query,
+    addedBy,
+    available,
+    maxDuration,
+    pagination,
+    distance,
+    order,
+  } = params;
+
   const builder = new QueryBuilder();
-  buildFoodSearchBaseOptions(builder, params);
-  const query = params.query;
-  if (query) {
-    buildFoodQueryOptions(builder, {
-      ...params,
-      query,
-    });
-  } else {
-    buildFoodAroundOptions(builder, params);
-  }
 
-  // order
-  const order = params.order;
-  builder.order("location.two_array", order?.distance);
-  builder.order("createdAt", order?.time);
-  builder.order("price", order?.price);
-  builder.order("quantity", order?.quantity);
-
-  return builder;
-};
-
-const buildFoodSearchBaseOptions = (
-  builder: QueryBuilder,
-  params: IFoodSearchParams
-): void => {
-  const { addedBy, available, maxDuration, pagination } = params;
-
-  builder.pagination(pagination);
-
+  // Base
   builder
+    .pagination(pagination)
     .value("active", params.active)
     .value("resolved", params.resolved)
     .array("categories", params.category)
@@ -237,7 +220,6 @@ const buildFoodSearchBaseOptions = (
     .incAndExc("resolveBy", params.resolveBy)
     .incAndExc("user", params.user)
     .incAndExc("place._id", params.place);
-
   if (addedBy != null) {
     if (typeof addedBy === "number") {
       if (addedBy === PlaceType.PERSONAL) {
@@ -281,56 +263,55 @@ const buildFoodSearchBaseOptions = (
   if (maxDuration != null && available !== "JUST_GONE") {
     builder.min("duration", Date.now() + maxDuration * 24 * 60 * 60 * 1000);
   }
-};
 
-export const buildFoodAroundOptions = (
-  builder: QueryBuilder,
-  params: Omit<IFoodSearchParams, "query">
-): void => {
-  const { distance } = params;
+  if (query) {
+    // Query
+    builder.value("$text", {
+      $search: query,
+    });
 
-  if (distance != null) {
-    builder.value("location.two_array", {
-      $near: {
-        $geometry: {
-          type: "Point",
-          coordinates: distance.current,
+    // max distance on location
+    if (distance != null) {
+      const { max, current } = distance;
+      builder.value("location.two_array", {
+        $geoWithin: {
+          $centerSphere: [[current.lng, current.lat], max / 6371],
         },
-        $maxDistance:
-          distance.max === Number.MAX_SAFE_INTEGER
-            ? distance.max
-            : distance.max * 1000,
-      },
+      });
+    }
+
+    builder.order("score", {
+      $meta: "textScore",
     });
-  }
-};
-
-export const buildFoodQueryOptions = (
-  builder: QueryBuilder,
-  params: Omit<IFoodSearchParams, "query"> & Required<Queried>
-): void => {
-  const { distance, query } = params;
-
-  builder.value("$text", {
-    $search: query,
-  });
-
-  // max distance on location
-  if (distance != null) {
-    const { max, current } = distance;
-    builder.value("location.two_array", {
-      $geoWithin: {
-        $centerSphere: [[current.lng, current.lat], max / 6371],
-      },
+    builder.me("score", {
+      $meta: "textScore",
     });
+  } else {
+    // Around
+    if (distance != null) {
+      const { current } = distance;
+      builder.value("location.two_array", {
+        $near: {
+          $geometry: {
+            type: "Point",
+            coordinates: [current.lng, current.lat],
+          },
+          $maxDistance:
+            distance.max === Number.MAX_SAFE_INTEGER
+              ? distance.max
+              : distance.max * 1000,
+        },
+      });
+    }
   }
 
-  builder.order("score", {
-    $meta: "textScore",
-  });
-  builder.me("score", {
-    $meta: "textScore",
-  });
+  // order
+  builder.order("location.two_array", order?.distance);
+  builder.order("createdAt", order?.time);
+  builder.order("price", order?.price);
+  builder.order("quantity", order?.quantity);
+
+  return builder;
 };
 
 export const searchFood = async (

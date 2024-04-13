@@ -18,6 +18,8 @@ export interface IPlace {
   type: PlaceType;
 }
 
+export interface IPlaceData extends Omit<IPlace, "author"> {}
+
 export const toPlace = (value: any): IPlace | undefined => {
   if (typeof value !== "object") return;
   if (!isString(value.exposeName) || isEmptyString(value.exposeName)) return;

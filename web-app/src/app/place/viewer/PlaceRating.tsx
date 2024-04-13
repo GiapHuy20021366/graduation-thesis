@@ -1,10 +1,10 @@
 import React from "react";
 import { Box, BoxProps, Typography } from "@mui/material";
-import { IPlaceExposed } from "../../../data";
+import { IPlaceExposedWithRatingAndFollow } from "../../../data";
 import { useComponentLanguage } from "../../../hooks";
 
 type PlaceRatingProps = BoxProps & {
-  data: IPlaceExposed;
+  data: IPlaceExposedWithRatingAndFollow;
 };
 
 const PlaceRating = React.forwardRef<HTMLDivElement, PlaceRatingProps>(

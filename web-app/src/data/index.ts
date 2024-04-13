@@ -50,9 +50,9 @@ export { PlaceType, toPlaceTypeLabel } from "./place-type";
 export { type IPlace } from "./place";
 export { type IRating } from "./rating";
 export {
-  type IPlaceAuthorExposed,
+  type IPlaceExposedAuthor,
   type IPlaceExposed,
-  type IPlaceExposedFollower,
+  type IPlaceExposedWithRatingAndFollow,
 } from "./place-exposed";
 export {
   FollowRole,
@@ -151,6 +151,7 @@ export {
   type Edited,
   type Paginationed,
   type Queried,
+  type Followed,
 } from "./schemad";
 export {
   type IFollowerSearchDuration,

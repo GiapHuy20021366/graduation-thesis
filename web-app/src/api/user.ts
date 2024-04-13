@@ -12,7 +12,6 @@ import {
   PlaceType,
   IPlaceExposed,
   FollowType,
-  IPlaceFollower,
   IRating,
   IPlaceFollowerExposed,
   IUserSearchParams,
@@ -24,6 +23,8 @@ import {
   IFollowerExposed,
   Paginationed,
   IPlaceSearchParams,
+  IPlaceExposedWithRatingAndFollow,
+  Followed,
 } from "../data";
 
 export const userEndpoints = {
@@ -32,7 +33,6 @@ export const userEndpoints = {
   signup: "/users/register",
   refeshToken: "/users/token/refresh",
   activeManual: "/users/active",
-  findUsersAround: "/users/around",
   getUserInfo: "/users/:id",
   searchUser: "/users/search",
   followUser: "/users/:id/follow",
@@ -158,12 +158,12 @@ export interface UserFetcher {
   unFollowUser(
     userId: string,
     auth: IAuthInfo
-  ): Promise<UserResponse<{ success: boolean }>>;
+  ): Promise<UserResponse<IUserFollowerExposed>>;
   updatePersonalData(
     userId: string,
     data: IPersonalDataUpdate,
     auth: IAuthInfo
-  ): Promise<UserResponse<{ success: boolean }>>;
+  ): Promise<UserResponse<IUserExposedSimple>>;
   getUserFollowers(
     user: string,
     params: IFollowerSearchParams,
@@ -183,7 +183,7 @@ export interface UserFetcher {
   getPlace(
     placeId: string,
     auth: IAuthInfo
-  ): Promise<UserResponse<IPlaceExposed>>;
+  ): Promise<UserResponse<IPlaceExposedWithRatingAndFollow>>;
   updatePlace(
     placeId: string,
     data: IPlaceData,
@@ -198,11 +198,11 @@ export interface UserFetcher {
     placeId: string,
     followType: FollowType,
     auth: IAuthInfo
-  ): Promise<UserResponse<IPlaceFollower>>;
+  ): Promise<UserResponse<Followed>>;
   unFollowPlace(
     placeId: string,
     auth: IAuthInfo
-  ): Promise<UserResponse<{ unfollow: boolean }>>;
+  ): Promise<UserResponse<Followed>>;
   ratingPlace(
     placeId: string,
     auth: IAuthInfo,
@@ -389,7 +389,7 @@ export const userFetcher: UserFetcher = {
   unFollowUser: (
     userId: string,
     auth: IAuthInfo
-  ): Promise<UserResponse<{ success: boolean }>> => {
+  ): Promise<UserResponse<IUserFollowerExposed>> => {
     const params = new URLSearchParams();
     params.set("action", "unfollow");
     return userInstance.put(
@@ -406,7 +406,7 @@ export const userFetcher: UserFetcher = {
     userId: string,
     data: IPersonalDataUpdate,
     auth: IAuthInfo
-  ): Promise<UserResponse<{ success: boolean }>> => {
+  ): Promise<UserResponse<IUserExposedSimple>> => {
     return userInstance.put(
       userEndpoints.updatePersonal.replace(":id", userId),
       data,
@@ -463,7 +463,7 @@ export const userFetcher: UserFetcher = {
   getPlace: (
     placeId: string,
     auth: IAuthInfo
-  ): Promise<UserResponse<IPlaceExposed>> => {
+  ): Promise<UserResponse<IPlaceExposedWithRatingAndFollow>> => {
     return userInstance.get(userEndpoints.getPlace.replace(":id", placeId), {
       headers: {
         Authorization: auth.token,
@@ -505,7 +505,7 @@ export const userFetcher: UserFetcher = {
     placeId: string,
     followType: FollowType,
     auth: IAuthInfo
-  ): Promise<UserResponse<IPlaceFollower>> => {
+  ): Promise<UserResponse<Followed>> => {
     return userInstance.get(
       userEndpoints.followPlace.replace(":id", placeId) +
         `?action=follow&type=${followType}`,
@@ -519,7 +519,7 @@ export const userFetcher: UserFetcher = {
   unFollowPlace: (
     placeId: string,
     auth: IAuthInfo
-  ): Promise<UserResponse<{ unfollow: boolean }>> => {
+  ): Promise<UserResponse<Followed>> => {
     return userInstance.get(
       userEndpoints.followPlace.replace(":id", placeId) + `?action=unfollow`,
       {

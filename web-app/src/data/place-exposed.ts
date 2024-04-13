@@ -2,26 +2,27 @@ import { IPlace } from "./place";
 import { IPlaceRating } from "./place-rating";
 import { IRating } from "./rating";
 import { IPlaceFollower } from "./follower";
+import { Timed } from "./schemad";
 
-export interface IPlaceAuthorExposed {
+export interface IPlaceExposedAuthor {
   firstName: string;
   lastName: string;
   email: string;
   _id: string;
 }
 
-export interface IPlaceExposedFollower extends IPlaceFollower {
-  time: number;
-}
-
 export interface IPlaceExposed extends Omit<IPlace, "author"> {
-  author: string | IPlaceAuthorExposed;
+  author: string | IPlaceExposedAuthor;
   _id: string;
   rating: IRating;
   active: boolean;
   createdAt: Date;
   updatedAt: Date;
-  userRating?: IPlaceRating;
-  userFollow?: IPlaceExposedFollower;
+}
+
+export interface IPlaceExposedWithRatingAndFollow
+  extends Omit<IPlaceExposed, "author"> {
+  userRating?: IPlaceRating & Timed;
+  userFollow?: IPlaceFollower & Timed;
   subcribers?: number;
 }

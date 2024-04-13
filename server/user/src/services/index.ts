@@ -25,10 +25,7 @@ export {
 export { setUserLocation } from "./location";
 
 export {
-  searchUsersAround,
-  getBasicUserInfo,
   searchUser,
-  ISearchedUser,
   followUser,
   unFollowUser,
   updateUserPersonal,
@@ -42,7 +39,6 @@ export {
   activePlace,
   followPlace,
   unfollowPlace,
-  IPlaceData,
   ratingPlace,
   searchPlaces,
   getPlaceInfo,

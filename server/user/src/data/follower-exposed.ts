@@ -1,6 +1,8 @@
 import { IPlaceExposed } from "./place-exposed";
-import { Schemad } from "./schemad";
+import { Ided, Schemad, toId } from "./schemad";
 import { FollowRole, IFollowerBase } from "./follower";
+import { HydratedDocument, ObjectId } from "mongoose";
+import { IFollowerSchema } from "~/db/model";
 
 export interface IFollowerExposedTarget {
   _id: string;
@@ -42,4 +44,31 @@ export const isPlaceFollower = (
   value: IFollowerExposed
 ): value is IPlaceFollowerExposed => {
   return value.role === FollowRole.PLACE;
+};
+
+export const toFollowerExposed = (
+  follower: HydratedDocument<
+    Omit<IFollowerSchema, "place" | "user" | "subcriber"> & {
+      place?: ObjectId | Ided;
+      user?: ObjectId | Ided;
+      subcriber: ObjectId | Ided;
+    }
+  >,
+  meta?: {
+    place?: IFollowerExposedPlace;
+    user?: IFollowerExposedUser;
+    subcriber?: IFollowerExposedSubcriber;
+  }
+): IFollowerExposed => {
+  const { place, user, subcriber } = meta ?? {};
+  return {
+    _id: follower._id.toString(),
+    createdAt: follower.createdAt,
+    place: place ?? (follower.place && toId(follower.place))!,
+    user: user ?? (follower.user && toId(follower.user))!,
+    subcriber: subcriber ?? (follower.subcriber && toId(follower.subcriber))!,
+    role: follower.role,
+    type: follower.type,
+    updatedAt: follower.updatedAt,
+  }!;
 };

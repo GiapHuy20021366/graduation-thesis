@@ -2,100 +2,24 @@ import { Follower, IPlaceSchema, IUserSchema, User } from "../db/model";
 import {
   FollowRole,
   FollowType,
-  ICoordinates,
-  IPagination,
   IPersonalDataUpdate,
   IUserFollowerExposed,
   IUserSearchParams,
-  Ided,
   InternalError,
   ResourceNotExistedError,
-  IUserCredential,
-  IUserPersonal,
   IUserExposedSimple,
   IUserExposedWithFollower,
   IFollowerSearchParams,
   IFollowerExposed,
-  toIncludeAndExcludeQueryOptions,
-  OrderState,
   IFollowerExposedUser,
   IFollowerExposedPlace,
   IFollowerExposedSubcriber,
+  toUserExposed,
+  toUserExposedSimple,
+  QueryBuilder,
+  IUserExposed,
 } from "../data";
 import { HydratedDocument, ObjectId } from "mongoose";
-
-export interface ISearchedUser
-  extends Ided,
-    Pick<IUserCredential, "email">,
-    Pick<
-      IUserPersonal,
-      "firstName" | "lastName" | "location" | "avatar" | "exposedName"
-    > {}
-
-export const searchUsersAround = async (params: {
-  maxDistance: number;
-  location: ICoordinates;
-  pagination: IPagination;
-}): Promise<ISearchedUser[]> => {
-  const { location, maxDistance, pagination } = params;
-  const users = await User.find({
-    "location.two_array": {
-      $geoWithin: {
-        $centerSphere: [[location.lng, location.lat], maxDistance / 6378.1],
-      },
-    },
-  })
-    .skip(pagination.skip)
-    .limit(pagination.limit)
-    .exec();
-
-  if (users == null) {
-    throw new InternalError({
-      message: "Can not find users in database",
-      data: {
-        target: "database",
-        reason: "unknown",
-      },
-    });
-  }
-  const result: ISearchedUser[] = [];
-  users.forEach((user) => {
-    if (user.location != null && user.location.name) {
-      result.push({
-        _id: user._id.toString(),
-        avatar: user.avatar,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        location: user.location,
-        exposedName: user.exposedName,
-      });
-    }
-  });
-  return result;
-};
-
-export const getBasicUserInfo = async (id: string) => {
-  const user = await User.findById(id);
-  if (user == null) {
-    throw new ResourceNotExistedError({
-      message: `No user with id ${id} found`,
-      data: {
-        target: "user",
-        reason: "no-user-found",
-      },
-    });
-  }
-
-  return {
-    _id: user._id.toString(),
-    avatar: user.avatar,
-    email: user.email,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    location: user.location,
-  };
-};
 
 export const getUser = async (
   id: string,
@@ -120,17 +44,7 @@ export const getUser = async (
       subcriber: sourceId, // does this user follow this user or not
     });
     const result: IUserExposedWithFollower = {
-      _id: user._id.toString(),
-      active: user.active,
-      createdAt: user.createdAt,
-      email: user.email,
-      exposedName: user.exposedName,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      avatar: user.avatar,
-      categories: user.categories,
-      description: user.description,
-      location: user.location,
+      ...toUserExposed(user, { description: true }),
       subcribers: numFollowers,
     };
     if (userFollower) {
@@ -145,59 +59,55 @@ export const getUser = async (
     }
     return result;
   } else {
-    const result: IUserExposedSimple = {
-      _id: user._id.toString(),
-      active: user.active,
-      email: user.email,
-      exposedName: user.exposedName,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      avatar: user.avatar,
-      location: user.location,
-    };
-    return result;
+    return toUserExposedSimple(user);
   }
+};
+
+const toUserSearchBuilder = (params: IUserSearchParams): QueryBuilder => {
+  const { distance, order, pagination, query } = params;
+
+  const builder = new QueryBuilder();
+  builder.pagination(pagination);
+
+  if (query) {
+    const regex = new RegExp(query, "i");
+    builder.value("$or", [
+      { firstName: { $regex: regex } },
+      { lastName: { $regex: regex } },
+    ]);
+  }
+  if (distance != null) {
+    const { current } = distance;
+    builder.value("location.two_array", {
+      $near: {
+        $geometry: {
+          type: "Point",
+          coordinates: [current.lng, current.lat],
+        },
+        $maxDistance:
+          distance.max === Number.MAX_SAFE_INTEGER
+            ? distance.max
+            : distance.max * 1000,
+      },
+    });
+  }
+
+  builder
+    .order("location.two_array", order?.distance)
+    .order("createdAt", order?.time);
+
+  return builder;
 };
 
 export const searchUser = async (
   params: IUserSearchParams
-): Promise<ISearchedUser[]> => {
-  const { distance, order, pagination, query } = params;
+): Promise<IUserExposed[]> => {
+  const buider = toUserSearchBuilder(params);
 
-  const options: any = {};
-  const orderOptions: any = {};
-
-  if (distance) {
-    const { current, max } = distance;
-    options["location.two_array"] = {
-      $geoWithin: {
-        $centerSphere: [[current.lng, current.lat], max / 6378.1],
-      },
-    };
-  }
-
-  if (query) {
-    const regex = new RegExp(query, "i");
-    options.$or = [
-      { firstName: { $regex: regex } },
-      { lastName: { $regex: regex } },
-    ];
-  }
-
-  if (order) {
-    const { distance, time } = order;
-    if (distance) {
-      orderOptions.distance = distance;
-    }
-    if (time) {
-      orderOptions.createdAt = time;
-    }
-  }
-
-  const users = await User.find(options)
-    .sort(orderOptions)
-    .skip(pagination?.skip ?? 0)
-    .limit(pagination?.limit ?? 24);
+  const users = await User.find(buider.options)
+    .sort(buider.sort)
+    .skip(buider.skip)
+    .limit(buider.limit);
 
   if (users == null) {
     throw new InternalError();
@@ -205,17 +115,7 @@ export const searchUser = async (
 
   return users
     .filter((user) => user.location && user.location.name)
-    .map(
-      (user): ISearchedUser => ({
-        _id: user._id.toString(),
-        avatar: user.avatar,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        location: user.location,
-        exposedName: user.exposedName,
-      })
-    );
+    .map((user): IUserExposed => toUserExposed(user));
 };
 
 export const followUser = async (
@@ -277,7 +177,7 @@ export const unFollowUser = async (
 export const updateUserPersonal = async (
   userId: string,
   data: IPersonalDataUpdate
-): Promise<{ success: boolean }> => {
+): Promise<IUserExposedSimple> => {
   const user = await User.findById(userId);
   if (user == null) {
     throw new ResourceNotExistedError({
@@ -342,7 +242,7 @@ export const updateUserPersonal = async (
   }
   user.updatedAt = new Date();
   await user.save();
-  return { success: true };
+  return toUserExposedSimple(user);
 };
 
 const toSubcriber = (
@@ -422,61 +322,21 @@ export const getFollowers = async (
     populate,
   } = params;
 
-  const options: any = {};
-  if (duration != null) {
-    const { from, to } = duration;
-    const createdAtOptions: any = {};
-    if (from != null) {
-      createdAtOptions.$gte = from;
-    }
-    if (to != null) {
-      createdAtOptions.$lte = to;
-    }
-    if (from != null || to != null) {
-      options["createdAt"] = createdAtOptions;
-    }
-  }
+  const builder = new QueryBuilder();
+  builder
+    .pagination(pagination)
+    .minMax("createdAt", {
+      min: duration?.from,
+      max: duration?.to,
+    })
+    .incAndExc("place", place)
+    .incAndExc("subcriber", subcriber)
+    .incAndExc("user", user)
+    .array("role", role)
+    .array("type", type)
+    .order("createdAt", order?.time);
 
-  const placeOptions = toIncludeAndExcludeQueryOptions(place);
-  if (placeOptions != null) {
-    options["place"] = placeOptions;
-  }
-
-  const subcriberOptions = toIncludeAndExcludeQueryOptions(subcriber);
-  if (subcriberOptions != null) {
-    options["subcriber"] = subcriberOptions;
-  }
-
-  const userOptions = toIncludeAndExcludeQueryOptions(user);
-  if (userOptions != null) {
-    options["user"] = userOptions;
-  }
-
-  if (role != null) {
-    if (role.length === 1) {
-      options["role"] = role[0];
-    } else {
-      options["role"] = { $in: role };
-    }
-  }
-
-  if (type != null) {
-    if (type.length === 1) {
-      options["type"] = type[0];
-    } else {
-      options["type"] = { $in: type };
-    }
-  }
-
-  const sort: any = {};
-  if (order != null) {
-    const { time } = order;
-    if (time != null && time !== OrderState.NONE) {
-      sort["createdAt"] = time;
-    }
-  }
-
-  const query = Follower.find(options);
+  const query = Follower.find(builder.options);
   const populates: string[] = [];
   if (populate != null && Object.keys(populate).length > 0) {
     if (populate.place) populates.push("place");
@@ -490,9 +350,9 @@ export const getFollowers = async (
   }
 
   const followers = await query
-    .sort(sort)
-    .skip(pagination?.skip ?? 0)
-    .limit(pagination?.limit ?? 24)
+    .sort(builder.sort)
+    .skip(builder.skip)
+    .limit(builder.limit)
     .exec();
 
   if (followers == null) throw new InternalError();
@@ -516,7 +376,7 @@ export const getFollowers = async (
         type: f.type,
         updatedAt: f.updatedAt,
         user: toUser(populates, user)!,
-        place: toPlace(populates, place)!
+        place: toPlace(populates, place)!,
       };
     });
 };
