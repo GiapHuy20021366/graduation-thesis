@@ -3,39 +3,47 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
-import { Edit, MoreVert, ReportGmailerrorred } from "@mui/icons-material";
-import { ListItemIcon } from "@mui/material";
-import { useNavigate } from "react-router";
-import { IFoodPostExposed } from "../../../data";
-import { applicationPages, useComponentLanguage } from "../../../hooks";
+import {
+  Edit,
+  MoreVert,
+  ReportGmailerrorred,
+  SentimentVeryDissatisfiedOutlined,
+  SentimentVerySatisfiedOutlined,
+  VisibilityOffOutlined,
+  VisibilityOutlined,
+} from "@mui/icons-material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  ListItemIcon,
+} from "@mui/material";
+import {
+  applicationPages,
+  useComponentLanguage,
+  useFoodPostViewerContext,
+} from "../../../hooks";
+import { useState } from "react";
+import StyledLink from "../../common/navigate/StyledLink";
 
-interface IFoodPostButtonWithMenuProps {
-  data?: IFoodPostExposed;
-}
-
-export default function FoodPostButtonWithMenu({
-  data,
-}: IFoodPostButtonWithMenuProps) {
+export default function FoodPostButtonWithMenu() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
+  const viewerContext = useFoodPostViewerContext();
+  const { food, activeFood, resolveFood } = viewerContext;
+  const { active, resolved } = food;
   const lang = useComponentLanguage("FoodPostButtonWithMenu");
-
-  const navigate = useNavigate();
+  const [openConfirmHide, setOpenConfirmHide] = useState<boolean>(false);
+  const [openConfirmResolve, setOpenConfirmResolve] = useState<boolean>(false);
 
   const handleClose = () => {
     setAnchorEl(null);
-  };
-
-  const navigateToEdit = () => {
-    // Close menu
-    handleClose();
-
-    if (data?._id != null) {
-      navigate(applicationPages.FOOD_SHARING, { state: data });
-    }
   };
 
   return (
@@ -89,11 +97,47 @@ export default function FoodPostButtonWithMenu({
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem onClick={navigateToEdit}>
+        <StyledLink to={applicationPages.FOOD_SHARING} state={food}>
+          <MenuItem>
+            <ListItemIcon>
+              <Edit fontSize="small" />
+            </ListItemIcon>
+            {lang("edit")}
+          </MenuItem>
+        </StyledLink>
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            if (active) {
+              setOpenConfirmHide(true);
+            } else {
+              activeFood();
+            }
+          }}
+        >
           <ListItemIcon>
-            <Edit fontSize="small" />
+            {active ? <VisibilityOffOutlined /> : <VisibilityOutlined />}
           </ListItemIcon>
-          {lang("edit")}
+          {lang(active ? "hide" : "unhide")}
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            if (resolved) {
+              setOpenConfirmResolve(true);
+            } else {
+              resolveFood();
+            }
+          }}
+        >
+          <ListItemIcon>
+            {resolved ? (
+              <SentimentVeryDissatisfiedOutlined />
+            ) : (
+              <SentimentVerySatisfiedOutlined />
+            )}
+          </ListItemIcon>
+          {lang(resolved ? "unresolve" : "resolve")}
         </MenuItem>
         <MenuItem onClick={handleClose}>
           <ListItemIcon>
@@ -102,6 +146,62 @@ export default function FoodPostButtonWithMenu({
           {lang("report")}
         </MenuItem>
       </Menu>
+
+      {/* Dialog confirm hide/unhide */}
+      <Dialog
+        open={openConfirmHide}
+        keepMounted
+        onClose={() => setOpenConfirmHide(false)}
+        aria-describedby="dialog-confirm-hide-food"
+      >
+        <DialogTitle>{lang("confirm-hide-title")}</DialogTitle>
+        <DialogContent sx={{ minWidth: "300px" }}>
+          <DialogContentText id="dialog-confirm-hide-food">
+            {lang("confirm-hide-content")}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenConfirmHide(false)}>
+            {lang("cancel")}
+          </Button>
+          <Button
+            onClick={() => {
+              setOpenConfirmHide(false);
+              activeFood();
+            }}
+          >
+            {lang("agree")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog confirm resolve/unresolve */}
+      <Dialog
+        open={openConfirmResolve}
+        keepMounted
+        onClose={() => setOpenConfirmResolve(false)}
+        aria-describedby="dialog-confirm-resolve-food"
+      >
+        <DialogTitle>{lang("confirm-resolve-title")}</DialogTitle>
+        <DialogContent sx={{ minWidth: "300px" }}>
+          <DialogContentText id="dialog-confirm-resolve-food">
+            {lang("confirm-resolve-content")}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenConfirmResolve(false)}>
+            {lang("cancel")}
+          </Button>
+          <Button
+            onClick={() => {
+              setOpenConfirmResolve(false);
+              resolveFood();
+            }}
+          >
+            {lang("agree")}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

@@ -2,7 +2,6 @@ import { History, SearchOutlined, TuneOutlined } from "@mui/icons-material";
 import {
   Autocomplete,
   Box,
-  Button,
   Divider,
   IconButton,
   InputAdornment,
@@ -14,7 +13,6 @@ import {
   Tabs,
   TextField,
   Tooltip,
-  Typography,
 } from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -43,7 +41,9 @@ import {
   foodFetcher,
 } from "../../../api/food";
 import OrderIcon from "../../common/custom/OrderIcon";
-import { useScrollListener } from "../../../hooks/useScrollListenter";
+import ListEnd from "../../common/viewer/data/ListEnd";
+import ErrorRetry from "../../common/viewer/data/ErrorRetry";
+import EmptyList from "../../common/viewer/data/EmptyList";
 
 const SearchTab = {
   RELATED: 0,
@@ -225,7 +225,14 @@ export default function FoodSearchBody() {
 
       setFoods([]);
       foodFetcher
-        .searchFood(params, auth)
+        .searchFood(
+          {
+            ...params,
+            active: true,
+            resolved: false,
+          },
+          auth
+        )
         .then((data) => {
           const datas = data.data;
           if (datas != null) {
@@ -393,7 +400,14 @@ export default function FoodSearchBody() {
     loader.setIsFetching(true);
 
     foodFetcher
-      .searchFood(params, auth)
+      .searchFood(
+        {
+          ...params,
+          active: true,
+          resolved: false,
+        },
+        auth
+      )
       .then((data) => {
         const datas = data.data;
         if (datas != null) {
@@ -620,23 +634,19 @@ export default function FoodSearchBody() {
               />
             );
           })}
-          {loader.isFetching && (
-            <>
-              <FoodItemSkeleton />
-            </>
-          )}
-          {loader.isEnd && !loader.isError && (
-            <Box textAlign={"center"} mt={2}>
-              <Typography>Bạn đã tìm kiếm hết</Typography>
-              <Button onClick={() => doSearchMore()}>Tìm kiếm thêm</Button>
-            </Box>
-          )}
-          {!loader.isFetching && loader.isError && (
-            <Box textAlign={"center"} mt={2}>
-              <Typography>Có lỗi xảy ra</Typography>
-              <Button onClick={() => doSearchMore()}>Thử lại</Button>
-            </Box>
-          )}
+          {loader.isFetching && <FoodItemSkeleton />}
+          <ListEnd
+            active={loader.isEnd && !loader.isError && foods.length > 0}
+            onRetry={doSearchMore}
+          />
+          <ErrorRetry
+            active={!loader.isFetching && loader.isError}
+            onRetry={doSearchMore}
+          />
+          <EmptyList
+            active={!loader.isFetching && !loader.isError && foods.length === 0}
+            onRetry={doSearchMore}
+          />
         </Stack>
       </Stack>
     </Box>

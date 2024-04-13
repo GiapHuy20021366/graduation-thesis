@@ -113,7 +113,7 @@ export default function UserViewerContextProvider({
         subcribers,
         userFollow,
         active: user.active,
-        createdAt: user.createdAt,
+        createdAt: new Date(user.createdAt),
         _id: user._id,
       }}
     >

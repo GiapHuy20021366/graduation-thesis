@@ -8,9 +8,15 @@ interface ITimeExposedProps {
   time?: number | string | Date;
   date?: boolean;
   hour?: boolean;
+  milisecond?: boolean;
 }
 
-export default function TimeExposed({ time, date, hour }: ITimeExposedProps) {
+export default function TimeExposed({
+  time,
+  date,
+  hour,
+  milisecond,
+}: ITimeExposedProps) {
   const timeInfo = toTimeInfo(time ?? new Date());
   return (
     <>
@@ -22,8 +28,8 @@ export default function TimeExposed({ time, date, hour }: ITimeExposedProps) {
       {hour !== false && (
         <>
           {" "}
-          {toPad(timeInfo.hours)}:{toPad(timeInfo.minutes)}:
-          {toPad(timeInfo.seconds)}
+          {toPad(timeInfo.hours)}:{toPad(timeInfo.minutes)}
+          <>{milisecond !== false ? <>:{toPad(timeInfo.seconds)}</> : <></>}</>
         </>
       )}
     </>

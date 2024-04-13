@@ -44,7 +44,7 @@ export interface IFoodPostExposed
   categories: FoodCategory[];
   description?: string;
   quantity: number;
-  duration: string | Date;
+  duration: string;
   price: number;
   isEdited: boolean;
   likeCount: number;

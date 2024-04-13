@@ -16,6 +16,7 @@ import {
   IFoodResolved,
   Ided,
   Timed,
+  Actived,
 } from "../data";
 
 export const foodEndpoints = {
@@ -32,6 +33,7 @@ export const foodEndpoints = {
   favorite: "/foods/favorite/users/:userId",
   registerd: "/foods/register/users/:userId",
   resolveFood: "/foods/:id/resolve",
+  activeFood: "/foods/:id/active",
 } as const;
 
 export interface FoodResponseError
@@ -131,6 +133,12 @@ export interface FoodFetcher {
     auth: IAuthInfo,
     resolveBy?: string
   ): Promise<FoodResponse<Partial<IFoodResolved>>>;
+
+  activeFood(
+    foodId: string,
+    auth: IAuthInfo,
+    active?: boolean
+  ): Promise<FoodResponse<Actived>>;
 }
 
 export const foodFetcher: FoodFetcher = {
@@ -292,6 +300,25 @@ export const foodFetcher: FoodFetcher = {
       foodEndpoints.resolveFood.replace(":id", foodId) +
         "?" +
         params.toString(),
+      {},
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
+  },
+
+  activeFood: (
+    foodId: string,
+    auth: IAuthInfo,
+    active?: boolean
+  ): Promise<FoodResponse<Actived>> => {
+    const params = new URLSearchParams();
+    params.set("active", active ? "true" : "false");
+    return foodInstance.put(
+      foodEndpoints.activeFood.replace(":id", foodId) + "?" + params.toString(),
+      {},
       {
         headers: {
           Authorization: auth.token,

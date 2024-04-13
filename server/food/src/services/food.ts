@@ -1,5 +1,6 @@
 import { HydratedDocument } from "mongoose";
 import {
+  Actived,
   IFoodPostExposed,
   IFoodPostExposedPlace,
   IFoodPostExposedUser,
@@ -501,4 +502,25 @@ export const resolveFood = async (
       resolveTime: now,
     };
   }
+};
+
+export const activeFood = async (
+  userId: string,
+  foodId: string,
+  active: boolean
+): Promise<Actived> => {
+  const food = await FoodPost.findById(foodId);
+  if (food == null) {
+    throw new ResourceNotExistedError();
+  }
+  if (food.user.toString() !== userId) {
+    throw new UnauthorizationError();
+  }
+  if (food.active !== active) {
+    food.active = active;
+    await food.save();
+  }
+  return {
+    active: active,
+  };
 };

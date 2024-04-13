@@ -47,3 +47,4 @@ export {
   type IUseScrollListenrStates,
   useScrollListener,
 } from "./useScrollListenter";
+export { useFoodPostViewerContext } from "./useFoodPostViewerContext";

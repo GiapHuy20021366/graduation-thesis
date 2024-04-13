@@ -7,6 +7,7 @@ export {
   updateFoodPost,
   getLikedFoodPost,
   resolveFood,
+  activeFood,
 } from "./food";
 export { searchHistory } from "./history";
 export { getFavoriteFoods, getRegisteredFoods } from "./personal";

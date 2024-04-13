@@ -1,6 +1,7 @@
 import express, { Express } from "express";
 import { errorHandler, tokenParser } from "../middlewares";
 import {
+  activeFood,
   findFoodPost,
   getLikedFoodPost,
   likeOrUnlikeFoodPost,
@@ -31,6 +32,7 @@ export const initRouter = (app: Express): void => {
   router.get("/register/users/:id", tokenParser, getRegisteredFoods);
   router.get("/favorite/users/:id", tokenParser, getFavoriteFoods);
   router.put("/:id/resolve", tokenParser, resolveFood);
+  router.put("/:id/active", tokenParser, activeFood);
 
   router.use(errorHandler);
   app.use("/foods/", router);

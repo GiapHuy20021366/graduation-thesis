@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import {
-  IPlaceData,
   createNewPlace as createPlaceService,
   updatePlace as updatePlaceService,
   activePlace as activePlaceService,
@@ -20,6 +19,7 @@ import {
   FollowType,
   IFollowerSearchParams,
   IPagination,
+  IPlaceData,
   IPlaceSearchParams,
   InvalidDataError,
   Paginationed,

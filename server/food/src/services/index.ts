@@ -8,6 +8,8 @@ export {
   updateFoodPost,
   getLikedFoods,
   resolveFood,
+  IPostFoodResponse,
+  activeFood,
 } from "./food";
 
 export {

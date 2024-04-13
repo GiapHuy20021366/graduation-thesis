@@ -4,6 +4,7 @@ import React, {
   createContext,
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { userFetcher } from "../api";
@@ -23,6 +24,29 @@ interface IAuthContext {
   updateLocation(location: ILocation): void;
 }
 
+const loadFromLocal = (): {
+  auth: IAuthInfo;
+  account: IAccountExposed;
+} | null => {
+  try {
+    const authValue = localStorage.getItem("auth");
+    const accountValue = localStorage.getItem("account");
+    if (!authValue || !accountValue) return null;
+    const auth = JSON.parse(authValue) as IAuthInfo | undefined;
+    const account = JSON.parse(accountValue) as IAccountExposed | undefined;
+    if (!auth || !account) {
+      return null;
+    }
+    return {
+      auth,
+      account,
+    };
+  } catch (error) {
+    // DO NOTHING
+  }
+  return null;
+};
+
 export const AuthenticationContext = createContext<IAuthContext>({
   setAccount: () => {},
   logout: () => {},
@@ -33,17 +57,22 @@ export const AuthenticationContext = createContext<IAuthContext>({
 export default function AuthContextProvider({
   children,
 }: IAuthContextProviderProps) {
-  const [account, setAccount] = useState<IAccountExposed | undefined>();
-  const [auth, setAuth] = useState<IAuthInfo | undefined>();
+  const local = loadFromLocal();
+  const [account, setAccount] = useState<IAccountExposed | undefined>(
+    local?.account
+  );
+  const [auth, setAuth] = useState<IAuthInfo | undefined>(local?.auth);
+  const timeOutRef = useRef<number | undefined>();
 
   const logout = () => {
     localStorage.removeItem("auth");
     localStorage.removeItem("account");
+    sessionStorage.clear();
     setAccount(undefined);
     setAuth(undefined);
   };
 
-  const setToken = (token?: string, updatedAt?: number): void => {
+  const setToken = useCallback((token?: string, updatedAt?: number): void => {
     updatedAt ??= Date.now();
     if (token == null) {
       setAuth(undefined);
@@ -53,72 +82,60 @@ export default function AuthContextProvider({
         updatedAt,
       });
     }
-    localStorage.setItem(
-      "auth",
-      JSON.stringify({
-        token,
-        updatedAt,
-      })
-    );
-  };
-
-  useEffect(() => {
-    const authValue = localStorage.getItem("auth");
-    const accountValue = localStorage.getItem("account");
-    let account: IAccountExposed | undefined;
-    if (accountValue != null) {
-      try {
-        account = JSON.parse(accountValue) as IAccountExposed | undefined;
-      } catch (error) {
-        // Do nothing
-      }
-    }
-    if (authValue != null) {
-      try {
-        const auth = JSON.parse(authValue) as IAuthInfo;
-        if (auth.updatedAt <= Date.now() - 55 * 60 * 1000) {
-          setAuth(undefined);
-        } else if (
-          auth.updatedAt < Date.now() - 30 * 60 * 1000 ||
-          account == null
-        ) {
-          // RefreshToken
-          userFetcher
-            .refreshToken(auth.token, true)
-            .then((result) => {
-              const account = result.data;
-              if (account && account?.location) {
-                const location = account.location;
-                if (
-                  location.name == null ||
-                  location.coordinates == null ||
-                  location.coordinates.lat == null ||
-                  location.coordinates.lng == null
-                ) {
-                  account.location = undefined;
-                }
-              }
-              setAccount(account);
-              setToken(account?.token);
-            })
-            .catch(() => {
-              setAuth(undefined);
-            });
-        } else {
-          setAuth(auth);
-          setAccount(account);
-        }
-      } catch (error) {
-        setAuth(undefined);
-      }
-    } else {
-      setAuth(undefined);
-    }
   }, []);
 
   useEffect(() => {
+    localStorage.setItem("auth", JSON.stringify(auth));
     localStorage.setItem("account", JSON.stringify(account));
-  }, [account]);
+  }, [account, auth]);
+
+  const refreshToken = useCallback(() => {
+    if (auth?.token == null) {
+      logout();
+      return;
+    }
+    userFetcher
+      .refreshToken(auth.token, true)
+      .then((result) => {
+        const account = result.data;
+        if (account && account?.location) {
+          const location = account.location;
+          if (
+            location.name == null ||
+            location.coordinates == null ||
+            location.coordinates.lat == null ||
+            location.coordinates.lng == null
+          ) {
+            account.location = undefined;
+          }
+        }
+        setAccount(account);
+        setToken(account?.token);
+        localStorage.setItem("account", JSON.stringify(account));
+        localStorage.setAuth("auth", JSON.stringify(auth));
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, [auth, setToken]);
+
+  useEffect(() => {
+    const timeOut = timeOutRef.current;
+    if (timeOut != null) {
+      clearTimeout(timeOut);
+    }
+    if (auth && account) {
+      const delta = Date.now() - auth.updatedAt;
+      if (delta >= 40 * 60 * 1000 && delta <= 59 * 60 * 1000) {
+        refreshToken();
+        timeOutRef.current = setTimeout(() => {
+          refreshToken();
+        }, 40 * 60 * 1000 - auth.updatedAt);
+      } else if (delta > 59 * 60 * 1000) {
+        logout();
+      }
+    }
+  }, [account, auth, refreshToken]);
 
   const updateLocation = useCallback(
     (location: ILocation) => {

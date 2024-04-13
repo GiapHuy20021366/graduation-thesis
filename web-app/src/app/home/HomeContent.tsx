@@ -7,6 +7,7 @@ import LazyLoad from "react-lazy-load";
 import FoodViewerDialog from "../common/viewer/dialog/FoodViewerDialog";
 import PlaceViewerDialog from "../common/viewer/dialog/PlaceViewerDialog";
 import UserViewerDialog from "../common/viewer/dialog/UserViewerDialog";
+import EmptyList from "../common/viewer/data/EmptyList";
 
 type HomeContentProps = StackProps;
 
@@ -86,7 +87,12 @@ const HomeContent = React.forwardRef<HTMLDivElement, HomeContentProps>(
           />
         )}
 
-        <ListEnd active={true} onRetry={() => load()} mt={3} />
+        <ListEnd
+          active={displayedFoods.length !== 0}
+          onRetry={() => load()}
+          mt={3}
+        />
+        <EmptyList active={displayedFoods.length === 0} onRetry={() => load} />
       </Stack>
     );
   }

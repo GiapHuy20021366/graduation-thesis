@@ -7,6 +7,7 @@ import {
   useAppContentContext,
   useAuthContext,
   useConversationContext,
+  useFoodPostViewerContext,
   useI18nContext,
 } from "../../../hooks";
 import { useState } from "react";
@@ -28,9 +29,12 @@ import {
   LocationOnOutlined,
   MapsUgcOutlined,
   ProductionQuantityLimitsOutlined,
+  SentimentVerySatisfiedOutlined,
   Share,
   SocialDistanceOutlined,
   TimelapseOutlined,
+  VisibilityOffOutlined,
+  VisibilityOutlined,
 } from "@mui/icons-material";
 import { foodFetcher } from "../../../api";
 import CountDown from "../../common/util/CountDown";
@@ -38,10 +42,7 @@ import FoodPostButtonWithMenu from "./FoodPostButtonWithMenu";
 import { RichTextReadOnly } from "mui-tiptap";
 import StarterKit from "@tiptap/starter-kit";
 import FoodAvatars from "../../common/viewer/data/FoodAvatars";
-
-interface IFoodPostInfoDataDisplayProps {
-  data: IFoodPostExposedWithLike;
-}
+import TimeExposed from "../../common/custom/TimeExposed";
 
 const toUserId = (post: IFoodPostExposedWithLike): string => {
   const user = post.user;
@@ -63,9 +64,7 @@ const toUserExposedName = (post: IFoodPostExposedWithLike): string => {
   return user.firstName + " " + user.lastName;
 };
 
-export default function FoodPostViewerData({
-  data,
-}: IFoodPostInfoDataDisplayProps) {
+export default function FoodPostViewerData() {
   const i18n = useI18nContext();
   const lang = i18n.of(
     FoodPostViewerData,
@@ -76,6 +75,8 @@ export default function FoodPostViewerData({
   const appContentContext = useAppContentContext();
   const authContext = useAuthContext();
   const conversationContext = useConversationContext();
+  const viewerContext = useFoodPostViewerContext();
+  const { food: data } = viewerContext;
 
   const [liked, setLiked] = useState<boolean>(data.liked ?? false);
   const { user } = data;
@@ -91,6 +92,8 @@ export default function FoodPostViewerData({
 
   const userId = toUserId(data);
   const userExposedName = toUserExposedName(data);
+
+  const { active, resolved, resolveTime } = data;
 
   return (
     <Box width={"100%"}>
@@ -125,9 +128,38 @@ export default function FoodPostViewerData({
         gap={0.5}
         p={1}
       >
-        <Box component={"h3"} textTransform={"capitalize"} sx={{ mb: 2 }}>
-          {data.title || lang("no-title")}
-        </Box>
+        <Stack>
+          <Box component={"h3"} textTransform={"capitalize"} sx={{ mb: 2 }}>
+            {data.title || lang("no-title")}
+          </Box>
+          <Stack direction={"row"} justifyContent={"end"} gap={2}>
+            <Stack direction={"row"} gap={1}>
+              <Tooltip
+                arrow
+                title={lang(active ? "every-one-tooltip" : "only-you-tooltip")}
+              >
+                {!active ? (
+                  <VisibilityOffOutlined color="error" />
+                ) : (
+                  <VisibilityOutlined color="success" />
+                )}
+              </Tooltip>
+              <Typography>{lang(active ? "every-one" : "only-you")}</Typography>
+            </Stack>
+            {resolved && (
+              <>
+                <Stack direction={"row"} gap={1}>
+                  <Tooltip arrow title={lang("resolved-tooltip")}>
+                    <SentimentVerySatisfiedOutlined color="primary" />
+                  </Tooltip>
+                  <Typography>
+                    <TimeExposed time={resolveTime} milisecond={false} />
+                  </Typography>
+                </Stack>
+              </>
+            )}
+          </Stack>
+        </Stack>
         <Stack direction={"row"} justifyContent={"space-between"}>
           <Stack direction={"row"} alignItems={"center"}>
             <TimelapseOutlined
@@ -138,7 +170,7 @@ export default function FoodPostViewerData({
             />
             <CountDown time={data.duration} sx={{ ml: 1 }} />
           </Stack>
-          <FoodPostButtonWithMenu data={data} />
+          <FoodPostButtonWithMenu />
         </Stack>
 
         <Stack direction="row" justifyContent={"space-between"}>

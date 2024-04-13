@@ -233,7 +233,7 @@ export const getLikedFoodPost = (
 };
 
 export const resolveFood = (
-  req: Request<{ id: string }, {}, {}, { resolvedBy?: string }>,
+  req: Request<{ id: string }, {}, {}, { resolveBy?: string }>,
   res: Response,
   next: NextFunction
 ) => {
@@ -242,9 +242,26 @@ export const resolveFood = (
   if (!isObjectId(foodId)) {
     return next(new InvalidDataError());
   }
-  const resolvedBy = req.query.resolvedBy ?? null;
+  const resolveBy = req.query.resolveBy ?? null;
   services
-    .resolveFood(auth._id, foodId, resolvedBy)
+    .resolveFood(auth._id, foodId, resolveBy)
+    .then((data) => res.status(200).json(toResponseSuccessData(data)))
+    .catch(next);
+};
+
+export const activeFood = (
+  req: Request<{ id: string }, {}, {}, { active?: string }>,
+  res: Response,
+  next: NextFunction
+) => {
+  const auth = req.authContext as AuthLike;
+  const foodId = req.params.id;
+  if (!isObjectId(foodId)) {
+    return next(new InvalidDataError());
+  }
+  const active = req.query.active === "false" ? false : true;
+  services
+    .activeFood(auth._id, foodId, active)
     .then((data) => res.status(200).json(toResponseSuccessData(data)))
     .catch(next);
 };

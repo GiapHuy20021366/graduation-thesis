@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SignUp from "./signup/SignUp";
 import SignIn from "./signin/SignIn";
 import IsNotAuthenticated from "./common/auth/IsNotAuthenticated";
-import AppContent from "./AppContent";
 import IsAuthenticated from "./common/auth/IsAuthenticated";
 import PageNotFound from "./common/PageNotFound";
 import Verify from "./verify/Verify";
@@ -10,6 +9,10 @@ import "react-toastify/dist/ReactToastify.css";
 import ConversationContextProvider from "./ConversationContext";
 import NotificationContextProvider from "./body/header/utils/notification/NotificationContext";
 import AppContextProviders from "./AppContextProviders";
+
+import { Suspense, lazy } from "react";
+import AppContentHolder from "./AppContentHolder";
+const AppContent = lazy(() => import("./AppContent"));
 
 function App() {
   return (
@@ -22,7 +25,9 @@ function App() {
               <IsAuthenticated>
                 <ConversationContextProvider>
                   <NotificationContextProvider>
-                    <AppContent />
+                    <Suspense fallback={<AppContentHolder />}>
+                      <AppContent />
+                    </Suspense>
                   </NotificationContextProvider>
                 </ConversationContextProvider>
               </IsAuthenticated>

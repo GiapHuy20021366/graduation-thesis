@@ -5,25 +5,32 @@ import { useEffect, useState } from "react";
 import { foodFetcher } from "../../../api";
 import FoodPostViewerData from "./FoodPostViewerData";
 import FoodPostViewerHolder from "./FoodPostViewerHolder";
-import { IFoodPostExposedWithLike } from "../../../data";
+import { IFoodPostExposed, IFoodPostExposedWithLike } from "../../../data";
+import FoodPostViewerContextProvider from "./FoodPostViewerContext";
+import NoAccess from "../../common/NoAccess";
 
 interface IFoodPostInfoProps {
   id?: string;
 }
 
+const toUserId = (food: IFoodPostExposed): string => {
+  const user = food.user;
+  return typeof user === "string" ? user : user._id;
+};
+
 export default function FoodPostViewerId({ id }: IFoodPostInfoProps) {
   const params = useParams();
   const authContext = useAuthContext();
+  const { auth, account } = authContext;
   const loading = useLoading();
   const [data, setData] = useState<IFoodPostExposedWithLike>();
   const [found, setFound] = useState<boolean>(true);
 
   const fetchingFood = (id: string) => {
-    const auth = authContext.auth;
     if (auth != null) {
       loading.active();
       foodFetcher
-        .findFoodPost(id, auth)
+        .getFoodPost(id, auth)
         .then((data) => {
           setFound(true);
           setData(data.data);
@@ -45,11 +52,18 @@ export default function FoodPostViewerId({ id }: IFoodPostInfoProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const accessable = data && (data.active || toUserId(data) === account?._id);
+
   return (
     <>
       {params.id == null || (params.id === "" && <PageNotFound />)}
       {loading.isActice && <FoodPostViewerHolder />}
-      {data && <FoodPostViewerData data={data} />}
+      {data && accessable && (
+        <FoodPostViewerContextProvider foodPost={data}>
+          <FoodPostViewerData />
+        </FoodPostViewerContextProvider>
+      )}
+      {data && !accessable && <NoAccess />}
       {!found && <PageNotFound />}
     </>
   );

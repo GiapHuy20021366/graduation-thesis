@@ -13,14 +13,7 @@ import {
   toResponseSuccessData,
   toUserSearchParams,
 } from "../data";
-import {
-  searchUser as searchUserService,
-  followUser as followUserService,
-  unFollowUser as unFollowUserService,
-  updateUserPersonal as updateUserPersonalService,
-  getUser as getUserService,
-  getFollowers,
-} from "../services";
+import * as services from "../services";
 
 export const searchUser = async (
   req: Request<{}, {}, IUserSearchParams, {}>,
@@ -29,7 +22,8 @@ export const searchUser = async (
 ) => {
   const params = req.body;
   const paramsToSearch = toUserSearchParams(params);
-  searchUserService(paramsToSearch)
+  services
+    .searchUser(paramsToSearch)
     .then((data) => res.send(toResponseSuccessData(data)))
     .catch(next);
 };
@@ -46,7 +40,8 @@ export const followUser = async (
   const auth = req.authContext as AuthLike;
   const sourceUser = auth._id;
   const action = req.query.action;
-  const service = action === "follow" ? followUserService : unFollowUserService;
+  const service =
+    action === "follow" ? services.followUser : services.unFollowUser;
   service(targetUser, sourceUser)
     .then((data) => res.status(200).json(toResponseSuccessData(data)))
     .catch(next);
@@ -64,7 +59,8 @@ export const getUser = async (
   const auth = req.authContext as AuthLike;
   const sourceUser = auth._id;
   const detail = req.query.detail === "true";
-  getUserService(targetUser, sourceUser, detail)
+  services
+    .getUser(targetUser, sourceUser, detail)
     .then((data) => res.status(200).json(toResponseSuccessData(data)))
     .catch(next);
 };
@@ -85,7 +81,7 @@ export const updateUserPersonal = async (
   }
   const params = req.body;
   const updateParams = toPersonalDataUpdate(params);
-  updateUserPersonalService(targetUser, updateParams)
+  services.updateUserPersonal(targetUser, updateParams)
     .then((data) => res.status(200).json(toResponseSuccessData(data)))
     .catch(next);
 };
@@ -106,7 +102,7 @@ export const getUsersAndPlacesFollowed = async (
       include: targetUser,
     },
   };
-  getFollowers(searchParams)
+  services.getFollowers(searchParams)
     .then((data) => res.status(200).json(toResponseSuccessData(data)))
     .catch(next);
 };
@@ -128,7 +124,7 @@ export const getUserFollowers = async (
       include: targetUser,
     },
   };
-  getFollowers(searchParams)
+  services.getFollowers(searchParams)
     .then((data) => res.status(200).json(toResponseSuccessData(data)))
     .catch(next);
 };
