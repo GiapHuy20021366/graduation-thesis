@@ -7,7 +7,27 @@ import {
   rpcGetRegistersByUserId,
   rpcGetRatedScoresByUserId,
 } from "../services";
-import { RpcAction, RpcRequest, RpcResponse } from "../data";
+import { RabbitMQ } from "./rpc";
+import { RpcRequest } from "./rpc-request-and-response";
+
+export const RpcAction = {
+  USER_RPC_GET_INFO: "rpcGetUserInfo",
+  USER_RPC_GET_USER_BY_ID: "rpcGetUserById",
+  USER_RPC_GET_DICT_USER_BY_LIST_ID: "rpcGetDictUserByListId",
+  USER_RPC_GET_PLACE_BY_ID: "rpcGetPlaceById",
+  USER_RPC_GET_DICT_PLACE_BY_LIST_ID: "rpcGetDictPlaceByListId",
+  USER_RPC_GET_REGISTERS_BY_USER_ID: "rpcGetRegistersByUserId",
+  USER_RPC_GET_RATED_SCORES_BY_USER_ID: "rpcGetRatedScoresByUserId",
+} as const;
+
+export type RpcAction = (typeof RpcAction)[keyof typeof RpcAction];
+
+export const brokerOperations = {
+  mail: {
+    ACTIVE_MANUAL_ACCOUNT: "ACTIVE_MANUAL_ACCOUNT",
+    NEW_ACCOUNT_CREATED: "NEW_ACCOUNT_CREATED",
+  },
+} as const;
 
 export interface IRpcGetInfoPayLoad {
   _id: string;
@@ -41,110 +61,63 @@ export interface IRpcGetRatedScoresPayload {
   userId: string;
 }
 
-export default async function consum(
-  request: RpcRequest
-): Promise<RpcResponse> {
-  const response: RpcResponse = {};
-  switch (request.action) {
-    case RpcAction.USER_RPC_GET_INFO: {
-      const userRequest = request as RpcRequest<IRpcGetInfoPayLoad>;
-      try {
-        response.data = await rpcGetUserInfo(userRequest.payload._id);
-      } catch (error) {
-        response.err = {
-          code: 500,
-          reason: "unknown",
-          target: "unknown",
-        };
-      }
+export const initRpcConsumers = (rabbit: RabbitMQ): void => {
+  rabbit.listenRpc(
+    RpcAction.USER_RPC_GET_INFO,
+    (req: RpcRequest<IRpcGetInfoPayLoad>) => {
+      return rpcGetUserInfo(req.payload._id);
+    }
+  );
 
-      break;
+  rabbit.listenRpc(
+    RpcAction.USER_RPC_GET_USER_BY_ID,
+    (req: RpcRequest<IRpcGetUserByIdPayload>) => {
+      const { _id, select } = req.payload;
+      return rpcGetUserById(_id, select);
     }
-    case RpcAction.USER_RPC_GET_USER_BY_ID: {
-      const userRequest = request as RpcRequest<IRpcGetUserByIdPayload>;
-      try {
-        const { _id, select } = userRequest.payload;
-        response.data = await rpcGetUserById(_id, select);
-      } catch (error) {
-        response.err = {
-          code: 500,
-          reason: "unknown",
-          target: "unknown",
-        };
-      }
-      break;
-    }
-    case RpcAction.USER_RPC_GET_DICT_USER_BY_LIST_ID: {
-      const userRequest = request as RpcRequest<IRpcGetDictUserPayload>;
-      try {
-        const { _ids, select } = userRequest.payload;
-        response.data = await rpcGetDictUserByListId(_ids, select);
-      } catch (error) {
-        response.err = {
-          code: 500,
-          reason: "unknown",
-          target: "unknown",
-        };
-      }
-      break;
-    }
-    case RpcAction.USER_RPC_GET_PLACE_BY_ID: {
-      const userRequest = request as RpcRequest<IRpcGetPlaceByIdPayload>;
-      try {
-        const { _id, select } = userRequest.payload;
-        response.data = await rpcGetPlaceById(_id, select);
-      } catch (error) {
-        response.err = {
-          code: 500,
-          reason: "unknown",
-          target: "unknown",
-        };
-      }
-      break;
-    }
-    case RpcAction.USER_RPC_GET_DICT_PLACE_BY_LIST_ID: {
-      const userRequest = request as RpcRequest<IRpcGetDictPlacePayload>;
-      try {
-        const { _ids, select } = userRequest.payload;
-        response.data = await rpcGetDictPlaceByListId(_ids, select);
-      } catch (error) {
-        response.err = {
-          code: 500,
-          reason: "unknown",
-          target: "unknown",
-        };
-      }
-      break;
-    }
-    case RpcAction.USER_RPC_GET_REGISTERS_BY_USER_ID: {
-      const userRequest = request as RpcRequest<IRpcGetRegistersPayload>;
-      try {
-        const { userId } = userRequest.payload;
-        response.data = await rpcGetRegistersByUserId(userId);
-      } catch (error) {
-        response.err = {
-          code: 500,
-          reason: "unknown",
-          target: "unknown",
-        };
-      }
-      break;
-    }
-    case RpcAction.USER_RPC_GET_RATED_SCORES_BY_USER_ID: {
-      const userRequest = request as RpcRequest<IRpcGetRatedScoresPayload>;
-      try {
-        const { userId } = userRequest.payload;
-        response.data = await rpcGetRatedScoresByUserId(userId);
-      } catch (error) {
-        response.err = {
-          code: 500,
-          reason: "unknown",
-          target: "unknown",
-        };
-      }
-      break;
-    }
-  }
+  );
 
-  return response;
-}
+  rabbit.listenRpc(
+    RpcAction.USER_RPC_GET_DICT_USER_BY_LIST_ID,
+    (req: RpcRequest<IRpcGetDictUserPayload>) => {
+      const { _ids, select } = req.payload;
+      return rpcGetDictUserByListId(_ids, select);
+    }
+  );
+
+  rabbit.listenRpc(
+    RpcAction.USER_RPC_GET_PLACE_BY_ID,
+    (req: RpcRequest<IRpcGetPlaceByIdPayload>) => {
+      const { _id, select } = req.payload;
+      return rpcGetPlaceById(_id, select);
+    }
+  );
+
+  rabbit.listenRpc(
+    RpcAction.USER_RPC_GET_DICT_PLACE_BY_LIST_ID,
+    (req: RpcRequest<IRpcGetDictPlacePayload>) => {
+      const { _ids, select } = req.payload;
+      return rpcGetDictPlaceByListId(_ids, select);
+    }
+  );
+
+  rabbit.listenRpc(
+    RpcAction.USER_RPC_GET_REGISTERS_BY_USER_ID,
+    (req: RpcRequest<IRpcGetRegistersPayload>) => {
+      const { userId } = req.payload;
+      return rpcGetRegistersByUserId(userId);
+    }
+  );
+
+  rabbit.listenRpc(
+    RpcAction.USER_RPC_GET_RATED_SCORES_BY_USER_ID,
+    (req: RpcRequest<IRpcGetRatedScoresPayload>) => {
+      const { userId } = req.payload;
+      return rpcGetRatedScoresByUserId(userId);
+    }
+  );
+};
+
+export const initBrokerConsumners = (_rabbit: RabbitMQ): void => {
+  // Do nothing
+};

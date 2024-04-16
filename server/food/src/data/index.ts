@@ -54,23 +54,6 @@ export {
 } from "./to-error";
 
 export {
-  RpcAction,
-  IRpcGetDictUserPayload,
-  IRpcGetInfoPayLoad,
-  IRpcGetUserByIdPayload,
-  IRpcGetDictPlacePayload,
-  IRpcGetPlaceByIdPayload,
-  IRpcGetRegistersPayload,
-  IRpcGetRatedScoresPayload,
-} from "./rpc-action";
-export { RpcQueueName } from "./rpc-queue-name";
-export { RpcSource } from "./rpc-source";
-export {
-  RpcRequest,
-  RpcResponse,
-  RpcResponseErr,
-} from "./rpc-request-and-response";
-export {
   IFoodSeachOrder,
   IFoodSearchParams,
   IFoodSearchPrice,

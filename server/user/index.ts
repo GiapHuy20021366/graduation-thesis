@@ -5,12 +5,16 @@ import { initRouters } from "./src/route";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { consoleLogger } from "./src/config";
-import { RPCObserver, subscribeMessage } from "./src/broker";
+import { RabbitMQ, initBrokerConsumners, initRpcConsumers } from "./src/broker";
 
 const app: Express = express();
 
 connectDB();
-RPCObserver();
+
+// Init RPC
+const rabbit = RabbitMQ.instance;
+initRpcConsumers(rabbit);
+initBrokerConsumners(rabbit);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -20,10 +24,5 @@ app.use(cors());
 initRouters(app);
 
 app.listen(PORT, () => {
-  consoleLogger.info(`User sevice is Listening to Port ${PORT}`)
+  consoleLogger.info(`User sevice is Listening to Port ${PORT}`);
 });
-
-subscribeMessage().then(() => {
-  consoleLogger.info("[MESSAGE BROKER] start listening messages");
-});
-

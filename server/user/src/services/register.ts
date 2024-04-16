@@ -7,8 +7,7 @@ import {
   toAccountExposed,
 } from "../data";
 import { IUserSchema, User } from "../db/model";
-import { USER_SERVICE } from "../config";
-import { operations, brokerChannel } from "../broker";
+import { RabbitMQ, RpcSource, brokerOperations } from "../broker";
 import {
   generateRandomPassword,
   hashText,
@@ -46,15 +45,16 @@ export const registAccountByManual = async (
     },
     "1h"
   );
-  const message = JSON.stringify({
-    email: info.email,
-    operation: operations.mail.ACTIVE_MANUAL_ACCOUNT,
-    token: token,
-    from: USER_SERVICE,
-  });
 
   // send email to user
-  brokerChannel.toMessageServiceQueue(message);
+  RabbitMQ.instance.publicMessage(
+    RpcSource.MESSAGE,
+    brokerOperations.mail.ACTIVE_MANUAL_ACCOUNT,
+    {
+      email: info.email,
+      token: token,
+    }
+  );
 
   return {
     isSuccessful: true,
@@ -166,13 +166,14 @@ export const registAccountByGoogleCridential = async (
     await user.save();
 
     // send when new account created
-    const message = JSON.stringify({
-      email: email,
-      operation: operations.mail.NEW_ACCOUNT_CREATED,
-      password: genPassword,
-      from: USER_SERVICE,
-    });
-    brokerChannel.toMessageServiceQueue(message);
+    RabbitMQ.instance.publicMessage(
+      RpcSource.MESSAGE,
+      brokerOperations.mail.NEW_ACCOUNT_CREATED,
+      {
+        email: email,
+        password: genPassword,
+      }
+    );
 
     responseUser = user;
   }

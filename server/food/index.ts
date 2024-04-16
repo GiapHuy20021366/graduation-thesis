@@ -5,18 +5,22 @@ import { initRouter } from "./src/route";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { consoleLogger } from "./src/config";
-import { RPCObserver, subscribeMessage } from "./src/broker";
-
+import { RabbitMQ, initBrokerConsumners, initRpcConsumers } from "./src/broker";
 
 const app: Express = express();
 
 connectDB();
-RPCObserver();
+// Init RPC
+const rabbit = RabbitMQ.instance;
+initRpcConsumers(rabbit);
+initBrokerConsumners(rabbit);
 
-app.use(cors({
-  credentials: true,
-  origin: [PROXY_URL]
-}));
+app.use(
+  cors({
+    credentials: true,
+    origin: [PROXY_URL],
+  })
+);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -24,9 +28,5 @@ app.use(bodyParser.urlencoded({ extended: true }));
 initRouter(app);
 
 app.listen(PORT, () => {
-  consoleLogger.info(`Food sevice is Listening to Port ${PORT}`)
-});
-
-subscribeMessage().then(() => {
-  consoleLogger.info("[MESSAGE BROKER] start listening messages");
+  consoleLogger.info(`Food sevice is Listening to Port ${PORT}`);
 });

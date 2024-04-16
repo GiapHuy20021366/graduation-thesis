@@ -1,10 +1,31 @@
-import { MESSAGE_SERVICE } from "../config";
-import { publishMessage } from "./broker";
+export {
+  IBrokerMessage,
+  IRabbitMQOptions,
+  RabbitMQ,
+  TBrokerConsumer,
+  TRpcConsumer,
+} from "./rpc";
 
-export { getChannel } from "./channel";
-export { withQueue, subscribeMessage, publishMessage, operations } from "./broker";
-export { RPCObserver, RPCRequest } from "./rpc";
+export {
+  IRpcGetDictPlacePayload,
+  IRpcGetDictUserPayload,
+  IRpcGetInfoPayLoad,
+  IRpcGetPlaceByIdPayload,
+  IRpcGetRatedScoresPayload,
+  IRpcGetRegistersPayload,
+  IRpcGetUserByIdPayload,
+  RpcAction,
+  initBrokerConsumners,
+  initRpcConsumers,
+  brokerOperations,
+} from "./rpc-consumer";
 
-export const brokerChannel = {
-    toMessageServiceQueue: (message: string) => publishMessage(MESSAGE_SERVICE, message)
-}
+export { RpcQueueName } from "./rpc-queue-name";
+
+export {
+  RpcRequest,
+  RpcResponse,
+  RpcResponseErr,
+} from "./rpc-request-and-response";
+
+export { RpcSource } from "./rpc-source";

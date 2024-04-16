@@ -1,18 +1,17 @@
-import { RPCRequest } from "../broker";
 import {
-  ILocation,
   IRpcGetDictPlacePayload,
   IRpcGetDictUserPayload,
   IRpcGetPlaceByIdPayload,
   IRpcGetRatedScoresPayload,
   IRpcGetRegistersPayload,
   IRpcGetUserByIdPayload,
-  PlaceType,
+  RabbitMQ,
   RpcAction,
   RpcQueueName,
   RpcRequest,
   RpcSource,
-} from "../data";
+} from "../broker";
+import { ILocation, PlaceType } from "../data";
 
 export interface IPlaceIdAndType {
   _id: string;
@@ -44,7 +43,10 @@ export const rpcGetUser = async <T>(
       select: select,
     },
   };
-  const response = await RPCRequest<T>(RpcQueueName.RPC_USER, rpcUserRequest);
+  const response = await RabbitMQ.instance.requestData<T>(
+    RpcQueueName.RPC_USER,
+    rpcUserRequest
+  );
   if (response == null || response.data == null) return null;
   return response.data;
 };
@@ -62,7 +64,10 @@ export const rpcGetPlace = async <T>(
       select: select,
     },
   };
-  const response = await RPCRequest<T>(RpcQueueName.RPC_USER, rpcPlaceRequest);
+  const response = await RabbitMQ.instance.requestData<T>(
+    RpcQueueName.RPC_USER,
+    rpcPlaceRequest
+  );
   if (response == null || response.data == null) return null;
   return response.data;
 };
@@ -80,7 +85,10 @@ export const rpcGetDictPlace = async <T>(
       select: select,
     },
   };
-  const response = await RPCRequest<T>(RpcQueueName.RPC_USER, rpcPlaceRequest);
+  const response = await RabbitMQ.instance.requestData<T>(
+    RpcQueueName.RPC_USER,
+    rpcPlaceRequest
+  );
   if (response == null || response.data == null) return null;
   return response.data;
 };
@@ -98,7 +106,10 @@ export const rpcGetDictUser = async <T>(
       select: select,
     },
   };
-  const response = await RPCRequest<T>(RpcQueueName.RPC_USER, rpcPlaceRequest);
+  const response = await RabbitMQ.instance.requestData<T>(
+    RpcQueueName.RPC_USER,
+    rpcPlaceRequest
+  );
   if (response == null || response.data == null) return null;
   return response.data;
 };
@@ -111,7 +122,10 @@ export const rpcGetRegisters = async <T>(userId: string): Promise<T | null> => {
       userId: userId,
     },
   };
-  const response = await RPCRequest<T>(RpcQueueName.RPC_USER, rpcPlaceRequest);
+  const response = await RabbitMQ.instance.requestData<T>(
+    RpcQueueName.RPC_USER,
+    rpcPlaceRequest
+  );
   if (response == null || response.data == null) return null;
   return response.data;
 };
@@ -126,7 +140,10 @@ export const rpcGetRatedScores = async <T>(
       userId: userId,
     },
   };
-  const response = await RPCRequest<T>(RpcQueueName.RPC_USER, rpcPlaceRequest);
+  const response = await RabbitMQ.instance.requestData<T>(
+    RpcQueueName.RPC_USER,
+    rpcPlaceRequest
+  );
   if (response == null || response.data == null) return null;
   return response.data;
 };
