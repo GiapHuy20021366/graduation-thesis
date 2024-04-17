@@ -48,3 +48,5 @@ export {
   useScrollListener,
 } from "./useScrollListenter";
 export { useFoodPostViewerContext } from "./useFoodPostViewerContext";
+export { type IUseGetUserStates, useGetUser } from "./useGetUser";
+export { type IUseGetPlaceStates, useGetPlace } from "./useGetPlace";

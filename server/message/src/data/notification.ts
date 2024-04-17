@@ -1,4 +1,4 @@
-const NotificationType = {
+export const NotificationType = {
   /**
    * When a or many food near expired (had gone)
    */
@@ -59,7 +59,7 @@ export interface INotification {
   reads: string[];
   type: NotificationType;
 
-  typedFoods: string[]; // for food type
-  typedPlace: string; // for place type
-  typedUser: string; // for user type
+  typedFoods?: string[]; // for food type
+  typedPlace?: string; // for place type
+  typedUser?: string; // for user type
 }

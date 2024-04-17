@@ -18,6 +18,8 @@ export {
   initBrokerConsumners,
   initRpcConsumers,
   brokerOperations,
+  IBrokerNotifyNewFoodPayload,
+  IBrokerNotifyNewFoodPayloadFood,
 } from "./rpc-consumer";
 
 export { RpcQueueName } from "./rpc-queue-name";
@@ -28,4 +30,4 @@ export {
   RpcResponseErr,
 } from "./rpc-request-and-response";
 
-export { RpcSource } from "./rpc-source";
+export { RpcSource, BrokerSource } from "./rpc-source";

@@ -92,7 +92,10 @@ const HomeContent = React.forwardRef<HTMLDivElement, HomeContentProps>(
           onRetry={() => load()}
           mt={3}
         />
-        <EmptyList active={displayedFoods.length === 0} onRetry={() => load} />
+        <EmptyList
+          active={displayedFoods.length === 0}
+          onRetry={() => load()}
+        />
       </Stack>
     );
   }

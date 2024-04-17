@@ -7,7 +7,7 @@ import {
   toAccountExposed,
 } from "../data";
 import { IUserSchema, User } from "../db/model";
-import { RabbitMQ, RpcSource, brokerOperations } from "../broker";
+import { BrokerSource, RabbitMQ, brokerOperations } from "../broker";
 import {
   generateRandomPassword,
   hashText,
@@ -48,7 +48,7 @@ export const registAccountByManual = async (
 
   // send email to user
   RabbitMQ.instance.publicMessage(
-    RpcSource.MESSAGE,
+    BrokerSource.MESSAGE,
     brokerOperations.mail.ACTIVE_MANUAL_ACCOUNT,
     {
       email: info.email,
@@ -167,7 +167,7 @@ export const registAccountByGoogleCridential = async (
 
     // send when new account created
     RabbitMQ.instance.publicMessage(
-      RpcSource.MESSAGE,
+      BrokerSource.MESSAGE,
       brokerOperations.mail.NEW_ACCOUNT_CREATED,
       {
         email: email,

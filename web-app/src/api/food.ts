@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { PROXY_URL, FOOD_PATH } from "../env";
 import {
   ResponseLike,
@@ -50,7 +50,21 @@ export const foodInstance = axios.create({
 
 foodInstance.interceptors.response.use(
   (response) => response.data,
-  (error) => Promise.reject(error?.response?.data?.error)
+  (error: AxiosError) => {
+    const response = error.response;
+    if (typeof response?.data === "object") {
+      const data = response.data as ResponseLike<
+        unknown,
+        ResponseErrorLike<unknown, unknown>
+      >;
+      return Promise.reject(data);
+    }
+    const _error: ResponseErrorLike<unknown, unknown> = {
+      code: response?.status ?? 500,
+      message: "",
+    };
+    return Promise.reject(_error);
+  }
 );
 
 export interface IPostFoodResponse

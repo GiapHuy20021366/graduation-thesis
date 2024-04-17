@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { PROXY_URL, USER_PATH } from "../env";
 import {
   ResponseLike,
@@ -68,10 +68,20 @@ export const userInstance = axios.create({
 
 userInstance.interceptors.response.use(
   (response) => response.data,
-  (error) => {
-    const errInfo = error?.response?.data?.error;
-    if (errInfo != null) return Promise.reject(errInfo);
-    else Promise.reject(error);
+  (error: AxiosError) => {
+    const response = error.response;
+    if (typeof response?.data === "object") {
+      const data = response.data as ResponseLike<
+        unknown,
+        ResponseErrorLike<unknown, unknown>
+      >;
+      return Promise.reject(data);
+    }
+    const _error: ResponseErrorLike<unknown, unknown> = {
+      code: response?.status ?? 500,
+      message: "",
+    };
+    return Promise.reject(_error);
   }
 );
 

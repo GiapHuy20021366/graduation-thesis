@@ -29,6 +29,10 @@ export {
   ICategories,
   IdAndLocationAndCategories,
   rpcGetRatedScores,
+  IRpcGetPlaceSubcribersPayload,
+  IRpcGetUserSubcribersPayload,
+  rpcGetPlaceSubcribers,
+  rpcGetUserSubcribers,
 } from "./rpc";
 
 export {
@@ -39,3 +43,5 @@ export {
 } from "./cached";
 
 export { getRegisteredFoods, getFavoriteFoods } from "./personal";
+
+export { notifySharedFoodToSubcribers } from "./checker";

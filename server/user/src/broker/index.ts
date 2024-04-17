@@ -28,4 +28,4 @@ export {
   RpcResponseErr,
 } from "./rpc-request-and-response";
 
-export { RpcSource } from "./rpc-source";
+export { RpcSource, BrokerSource } from "./rpc-source";

@@ -1,6 +1,8 @@
+import { Ided } from "../data";
 import {
   ManualAccountInfo,
   NewAccountInfo,
+  createNewFoodNotifications,
   sendActiveManualAccount,
   sendNewAccountCreated,
 } from "../services";
@@ -22,6 +24,9 @@ export const brokerOperations = {
   mail: {
     ACTIVE_MANUAL_ACCOUNT: "ACTIVE_MANUAL_ACCOUNT",
     NEW_ACCOUNT_CREATED: "NEW_ACCOUNT_CREATED",
+  },
+  food: {
+    NOTIFY_NEW_FOOD: "NOTIFY_NEW_FOOD",
   },
 } as const;
 
@@ -57,6 +62,15 @@ export interface IRpcGetRatedScoresPayload {
   userId: string;
 }
 
+export interface IBrokerNotifyNewFoodPayloadFood extends Ided {
+  user: string;
+  place?: string;
+}
+export interface IBrokerNotifyNewFoodPayload {
+  food: IBrokerNotifyNewFoodPayloadFood;
+  subcribers: string[];
+}
+
 export const initRpcConsumers = (_rabbit: RabbitMQ): void => {
   // Do nothing
 };
@@ -73,6 +87,14 @@ export const initBrokerConsumners = (rabbit: RabbitMQ): void => {
     brokerOperations.mail.NEW_ACCOUNT_CREATED,
     (msg: IBrokerMessage<NewAccountInfo>) => {
       sendNewAccountCreated(msg.data);
+    }
+  );
+
+  rabbit.listenMessage(
+    brokerOperations.food.NOTIFY_NEW_FOOD,
+    (msg: IBrokerMessage<IBrokerNotifyNewFoodPayload>) => {
+      const { food, subcribers } = msg.data;
+      createNewFoodNotifications(food, subcribers);
     }
   );
 };

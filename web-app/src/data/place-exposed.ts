@@ -20,8 +20,7 @@ export interface IPlaceExposed extends Omit<IPlace, "author"> {
   updatedAt: Date;
 }
 
-export interface IPlaceExposedWithRatingAndFollow
-  extends Omit<IPlaceExposed, "author"> {
+export interface IPlaceExposedWithRatingAndFollow extends IPlaceExposed {
   userRating?: IPlaceRating & Timed;
   userFollow?: IPlaceFollower & Timed;
   subcribers?: number;

@@ -44,6 +44,7 @@ export {
   isNumber,
   isObjectId,
   isString,
+  num,
 } from "./data-validate";
 export { IConversationExposed } from "./conversation-exposed";
 export { IConversationMessageExposed } from "./conversation-message-exposed";
@@ -58,4 +59,7 @@ export {
   Queried,
 } from "./schemad";
 export { INotification, NotificationType } from "./notification";
-export { INotificationExposed } from "./notification-exposed";
+export {
+  INotificationExposed,
+  toNotificationExposed,
+} from "./notification-exposed";

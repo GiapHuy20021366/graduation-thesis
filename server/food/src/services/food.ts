@@ -30,6 +30,7 @@ import {
   rpcGetPlace,
   rpcGetUser,
 } from "./rpc";
+import { notifySharedFoodToSubcribers } from "./checker";
 
 export interface IPostFoodResponse
   extends Pick<
@@ -87,6 +88,9 @@ export const postFood = async (
   });
 
   await foodPost.save();
+
+  // Notify to subcribers
+  notifySharedFoodToSubcribers(foodPost);
 
   return toFoodPostResponse(foodPost);
 };

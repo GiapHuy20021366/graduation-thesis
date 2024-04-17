@@ -1,5 +1,12 @@
 import mongoose from "mongoose";
-import { FollowRole, FollowType, IUserPersonal, Ided } from "../data";
+import {
+  FollowRole,
+  FollowType,
+  IPagination,
+  IUserPersonal,
+  Ided,
+  InternalError,
+} from "../data";
 import { Follower, Place, PlaceRating, User } from "../db/model";
 
 export interface RPCGetUserInfoReturn
@@ -142,7 +149,7 @@ export interface IUserCachedFavoriteScore {
 export const rpcGetRatedScoresByUserId = async (
   userId: string
 ): Promise<IUserCachedFavoriteScore[]> => {
-  const datas =  await PlaceRating.aggregate<{
+  const datas = await PlaceRating.aggregate<{
     _id: string;
     count: number;
   }>([
@@ -178,4 +185,36 @@ export const rpcGetRatedScoresByUserId = async (
   ]).exec();
 
   return datas.map((d) => ({ category: d._id, score: d.count }));
+};
+
+export const rpcGetUserSubcribersByUserId = async (
+  userId: string,
+  pagination: IPagination
+): Promise<string[]> => {
+  const followers = await Follower.find({
+    role: FollowRole.USER,
+    user: userId,
+  })
+    .skip(pagination.skip)
+    .limit(pagination.limit)
+    .exec();
+
+  if (followers == null) throw new InternalError();
+  return followers.map((f) => f.subcriber.toString());
+};
+
+export const rpcGetPlaceSubcribersByPlaceId = async (
+  placeId: string,
+  pagination: IPagination
+): Promise<string[]> => {
+  const followers = await Follower.find({
+    role: FollowRole.PLACE,
+    place: placeId,
+  })
+    .skip(pagination.skip)
+    .limit(pagination.limit)
+    .exec();
+
+  if (followers == null) throw new InternalError();
+  return followers.map((f) => f.subcriber.toString());
 };

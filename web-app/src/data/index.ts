@@ -184,3 +184,10 @@ export {
   type IPlaceSearchParams,
   type IPlaceSearchRating,
 } from "./place-search-params";
+export {
+  type IHookFetchLike,
+  type IHookFetchState,
+  type IHookFetchError,
+  parseError,
+  utilRetry,
+} from "./hook-fetch-like";

@@ -9,7 +9,7 @@ import {
   consoleLogger,
 } from "../config";
 import { RpcRequest, RpcResponse } from "./rpc-request-and-response";
-import { RpcSource } from "./rpc-source";
+import { BrokerSource, RpcSource } from "./rpc-source";
 import { RpcAction } from "./rpc-consumer";
 
 export interface IRabbitMQOptions {
@@ -20,7 +20,7 @@ export interface IRabbitMQOptions {
 }
 
 export interface IBrokerMessage<T> {
-  source: string;
+  source: BrokerSource;
   data: T;
   path: string;
 }
@@ -116,7 +116,7 @@ export class RabbitMQ {
     }
   }
 
-  publicMessage(target: string, path: string, data: object): void {
+  publicMessage(target: BrokerSource, path: string, data: object): void {
     const options = this._options;
     const messageToSend: IBrokerMessage<object> = {
       data: data,

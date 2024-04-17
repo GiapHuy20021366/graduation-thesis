@@ -13,3 +13,5 @@ export {
   newConversationMessage,
   getMessages,
 } from "./conversation";
+
+export { getNotifications, createNewFoodNotifications } from "./notification";

@@ -20,6 +20,8 @@ export {
   rpcGetRegistersByUserId,
   IUserCachedFavoriteScore,
   rpcGetRatedScoresByUserId,
+  rpcGetPlaceSubcribersByPlaceId,
+  rpcGetUserSubcribersByUserId,
 } from "./rpc";
 
 export { setUserLocation } from "./location";

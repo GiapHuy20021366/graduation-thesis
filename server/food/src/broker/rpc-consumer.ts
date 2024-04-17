@@ -8,6 +8,8 @@ export const RpcAction = {
   USER_RPC_GET_DICT_PLACE_BY_LIST_ID: "rpcGetDictPlaceByListId",
   USER_RPC_GET_REGISTERS_BY_USER_ID: "rpcGetRegistersByUserId",
   USER_RPC_GET_RATED_SCORES_BY_USER_ID: "rpcGetRatedScoresByUserId",
+  USER_RPC_GET_PLACE_SUBCRIBERS_BY_PLACE_ID: "rpcGetPlaceSubcribersByPlaceId",
+  USER_RPC_GET_USER_SUBCRIBERS_BY_USER_ID: "rpcGetUserSubcribersByUserId",
 } as const;
 
 export type RpcAction = (typeof RpcAction)[keyof typeof RpcAction];
@@ -16,6 +18,9 @@ export const brokerOperations = {
   mail: {
     ACTIVE_MANUAL_ACCOUNT: "ACTIVE_MANUAL_ACCOUNT",
     NEW_ACCOUNT_CREATED: "NEW_ACCOUNT_CREATED",
+  },
+  food: {
+    NOTIFY_NEW_FOOD: "NOTIFY_NEW_FOOD",
   },
 } as const;
 

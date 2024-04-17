@@ -4,3 +4,5 @@ export {
   getConversationMessages,
   getConversations,
 } from "./conversation";
+
+export { getNotifications } from "./notification";

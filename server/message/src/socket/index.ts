@@ -6,9 +6,11 @@ import {
   sendMessageToConversation,
 } from "./conversation";
 import { verifyToken } from "../utils";
-import { AuthLike, IConversationMessage, INotificationExposed } from "../data";
+import { AuthLike, IConversationMessage, toNotificationExposed } from "../data";
 import { consoleLogger } from "../config";
 import { readNotifications, sendNotification } from "./notification";
+import { HydratedDocument } from "mongoose";
+import { INotificationSchema } from "../db/model";
 
 const socketOnKey = {
   CONVERSATION_JOIN: "conversation-join",
@@ -134,12 +136,12 @@ export const initSocketServer = (server: any) => {
 
 export const sendNotificationToUsers = (
   users: string[],
-  notification: INotificationExposed
+  notification: HydratedDocument<INotificationSchema>
 ) => {
   users.forEach((user) => {
     const sockets = userIdToSockets[user];
     if (sockets) {
-      sendNotification(sockets, notification);
+      sendNotification(sockets, toNotificationExposed(notification, user));
     }
   });
 };

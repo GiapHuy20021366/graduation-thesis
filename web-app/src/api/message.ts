@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { PROXY_URL, MESSAGE_PATH } from "../env";
 import {
   IAuthInfo,
@@ -37,10 +37,20 @@ export const messageInstance = axios.create({
 
 messageInstance.interceptors.response.use(
   (response) => response.data,
-  (error) => {
-    const errInfo = error?.response?.data?.error;
-    if (errInfo != null) return Promise.reject(errInfo);
-    else Promise.reject(error);
+  (error: AxiosError) => {
+    const response = error.response;
+    if (typeof response?.data === "object") {
+      const data = response.data as ResponseLike<
+        unknown,
+        ResponseErrorLike<unknown, unknown>
+      >;
+      return Promise.reject(data);
+    }
+    const _error: ResponseErrorLike<unknown, unknown> = {
+      code: response?.status ?? 500,
+      message: "",
+    };
+    return Promise.reject(_error);
   }
 );
 
@@ -68,7 +78,8 @@ export interface MessageFetcher {
   ) => Promise<MessageResponse<IConversationExposed>>;
 
   getNotifications: (
-    latestTime: number,
+    from: number,
+    to: number,
     limit: number,
     auth: IAuthInfo
   ) => Promise<MessageResponse<INotificationExposed[]>>;
@@ -137,11 +148,30 @@ export const messageFetcher: MessageFetcher = {
   },
 
   getNotifications: (
-    before: number,
-    limit: number,
+    from: number | null,
+    to: number | null,
+    limit: number | null,
     auth: IAuthInfo
   ): Promise<MessageResponse<INotificationExposed[]>> => {
-    console.log(before, limit, auth);
+    console.log(from, to, limit, auth);
+    // const params = new URLSearchParams();
+    // if (from) {
+    //   params.set("from", String(from));
+    // }
+    // if (to) {
+    //   params.set("to", String(to));
+    // }
+    // if (limit) {
+    //   params.set("limit", String(limit));
+    // }
+    // return messageInstance.get(
+    //   messageEndpoints.getNotifications + "?" + params.toString(),
+    //   {
+    //     headers: {
+    //       Authorization: auth.token,
+    //     },
+    //   }
+    // );
     return Promise.resolve({
       data: fakeNotification(),
     });
@@ -170,8 +200,8 @@ const fakeNotification = (): INotificationExposed[] => {
       result.push({
         user: "123",
         _id: String(Date.now() + ++idx),
-        createdAt: new Date(time),
-        updatedAt: new Date(time),
+        createdAt: new Date(time).toISOString(),
+        updatedAt: new Date(time).toISOString(),
         read: false,
         type: type,
         typedFoods: ["1", "2", "3"],

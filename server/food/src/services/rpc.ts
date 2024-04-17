@@ -11,7 +11,7 @@ import {
   RpcRequest,
   RpcSource,
 } from "../broker";
-import { ILocation, PlaceType } from "../data";
+import { ILocation, IPagination, PlaceType } from "../data";
 
 export interface IPlaceIdAndType {
   _id: string;
@@ -28,6 +28,16 @@ export interface ICategories {
 
 export interface IdAndLocationAndCategories extends Id, ICategories {
   location?: ILocation;
+}
+
+export interface IRpcGetPlaceSubcribersPayload {
+  placeId: string;
+  pagination: IPagination;
+}
+
+export interface IRpcGetUserSubcribersPayload {
+  userId: string;
+  pagination: IPagination;
 }
 
 export const rpcGetUser = async <T>(
@@ -143,6 +153,46 @@ export const rpcGetRatedScores = async <T>(
   const response = await RabbitMQ.instance.requestData<T>(
     RpcQueueName.RPC_USER,
     rpcPlaceRequest
+  );
+  if (response == null || response.data == null) return null;
+  return response.data;
+};
+
+export const rpcGetUserSubcribers = async (
+  userId: string,
+  pagination: IPagination
+): Promise<string[] | null> => {
+  const request: RpcRequest<IRpcGetUserSubcribersPayload> = {
+    action: RpcAction.USER_RPC_GET_USER_SUBCRIBERS_BY_USER_ID,
+    source: RpcSource.FOOD,
+    payload: {
+      userId,
+      pagination,
+    },
+  };
+  const response = await RabbitMQ.instance.requestData<string[]>(
+    RpcQueueName.RPC_USER,
+    request
+  );
+  if (response == null || response.data == null) return null;
+  return response.data;
+};
+
+export const rpcGetPlaceSubcribers = async (
+  placeId: string,
+  pagination: IPagination
+): Promise<string[] | null> => {
+  const request: RpcRequest<IRpcGetPlaceSubcribersPayload> = {
+    action: RpcAction.USER_RPC_GET_PLACE_SUBCRIBERS_BY_PLACE_ID,
+    source: RpcSource.FOOD,
+    payload: {
+      placeId,
+      pagination,
+    },
+  };
+  const response = await RabbitMQ.instance.requestData<string[]>(
+    RpcQueueName.RPC_USER,
+    request
   );
   if (response == null || response.data == null) return null;
   return response.data;
