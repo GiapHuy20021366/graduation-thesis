@@ -40,6 +40,7 @@ const genUserFood = (name: string, user: IUserSchema): IFoodSchema => {
     quantity: randInt(2, 5),
     title: name,
     user: user._id.$oid,
+    resolved: false,
   };
 };
 
@@ -74,6 +75,7 @@ const genPlaceFood = (name: string, place: IPlaceSchema): IFoodSchema => {
       _id: place._id.$oid,
       type: place.type,
     },
+    resolved: false,
   };
 };
 

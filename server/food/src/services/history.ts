@@ -57,6 +57,7 @@ export const searchHistory = async (
                 $in: users,
               }
             : undefined,
+        "params.query": { $ne: "" },
         $text: { $search: query ?? "" },
       },
     },

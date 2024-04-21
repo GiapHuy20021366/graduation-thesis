@@ -184,8 +184,8 @@ export default function FoodSearchBody() {
 
   useEffect(() => {
     const params: IFoodSearchHistoryParams = {};
-    if (query && query.trim() === "" && authContext.account != null) {
-      params["users"] = [authContext.account._id];
+    if (authContext.account != null) {
+      params.users = [authContext.account._id];
     }
     if (query && query.trim() !== "") {
       params["query"] = query.trim();

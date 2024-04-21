@@ -124,6 +124,9 @@ export interface IFoodSchema
     _id: string;
     type: number;
   };
+  resolved: boolean;
+  resolveTime?: Dated,
+  resolveBy?: string;
 }
 
 export interface IFollowerSchema extends Ided, Timed {
