@@ -91,7 +91,7 @@ export const updatePlace = async (
   // update !!!
   place.categories = newData.categories;
   place.description = newData.description ?? "";
-  place.exposeName = newData.exposeName;
+  place.exposedName = newData.exposedName;
   place.images = newData.images;
   place.location = newData.location;
   place.type = newData.type;

@@ -22,8 +22,8 @@ const toAuthorName = (food: IFoodPostExposed): string => {
 
 const toPlaceName = (food: IFoodPostExposed): string => {
   const place = food.place;
-  if (place && typeof place === "object" && place.exposeName) {
-    return place.exposeName;
+  if (place && typeof place === "object" && place.exposedName) {
+    return place.exposedName;
   }
   return "SYSTEM_PLACE";
 };

@@ -27,7 +27,7 @@ const PlaceavatarAndImages = React.forwardRef<
   PlaceavatarAndImagesProps
 >((props, ref) => {
   const editContext = usePlaceEditContext();
-  const { images, setImages, avatar, setavatar, exposeName } = editContext;
+  const { images, setImages, avatar, setavatar, exposedName } = editContext;
   const [index, setIndex] = useState<number>(0);
   const lang = useComponentLanguage();
 
@@ -242,7 +242,7 @@ const PlaceavatarAndImages = React.forwardRef<
           H
         </Avatar>
         <Typography sx={{ fontWeight: 500, fontSize: "1.3rem", mt: 2 }}>
-          {exposeName ? exposeName : lang("input-your-place-name")}
+          {exposedName ? exposedName : lang("input-your-place-name")}
         </Typography>
       </Stack>
     </Box>

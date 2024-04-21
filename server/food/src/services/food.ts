@@ -171,7 +171,7 @@ export const findFoodPostById = async (
     ),
     rpcGetPlace<IFoodPostExposedPlace>(
       foodPost.place?._id,
-      "_id exposeName avatar type location"
+      "_id exposedName avatar type location"
     ),
   ]);
 
@@ -356,7 +356,7 @@ export const searchFood = async (
     ),
     rpcGetDictPlace<Record<string, IFoodPostExposedPlace>>(
       places,
-      "_id exposeName avatar type location"
+      "_id exposedName avatar type location"
     ),
   ]);
 

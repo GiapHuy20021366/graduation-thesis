@@ -38,7 +38,7 @@ export const toPlaceExposed = (
     author: meta?.author ?? toId(author),
     categories: place.categories,
     createdAt: place.createdAt,
-    exposeName: place.exposeName,
+    exposedName: place.exposedName,
     images: place.images,
     location: place.location,
     rating: place.rating,

@@ -45,7 +45,7 @@ const validatePlaceData = (value?: IPlaceData) => {
       message: "Invalid place data",
     });
   }
-  throwErrorIfInvalidFormat("expose-name", value.exposeName, isNotEmptyString);
+  throwErrorIfInvalidFormat("expose-name", value.exposedName, isNotEmptyString);
   throwErrorIfInvalidFormat("description", value.description, isString);
   throwErrorIfInvalidFormat(
     "categories",

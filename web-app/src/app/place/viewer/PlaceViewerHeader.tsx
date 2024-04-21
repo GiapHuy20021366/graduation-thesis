@@ -27,7 +27,7 @@ const PlaceViewerHeader = React.forwardRef<
   PlaceViewerHeaderProps
 >((props, ref) => {
   const { place, ...rest } = props;
-  const { images, exposeName } = place;
+  const { images, exposedName } = place;
   const lang = useComponentLanguage();
 
   const [subribedCount, setSubcribedCount] = useState<number>(
@@ -81,11 +81,11 @@ const PlaceViewerHeader = React.forwardRef<
           }}
           src={place.avatar}
         >
-          {place.exposeName.charAt(0)}
+          {place.exposedName.charAt(0)}
         </Avatar>
         <Stack gap={1} flex={1}>
           <Typography sx={{ fontWeight: 500, fontSize: "1.3rem", mt: 2 }}>
-            {exposeName}
+            {exposedName}
           </Typography>
 
           <PlaceViewerExposedType placeType={place.type} />

@@ -298,7 +298,7 @@ const toPlace = (
     author: place.author.toString(),
     categories: place.categories,
     createdAt: place.createdAt,
-    exposeName: place.exposeName,
+    exposedName: place.exposedName,
     images: place.images,
     location: place.location,
     rating: place.rating,

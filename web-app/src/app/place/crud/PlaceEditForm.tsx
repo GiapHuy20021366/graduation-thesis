@@ -18,7 +18,7 @@ export default function PlaceEditForm() {
   const i18nContext = useI18nContext();
   const lang = i18nContext.of("PlaceEditForm");
   const editContext = usePlaceEditContext();
-  const { exposeName, setExposeName, type, setType, isEditable, location } =
+  const { exposedName, setExposeName, type, setType, isEditable, location } =
     editContext;
 
   const toastContext = useToastContext();
@@ -31,7 +31,7 @@ export default function PlaceEditForm() {
   const handleCreatePlace = () => {
     if (auth == null) return;
 
-    if (exposeName === "") {
+    if (exposedName === "") {
       toastContext.error(lang("please-input-place-name"));
       return;
     }
@@ -41,7 +41,7 @@ export default function PlaceEditForm() {
     }
     const datas: IPlaceData = {
       categories: editContext.categories,
-      exposeName: editContext.exposeName,
+      exposedName: editContext.exposedName,
       images: editContext.images,
       location: location,
       type: editContext.type,
@@ -81,7 +81,7 @@ export default function PlaceEditForm() {
         label={lang("l-expose-name")}
         type="text"
         variant="standard"
-        value={exposeName}
+        value={exposedName}
         placeholder={lang("expose-name-placeholder")}
         onChange={(event) => setExposeName(event.target.value)}
         spellCheck={"false"}

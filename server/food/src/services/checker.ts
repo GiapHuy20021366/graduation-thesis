@@ -1,11 +1,9 @@
-// Notify food to subcribed users and places
-
 import { HydratedDocument } from "mongoose";
 import { toFoodPostExposed } from "../data";
 import { IFoodPostSchema } from "../db/model";
-import { consoleLogger } from "~/config";
+import { consoleLogger } from "../config";
 import { rpcGetPlaceSubcribers, rpcGetUserSubcribers } from "./rpc";
-import { BrokerSource, RabbitMQ, brokerOperations } from "~/broker";
+import { BrokerSource, RabbitMQ, brokerOperations } from "../broker";
 
 const CHUNK_SIZE = 100;
 

@@ -121,7 +121,7 @@ const FoodPlacePicker = React.forwardRef<HTMLDivElement, FoodPlacePickerProps>(
           {places.map((place) => {
             return (
               <MenuItem value={place._id} key={place._id}>
-                {place.exposeName}
+                {place.exposedName}
               </MenuItem>
             );
           })}

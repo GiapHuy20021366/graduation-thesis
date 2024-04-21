@@ -12,7 +12,7 @@ interface IPlaceMethods {}
 interface IPlaceModel extends Model<IPlaceSchema, {}, IPlaceMethods> {}
 
 const placeSchema = new Schema<IPlaceSchema, IPlaceModel, IPlaceMethods>({
-  exposeName: {
+  exposedName: {
     type: String,
     required: true,
     index: "text",

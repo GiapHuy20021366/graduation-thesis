@@ -24,13 +24,13 @@ export default function InfoWindowPlace({
     <Stack gap={1}>
       <Stack direction={"row"} gap={1} alignItems={"center"}>
         <Avatar
-          alt={place.exposeName}
+          alt={place.exposedName}
           sx={{ bgcolor: deepOrange[500], cursor: "pointer" }}
           src={place.avatar}
         >
-          {place.exposeName[0]}
+          {place.exposedName[0]}
         </Avatar>
-        <Typography>{place.exposeName}</Typography>
+        <Typography>{place.exposedName}</Typography>
       </Stack>
       <Divider />
       <Stack gap={1} direction={"row"}>

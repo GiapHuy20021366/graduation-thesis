@@ -51,7 +51,7 @@ const PlaceListItemMine = React.forwardRef<
             }}
             src={data.avatar}
           >
-            {data.exposeName[0]}
+            {data.exposedName[0]}
           </Avatar>
         </StyledLink>
       </Box>
@@ -63,7 +63,7 @@ const PlaceListItemMine = React.forwardRef<
           }
         >
           <Typography sx={{ fontWeight: 500, fontSize: "1.3rem", mt: 2 }}>
-            {data.exposeName}
+            {data.exposedName}
           </Typography>
         </StyledLink>
 

@@ -8,7 +8,7 @@ import { ILocation } from "./location";
 import { PlaceType } from "./place-type";
 
 export interface IPlace {
-  exposeName: string;
+  exposedName: string;
   description?: string;
   categories: string[];
   location: ILocation;
@@ -22,7 +22,7 @@ export interface IPlaceData extends Omit<IPlace, "author"> {}
 
 export const toPlace = (value: any): IPlace | undefined => {
   if (typeof value !== "object") return;
-  if (!isString(value.exposeName) || isEmptyString(value.exposeName)) return;
+  if (!isString(value.exposedName) || isEmptyString(value.exposedName)) return;
   if (value.description != null && !isString(value.description)) return;
   if (value.categories != null && !isAllNotEmptyString(value.categories))
     return;
@@ -35,7 +35,7 @@ export const toPlace = (value: any): IPlace | undefined => {
   if (value.images != null && !isAllNotEmptyString(value.images)) return;
 
   const result: IPlace = {
-    exposeName: value.exposeName as string,
+    exposedName: value.exposedName as string,
     description: value.description ?? "",
     categories: value.categories ?? [],
     location: value.location as ILocation, // require,

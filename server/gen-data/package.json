@@ -1,0 +1,24 @@
+{
+  "name": "gen-data",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "gen-users": "npx tsc src/gen-user.ts && node src/gen-user.js",
+    "gen-places": "npx tsc src/gen-place.ts && node src/gen-place.js",
+    "gen-foods": "npx tsc src/gen-food.ts && node src/gen-food.js",
+    "gen-followers": "npx tsc src/gen-follower.ts && node src/gen-follower.js",
+    "gen-ratings": "npx tsc src/gen-place-rating.ts && node src/gen-place-rating.js",
+    "gen-loves": "npx tsc src/gen-food-love.ts && node src/gen-food-love.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "mongodb": "^6.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.7",
+    "typescript": "^5.2.2"
+  }
+}

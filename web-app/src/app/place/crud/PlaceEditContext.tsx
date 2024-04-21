@@ -12,7 +12,7 @@ import {
 } from "../../../data";
 
 interface IPlaceEditContext {
-  exposeName: string;
+  exposedName: string;
   description?: string;
   categories: FoodCategory[];
   location?: ILocation;
@@ -33,7 +33,7 @@ interface IPlaceEditContext {
 
 const defaultPlaceEditContext: IPlaceEditContext = {
   categories: [],
-  exposeName: "",
+  exposedName: "",
   images: [],
   type: PlaceType.VOLUNTEER,
 
@@ -61,7 +61,7 @@ export default function PlaceEditContextProvider({
 }: IPlaceEditContextProviderProps) {
   const dataToEdit = preData ?? defaultPlaceEditContext;
 
-  const [exposeName, setExposeName] = useState<string>(dataToEdit.exposeName);
+  const [exposedName, setExposeName] = useState<string>(dataToEdit.exposedName);
   const [description, setDescription] = useState<string | undefined>(
     dataToEdit.description ?? ""
   );
@@ -82,7 +82,7 @@ export default function PlaceEditContextProvider({
     <PlaceEditContext.Provider
       value={{
         categories,
-        exposeName,
+        exposedName,
         images,
         location,
         type,

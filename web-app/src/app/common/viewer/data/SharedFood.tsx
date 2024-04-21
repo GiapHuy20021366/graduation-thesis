@@ -29,7 +29,7 @@ const toExposedPlace = (data: IFoodPostExposed): string | undefined => {
     if (typeof place === "string") {
       return undefined;
     } else {
-      return place.exposeName;
+      return place.exposedName;
     }
   }
 };

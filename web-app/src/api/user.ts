@@ -109,7 +109,7 @@ export interface IGetUserNearParams extends Paginationed {
 }
 
 export interface IPlaceData {
-  exposeName: string;
+  exposedName: string;
   description?: string;
   categories: string[];
   location: ILocation;
