@@ -6,10 +6,11 @@ import {
   ICoordinates,
   IUserSearchParams,
   OrderState,
+  IPlaceSearchParams,
 } from "../data";
 import { useAuthContext } from "./useAuthContext";
 import { IUseLoaderStates, useLoader } from "./useLoader";
-import { userFetcher, IPlaceSearchParams } from "../api";
+import { userFetcher } from "../api";
 
 interface ILoadCallbackFns {
   onSuccess?: (datas: (IUserExposedSimple | IPlaceExposed)[]) => void;
@@ -175,8 +176,10 @@ export const useLoadUsersAndPlacesAround = (
     if (auth == null) return Promise.reject();
 
     const params: IPlaceSearchParams = {
-      maxDistance: maxDistance,
-      currentLocation: current,
+      distance: {
+        current: current,
+        max: maxDistance,
+      },
       pagination: {
         skip: 0,
         limit: limit,

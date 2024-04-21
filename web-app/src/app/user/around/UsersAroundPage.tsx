@@ -10,6 +10,7 @@ import {
   ICoordinates,
   ILocation,
   IPlaceExposed,
+  IPlaceSearchParams,
   IUserExposedSimple,
   IUserSearchParams,
   OrderState,
@@ -42,13 +43,13 @@ import {
 } from "@mui/icons-material";
 import {
   useAuthContext,
+  useComponentLanguage,
   useDistanceCalculation,
-  useI18nContext,
   useLoader,
 } from "../../../hooks";
 import ToggleChipGroup from "../../common/custom/ToggleChipGroup";
 import ToggleChip from "../../common/custom/ToggleChip";
-import { IPlaceSearchParams, userFetcher } from "../../../api";
+import { userFetcher } from "../../../api";
 import InfoWindowUser from "./InfoWindowUser";
 import TogglePurpleChip from "../../common/custom/TogglePurpleChip";
 import InfoWindowPlace from "./InfoWindowPlace";
@@ -85,10 +86,8 @@ export default function UsersAroundPage() {
   const [markets, setMarkets] = useState<IPlaceExposed[]>([]);
   const [volunteers, setVolunteers] = useState<IPlaceExposed[]>([]);
 
-  const [distance, setDistance] = useState<number>(0.5);
+  const [distance, setDistance] = useState<number>(2);
   const [infoOpen, setInfoOpen] = useState<boolean>(false);
-  const i8nContext = useI18nContext();
-  const lang = i8nContext.of(UsersAroundPage);
   const mapRef = useRef<google.maps.Map>();
   const authContext = useAuthContext();
   const { auth, account } = authContext;
@@ -100,6 +99,8 @@ export default function UsersAroundPage() {
 
   const loader = useLoader();
   const dirtyRef = useRef<boolean>(true);
+
+  const lang = useComponentLanguage("UsersAroundPage");
 
   const doSaveStorage = () => {
     const map = mapRef.current;
@@ -226,8 +227,10 @@ export default function UsersAroundPage() {
       };
 
       const params: IPlaceSearchParams = {
-        maxDistance: maxDistance,
-        currentLocation: current,
+        distance: {
+          current: current,
+          max: maxDistance,
+        },
         pagination: {
           skip: 0,
           limit: 50,
@@ -480,8 +483,8 @@ export default function UsersAroundPage() {
             >
               {infoOpen && (
                 <InfoWindowF position={center} onCloseClick={handleOpenInfo}>
-                  <Box>
-                    <span>Vị trí hiện tại của bạn</span>
+                  <Box color={"black"}>
+                    <span>{lang("your-current-location")}</span>
                   </Box>
                 </InfoWindowF>
               )}
@@ -676,8 +679,8 @@ export default function UsersAroundPage() {
                 position={home.coordinates}
               >
                 <InfoWindowF position={home.coordinates}>
-                  <Box sx={{ width: 200 }}>
-                    <span>Nhà của bạn</span>
+                  <Box sx={{ width: 200 }} color={"black"}>
+                    <span>{lang("your-home")}</span>
                   </Box>
                 </InfoWindowF>
               </MarkerF>
@@ -694,40 +697,28 @@ export default function UsersAroundPage() {
       >
         <Stack direction={"column"} gap={1} alignItems={"center"} my={1}>
           <Chip
-            label={"Locate Me"}
+            label={lang("l-locate-me")}
             sx={{
-              backgroundColor: "purple",
               width: "fit-content",
               px: 5,
               fontWeight: 600,
               fontSize: "1.3rem",
-              color: "white",
-              cursor: "pointer",
-              ":hover": {
-                backgroundColor: "white",
-                color: "black",
-              },
             }}
+            color="primary"
             onClick={handleLocateMe}
             icon={<CenterFocusStrongOutlined color="inherit" />}
           />
           <Chip
-            label={"Load this area"}
+            label={lang("l-load-this-area")}
             onClick={doLoadArea}
             sx={{
-              backgroundColor: "purple",
               width: "fit-content",
               px: 5,
               fontWeight: 600,
               fontSize: "1.3rem",
-              color: "white",
-              cursor: "pointer",
-              ":hover": {
-                backgroundColor: "white",
-                color: "black",
-              },
               display: !loadActive ? "none" : "block",
             }}
+            color="primary"
           />
         </Stack>
         <Accordion>
@@ -743,8 +734,7 @@ export default function UsersAroundPage() {
                 icon={<SocialDistance />}
                 label={distance + " km"}
                 sx={{
-                  backgroundColor: "white",
-                  color: "black",
+                  color: "inherit",
                   fontSize: "1.2rem",
                 }}
               />

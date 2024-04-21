@@ -1,10 +1,10 @@
 import { Avatar, Button, Divider, Stack, Typography } from "@mui/material";
 import { toDistance } from "../../../data";
 import { deepOrange } from "@mui/material/colors";
-import { useNavigate } from "react-router";
-import { useAppContentContext } from "../../../hooks";
+import { useAppContentContext, useComponentLanguage } from "../../../hooks";
 import { LocalOfferOutlined, LocationOnOutlined } from "@mui/icons-material";
 import { IUserExposedSimple } from "../../../data/user-exposed";
+import StyledLink from "../../common/navigate/StyledLink";
 
 interface IInfoWindowUser {
   user: IUserExposedSimple;
@@ -15,15 +15,11 @@ export default function InfoWindowUser({
   user,
   onBeforeNavigate,
 }: IInfoWindowUser) {
-  const navigate = useNavigate();
   const appContentContext = useAppContentContext();
+  const lang = useComponentLanguage();
 
-  const onNavigate = () => {
-    onBeforeNavigate && onBeforeNavigate();
-    navigate(`/profile/${user._id}`);
-  };
   return (
-    <Stack gap={1}>
+    <Stack gap={1} color={"black"}>
       <Stack direction={"row"} gap={1} alignItems={"center"}>
         <Avatar
           alt={user.firstName + " " + user.lastName}
@@ -42,7 +38,7 @@ export default function InfoWindowUser({
             ? toDistance(
                 user.location.coordinates,
                 appContentContext.currentLocation
-              )
+              ).toFixed(1)
             : 0}{" "}
           kms
         </Typography>
@@ -52,13 +48,14 @@ export default function InfoWindowUser({
         <Typography>{user.location?.name}</Typography>
       </Stack>
       <Divider />
-      <Button
-        variant="outlined"
-        sx={{ textTransform: "initial" }}
-        onClick={() => onNavigate()}
+      <StyledLink
+        to={`/profile/${user._id}`}
+        onBeforeNavigate={onBeforeNavigate}
       >
-        Go to view this user
-      </Button>
+        <Button variant="outlined" sx={{ textTransform: "initial" }} fullWidth>
+          {lang("go-to-view-this-user")}
+        </Button>
+      </StyledLink>
     </Stack>
   );
 }

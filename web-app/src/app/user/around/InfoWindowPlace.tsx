@@ -1,9 +1,9 @@
 import { Avatar, Button, Divider, Stack, Typography } from "@mui/material";
 import { IPlaceExposed, toDistance } from "../../../data";
 import { deepOrange } from "@mui/material/colors";
-import { useNavigate } from "react-router";
-import { useAppContentContext } from "../../../hooks";
+import { useAppContentContext, useComponentLanguage } from "../../../hooks";
 import { LocalOfferOutlined, LocationOnOutlined } from "@mui/icons-material";
+import StyledLink from "../../common/navigate/StyledLink";
 
 interface IInfoWindowPlaceProps {
   place: IPlaceExposed;
@@ -14,14 +14,11 @@ export default function InfoWindowPlace({
   place,
   onBeforeNavigate,
 }: IInfoWindowPlaceProps) {
-  const navigate = useNavigate();
   const appContentContext = useAppContentContext();
-  const onNavigate = () => {
-    onBeforeNavigate && onBeforeNavigate();
-    navigate(`/place/${place._id}`);
-  };
+  const lang = useComponentLanguage();
+
   return (
-    <Stack gap={1}>
+    <Stack gap={1} color={"black"}>
       <Stack direction={"row"} gap={1} alignItems={"center"}>
         <Avatar
           alt={place.exposedName}
@@ -50,13 +47,14 @@ export default function InfoWindowPlace({
         <Typography>{place.location?.name}</Typography>
       </Stack>
       <Divider />
-      <Button
-        variant="outlined"
-        sx={{ textTransform: "initial" }}
-        onClick={() => onNavigate()}
+      <StyledLink
+        to={`/place/${place._id}`}
+        onBeforeNavigate={onBeforeNavigate}
       >
-        Go to view this place
-      </Button>
+        <Button variant="outlined" sx={{ textTransform: "initial" }} fullWidth>
+          {lang("go-to-view-this-place")}
+        </Button>
+      </StyledLink>
     </Stack>
   );
 }

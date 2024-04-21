@@ -235,7 +235,7 @@ export interface UserFetcher {
     user: string,
     pagination: IPagination,
     auth: IAuthInfo
-  ): Promise<UserResponse<IPlaceExposed[]>>;
+  ): Promise<UserResponse<IPlaceExposedWithRatingAndFollow[]>>;
   getPlaceFollowers(
     place: string,
     params: IFollowerSearchParams,
@@ -600,7 +600,7 @@ export const userFetcher: UserFetcher = {
     user: string,
     pagination: IPagination,
     auth: IAuthInfo
-  ): Promise<UserResponse<IPlaceExposed[]>> => {
+  ): Promise<UserResponse<IPlaceExposedWithRatingAndFollow[]>> => {
     const params = new URLSearchParams();
     params.set("skip", String(pagination.skip));
     params.set("limit", String(pagination.limit));

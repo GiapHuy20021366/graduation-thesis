@@ -1,8 +1,11 @@
 import { ICoordinates } from "./coordinates";
 import { toDistance } from "./location-util";
-import { IPlaceExposed } from "./place-exposed";
+import {
+  IPlaceExposed,
+  IPlaceExposedWithRatingAndFollow,
+} from "./place-exposed";
 
-export interface IPlaceExposedCooked extends IPlaceExposed {
+export interface IPlaceExposedCooked extends IPlaceExposedWithRatingAndFollow {
   currentDistance?: number;
   homeDistance?: number;
 }

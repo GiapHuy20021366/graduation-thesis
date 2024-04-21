@@ -73,7 +73,7 @@ const SubcribedItem = React.forwardRef<HTMLDivElement, SubcribedItemProps>(
                 "subcribed-from",
                 lang(toFollowTypeLabel(data.userFollow?.type) ?? "subcribe")
               )}
-              <TimeExposed time={data.userFollow?.time} hour={false} />
+              <TimeExposed time={data.userFollow?.createdAt} hour={false} />
             </Typography>
           </Stack>
           <Stack direction="row" gap={1}>

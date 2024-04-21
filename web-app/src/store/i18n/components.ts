@@ -32,4 +32,5 @@ export type I18nReactComponent =
   | "PlaceEditForm"
   | "DescriptionEditor"
   | "PlaceSearchFilter"
-  | "SignUpForm";
+  | "SignUpForm"
+  | "UsersAroundPage";
