@@ -2,6 +2,7 @@ import { Ided } from "../data";
 import {
   ManualAccountInfo,
   NewAccountInfo,
+  createAroundFoodNotifications,
   createNewFoodNotifications,
   sendActiveManualAccount,
   sendNewAccountCreated,
@@ -27,6 +28,7 @@ export const brokerOperations = {
   },
   food: {
     NOTIFY_NEW_FOOD: "NOTIFY_NEW_FOOD",
+    NOFITY_FOOD_AROUND: "NOTIFY_FOOD_AROUND",
   },
 } as const;
 
@@ -71,6 +73,11 @@ export interface IBrokerNotifyNewFoodPayload {
   subcribers: string[];
 }
 
+export interface IBrokerNotifyAroundFoodPayload {
+  users: string[];
+  foods: string[];
+}
+
 export const initRpcConsumers = (_rabbit: RabbitMQ): void => {
   // Do nothing
 };
@@ -95,6 +102,14 @@ export const initBrokerConsumners = (rabbit: RabbitMQ): void => {
     (msg: IBrokerMessage<IBrokerNotifyNewFoodPayload>) => {
       const { food, subcribers } = msg.data;
       createNewFoodNotifications(food, subcribers);
+    }
+  );
+
+  rabbit.listenMessage(
+    brokerOperations.food.NOFITY_FOOD_AROUND,
+    (msg: IBrokerMessage<IBrokerNotifyAroundFoodPayload>) => {
+      const { foods, users } = msg.data;
+      createAroundFoodNotifications(foods, users);
     }
   );
 };

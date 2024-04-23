@@ -14,4 +14,8 @@ export {
   getMessages,
 } from "./conversation";
 
-export { getNotifications, createNewFoodNotifications } from "./notification";
+export {
+  getNotifications,
+  createNewFoodNotifications,
+  createAroundFoodNotifications,
+} from "./notification";

@@ -85,7 +85,7 @@ export class RabbitMQ {
       `[MESSAGE BROKER] [BINDING] Biding exchange ${exchange} and queue ${q.queue} with name ${service}`
     );
 
-    channel.consume(q.queue, this.consumeBrokerMessage, {
+    channel.consume(q.queue, (msg) => this.consumeBrokerMessage(msg), {
       noAck: true,
     });
   }
@@ -103,7 +103,7 @@ export class RabbitMQ {
         consumers.forEach((consumer) => consumer(data));
       }
     } catch (error) {
-      consoleLogger.err("An broker message is wrong format:", content);
+      consoleLogger.err("Broker Error:", error);
     }
   }
 

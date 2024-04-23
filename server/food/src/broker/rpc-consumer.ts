@@ -21,6 +21,7 @@ export const brokerOperations = {
   },
   food: {
     NOTIFY_NEW_FOOD: "NOTIFY_NEW_FOOD",
+    NOFITY_FOOD_AROUND: "NOTIFY_FOOD_AROUND",
   },
 } as const;
 
@@ -54,6 +55,11 @@ export interface IRpcGetRegistersPayload {
 
 export interface IRpcGetRatedScoresPayload {
   userId: string;
+}
+
+export interface IBrokerNotifyAroundFoodPayload {
+  users: string[];
+  foods: string[];
 }
 
 export const initRpcConsumers = (_rabbit: RabbitMQ): void => {

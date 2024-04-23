@@ -52,15 +52,11 @@ export const getFavoriteFoods = async (
     return [];
   }
 
-  const categoryRank = Object.entries(categoryToScrore).map(([k, v]) => ({
-    name: k,
-    points: v,
-  }));
-
   const foods = await FoodPost.aggregate<HydratedDocument<IFoodPostSchema>>([
     {
       $match: {
         active: true,
+        resolved: false,
         user: {
           $ne: userId,
         },
@@ -69,40 +65,28 @@ export const getFavoriteFoods = async (
         },
       },
     },
+    { $unwind: "$categories" },
     {
-      $addFields: {
-        totalPoints: {
-          $reduce: {
-            input: "$categories",
-            initialValue: 0,
-            in: {
-              $add: [
-                "$$value",
-                {
-                  $sum: {
-                    $map: {
-                      input: categoryRank,
-                      as: "rank",
-                      in: {
-                        $cond: [
-                          { $in: ["$$rank.name", "$$this"] },
-                          "$$rank.points",
-                          0,
-                        ],
-                      },
-                    },
-                  },
-                },
-              ],
-            },
-          },
+      $project: {
+        _id: 1,
+        category: "$categories",
+        point: {
+          $arrayElemAt: [{ $objectToArray: categoryToScrore }, "$categories"],
         },
       },
     },
-    { $sort: { totalPoints: -1 } },
+    {
+      $group: {
+        _id: "$_id",
+        total_points: { $sum: "$point" },
+      },
+    },
+    { $sort: { total_points: -1 } },
     { $skip: pagination?.skip ?? 0 },
     { $limit: pagination?.limit ?? 24 },
   ]).exec();
+
+  console.log(foods.length);
 
   return foods.map((p) => ({
     _id: p._id.toString(),
@@ -142,15 +126,18 @@ export const getRegisteredFoods = async (
         "place._id": {
           $in: ids,
         },
+      },
+      {
         user: {
           $in: ids,
         },
-        duration: {
-          $gt: Date.now(),
-        },
-        active: true,
       },
     ],
+    duration: {
+      $gt: Date.now(),
+    },
+    active: true,
+    resolved: false,
   })
     .skip(pagination?.skip ?? 0)
     .limit(pagination?.limit ?? 24)

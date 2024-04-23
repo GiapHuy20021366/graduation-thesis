@@ -1,4 +1,4 @@
-import { sendNotificationToUsers } from "~/socket";
+import { sendNotificationToUsers } from "../socket";
 import { IBrokerNotifyNewFoodPayloadFood } from "../broker";
 import {
   INotification,
@@ -53,4 +53,19 @@ export const createNewFoodNotifications = async (
     subcribers.filter((s) => s !== food.user),
     notification
   );
+};
+
+export const createAroundFoodNotifications = async (
+  foods: string[],
+  users: string[]
+) => {
+  const notificationData: INotification = {
+    users: users,
+    reads: [],
+    type: NotificationType.FOOD_SUGGESTED_AROUND,
+    typedFoods: foods,
+  };
+  const notification = new Notification(notificationData);
+  await notification.save();
+  sendNotificationToUsers(users, notification);
 };

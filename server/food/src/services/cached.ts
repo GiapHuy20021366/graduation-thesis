@@ -69,18 +69,19 @@ export const updateUserCached = async (
     cached.favorite.updatedAt = new Date();
   }
 
-  await UserCached.updateOne(
-    { _id: cached._id.toString() },
-    {
-      $set: {
-        location: cached.location,
-        categories: cached.categories,
-        favorite: cached.favorite,
-        register: cached.register,
-        updatedAt: cached.updatedAt,
-      },
-    }
-  );
+  // await UserCached.updateOne(
+  //   { _id: cached._id.toString() },
+  //   {
+  //     $set: {
+  //       location: cached.location,
+  //       categories: cached.categories,
+  //       favorite: cached.favorite,
+  //       register: cached.register,
+  //       updatedAt: cached.updatedAt,
+  //     },
+  //   }
+  // );
+  await cached.save();
 
   return cached;
 };
@@ -150,7 +151,6 @@ export const getUserCached = async (
         users: [],
       },
     });
-    await userCached.save();
     await updateUserCached(userCached, options);
     result = {
       categories: userCached.categories,
