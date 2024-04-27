@@ -366,7 +366,10 @@
         "use-this-location": "Sử dụng địa điểm này",
         "join-at": "Tham gia vào ",
         "user-hide-location": "Người dùng ẩn vị trí",
-        "unkown-location": "Vị khí không xác định"
+        "unkown-location": "Vị khí không xác định",
+        "l-locate-me": "Vị trí của tôi",
+        "l-load-this-area": "Tìm kiếm khu vực này",
+        "every-one": "mọi người"
     },
     "Toasts": {
         "can-not-sharing-now": "Không thể chia sẻ thực phẩm vào lúc này",

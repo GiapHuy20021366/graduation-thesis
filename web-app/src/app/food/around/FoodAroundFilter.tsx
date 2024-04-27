@@ -242,7 +242,7 @@ export default function FoodAroundFilter({
         position: "absolute",
         right: 0,
         zIndex: 1200,
-        backgroundColor: "white",
+        backgroundColor: "background.default",
       }}
     >
       <Tooltip

@@ -15,6 +15,8 @@ import {
 } from "./rpc";
 import { USER_TO_REGISTERED_MAX_DURATION } from "../config";
 
+export const updatings = new Set<string>();
+
 export interface IUserCachedUpdateOptions {
   favorite?: boolean;
   register?: boolean;
@@ -26,62 +28,64 @@ export const updateUserCached = async (
   options?: IUserCachedUpdateOptions
 ): Promise<HydratedDocument<IUserCachedSchema>> => {
   const userId = cached.user;
+  if (updatings.has(userId)) {
+    return cached;
+  }
+  updatings.add(userId);
+  const promises: (() => Promise<any>)[] = [];
 
   let user: IdAndLocationAndCategories | null = null;
   if (options?.basic !== false) {
-    user = await rpcGetUser<IdAndLocationAndCategories>(
-      userId,
-      "_id location categories"
-    );
-    if (user == null) {
-      throw new InternalError();
-    }
-    cached.location = user.location;
-    cached.categories = user.categories;
-    cached.updatedAt = new Date();
+    promises.push(async () => {
+      user = await rpcGetUser<IdAndLocationAndCategories>(
+        userId,
+        "_id location categories"
+      );
+      if (user == null) {
+        throw new InternalError();
+      }
+      cached.location = user.location;
+      cached.categories = user.categories;
+      cached.updatedAt = new Date();
+    });
   }
 
   if (options?.register !== false) {
     // Call user service to get places/user registered
-    const registerData = await rpcGetRegisters<IUserCachedRegister>(userId);
-    if (registerData == null) {
-      throw new InternalError();
-    }
-    cached.register.users = registerData.users;
-    cached.register.places = registerData.places;
-    cached.register.updatedAt = new Date();
+    promises.push(async () => {
+      const registerData = await rpcGetRegisters<IUserCachedRegister>(userId);
+      if (registerData == null) {
+        throw new InternalError();
+      }
+      cached.register.users = registerData.users;
+      cached.register.places = registerData.places;
+      cached.register.updatedAt = new Date();
+    });
   }
 
   if (options?.favorite !== false) {
     // Call user service to get categories of place rated
-    const ratedDatas = await rpcGetRatedScores<IUserCachedFavoriteScore[]>(
-      userId
-    );
-    if (ratedDatas == null) {
-      throw new InternalError();
-    }
-    cached.favorite.rateds = ratedDatas;
+    promises.push(async () => {
+      const ratedDatas = await rpcGetRatedScores<IUserCachedFavoriteScore[]>(
+        userId
+      );
+      if (ratedDatas == null) {
+        throw new InternalError();
+      }
+      cached.favorite.rateds = ratedDatas;
 
-    // Check db to get food rated
-    const lovedDatas = await getRatedCategoryScore(userId);
-    cached.favorite.loveds = lovedDatas.loveds;
+      // Check db to get food rated
+      const lovedDatas = await getRatedCategoryScore(userId);
+      cached.favorite.loveds = lovedDatas.loveds;
 
-    cached.favorite.updatedAt = new Date();
+      cached.favorite.updatedAt = new Date();
+    });
   }
 
-  // await UserCached.updateOne(
-  //   { _id: cached._id.toString() },
-  //   {
-  //     $set: {
-  //       location: cached.location,
-  //       categories: cached.categories,
-  //       favorite: cached.favorite,
-  //       register: cached.register,
-  //       updatedAt: cached.updatedAt,
-  //     },
-  //   }
-  // );
-  await cached.save();
+  await Promise.all(promises.map((p) => p())).finally(async () => {
+    await cached.save();
+    updatings.delete(userId);
+  });
 
   return cached;
 };

@@ -45,20 +45,42 @@ export class TaskExecutable {
 }
 
 export class TaskScheduler {
+  protected _meta: {
+    name: string;
+    task: () => Promise<any>;
+    duration: number;
+    init: boolean;
+  };
+
   constructor(
     name: string,
     task: () => Promise<any>,
     duration: number = 12 * 60 * 60 * 1000,
     init: boolean = true
   ) {
-    consoleLogger.info("[SCHEDULER]", name, "inited");
-    init && task();
+    this._meta = {
+      name,
+      task,
+      duration,
+      init,
+    };
+  }
+
+  exe(delay: number = 0) {
+    const { duration, init, name, task } = this._meta;
     const timeBound = () => {
       setTimeout(() => {
+        consoleLogger.info("[SCHEDULER]", name, "inited");
         task();
         timeBound();
       }, duration);
     };
+    setTimeout(() => {
+      if (init) {
+        consoleLogger.info("[SCHEDULER]", name, "inited");
+        init && task();
+      }
+    }, delay);
     timeBound();
   }
 }

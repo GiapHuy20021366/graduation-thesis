@@ -22,6 +22,10 @@ export const brokerOperations = {
   food: {
     NOTIFY_NEW_FOOD: "NOTIFY_NEW_FOOD",
     NOFITY_FOOD_AROUND: "NOTIFY_FOOD_AROUND",
+    NOTIFY_FOOD_NEAR_EXPIRED: "NOTIFY_FOOD_NEAR_EXPIRED",
+    NOTIFY_FOOD_EXPIRED: "NOTIFY_FOOD_EXPIRED",
+    NOTIFY_FOOD_FAVORITE: "NOTIFY_FOOD_FAVORITE",
+    NOTIFY_FOOD_LIKED: "NOTIFY_FOOD_LIKED",
   },
 } as const;
 
@@ -60,6 +64,28 @@ export interface IRpcGetRatedScoresPayload {
 export interface IBrokerNotifyAroundFoodPayload {
   users: string[];
   foods: string[];
+}
+
+export interface IBrokerNotifyNearExpiredFoodPayload {
+  foodId: string;
+  authorId: string;
+  placeId?: string;
+}
+
+export interface IBrokerNotifyExpiredFoodPayload {
+  foodId: string;
+  authorId: string;
+  placeId?: string;
+}
+
+export interface IBrokerNotifyFavoriteFoodPayload {
+  userId: string;
+  foodIds: string[];
+}
+
+export interface IBrokerNotifyLikedFoodPayload {
+  userId: string;
+  foodId: string;
 }
 
 export const initRpcConsumers = (_rabbit: RabbitMQ): void => {

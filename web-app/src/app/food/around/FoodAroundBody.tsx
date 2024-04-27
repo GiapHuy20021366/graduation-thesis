@@ -229,6 +229,8 @@ export default function FoodAroundBody() {
       lng: center.lng(),
     };
 
+    const accountId = authContext.account?._id;
+
     const paramsToSearch: IFoodSearchParams = {
       category: params.categories,
       active: true,
@@ -237,17 +239,20 @@ export default function FoodAroundBody() {
       maxDuration: params.maxDuration,
       minQuantity: params.minQuantity,
       price: params.price,
+      user: {
+        exclude: accountId ? [accountId] : undefined,
+      },
       populate: {
         user: false,
         place: false,
       },
       distance: {
         current: current,
-        max: searchContext.maxDistance ?? Number.MAX_SAFE_INTEGER,
+        max: searchContext.maxDistance ?? 2,
       },
       pagination: {
         skip: 0,
-        limit: 200,
+        limit: Number.MAX_SAFE_INTEGER,
       },
       order: {
         distance: OrderState.INCREASE,
@@ -263,6 +268,8 @@ export default function FoodAroundBody() {
   const onButtonLoadClick = () => {
     doSearch();
   };
+
+  console.log(foods);
 
   return (
     <Stack
@@ -325,7 +332,7 @@ export default function FoodAroundBody() {
             >
               {infoOpen && (
                 <InfoWindowF position={center} onCloseClick={handleOpenInfo}>
-                  <Box>
+                  <Box color={"black"}>
                     <span>Vị trí hiện tại của bạn</span>
                   </Box>
                 </InfoWindowF>
@@ -333,8 +340,7 @@ export default function FoodAroundBody() {
             </MarkerF>
 
             {foods.map((food, i) => {
-              const coordinate = food.location?.coordinates;
-              if (coordinate == null) return <></>;
+              const coordinate = food.location.coordinates;
               return (
                 <MarkerF
                   icon={{
@@ -350,7 +356,9 @@ export default function FoodAroundBody() {
                       position={coordinate}
                       onCloseClick={() => toggleMarker(food._id)}
                     >
-                      <InfoWindowFood food={food} />
+                      <Box color={"black"}>
+                        <InfoWindowFood food={food} />
+                      </Box>
                     </InfoWindowF>
                   )}
                 </MarkerF>
@@ -366,7 +374,7 @@ export default function FoodAroundBody() {
                 position={home.coordinates}
               >
                 <InfoWindowF position={home.coordinates}>
-                  <Box sx={{ width: 200 }}>
+                  <Box sx={{ width: 200 }} color={"black"}>
                     <span>Nhà của bạn</span>
                   </Box>
                 </InfoWindowF>
@@ -386,18 +394,12 @@ export default function FoodAroundBody() {
           <Chip
             label={"Locate Me"}
             sx={{
-              backgroundColor: "purple",
               width: "fit-content",
               px: 5,
               fontWeight: 600,
               fontSize: "1.3rem",
-              color: "white",
-              cursor: "pointer",
-              ":hover": {
-                backgroundColor: "white",
-                color: "black",
-              },
             }}
+            color="primary"
             onClick={handleLocateMe}
             icon={<CenterFocusStrongOutlined color="inherit" />}
           />
@@ -405,19 +407,13 @@ export default function FoodAroundBody() {
             label={"Load this area"}
             onClick={onButtonLoadClick}
             sx={{
-              backgroundColor: "purple",
               width: "fit-content",
               px: 5,
               fontWeight: 600,
               fontSize: "1.3rem",
-              color: "white",
-              cursor: "pointer",
-              ":hover": {
-                backgroundColor: "white",
-                color: "black",
-              },
               display: fetching.isActice || !loadActive ? "none" : "block",
             }}
+            color="primary"
           />
         </Stack>
       </Box>

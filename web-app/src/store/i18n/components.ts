@@ -33,4 +33,5 @@ export type I18nReactComponent =
   | "DescriptionEditor"
   | "PlaceSearchFilter"
   | "SignUpForm"
-  | "UsersAroundPage";
+  | "UsersAroundPage"
+  | "FoodSearchFilter";

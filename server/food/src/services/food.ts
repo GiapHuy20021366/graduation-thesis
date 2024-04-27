@@ -30,7 +30,7 @@ import {
   rpcGetPlace,
   rpcGetUser,
 } from "./rpc";
-import { notifySharedFoodToSubcribers } from "./checker";
+import { notifyLikedFood, notifySharedFoodToSubcribers } from "./checker";
 
 export interface IPostFoodResponse
   extends Pick<
@@ -416,6 +416,8 @@ export const userLikeOrUnlikeFoodPost = async (
     const newLikeCount = (foodPost.likeCount ?? 0) + 1;
     foodPost.likeCount = newLikeCount;
     await foodPost.save();
+    // Notify
+    notifyLikedFood(userId, foodPostId);
     return toFoodUserLikeExposed(newLike);
   }
 

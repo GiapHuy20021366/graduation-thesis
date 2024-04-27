@@ -6,6 +6,12 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import { consoleLogger } from "./src/config";
 import { RabbitMQ, initBrokerConsumners, initRpcConsumers } from "./src/broker";
+import {
+  notifyFavoriteFoodsChecker,
+  notifyNearExpiredChecker,
+  notifyAroundChecker,
+  notifyExpiredChecker,
+} from "./src/services";
 
 const app: Express = express();
 
@@ -14,6 +20,12 @@ connectDB();
 const rabbit = RabbitMQ.instance;
 initRpcConsumers(rabbit);
 initBrokerConsumners(rabbit);
+
+// Checkers
+notifyAroundChecker.exe(0);
+notifyFavoriteFoodsChecker.exe(30 * 60 * 1000);
+notifyNearExpiredChecker.exe(60 * 60 * 1000);
+notifyExpiredChecker.exe(60 * 60 * 1000);
 
 app.use(
   cors({

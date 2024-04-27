@@ -18,4 +18,8 @@ export {
   getNotifications,
   createNewFoodNotifications,
   createAroundFoodNotifications,
+  createNearExpiredFoodNotifications,
+  createFavoriteFoodNotifications,
+  createLikedFoodNotifications,
+  createExpiredFoodNotifications,
 } from "./notification";

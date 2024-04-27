@@ -3,6 +3,10 @@ import {
   ManualAccountInfo,
   NewAccountInfo,
   createAroundFoodNotifications,
+  createExpiredFoodNotifications,
+  createFavoriteFoodNotifications,
+  createLikedFoodNotifications,
+  createNearExpiredFoodNotifications,
   createNewFoodNotifications,
   sendActiveManualAccount,
   sendNewAccountCreated,
@@ -29,6 +33,10 @@ export const brokerOperations = {
   food: {
     NOTIFY_NEW_FOOD: "NOTIFY_NEW_FOOD",
     NOFITY_FOOD_AROUND: "NOTIFY_FOOD_AROUND",
+    NOTIFY_FOOD_NEAR_EXPIRED: "NOTIFY_FOOD_NEAR_EXPIRED",
+    NOTIFY_FOOD_EXPIRED: "NOTIFY_FOOD_EXPIRED",
+    NOTIFY_FOOD_FAVORITE: "NOTIFY_FOOD_FAVORITE",
+    NOTIFY_FOOD_LIKED: "NOTIFY_FOOD_LIKED",
   },
 } as const;
 
@@ -78,6 +86,28 @@ export interface IBrokerNotifyAroundFoodPayload {
   foods: string[];
 }
 
+export interface IBrokerNotifyNearExpiredFoodPayload {
+  foodId: string;
+  authorId: string;
+  placeId?: string;
+}
+
+export interface IBrokerNotifyExpiredFoodPayload {
+  foodId: string;
+  authorId: string;
+  placeId?: string;
+}
+
+export interface IBrokerNotifyFavoriteFoodPayload {
+  userId: string;
+  foodIds: string[];
+}
+
+export interface IBrokerNotifyLikedFoodPayload {
+  userId: string;
+  foodId: string;
+}
+
 export const initRpcConsumers = (_rabbit: RabbitMQ): void => {
   // Do nothing
 };
@@ -110,6 +140,38 @@ export const initBrokerConsumners = (rabbit: RabbitMQ): void => {
     (msg: IBrokerMessage<IBrokerNotifyAroundFoodPayload>) => {
       const { foods, users } = msg.data;
       createAroundFoodNotifications(foods, users);
+    }
+  );
+
+  rabbit.listenMessage(
+    brokerOperations.food.NOTIFY_FOOD_NEAR_EXPIRED,
+    (msg: IBrokerMessage<IBrokerNotifyNearExpiredFoodPayload>) => {
+      const { authorId, foodId, placeId } = msg.data;
+      createNearExpiredFoodNotifications(foodId, authorId, placeId);
+    }
+  );
+
+  rabbit.listenMessage(
+    brokerOperations.food.NOTIFY_FOOD_EXPIRED,
+    (msg: IBrokerMessage<IBrokerNotifyExpiredFoodPayload>) => {
+      const { authorId, foodId, placeId } = msg.data;
+      createExpiredFoodNotifications(foodId, authorId, placeId);
+    }
+  );
+
+  rabbit.listenMessage(
+    brokerOperations.food.NOTIFY_FOOD_FAVORITE,
+    (msg: IBrokerMessage<IBrokerNotifyFavoriteFoodPayload>) => {
+      const { foodIds, userId } = msg.data;
+      createFavoriteFoodNotifications(userId, foodIds);
+    }
+  );
+
+  rabbit.listenMessage(
+    brokerOperations.food.NOTIFY_FOOD_LIKED,
+    (msg: IBrokerMessage<IBrokerNotifyLikedFoodPayload>) => {
+      const { foodId, userId } = msg.data;
+      createLikedFoodNotifications(userId, foodId);
     }
   );
 };

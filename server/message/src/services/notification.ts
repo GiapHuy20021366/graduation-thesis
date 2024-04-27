@@ -69,3 +69,67 @@ export const createAroundFoodNotifications = async (
   await notification.save();
   sendNotificationToUsers(users, notification);
 };
+
+export const createNearExpiredFoodNotifications = async (
+  foodId: string,
+  authorId: string,
+  placeId?: string
+) => {
+  const notificationData: INotification = {
+    users: [authorId],
+    reads: [],
+    type: NotificationType.FOOD_NEAR_EXPIRED,
+    typedFoods: [foodId],
+    typedPlace: placeId,
+  };
+  const notification = new Notification(notificationData);
+  await notification.save();
+  sendNotificationToUsers([authorId], notification);
+};
+
+export const createExpiredFoodNotifications = async (
+  foodId: string,
+  authorId: string,
+  placeId?: string
+) => {
+  const notificationData: INotification = {
+    users: [authorId],
+    reads: [],
+    type: NotificationType.FOOD_EXPIRED,
+    typedFoods: [foodId],
+    typedPlace: placeId,
+  };
+  const notification = new Notification(notificationData);
+  await notification.save();
+  sendNotificationToUsers([authorId], notification);
+};
+
+export const createFavoriteFoodNotifications = async (
+  userId: string,
+  foodIds: string[]
+) => {
+  const notificationData: INotification = {
+    users: [userId],
+    reads: [],
+    type: NotificationType.FOOD_SUGGESTED_CATEGORY,
+    typedFoods: foodIds,
+  };
+  const notification = new Notification(notificationData);
+  await notification.save();
+  sendNotificationToUsers([userId], notification);
+};
+
+export const createLikedFoodNotifications = async (
+  userId: string,
+  foodId: string
+) => {
+  const notificationData: INotification = {
+    users: [userId],
+    reads: [],
+    type: NotificationType.FOOD_LIKED,
+    typedFoods: [foodId],
+  };
+  const notification = new Notification(notificationData);
+  await notification.save();
+  sendNotificationToUsers([userId], notification);
+};
