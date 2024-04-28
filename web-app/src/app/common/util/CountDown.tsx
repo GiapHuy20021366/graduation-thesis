@@ -16,7 +16,9 @@ export default function CountDown({
   enable,
   second,
 }: ICountDownProps) {
-  const [timeLeft, setTimeLeft] = useState<number>(0);
+  const [timeLeft, setTimeLeft] = useState<number>(
+    new Date(time).getTime() - Date.now()
+  );
   const i18n = useI18nContext();
   const lang = i18n.of(CountDown);
 

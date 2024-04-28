@@ -155,7 +155,7 @@ export default function FoodPostViewerData() {
                 marginLeft: "auto",
               }}
             />
-            <CountDown time={data.duration} sx={{ ml: 1 }} />
+            <CountDown time={data.duration} sx={{ ml: 1 }} enable={true} />
           </Stack>
           <FoodPostButtonWithMenu />
         </Stack>

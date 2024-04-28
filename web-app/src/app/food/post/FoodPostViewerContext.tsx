@@ -94,6 +94,12 @@ export default function FoodPostViewerContextProvider({
       } else if (food.like != null && !liked) {
         newCount++;
       }
+      if (food.like == null && !liked) {
+        newCount++;
+      }
+      if (food.like == null && liked) {
+        newCount--;
+      }
       setFood({
         ...food,
         liked: !liked,

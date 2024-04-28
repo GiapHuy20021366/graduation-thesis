@@ -97,14 +97,16 @@ export default function FoodPostButtonWithMenu() {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <StyledLink to={applicationPages.FOOD_SHARING} state={food}>
-          <MenuItem>
-            <ListItemIcon>
-              <Edit fontSize="small" />
-            </ListItemIcon>
-            {lang("edit")}
-          </MenuItem>
-        </StyledLink>
+        {editable && (
+          <StyledLink to={applicationPages.FOOD_SHARING} state={food}>
+            <MenuItem>
+              <ListItemIcon>
+                <Edit fontSize="small" />
+              </ListItemIcon>
+              {lang("edit")}
+            </MenuItem>
+          </StyledLink>
+        )}
         {editable && (
           <MenuItem
             onClick={() => {
