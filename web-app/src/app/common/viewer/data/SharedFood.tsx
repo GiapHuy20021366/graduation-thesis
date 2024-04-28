@@ -110,11 +110,12 @@ const SharedFood = React.forwardRef<HTMLDivElement, SharedFoodProps>(
           </StyledLink>
 
           <Typography>
-            {lang("added-at")} <TimeExposed time={data.createdAt} />
+            {lang("added-at")}{" "}
+            <TimeExposed time={data.createdAt} milisecond={false} />
           </Typography>
           <Typography>
-            {isExpired ? lang("will-expired-at") : lang("expired-at")}
-            <TimeExposed time={data.duration} />
+            {isExpired ? lang("will-expired-at") : lang("expired-at")}{" "}
+            <TimeExposed time={data.duration} milisecond={false} />
           </Typography>
         </Stack>
       </Stack>

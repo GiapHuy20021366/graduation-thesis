@@ -19,7 +19,7 @@ export default function PlaceViewerData({ data }: PlaceViewerDataProps) {
   const [tab, setTab] = useState<PlaceViewerTab>(0);
   const lang = useComponentLanguage();
   return (
-    <Stack width={"100%"} boxSizing={"border-box"} boxShadow={1} gap={2} px={1}>
+    <Stack width={"100%"} boxSizing={"border-box"} boxShadow={1} gap={0} px={1}>
       <PlaceViewerHeader place={data} />
 
       <PlaceViewerTabs
@@ -29,6 +29,8 @@ export default function PlaceViewerData({ data }: PlaceViewerDataProps) {
           top: 1,
           zIndex: 1000,
           boxShadow: 1,
+          backgroundColor: "background.default",
+          mt: 2,
         }}
       />
       {/* Tabs display */}
@@ -36,13 +38,28 @@ export default function PlaceViewerData({ data }: PlaceViewerDataProps) {
         <PlaceViewerIntroduction
           data={data}
           active={tab === PlaceViewerTab.DESCRIPTION}
+          sx={{
+            backgroundColor: "background.default",
+            pl: 1,
+          }}
         />
 
-        <PlaceViewerShared place={data} active={tab === PlaceViewerTab.FOOD} />
+        <PlaceViewerShared
+          place={data}
+          active={tab === PlaceViewerTab.FOOD}
+          sx={{
+            backgroundColor: "background.default",
+            pl: 1,
+          }}
+        />
 
         <PlaceViewerSubcribed
           active={tab === PlaceViewerTab.SUBCRIBED}
           place={data}
+          sx={{
+            backgroundColor: "background.default",
+            pl: 1,
+          }}
         />
       </>
 
