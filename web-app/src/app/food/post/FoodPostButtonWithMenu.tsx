@@ -36,7 +36,7 @@ export default function FoodPostButtonWithMenu() {
     setAnchorEl(event.currentTarget);
   };
   const viewerContext = useFoodPostViewerContext();
-  const { food, activeFood, resolveFood } = viewerContext;
+  const { food, activeFood, resolveFood, editable } = viewerContext;
   const { active, resolved } = food;
   const lang = useComponentLanguage("FoodPostButtonWithMenu");
   const [openConfirmHide, setOpenConfirmHide] = useState<boolean>(false);
@@ -105,40 +105,44 @@ export default function FoodPostButtonWithMenu() {
             {lang("edit")}
           </MenuItem>
         </StyledLink>
-        <MenuItem
-          onClick={() => {
-            handleClose();
-            if (active) {
-              setOpenConfirmHide(true);
-            } else {
-              activeFood();
-            }
-          }}
-        >
-          <ListItemIcon>
-            {active ? <VisibilityOffOutlined /> : <VisibilityOutlined />}
-          </ListItemIcon>
-          {lang(active ? "hide" : "unhide")}
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            handleClose();
-            if (resolved) {
-              setOpenConfirmResolve(true);
-            } else {
-              resolveFood();
-            }
-          }}
-        >
-          <ListItemIcon>
-            {resolved ? (
-              <SentimentVeryDissatisfiedOutlined />
-            ) : (
-              <SentimentVerySatisfiedOutlined />
-            )}
-          </ListItemIcon>
-          {lang(resolved ? "unresolve" : "resolve")}
-        </MenuItem>
+        {editable && (
+          <MenuItem
+            onClick={() => {
+              handleClose();
+              if (active) {
+                setOpenConfirmHide(true);
+              } else {
+                activeFood();
+              }
+            }}
+          >
+            <ListItemIcon>
+              {active ? <VisibilityOffOutlined /> : <VisibilityOutlined />}
+            </ListItemIcon>
+            {lang(active ? "hide" : "unhide")}
+          </MenuItem>
+        )}
+        {editable && (
+          <MenuItem
+            onClick={() => {
+              handleClose();
+              if (resolved) {
+                setOpenConfirmResolve(true);
+              } else {
+                resolveFood();
+              }
+            }}
+          >
+            <ListItemIcon>
+              {resolved ? (
+                <SentimentVeryDissatisfiedOutlined />
+              ) : (
+                <SentimentVerySatisfiedOutlined />
+              )}
+            </ListItemIcon>
+            {lang(resolved ? "unresolve" : "resolve")}
+          </MenuItem>
+        )}
         <MenuItem onClick={handleClose}>
           <ListItemIcon>
             <ReportGmailerrorred fontSize="small" />

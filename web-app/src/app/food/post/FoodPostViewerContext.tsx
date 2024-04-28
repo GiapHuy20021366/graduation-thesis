@@ -1,5 +1,5 @@
 import React, { createContext, useState } from "react";
-import { IFoodPostExposedWithLike } from "../../../data";
+import { IFoodPostExposed, IFoodPostExposedWithLike } from "../../../data";
 import {
   useAuthContext,
   useComponentLanguage,
@@ -16,13 +16,22 @@ interface IFoodPostViewerContext {
   food: IFoodPostExposedWithLike;
   activeFood: () => void;
   resolveFood: (resolvedBy?: string) => void;
+  likeFood: () => void;
+  editable: boolean;
 }
 
 export const FoodPostViewerContext = createContext<IFoodPostViewerContext>({
   food: {} as IFoodPostExposedWithLike,
   activeFood: () => {},
   resolveFood: () => {},
+  likeFood: () => {},
+  editable: false,
 });
+
+const isEditable = (food: IFoodPostExposed, accountId?: string): boolean => {
+  const id = typeof food.user === "string" ? food.user : food.user._id;
+  return id === accountId;
+};
 
 export default function FoodPostViewerContextProvider({
   children,
@@ -75,12 +84,34 @@ export default function FoodPostViewerContextProvider({
       });
   };
 
+  const likeFood = () => {
+    if (auth == null) return;
+    const liked = food.liked;
+    foodFetcher.likeFood(food._id, liked ? "UNLIKE" : "LIKE", auth).then(() => {
+      let newCount: number = food.likeCount;
+      if (food.like != null && liked) {
+        newCount--;
+      } else if (food.like != null && !liked) {
+        newCount++;
+      }
+      setFood({
+        ...food,
+        liked: !liked,
+        likeCount: newCount,
+      });
+    });
+  };
+
+  const editable = isEditable(food, account?._id);
+
   return (
     <FoodPostViewerContext.Provider
       value={{
         activeFood,
         food,
         resolveFood,
+        likeFood,
+        editable,
       }}
     >
       {children}

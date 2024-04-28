@@ -50,3 +50,4 @@ export {
 export { useFoodPostViewerContext } from "./useFoodPostViewerContext";
 export { type IUseGetUserStates, useGetUser } from "./useGetUser";
 export { type IUseGetPlaceStates, useGetPlace } from "./useGetPlace";
+export { useFoodPostViewerIdHigherContext } from "./useFoodPostViewerIdHigherContext";

@@ -5,12 +5,10 @@ import {
 } from "../../../data";
 import {
   useAppContentContext,
-  useAuthContext,
   useConversationContext,
   useFoodPostViewerContext,
   useI18nContext,
 } from "../../../hooks";
-import { useState } from "react";
 import Carousel from "react-material-ui-carousel";
 import {
   Badge,
@@ -36,7 +34,6 @@ import {
   VisibilityOffOutlined,
   VisibilityOutlined,
 } from "@mui/icons-material";
-import { foodFetcher } from "../../../api";
 import CountDown from "../../common/util/CountDown";
 import FoodPostButtonWithMenu from "./FoodPostButtonWithMenu";
 import { RichTextReadOnly } from "mui-tiptap";
@@ -47,15 +44,6 @@ import TimeExposed from "../../common/custom/TimeExposed";
 const toUserId = (post: IFoodPostExposedWithLike): string => {
   const user = post.user;
   return typeof user === "string" ? user : user._id;
-};
-
-const toLikeCount = (
-  post: IFoodPostExposedWithLike,
-  liked: boolean
-): number => {
-  if (!post.liked && liked) return post.likeCount + 1;
-  if (post.liked && !liked) return post.likeCount - 1;
-  return post.likeCount;
 };
 
 const toUserExposedName = (post: IFoodPostExposedWithLike): string => {
@@ -73,21 +61,14 @@ export default function FoodPostViewerData() {
     "Quantities"
   );
   const appContentContext = useAppContentContext();
-  const authContext = useAuthContext();
   const conversationContext = useConversationContext();
   const viewerContext = useFoodPostViewerContext();
-  const { food: data } = viewerContext;
+  const { food: data, likeFood, editable } = viewerContext;
 
-  const [liked, setLiked] = useState<boolean>(data.liked ?? false);
   const { user } = data;
 
   const handleLikeOrUnlike = () => {
-    if (authContext.auth == null) return;
-    foodFetcher
-      .likeFood(data._id, liked ? "UNLIKE" : "LIKE", authContext.auth)
-      .then(() => {
-        setLiked(!liked);
-      });
+    likeFood();
   };
 
   const userId = toUserId(data);
@@ -133,19 +114,25 @@ export default function FoodPostViewerData() {
             {data.title || lang("no-title")}
           </Box>
           <Stack direction={"row"} justifyContent={"end"} gap={2}>
-            <Stack direction={"row"} gap={1}>
-              <Tooltip
-                arrow
-                title={lang(active ? "every-one-tooltip" : "only-you-tooltip")}
-              >
-                {!active ? (
-                  <VisibilityOffOutlined color="error" />
-                ) : (
-                  <VisibilityOutlined color="success" />
-                )}
-              </Tooltip>
-              <Typography>{lang(active ? "every-one" : "only-you")}</Typography>
-            </Stack>
+            {editable && (
+              <Stack direction={"row"} gap={1}>
+                <Tooltip
+                  arrow
+                  title={lang(
+                    active ? "every-one-tooltip" : "only-you-tooltip"
+                  )}
+                >
+                  {!active ? (
+                    <VisibilityOffOutlined color="error" />
+                  ) : (
+                    <VisibilityOutlined color="success" />
+                  )}
+                </Tooltip>
+                <Typography>
+                  {lang(active ? "every-one" : "only-you")}
+                </Typography>
+              </Stack>
+            )}
             {resolved && (
               <>
                 <Stack direction={"row"} gap={1}>
@@ -185,9 +172,9 @@ export default function FoodPostViewerData() {
             </Typography>
           </Stack>
           <Stack direction="row">
-            <IconButton color={liked ? "error" : "default"}>
+            <IconButton color={data.liked ? "error" : "default"}>
               <Badge
-                badgeContent={<span>{toLikeCount(data, liked)}</span>}
+                badgeContent={<span>{data.likeCount}</span>}
                 anchorOrigin={{
                   vertical: "top",
                   horizontal: "right",
