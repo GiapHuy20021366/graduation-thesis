@@ -20,13 +20,12 @@ import {
   IFoodPostExposed,
   IFoodSeachOrder,
   IFoodSearchParams,
-  loadFromSessionStorage,
-  saveToSessionStorage,
   toNextOrderState,
 } from "../../../data";
 import FoodSearchItem from "./FoodSearchItem";
 import FoodSearchFilter, { IFilterParams } from "./FoodSearchFilter";
 import {
+  useAppCacheContext,
   useAppContentContext,
   useAuthContext,
   useFoodSearchContext,
@@ -127,11 +126,15 @@ interface IFoodSearchBodySnapshotData {
 const FOOD_SEARCH_BODY_STORAGE_KEY = "food.search.body";
 
 export default function FoodSearchBody() {
+  const cacher = useAppCacheContext();
+  const cached = cacher.get<IFoodSearchBodySnapshotData>(
+    FOOD_SEARCH_BODY_STORAGE_KEY
+  );
   const inputRef = useRef<HTMLInputElement>(null);
-  const [foods, setFoods] = useState<IFoodPostExposed[]>([]);
+  const [foods, setFoods] = useState<IFoodPostExposed[]>(cached?.foods ?? []);
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [options, setOptions] = useState<IFoodSearchHistoryAndKey[]>([]);
-  const [tab, setTab] = useState<SearchTab>(SearchTab.RELATED);
+  const [tab, setTab] = useState<SearchTab>(cached?.tab ?? SearchTab.RELATED);
   const i18nContext = useI18nContext();
   const lang = i18nContext.of(FoodSearchBody);
   const loader = useLoader();
@@ -145,6 +148,7 @@ export default function FoodSearchBody() {
     setOrderNew,
     setOrderQuantity,
     order,
+    doSaveStorage: doSaveContext,
   } = searchContext;
 
   const {
@@ -169,11 +173,10 @@ export default function FoodSearchBody() {
       tab,
       scrollTop: appContentContext.mainRef?.current?.scrollTop,
     };
-    saveToSessionStorage(snapshot, {
-      key: FOOD_SEARCH_BODY_STORAGE_KEY,
-      account: account?._id,
-    });
-  }, [account?._id, appContentContext.mainRef, foods, tab]);
+    cacher.save(FOOD_SEARCH_BODY_STORAGE_KEY, snapshot);
+
+    doSaveContext();
+  }, [appContentContext.mainRef, cacher, doSaveContext, foods, tab]);
 
   const handleInputChange = (
     _event: React.SyntheticEvent<Element, Event>,
@@ -456,31 +459,34 @@ export default function FoodSearchBody() {
   }, [appContentContext.mainRef, doSearchMore, loader.isEnd]);
 
   useEffect(() => {
-    if (account == null) return;
     if (dirtyRef.current) {
       dirtyRef.current = false;
-      const snapshot = loadFromSessionStorage<IFoodSearchBodySnapshotData>({
-        key: FOOD_SEARCH_BODY_STORAGE_KEY,
-        maxDuration: 1 * 24 * 60 * 60 * 1000,
-        account: account._id,
-      });
-      if (snapshot) {
-        setTab(snapshot.tab);
-        setFoods(snapshot.foods);
+      const cached = cacher.get<IFoodSearchBodySnapshotData>(
+        FOOD_SEARCH_BODY_STORAGE_KEY
+      );
+      if (cached) {
         if (foods.length < 24) {
           loader.setIsEnd(true);
         }
         setTimeout(() => {
           const main = appContentContext.mainRef?.current;
-          if (main && snapshot.scrollTop) {
-            main.scrollTop = snapshot.scrollTop ?? 0;
+          if (main && cached.scrollTop) {
+            main.scrollTop = cached.scrollTop ?? 0;
           }
-        }, 500);
+        }, 0);
       } else {
         doSearch();
       }
     }
-  }, [account, appContentContext.mainRef, doSearch, foods.length, loader]);
+  }, [
+    account,
+    appContentContext.mainRef,
+    cached,
+    cacher,
+    doSearch,
+    foods.length,
+    loader,
+  ]);
 
   return (
     <Box width={"100%"} boxSizing={"border-box"}>

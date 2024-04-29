@@ -2,8 +2,6 @@ import React, {
   Dispatch,
   SetStateAction,
   createContext,
-  useEffect,
-  useRef,
   useState,
 } from "react";
 import {
@@ -12,10 +10,8 @@ import {
   ItemAvailable,
   OrderState,
   PlaceType,
-  loadFromSessionStorage,
-  saveToSessionStorage,
 } from "../../../data";
-import { useAuthContext } from "../../../hooks";
+import { useAppCacheContext } from "../../../hooks";
 
 interface IFoodSearchContextProviderProps {
   children?: React.ReactNode;
@@ -108,56 +104,45 @@ export default function FoodSearchContextProvider({
   children,
   categories: targetCategories,
 }: IFoodSearchContextProviderProps) {
-  const [maxDistance, setMaxDistance] = useState<number | undefined>();
+  const cacher = useAppCacheContext();
+  const cached = cacher.get<IFoodSearchContextSnapshotData>(
+    FOOD_SEARCH_CONTEXT_STORAGE_KEY
+  );
+
+  const [maxDistance, setMaxDistance] = useState<number | undefined>(
+    cached?.maxDistance
+  );
   const [categories, setCategories] = useState<FoodCategory[] | undefined>(
-    targetCategories
+    targetCategories ?? cached?.categories
   );
-  const [maxDuration, setMaxDuration] = useState<number | undefined>();
-  const [query, setQuery] = useState<string>("");
-  const [minQuantity, setMinQuantity] = useState<number>();
-  const [price, setPrice] = useState<IFoodSearchPrice>();
+  const [maxDuration, setMaxDuration] = useState<number | undefined>(
+    cached?.maxDuration
+  );
+  const [query, setQuery] = useState<string>(cached?.query ?? "");
+  const [minQuantity, setMinQuantity] = useState<number | undefined>(
+    cached?.minQuantity ?? 4
+  );
+  const [price, setPrice] = useState<IFoodSearchPrice | undefined>(
+    cached?.price
+  );
   const [orderDistance, setOrderDistance] = useState<OrderState>(
-    OrderState.NONE
+    cached?.order.distance ?? OrderState.NONE
   );
-  const [orderNew, setOrderNew] = useState<OrderState>(OrderState.NONE);
-  const [orderPrice, setOrderPrice] = useState<OrderState>(OrderState.NONE);
+  const [orderNew, setOrderNew] = useState<OrderState>(
+    cached?.order.time ?? OrderState.NONE
+  );
+  const [orderPrice, setOrderPrice] = useState<OrderState>(
+    cached?.order.price ?? OrderState.NONE
+  );
   const [orderQuantity, setOrderQuantity] = useState<OrderState>(
-    OrderState.NONE
+    cached?.order.quantity ?? OrderState.NONE
   );
-  const [addedBy, setAddedBy] = useState<PlaceType[] | undefined>();
+  const [addedBy, setAddedBy] = useState<PlaceType[] | undefined>(
+    cached?.addedBy
+  );
   const [available, setAvailable] = useState<ItemAvailable>(
-    ItemAvailable.AVAILABLE_ONLY
+    cached?.available ?? "AVAILABLE_ONLY"
   );
-
-  const authContext = useAuthContext();
-  const { account } = authContext;
-  const dirtyRef = useRef<boolean>(true);
-
-  useEffect(() => {
-    if (account == null) return;
-    if (!dirtyRef.current) {
-      dirtyRef.current = false;
-      const snapshot = loadFromSessionStorage<IFoodSearchContextSnapshotData>({
-        key: FOOD_SEARCH_CONTEXT_STORAGE_KEY,
-        maxDuration: 1 * 24 * 60 * 60 * 1000,
-        account: account._id,
-      });
-      if (snapshot) {
-        setMaxDistance(snapshot.maxDistance);
-        setCategories(snapshot.categories);
-        setPrice(snapshot.price);
-        setOrderDistance(snapshot.order.distance);
-        setOrderNew(snapshot.order.time);
-        setOrderPrice(snapshot.order.price);
-        setOrderQuantity(snapshot.order.quantity);
-        setMaxDuration(snapshot.maxDuration);
-        setAddedBy(snapshot.addedBy);
-        setAvailable(snapshot.available);
-        setMinQuantity(snapshot.minQuantity);
-        setPrice(snapshot.price);
-      }
-    }
-  }, [account]);
 
   const doSaveStorage = () => {
     const snapshot: IFoodSearchContextSnapshotData = {
@@ -176,10 +161,7 @@ export default function FoodSearchContextProvider({
       minQuantity,
       price,
     };
-    saveToSessionStorage(snapshot, {
-      key: FOOD_SEARCH_CONTEXT_STORAGE_KEY,
-      account: authContext.account?._id,
-    });
+    cacher.save(FOOD_SEARCH_CONTEXT_STORAGE_KEY, snapshot);
   };
 
   return (

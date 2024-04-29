@@ -14,6 +14,7 @@ interface IAppCacheContext {
     fn: (key: string, data: unknown) => boolean
   ) => T | undefined;
   querySelectorAll: <T>(fn: (key: string, data: unknown) => boolean) => T[];
+  clear: () => void;
 }
 
 export const AppCacheContext = createContext<IAppCacheContext>({
@@ -24,12 +25,38 @@ export const AppCacheContext = createContext<IAppCacheContext>({
   removeIf: () => {},
   querySelector: () => ({} as any),
   querySelectorAll: () => [],
+  clear: () => {},
 });
+
+const getDefault = (): Record<string, unknown> => {
+  const result: Record<string, unknown> = {};
+  Object.keys(localStorage).forEach((key) => {
+    if (key.startsWith("lapp")) {
+      try {
+        const data = JSON.parse(localStorage.getItem(key)!);
+        result[key] = data;
+      } catch (error) {
+        // DO NOTHING
+      }
+    }
+  });
+  Object.keys(sessionStorage).forEach((key) => {
+    if (key.startsWith("sapp")) {
+      try {
+        const data = JSON.parse(localStorage.getItem(key)!);
+        result[key] = data;
+      } catch (error) {
+        // DO NOTHING
+      }
+    }
+  });
+  return result;
+};
 
 export default function AppCacheContextProvider({
   children,
 }: IAppCacheContextProviderProps) {
-  const cacheRef = useRef<Record<string, unknown>>({});
+  const cacheRef = useRef<Record<string, unknown>>(getDefault());
 
   const get = function <T>(key: string) {
     const data = cacheRef.current[key];
@@ -44,8 +71,21 @@ export default function AppCacheContextProvider({
     return cacheRef.current[key] as T;
   };
 
-  const save = (key: string, data: any) => {
+  const save = (
+    key: string,
+    data: any,
+    target?: "SESSION" | "LOCAL" | "HEAP"
+  ) => {
+    target ??= "HEAP";
     cacheRef.current[key] = data;
+    switch (target) {
+      case "SESSION":
+        sessionStorage.setItem(`sapp:${key}`, JSON.stringify(data));
+        break;
+      case "LOCAL":
+        localStorage.setItem(`lapp:${key}`, JSON.stringify(data));
+        break;
+    }
   };
 
   const remove = (key: string) => {
@@ -89,6 +129,19 @@ export default function AppCacheContextProvider({
     return result;
   };
 
+  const clear = () => {
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith("lapp")) {
+        localStorage.removeItem(key);
+      }
+    });
+    Object.keys(sessionStorage).forEach((key) => {
+      if (key.startsWith("sapp")) {
+        sessionStorage.removeItem(key);
+      }
+    });
+  };
+
   return (
     <AppCacheContext.Provider
       value={{
@@ -99,6 +152,7 @@ export default function AppCacheContextProvider({
         querySelector,
         querySelectorAll,
         getOrCreate,
+        clear,
       }}
     >
       {children}

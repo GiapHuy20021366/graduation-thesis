@@ -11,7 +11,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import ToggleChipGroup from "../../common/custom/ToggleChipGroup";
 import ToggleChip from "../../common/custom/ToggleChip";
 import {
@@ -20,8 +20,6 @@ import {
   ItemAddedBy,
   ItemAvailable,
   PlaceType,
-  loadFromSessionStorage,
-  saveToSessionStorage,
   toItemAddedBy,
   toPlaceTypes,
   toQuantityType,
@@ -51,19 +49,6 @@ export interface IFilterParams {
   price?: IFoodSearchPrice;
 }
 
-interface IFoodSearchFilterSnapshotData {
-  addedBy: ItemAddedBy;
-  available: ItemAvailable;
-  maxDistance?: number;
-  categories?: FoodCategory[];
-  minQuantity?: number;
-  maxDuration?: number;
-  priceOption?: string;
-  priceRange?: IFoodSearchPrice;
-}
-
-const FOOD_SEARCH_FILTER_STORAGE_KEY = "food.search.filter";
-
 export default function FoodSearchFilter({
   isActive,
   onClose,
@@ -83,7 +68,7 @@ export default function FoodSearchFilter({
     searchContext.categories
   );
   const [categoryActive, setCategoryActive] = useState<boolean>(
-    searchContext.categories?.length === 0
+    searchContext.categories?.length !== 0
   );
   const [minQuantity, setMinQuantity] = useState<number | undefined>(
     searchContext.minQuantity
@@ -107,8 +92,6 @@ export default function FoodSearchFilter({
     "Quantities",
     "DayValues"
   );
-
-  const dirtyRef = useRef<boolean>(true);
 
   const handleReset = () => {
     setAddedBy(ItemAddedBy.ALL);
@@ -137,7 +120,6 @@ export default function FoodSearchFilter({
       price: price,
     };
     onApply(params);
-    doSaveStorage();
   };
 
   const handleCategoryPicked = (category: FoodCategory | null): void => {
@@ -190,42 +172,6 @@ export default function FoodSearchFilter({
       max: +event.target.value,
     });
   };
-
-  const doSaveStorage = () => {
-    const snapshot: IFoodSearchFilterSnapshotData = {
-      addedBy,
-      available,
-      categories,
-      maxDistance,
-      maxDuration,
-      minQuantity,
-      priceOption,
-      priceRange,
-    };
-    saveToSessionStorage(snapshot, {
-      key: FOOD_SEARCH_FILTER_STORAGE_KEY,
-    });
-  };
-
-  useEffect(() => {
-    if (dirtyRef.current) {
-      dirtyRef.current = false;
-      const snapshot = loadFromSessionStorage<IFoodSearchFilterSnapshotData>({
-        key: FOOD_SEARCH_FILTER_STORAGE_KEY,
-        maxDuration: 1 * 24 * 60 * 60 * 1000,
-      });
-      if (snapshot) {
-        setAddedBy(snapshot.addedBy);
-        setAvailable(snapshot.available);
-        setMaxDistance(snapshot.maxDistance);
-        setCategories(snapshot.categories);
-        setMinQuantity(snapshot.minQuantity);
-        setMaxDuration(snapshot.maxDuration);
-        setPriceOption(snapshot.priceOption);
-        setPriceRange(snapshot.priceRange);
-      }
-    }
-  }, []);
 
   const onItemAddedByChange = (value: string) => {
     setAddedBy(value as ItemAddedBy);

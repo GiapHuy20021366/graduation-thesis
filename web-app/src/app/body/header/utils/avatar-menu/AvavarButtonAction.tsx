@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import {
+  useAppCacheContext,
   useAuthContext,
   useComponentLanguage,
   useThemeContext,
@@ -27,9 +28,11 @@ const AvatarButtonAction = React.forwardRef<
   const { account } = authContext;
   const theme = useThemeContext();
   const lang = useComponentLanguage("AvatarButtonAction");
+  const cacher = useAppCacheContext();
 
   const logout = () => {
     sessionStorage.clear();
+    cacher.clear();
     authContext.logout();
   };
 
