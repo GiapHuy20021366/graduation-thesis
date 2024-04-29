@@ -48,10 +48,7 @@ export default function InfoWindowUser({
         <Typography>{user.location?.name}</Typography>
       </Stack>
       <Divider />
-      <StyledLink
-        to={`/profile/${user._id}`}
-        onBeforeNavigate={onBeforeNavigate}
-      >
+      <StyledLink to={`/user/${user._id}`} onBeforeNavigate={onBeforeNavigate}>
         <Button variant="outlined" sx={{ textTransform: "initial" }} fullWidth>
           {lang("go-to-view-this-user")}
         </Button>

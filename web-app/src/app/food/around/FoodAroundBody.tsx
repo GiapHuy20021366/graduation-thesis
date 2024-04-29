@@ -10,11 +10,8 @@ import {
   ICoordinates,
   IFoodPostExposed,
   IFoodSearchParams,
-  ILocation,
   OrderState,
-  loadFromSessionStorage,
   mapIcons,
-  saveToSessionStorage,
 } from "../../../data";
 import { Box, Chip, IconButton, Stack, Tooltip } from "@mui/material";
 import {
@@ -22,20 +19,51 @@ import {
   SettingsSuggestOutlined,
 } from "@mui/icons-material";
 import {
+  useAppCacheContext,
+  useAppContentContext,
   useAuthContext,
+  useComponentLanguage,
   useDistanceCalculation,
   useFoodSearchContext,
   useLoading,
+  useQueryDevice,
 } from "../../../hooks";
 import FoodAroundFilter, { IFilterParams } from "./FoodAroundFilter";
 import { foodFetcher } from "../../../api";
 import InfoWindowFood from "./InfoWindowFood";
+import FoodViewerDialog from "../../common/viewer/dialog/FoodViewerDialog";
 
 interface IFoodAroundBodySnapshotData {
   center: ICoordinates;
-  foods: IFoodPostExposed[];
-  selectedMarker?: number | string;
+  infoOpen?: number | string;
+  groups: IGroupFoodPostExposed[];
 }
+
+export interface IGroupFoodPostExposed {
+  coordinates: ICoordinates;
+  foods: IFoodPostExposed[];
+  _id: string;
+}
+
+const toGroups = (datas: IFoodPostExposed[]): IGroupFoodPostExposed[] => {
+  const map: Record<string, IFoodPostExposed[]> = {};
+  datas.forEach((d) => {
+    const coors = d.location.coordinates;
+    const key = coors.lat.toFixed(4) + "|" + coors.lng.toFixed(4);
+    if (map[key] == null) {
+      map[key] = [d];
+    } else {
+      map[key].push(d);
+    }
+  });
+  return Object.values(map).map(
+    (d): IGroupFoodPostExposed => ({
+      coordinates: d[0].location.coordinates,
+      foods: d,
+      _id: d[0]._id,
+    })
+  );
+};
 
 const FOOD_AROUND_BODY_STORAGE_KEY = "food.around.body";
 
@@ -44,25 +72,41 @@ export default function FoodAroundBody() {
     id: "google-map-script",
     googleMapsApiKey: GOOGLE_MAP_API_KEY,
   });
-  const [center, setCenter] = useState<ICoordinates>({
-    lat: 21.02,
-    lng: 105.83,
-  });
+  const cacher = useAppCacheContext();
+  const cached = cacher.get<IFoodAroundBodySnapshotData>(
+    FOOD_AROUND_BODY_STORAGE_KEY
+  );
+  const appContentContext = useAppContentContext();
+  const [center, setCenter] = useState<ICoordinates>(
+    cached?.center ??
+      appContentContext.currentLocation ?? {
+        lat: 21.02,
+        lng: 105.83,
+      }
+  );
 
-  const [foods, setFoods] = useState<IFoodPostExposed[]>([]);
+  const lang = useComponentLanguage();
 
-  const [infoOpen, setInfoOpen] = useState<boolean>(false);
+  const [groups, setGroups] = useState<IGroupFoodPostExposed[]>(
+    cached?.groups ?? []
+  );
+
+  const [infoOpen, setInfoOpen] = useState<string | number | undefined>(
+    cached?.infoOpen
+  );
   const fetching = useLoading();
   const mapRef = useRef<google.maps.Map>();
   const [loadActive, setLoadActive] = useState<boolean>(false);
   const authContext = useAuthContext();
-  const auth = authContext.auth;
-  const [selectedMarker, setSelectedMarker] = useState<string | number>();
-  const [home, setHome] = useState<ILocation>();
+  const { auth, account } = authContext;
+
   const [filterOpen, setFilterOpen] = useState<boolean>(false);
   const searchContext = useFoodSearchContext();
   const distances = useDistanceCalculation();
   const dirtyRef = useRef<boolean>(true);
+
+  const [openFood, setOpenFood] = useState<string | undefined>();
+  const device = useQueryDevice();
 
   const doSaveStorage = useCallback(() => {
     const map = mapRef.current;
@@ -77,13 +121,11 @@ export default function FoodAroundBody() {
 
     const snapshot: IFoodAroundBodySnapshotData = {
       center: current,
-      foods: foods,
-      selectedMarker: selectedMarker,
+      groups: groups,
+      infoOpen: infoOpen,
     };
-    saveToSessionStorage(snapshot, {
-      key: FOOD_AROUND_BODY_STORAGE_KEY,
-    });
-  }, [foods, selectedMarker]);
+    cacher.save(FOOD_AROUND_BODY_STORAGE_KEY, snapshot);
+  }, [cacher, groups, infoOpen]);
 
   const setCurrentLocation = useCallback(() => {
     () => {
@@ -105,7 +147,7 @@ export default function FoodAroundBody() {
         .then((data) => {
           const datas = data.data;
           if (datas != null && datas.length > 0) {
-            setFoods(datas);
+            setGroups(toGroups(datas));
             setTimeout(() => {
               doSaveStorage();
             }, 0);
@@ -145,62 +187,37 @@ export default function FoodAroundBody() {
       },
       distance: {
         current: current,
-        max: searchContext.maxDistance ?? Number.MAX_SAFE_INTEGER,
+        max: searchContext.maxDistance ?? 20,
       },
       pagination: {
         skip: 0,
-        limit: 200,
+        limit: 5000,
       },
       order: {
         distance: OrderState.INCREASE,
       },
     };
     searchFood(params);
-  }, [
-    searchContext.addedBy,
-    searchContext.available,
-    searchContext.categories,
-    searchContext.maxDistance,
-    searchContext.maxDuration,
-    searchContext.minQuantity,
-    searchContext.price,
-    searchFood,
-  ]);
+    searchContext.doSaveStorage();
+    setOpenFood(undefined);
+    setInfoOpen(undefined);
+  }, [searchContext, searchFood]);
 
   useEffect(() => {
     const map = mapRef.current;
     if (map == null) return;
     if (dirtyRef.current) {
       dirtyRef.current = false;
-      const snapshot = loadFromSessionStorage<IFoodAroundBodySnapshotData>({
-        key: FOOD_AROUND_BODY_STORAGE_KEY,
-        maxDuration: 1 * 24 * 60 * 60 * 1000,
-      });
-      if (snapshot) {
-        setCenter(snapshot.center);
-        setFoods(snapshot.foods);
-        setSelectedMarker(snapshot.selectedMarker);
-      } else {
+      if (cached == null) {
         setCurrentLocation();
         doSearch();
       }
     }
-  }, [doSearch, setCurrentLocation]);
-
-  useEffect(() => {
-    const userLocation = authContext.account?.location;
-    if (userLocation != null && home == null) {
-      setHome(userLocation);
-    }
-  }, [authContext.account, home]);
+  }, [cached, doSearch, setCurrentLocation]);
 
   const handleLocateMe = () => {
     setCenter({ ...center });
-    setInfoOpen(true);
-  };
-
-  const handleOpenInfo = () => {
-    setInfoOpen(!infoOpen);
+    setInfoOpen(0);
   };
 
   const onMapLoaded = (map: google.maps.Map) => {
@@ -212,8 +229,11 @@ export default function FoodAroundBody() {
   };
 
   const toggleMarker = (index: number | string) => {
-    if (selectedMarker === index) setSelectedMarker(undefined);
-    else setSelectedMarker(index);
+    if (infoOpen === index) {
+      setInfoOpen(undefined);
+    } else {
+      setInfoOpen(index);
+    }
   };
 
   const onFilterApply = (params: IFilterParams) => {
@@ -259,6 +279,18 @@ export default function FoodAroundBody() {
       },
     };
     searchFood(paramsToSearch);
+    setOpenFood(undefined);
+    setInfoOpen(undefined);
+
+    // Update context
+    searchContext.setAddedBy(params.addedBy);
+    searchContext.setAvailable(params.available);
+    searchContext.setMaxDistance(params.maxDistance);
+    searchContext.setMaxDuration(params.maxDuration);
+    searchContext.setCategories(params.categories);
+    searchContext.setMinQuantity(params.minQuantity);
+    searchContext.setPrice(params.price);
+    searchContext.doSaveStorage();
   };
 
   const onMapClick = () => {
@@ -268,8 +300,6 @@ export default function FoodAroundBody() {
   const onButtonLoadClick = () => {
     doSearch();
   };
-
-  console.log(foods);
 
   return (
     <Stack
@@ -328,19 +358,22 @@ export default function FoodAroundBody() {
                 scaledSize: new google.maps.Size(40, 40),
               }}
               position={center}
-              onClick={handleOpenInfo}
+              onClick={() => toggleMarker(0)}
             >
-              {infoOpen && (
-                <InfoWindowF position={center} onCloseClick={handleOpenInfo}>
+              {infoOpen === 0 && (
+                <InfoWindowF
+                  position={center}
+                  onCloseClick={() => toggleMarker(0)}
+                >
                   <Box color={"black"}>
-                    <span>Vị trí hiện tại của bạn</span>
+                    <span>{lang("your-current-location")}</span>
                   </Box>
                 </InfoWindowF>
               )}
             </MarkerF>
 
-            {foods.map((food, i) => {
-              const coordinate = food.location.coordinates;
+            {groups.map((group, i) => {
+              const coordinate = group.coordinates;
               return (
                 <MarkerF
                   icon={{
@@ -349,15 +382,18 @@ export default function FoodAroundBody() {
                   }}
                   key={i}
                   position={coordinate}
-                  onClick={() => toggleMarker(food._id)}
+                  onClick={() => toggleMarker(group._id)}
                 >
-                  {selectedMarker === food._id && (
+                  {infoOpen === group._id && (
                     <InfoWindowF
                       position={coordinate}
-                      onCloseClick={() => toggleMarker(food._id)}
+                      onCloseClick={() => toggleMarker(group._id)}
                     >
                       <Box color={"black"}>
-                        <InfoWindowFood food={food} />
+                        <InfoWindowFood
+                          group={group}
+                          onOpen={(id) => setOpenFood(id)}
+                        />
                       </Box>
                     </InfoWindowF>
                   )}
@@ -365,19 +401,24 @@ export default function FoodAroundBody() {
               );
             })}
 
-            {home != null && (
+            {account?.location != null && (
               <MarkerF
                 icon={{
                   url: mapIcons.homeGreen,
                   scaledSize: new google.maps.Size(40, 40),
                 }}
-                position={home.coordinates}
+                position={account.location.coordinates}
               >
-                <InfoWindowF position={home.coordinates}>
-                  <Box sx={{ width: 200 }} color={"black"}>
-                    <span>Nhà của bạn</span>
-                  </Box>
-                </InfoWindowF>
+                {infoOpen === 1 && (
+                  <InfoWindowF
+                    position={account.location.coordinates}
+                    onCloseClick={() => toggleMarker(1)}
+                  >
+                    <Box color={"black"}>
+                      <span>{lang("your-home")}</span>
+                    </Box>
+                  </InfoWindowF>
+                )}
               </MarkerF>
             )}
           </GoogleMap>
@@ -392,7 +433,7 @@ export default function FoodAroundBody() {
       >
         <Stack direction={"column"} gap={1} alignItems={"center"} my={1}>
           <Chip
-            label={"Locate Me"}
+            label={lang("l-locate-me")}
             sx={{
               width: "fit-content",
               px: 5,
@@ -404,7 +445,7 @@ export default function FoodAroundBody() {
             icon={<CenterFocusStrongOutlined color="inherit" />}
           />
           <Chip
-            label={"Load this area"}
+            label={lang("l-load-this-area")}
             onClick={onButtonLoadClick}
             sx={{
               width: "fit-content",
@@ -417,6 +458,15 @@ export default function FoodAroundBody() {
           />
         </Stack>
       </Box>
+      {openFood != null && (
+        <FoodViewerDialog
+          id={openFood}
+          open={true}
+          onClose={() => setOpenFood(undefined)}
+          onCloseClick={() => setOpenFood(undefined)}
+          fullScreen={device === "MOBILE"}
+        />
+      )}
     </Stack>
   );
 }

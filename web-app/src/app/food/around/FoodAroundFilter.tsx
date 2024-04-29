@@ -11,7 +11,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import ToggleChipGroup from "../../common/custom/ToggleChipGroup";
 import ToggleChip from "../../common/custom/ToggleChip";
 import {
@@ -20,8 +20,6 @@ import {
   ItemAddedBy,
   ItemAvailable,
   PlaceType,
-  loadFromSessionStorage,
-  saveToSessionStorage,
   toItemAddedBy,
   toPlaceTypes,
   toQuantityType,
@@ -50,19 +48,6 @@ interface IFoodSearchCondition {
   onApply?: (params: IFilterParams) => void;
   onCloseClick?: () => void;
 }
-
-interface IFoodAroundFilterSnapshotData {
-  addedBy: ItemAddedBy;
-  available: ItemAvailable;
-  maxDistance?: number;
-  categories?: FoodCategory[];
-  minQuantity?: number;
-  maxDuration?: number;
-  priceOption?: string;
-  priceRange?: IFoodSearchPrice;
-}
-
-const FOOD_AROUND_FILTER_STORAGE_KEY = "food.around.filter";
 
 export default function FoodAroundFilter({
   onApply,
@@ -107,8 +92,6 @@ export default function FoodAroundFilter({
     "DayValues"
   );
 
-  const dirtyRef = useRef<boolean>(true);
-
   const handleReset = () => {
     setAddedBy(ItemAddedBy.ALL);
     setAvailable(ItemAvailable.AVAILABLE_ONLY);
@@ -136,7 +119,6 @@ export default function FoodAroundFilter({
       price: price,
     };
     onApply && onApply(params);
-    doSaveStorage();
   };
 
   const handleCategoryPicked = (category: FoodCategory | null): void => {
@@ -189,42 +171,6 @@ export default function FoodAroundFilter({
       max: +event.target.value,
     });
   };
-
-  const doSaveStorage = () => {
-    const snapshot: IFoodAroundFilterSnapshotData = {
-      addedBy,
-      available,
-      categories,
-      maxDistance,
-      maxDuration,
-      minQuantity,
-      priceOption,
-      priceRange,
-    };
-    saveToSessionStorage(snapshot, {
-      key: FOOD_AROUND_FILTER_STORAGE_KEY,
-    });
-  };
-
-  useEffect(() => {
-    if (dirtyRef.current) {
-      dirtyRef.current = false;
-      const snapshot = loadFromSessionStorage<IFoodAroundFilterSnapshotData>({
-        key: FOOD_AROUND_FILTER_STORAGE_KEY,
-        maxDuration: 1 * 24 * 60 * 60 * 1000,
-      });
-      if (snapshot) {
-        setAddedBy(snapshot.addedBy);
-        setAvailable(snapshot.available);
-        setMaxDistance(snapshot.maxDistance);
-        setCategories(snapshot.categories);
-        setMinQuantity(snapshot.minQuantity);
-        setMaxDuration(snapshot.maxDuration);
-        setPriceOption(snapshot.priceOption);
-        setPriceRange(snapshot.priceRange);
-      }
-    }
-  }, []);
 
   const onItemAddedByChange = (value: string) => {
     setAddedBy(value as ItemAddedBy);

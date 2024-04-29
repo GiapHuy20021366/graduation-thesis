@@ -369,7 +369,8 @@
         "unkown-location": "Vị khí không xác định",
         "l-locate-me": "Vị trí của tôi",
         "l-load-this-area": "Tìm kiếm khu vực này",
-        "every-one": "mọi người"
+        "every-one": "mọi người",
+        "near": "Gần"
     },
     "Toasts": {
         "can-not-sharing-now": "Không thể chia sẻ thực phẩm vào lúc này",
