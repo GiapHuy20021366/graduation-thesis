@@ -1,0 +1,330 @@
+{
+	"info": {
+		"_postman_id": "b6e02d70-c3d1-4b15-be74-f1c70d646bb3",
+		"name": "CommuniFood API Test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26717257"
+	},
+	"item": [
+		{
+			"name": "Test Search Food Equivalent",
+			"item": [
+				{
+					"name": "Search Food",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set('body', JSON.stringify(data));"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+									"});\r",
+									"\r",
+									"const { user, place, query, distance, category, maxDuration, price, minQuantity, price, addedBy, available, order, populate, resolved, resolveBy, pagination, active } = data;\r",
+									"\r",
+									"if (pagination != null) {\r",
+									"    pm.test(\"Response should not include over number of food(s)\", function () {\r",
+									"        var jsonData = pm.response.json();\r",
+									"        pm.expect(jsonData.data.length).to.lte(pagination.limit);\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"const toUserId = (v) => {\r",
+									"    if (v instanceof \"object\") return v._id;\r",
+									"    else return v;\r",
+									"}\r",
+									"\r",
+									"const toPlaceId = (v) => {\r",
+									"    if (v == null) return \"NO_PLACE_FOUND\";\r",
+									"    if (v instanceof \"object\") return v._id;\r",
+									"    else return v;\r",
+									"}\r",
+									"\r",
+									"if (user?.include != null) {\r",
+									"    const include = user.include;\r",
+									"    pm.test(\"Response should include only user(s)\", function () {\r",
+									"        var jsonData = pm.response.json();\r",
+									"        pm.expect(jsonData.data.every(d => include.includes(toUserId(d.user)))).to.be.true;\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"if (user?.exclude != null) {\r",
+									"    const exclude = user.exclude;\r",
+									"    pm.test(\"Response should exclude user(s)\", function () {\r",
+									"        var jsonData = pm.response.json();\r",
+									"        pm.expect(jsonData.data.every(d => !exclude.includes(toUserId(d.user)))).to.be.true;\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"if (place?.include != null) {\r",
+									"    const include = place.include;\r",
+									"    pm.test(\"Response should include only place(s)\", function () {\r",
+									"        var jsonData = pm.response.json();\r",
+									"        pm.expect(jsonData.data.every(d => include.includes(toPlaceId(d.place)))).to.be.true;\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"if (place?.exclude != null) {\r",
+									"    const exclude = place.exclude;\r",
+									"    pm.test(\"Response should exclude place(s)\", function () {\r",
+									"        var jsonData = pm.response.json();\r",
+									"        pm.expect(jsonData.data.every(d => !exclude.includes(toPlaceId(d.place)))).to.be.true;\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"const toDistance = (coors1, coors2) => {\r",
+									"    const { lat: lat1, lng: lon1 } = coors1;\r",
+									"    const { lat: lat2, lng: lon2 } = coors2;\r",
+									"    const toRadians = (deg) => deg * (Math.PI / 180);\r",
+									"    const R = 6371;\r",
+									"    const φ1 = toRadians(lat1);\r",
+									"    const φ2 = toRadians(lat2);\r",
+									"    const Δφ = toRadians(lat2 - lat1);\r",
+									"    const Δλ = toRadians(lon2 - lon1);\r",
+									"    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +\r",
+									"        Math.cos(φ1) * Math.cos(φ2) *\r",
+									"        Math.sin(Δλ / 2) * Math.sin(Δλ / 2);\r",
+									"    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));\r",
+									"    const distance = R * c;\r",
+									"    return distance;\r",
+									"}\r",
+									"\r",
+									"if (distance != null) {\r",
+									"    const { max, current } = distance;\r",
+									"    pm.test(\"Response should have distance less than km(s)\", function () {\r",
+									"        var jsonData = pm.response.json();\r",
+									"        pm.expect(jsonData.data.every(d => toDistance(current, d.location.coordinates) <= max)).to.be.true;\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"if (category != null && category.length > 0) {\r",
+									"    pm.test(\"Response should have only category(s)\", function () {\r",
+									"        var jsonData = pm.response.json();\r",
+									"        pm.expect(jsonData.data.every(d => d.categories.some(c => category.includes(c)))).to.be.true;\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"if (maxDuration != null) {\r",
+									"    pm.test(\"Response should have duration less than\", function () {\r",
+									"        var jsonData = pm.response.json();\r",
+									"        pm.expect(jsonData.data.every(d => new Date(d.duration).getTime() < maxDuration)).to.be.true;\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"if (price != null) {\r",
+									"    const { min, max } = price;\r",
+									"    if (min != null) {\r",
+									"        pm.test(\"Response should have price greater or equal than\", function () {\r",
+									"            var jsonData = pm.response.json();\r",
+									"            pm.expect(jsonData.data.every(d => d.price >= min)).to.be.true;\r",
+									"        });\r",
+									"    }\r",
+									"    if (max != null) {\r",
+									"        pm.test(\"Response should have price less or equal than\", function () {\r",
+									"            var jsonData = pm.response.json();\r",
+									"            pm.expect(jsonData.data.every(d => d.price <= max)).to.be.true;\r",
+									"        });\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"if (minQuantity != null) {\r",
+									"    pm.test(\"Response should have quantity greater or equal than\", function () {\r",
+									"        var jsonData = pm.response.json();\r",
+									"        pm.expect(jsonData.data.every(d => d.quantity >= minQuantity)).to.be.true;\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"if (available != null) {\r",
+									"    const isValidAvailable = (data) => {\r",
+									"        if (available === \"AVAIABLE_ONLY\") return new Date(data.duration).getTime() >= Date.now()\r",
+									"        if (available === \"JUST_GONE\") return new Date(data.duration).getTime() < Date.now()\r",
+									"        return true;\r",
+									"    }\r",
+									"    pm.test(\"Response should have valid available\", function () {\r",
+									"        var jsonData = pm.response.json();\r",
+									"        pm.expect(jsonData.data.every(d => isValidAvailable(d))).to.be.true;\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"if (resolved != null) {\r",
+									"    pm.test(\"Response should have right resolved\", function () {\r",
+									"        var jsonData = pm.response.json();\r",
+									"        pm.expect(jsonData.data.every(d => d.resolved === resolved)).to.be.true;\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"if (resolveBy != null) {\r",
+									"    const { include, exclude } = resolveBy;\r",
+									"    if (include != null) {\r",
+									"        pm.test(\"Response should resolved by user(s)\", function () {\r",
+									"            var jsonData = pm.response.json();\r",
+									"            pm.expect(jsonData.data.every(d => !include.includes(d.resolveBy))).to.be.true;\r",
+									"        });\r",
+									"    }\r",
+									"    if (exclude != null) {\r",
+									"        pm.test(\"Response should not resolved by user(s)\", function () {\r",
+									"            var jsonData = pm.response.json();\r",
+									"            pm.expect(jsonData.data.every(d => !exclude.includes(d.resolveBy))).to.be.true;\r",
+									"        });\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"if (active != null) {\r",
+									"    pm.test(\"Response should have rigth active\", function () {\r",
+									"        var jsonData = pm.response.json();\r",
+									"        pm.expect(jsonData.data.every(d => d.active === active)).to.be.true;\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"const isCorrectOrder = (arr, order) => {\r",
+									"    if (order === -1) {\r",
+									"        return arr.sort((a, b) => a > b).join(\"|\") === arr.join(\"|\");\r",
+									"    }\r",
+									"    if (order === 1) {\r",
+									"        return arr.sort((a, b) => a < b).join(\"|\") === arr.join(\"|\");\r",
+									"    }\r",
+									"    return true;\r",
+									"}\r",
+									"\r",
+									"if (order != null) {\r",
+									"    const { relative, distance, time, price, quantity } = order;\r",
+									"    if ((query == null || query.length === 0) && distance != null) {\r",
+									"        if (distance) {\r",
+									"            pm.test(\"Response should correct order distance\", function () {\r",
+									"                var jsonData = pm.response.json();\r",
+									"                const distances = jsonData.data.map(d => toDistance(d.location.coordinates, distance.current));\r",
+									"                pm.expect(isCorrectOrder(distances, distance)).to.be.true;\r",
+									"            });\r",
+									"        }\r",
+									"        if (time) {\r",
+									"            pm.test(\"Response should correct order time\", function () {\r",
+									"                var jsonData = pm.response.json();\r",
+									"                const createdAts = jsonData.data.map(d => new Date(d.createdAt).getTime());\r",
+									"                pm.expect(isCorrectOrder(createdAts, time)).to.be.true;\r",
+									"            });\r",
+									"        }\r",
+									"        if (price) {\r",
+									"            pm.test(\"Response should correct order price\", function () {\r",
+									"                var jsonData = pm.response.json();\r",
+									"                const prices = jsonData.data.map(d => d.price);\r",
+									"                pm.expect(isCorrectOrder(prices, price)).to.be.true;\r",
+									"            });\r",
+									"        }\r",
+									"        if (quantity) {\r",
+									"            pm.test(\"Response should correct order quantity\", function () {\r",
+									"                var jsonData = pm.response.json();\r",
+									"                const quantities = jsonData.data.map(d => d.quantity);\r",
+									"                pm.expect(isCorrectOrder(quantities, quantity)).to.be.true;\r",
+									"            });\r",
+									"        }\r",
+									"    }\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{{body}}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{gateway}}/{{food_service}}/foods/search",
+							"host": [
+								"{{gateway}}"
+							],
+							"path": [
+								"{{food_service}}",
+								"foods",
+								"search"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"try {\r",
+							"    const token = jsonData.data.token;\r",
+							"    pm.environment.set(\"token\", token);\r",
+							"} catch (err) {\r",
+							"    console.error(err)\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"gv.huy.2002@gmail.com\",\r\n    \"password\": \"Sharefood@2024\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{gateway}}/{{user_service}}/users/login?method=manual",
+					"host": [
+						"{{gateway}}"
+					],
+					"path": [
+						"{{user_service}}",
+						"users",
+						"login"
+					],
+					"query": [
+						{
+							"key": "method",
+							"value": "manual"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,225 @@
+[
+    {},
+    {
+        "user": {
+            "include": [
+                "66252db3dce942e19b422a8e"
+            ],
+            "excude": [
+                "66252db3dce942e19b422a8f"
+            ]
+        }
+    },
+    {
+        "user": {
+            "include": [
+                "66252db3dce942e19b422a8e"
+            ]
+        }
+    },
+    {
+        "user": {
+            "excude": [
+                "66252db3dce942e19b422a8f"
+            ]
+        }
+    },
+    {
+        "place": {
+            "include": [
+                "66252e1e6e79b2222b6c72af"
+            ],
+            "excude": [
+                "66252e1e6e79b2222b6c72b0"
+            ]
+        }
+    },
+    {
+        "place": {
+            "include": [
+                "66252e1e6e79b2222b6c72af"
+            ]
+        }
+    },
+    {
+        "place": {
+            "excude": [
+                "66252e1e6e79b2222b6c72b0"
+            ]
+        }
+    },
+    {
+        "distance": {
+            "max": 10,
+            "current": {
+                "lat": 21.040621,
+                "lng": 105.777413
+            }
+        }
+    },
+    {
+        "distance": {
+            "max": 10
+        }
+    },
+    {
+        "distance": {
+            "current": {
+                "lat": 21.040621,
+                "lng": 105.777413
+            }
+        }
+    },
+    {
+        "category": [
+            "ANIMAL_PRODUCT",
+            "SALADS"
+        ]
+    },
+    {
+        "maxDuration": 3
+    },
+    {
+        "price": {
+            "min": 10000,
+            "max": 50000
+        }
+    },
+    {
+        "price": {
+            "min": 10000
+        }
+    },
+    {
+        "price": {
+            "max": 50000
+        }
+    },
+    {
+        "minQuantity": 4
+    },
+    {
+        "addedBy": [
+            0
+        ]
+    },
+    {
+        "addedBy": [
+            1
+        ]
+    },
+    {
+        "addedBy": [
+            2
+        ]
+    },
+    {
+        "addedBy": [
+            3
+        ]
+    },
+    {
+        "addedBy": [
+            4
+        ]
+    },
+    {
+        "addedBy": [
+            5
+        ]
+    },
+    {
+        "available": "ALL"
+    },
+    {
+        "available": "AVAILABLE_ONLY"
+    },
+    {
+        "available": "JUST_GONE"
+    },
+    {
+        "resolved": true
+    },
+    {
+        "resolved": false
+    },
+    {
+        "query": "Tôm"
+    },
+    {
+        "active": true
+    },
+    {
+        "active": false
+    },
+    {
+        "pagination": {
+            "skip": 0,
+            "limit": 10
+        }
+    },
+    {
+        "resolveBy": {
+            "include": [
+                "66252db3dce942e19b422a8e"
+            ],
+            "excude": [
+                "66252db3dce942e19b422a8f"
+            ]
+        }
+    },
+    {
+        "resolveBy": {
+            "include": [
+                "66252db3dce942e19b422a8e"
+            ]
+        }
+    },
+    {
+        "resolveBy": {
+            "excude": [
+                "66252db3dce942e19b422a8f"
+            ]
+        }
+    },
+    {
+        "order": {
+            "time": -1
+        }
+    },
+    {
+        "order": {
+            "time": 1
+        }
+    },
+    {
+        "order": {
+            "distance": -1
+        }
+    },
+    {
+        "order": {
+            "distance": 1
+        }
+    },
+    {
+        "order": {
+            "price": -1
+        }
+    },
+    {
+        "order": {
+            "price": 1
+        }
+    },
+    {
+        "order": {
+            "quantity": -1
+        }
+    },
+    {
+        "order": {
+            "quantity": 1
+        }
+    }
+]
