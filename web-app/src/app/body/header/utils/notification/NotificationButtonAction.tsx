@@ -67,7 +67,7 @@ const NotificationButtonAction = React.forwardRef<
           horizontal: "left",
         }}
       >
-        <NotificationSystemExposed />
+        <NotificationSystemExposed onItemClick={handleClose} />
       </Popover>
     </>
   );

@@ -8,7 +8,13 @@ import ListEnd from "../../../../common/viewer/data/ListEnd";
 import ErrorRetry from "../../../../common/viewer/data/ErrorRetry";
 import { useRef, useState } from "react";
 
-export default function NotifocationSystemExposed() {
+interface INotifocationSystemExposedProps {
+  onItemClick?: () => void;
+}
+
+export default function NotifocationSystemExposed({
+  onItemClick,
+}: INotifocationSystemExposedProps) {
   const notificationContext = useNotificationContext();
   const {
     groups,
@@ -103,6 +109,7 @@ export default function NotifocationSystemExposed() {
               onClick={() => {
                 readNotification(group._id);
                 kepts.current.add(group._id);
+                onItemClick && onItemClick();
               }}
               sx={{
                 minHeight: "5rem",
