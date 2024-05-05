@@ -121,13 +121,15 @@ export const createFavoriteFoodNotifications = async (
 
 export const createLikedFoodNotifications = async (
   userId: string,
-  foodId: string
+  foodId: string,
+  authorId: string
 ) => {
   const notificationData: INotification = {
-    users: [userId],
+    users: [authorId],
     reads: [],
     type: NotificationType.FOOD_LIKED,
     typedFoods: [foodId],
+    typedUser: userId,
   };
   const notification = new Notification(notificationData);
   await notification.save();

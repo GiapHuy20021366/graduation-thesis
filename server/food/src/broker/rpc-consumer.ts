@@ -86,6 +86,7 @@ export interface IBrokerNotifyFavoriteFoodPayload {
 export interface IBrokerNotifyLikedFoodPayload {
   userId: string;
   foodId: string;
+  authorId: string;
 }
 
 export const initRpcConsumers = (_rabbit: RabbitMQ): void => {

@@ -42,11 +42,5 @@ export const readNotifications = async (
         notifications.map((n) => n._id.toString())
       )
     );
-    /**
-     * Temp
-     */
-    sockets.forEach((s) =>
-      s.emit(socketNotificationEmitKey.READ_NOTIFICATION, notificationIds)
-    );
   }
 };

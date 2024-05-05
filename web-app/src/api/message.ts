@@ -153,28 +153,24 @@ export const messageFetcher: MessageFetcher = {
     limit: number | null,
     auth: IAuthInfo
   ): Promise<MessageResponse<INotificationExposed[]>> => {
-    console.log(from, to, limit, auth);
-    // const params = new URLSearchParams();
-    // if (from) {
-    //   params.set("from", String(from));
-    // }
-    // if (to) {
-    //   params.set("to", String(to));
-    // }
-    // if (limit) {
-    //   params.set("limit", String(limit));
-    // }
-    // return messageInstance.get(
-    //   messageEndpoints.getNotifications + "?" + params.toString(),
-    //   {
-    //     headers: {
-    //       Authorization: auth.token,
-    //     },
-    //   }
-    // );
-    return Promise.resolve({
-      data: fakeNotification(),
-    });
+    const params = new URLSearchParams();
+    if (from) {
+      params.set("from", String(from));
+    }
+    if (to) {
+      params.set("to", String(to));
+    }
+    if (limit) {
+      params.set("limit", String(limit));
+    }
+    return messageInstance.get(
+      messageEndpoints.getNotifications + "?" + params.toString(),
+      {
+        headers: {
+          Authorization: auth.token,
+        },
+      }
+    );
   },
 };
 

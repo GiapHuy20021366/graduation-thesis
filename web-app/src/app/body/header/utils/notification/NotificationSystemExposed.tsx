@@ -6,7 +6,7 @@ import {
 import NotificationItemExposed from "./NotificationItemExposed";
 import ListEnd from "../../../../common/viewer/data/ListEnd";
 import ErrorRetry from "../../../../common/viewer/data/ErrorRetry";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export default function NotifocationSystemExposed() {
   const notificationContext = useNotificationContext();
@@ -20,11 +20,24 @@ export default function NotifocationSystemExposed() {
   } = notificationContext;
   const [isAll, setIsAll] = useState<boolean>(true);
   const lang = useComponentLanguage("NotifocationSystemExposed");
+  const kepts = useRef<Set<string>>(new Set());
+
+  const handleSetAll = (val: boolean) => {
+    if (val == isAll) return;
+    setIsAll(val);
+    kepts.current.clear();
+  };
+
+  const handleReadAll = () => {
+    groups.forEach((g) => !g.read && kepts.current.add(g._id));
+    readAll();
+  };
 
   const unreadCount = notificationContext.groups.reduce((cur, group) => {
     if (!group.read) cur += 1;
     return cur;
   }, 0);
+
   return (
     <Stack
       width={["90vw", "60vw", "40vw"]}
@@ -51,7 +64,7 @@ export default function NotifocationSystemExposed() {
               textTransform: "none",
               fontSize: "0.8em",
             }}
-            onClick={() => readAll()}
+            onClick={() => handleReadAll()}
           >
             {lang("read-all")}
           </Button>
@@ -61,13 +74,13 @@ export default function NotifocationSystemExposed() {
             label={lang("all-label")}
             color={isAll ? "secondary" : "default"}
             sx={{ cursor: "pointer" }}
-            onClick={() => setIsAll(true)}
+            onClick={() => handleSetAll(true)}
           />
           <Chip
             label={lang("not-read-label")}
             color={!isAll ? "secondary" : "default"}
             sx={{ cursor: "pointer" }}
-            onClick={() => setIsAll(false)}
+            onClick={() => handleSetAll(false)}
           />
         </Stack>
       </Box>
@@ -80,14 +93,17 @@ export default function NotifocationSystemExposed() {
         gap={1}
       >
         {groups.map((group) => {
-          if (group.read && !isAll) {
+          if (group.read && !isAll && !kepts.current.has(group._id)) {
             return <></>;
           }
           return (
             <NotificationItemExposed
               group={group}
               key={group._id}
-              onClick={() => readNotification(group._id)}
+              onClick={() => {
+                readNotification(group._id);
+                kepts.current.add(group._id);
+              }}
               sx={{
                 minHeight: "5rem",
               }}
@@ -102,7 +118,7 @@ export default function NotifocationSystemExposed() {
         />
         <ErrorRetry
           active={isError && !isFetching}
-          onRetry={() => loadNotification}
+          onRetry={() => loadNotification()}
         />
       </Stack>
     </Stack>

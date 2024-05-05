@@ -112,7 +112,7 @@ export default function NotificationContextProvider({
     loader.setIsError(false);
 
     messageFetcher
-      .getNotifications(minTime, 50, auth)
+      .getNotifications(0, minTime, 50, auth)
       .then((res) => {
         const data = res.data;
         if (data) {

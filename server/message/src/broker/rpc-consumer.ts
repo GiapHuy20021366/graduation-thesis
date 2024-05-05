@@ -106,6 +106,7 @@ export interface IBrokerNotifyFavoriteFoodPayload {
 export interface IBrokerNotifyLikedFoodPayload {
   userId: string;
   foodId: string;
+  authorId: string;
 }
 
 export const initRpcConsumers = (_rabbit: RabbitMQ): void => {
@@ -170,8 +171,8 @@ export const initBrokerConsumners = (rabbit: RabbitMQ): void => {
   rabbit.listenMessage(
     brokerOperations.food.NOTIFY_FOOD_LIKED,
     (msg: IBrokerMessage<IBrokerNotifyLikedFoodPayload>) => {
-      const { foodId, userId } = msg.data;
-      createLikedFoodNotifications(userId, foodId);
+      const { foodId, userId, authorId } = msg.data;
+      createLikedFoodNotifications(userId, foodId, authorId);
     }
   );
 };

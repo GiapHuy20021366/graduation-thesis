@@ -1,5 +1,5 @@
 import React from "react";
-import { Avatar, Stack, StackProps, Typography } from "@mui/material";
+import { Avatar, Box, Stack, StackProps, Typography } from "@mui/material";
 import { INotificationGroup } from "../../../../../../data";
 import SquareContainer from "../../../../../common/custom/SquareContainer";
 import { useComponentLanguage } from "../../../../../../hooks";
@@ -43,16 +43,16 @@ const NotificationFoodSubcribedPlace = React.forwardRef<
         width: "100%",
         ...(rest.sx ?? {}),
       }}
-      gap={1}
+      gap={3}
       direction={"row"}
       p={1}
     >
-      <SquareContainer size={"12%"}>
-        <Avatar sx={{ width: "100%", height: "100%" }} />
-      </SquareContainer>
-      <Typography>
-        {lang("food-subcribed-place", data.foods.length)}
-      </Typography>
+      <Box width={"60px"}>
+        <SquareContainer size={"60px"}>
+          <Avatar sx={{ width: "100%", height: "100%" }} />
+        </SquareContainer>
+      </Box>
+      <Typography>{lang("food-subcribed-place", data.foods.length)}</Typography>
     </Stack>
   );
 });

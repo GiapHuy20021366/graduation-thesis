@@ -13,6 +13,8 @@ import NotificationPlaceRating from "./exposed/NotificationPlaceRating";
 import NotificationPlaceReport from "./exposed/NotificationPlaceReport";
 import NotificationdUserPersonal from "./exposed/NotificationUserPersonal";
 import NotificationdUserWelcome from "./exposed/NotificationUserWelcome";
+import StyledLink from "../../../../common/navigate/StyledLink";
+import { applicationPages } from "../../../../../hooks";
 
 type NotificationItemExposedProps = StackProps & {
   group: INotificationGroup;
@@ -35,46 +37,104 @@ const NotificationItemExposed = React.forwardRef<
         gap: 1,
         backgroundColor: read ? "inherit" : "action.hover",
         ":hover": {
-          backgroundColor: "action.hover",
+          backgroundColor: read ? "#242526" : undefined,
         },
         cursor: "pointer",
       }}
     >
       {type === NotificationType.FOOD_EXPIRED && (
-        <NotificationFoodExpired group={group} key={group._id} />
+        <StyledLink to={applicationPages.FOOD} key={group._id}>
+          <NotificationFoodExpired group={group} key={group._id} />
+        </StyledLink>
       )}
       {type === NotificationType.FOOD_LIKED && (
-        <NotificationFoodLike group={group} key={group._id} />
+        <StyledLink
+          to={applicationPages.FOOD_VIEWER.replace(
+            ":id",
+            group.datas[0].typedFoods![0]
+          )}
+          key={group._id}
+        >
+          <NotificationFoodLike group={group} key={group._id} />
+        </StyledLink>
       )}
       {type === NotificationType.FOOD_NEAR_EXPIRED && (
-        <NotificationFoodNearExpired group={group} key={group._id} />
+        <StyledLink to={applicationPages.FOOD} key={group._id}>
+          <NotificationFoodNearExpired group={group} key={group._id} />
+        </StyledLink>
       )}
+
       {type === NotificationType.FOOD_SUBCRIBED_PLACE && (
-        <NotificationFoodSubcribedPlace group={group} key={group._id} />
+        <StyledLink
+          to={applicationPages.HOME + "?tab=registed"}
+          key={group._id}
+        >
+          <NotificationFoodSubcribedPlace group={group} key={group._id} />
+        </StyledLink>
       )}
       {type === NotificationType.FOOD_SUBCRIBED_USER && (
-        <NotificationFoodSubcribedUser group={group} key={group._id} />
+        <StyledLink
+          to={applicationPages.HOME + "?tab=registed"}
+          key={group._id}
+        >
+          <NotificationFoodSubcribedUser group={group} key={group._id} />
+        </StyledLink>
       )}
       {type === NotificationType.FOOD_SUGGESTED_AROUND && (
-        <NotificationFoodSuggestedAround group={group} key={group._id} />
+        <StyledLink to={applicationPages.HOME + "?tab=around"} key={group._id}>
+          <NotificationFoodSuggestedAround group={group} key={group._id} />
+        </StyledLink>
       )}
       {type === NotificationType.FOOD_SUGGESTED_CATEGORY && (
-        <NotificationFoodSuggestedCategory group={group} key={group._id} />
+        <StyledLink
+          to={applicationPages.HOME + "?tab=suggested"}
+          key={group._id}
+        >
+          <NotificationFoodSuggestedCategory group={group} key={group._id} />
+        </StyledLink>
       )}
       {type === NotificationType.PLACE_INACTIVE && (
-        <NotificationPlaceInactive group={group} key={group._id} />
+        <StyledLink
+          to={applicationPages.PLACE_VIEWER.replace(
+            ":id",
+            group.datas[0].typedPlace!
+          )}
+          key={group._id}
+        >
+          <NotificationPlaceInactive group={group} key={group._id} />
+        </StyledLink>
       )}
       {type === NotificationType.PLACE_RATING && (
-        <NotificationPlaceRating group={group} key={group._id} />
+        <StyledLink
+          to={applicationPages.PLACE_VIEWER.replace(
+            ":id",
+            group.datas[0].typedPlace!
+          )}
+          key={group._id}
+        >
+          <NotificationPlaceRating group={group} key={group._id} />
+        </StyledLink>
       )}
       {type === NotificationType.PLACE_REPORT && (
-        <NotificationPlaceReport group={group} key={group._id} />
+        <StyledLink
+          to={applicationPages.PLACE_VIEWER.replace(
+            ":id",
+            group.datas[0].typedPlace!
+          )}
+          key={group._id}
+        >
+          <NotificationPlaceReport group={group} key={group._id} />
+        </StyledLink>
       )}
       {type === NotificationType.USER_PERSONAL_NEED_UPDATE && (
-        <NotificationdUserPersonal group={group} key={group._id} />
+        <StyledLink to={applicationPages.USER} key={group._id}>
+          <NotificationdUserPersonal group={group} key={group._id} />
+        </StyledLink>
       )}
       {type === NotificationType.USER_WELLCOME && (
-        <NotificationdUserWelcome group={group} key={group._id} />
+        <StyledLink to={applicationPages.USER} key={group._id}>
+          <NotificationdUserWelcome group={group} key={group._id} />
+        </StyledLink>
       )}
     </Stack>
   );

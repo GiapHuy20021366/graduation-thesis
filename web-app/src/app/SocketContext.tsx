@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useRef } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { Socket, io } from "socket.io-client";
 import { useAuthContext } from "../hooks";
 import { VITE_MESSAGE_SOCKET_URL } from "../env";
@@ -16,12 +16,11 @@ export const SocketContext = createContext<ISocketContext>({});
 export default function SocketContextProvider({
   children,
 }: ISocketContextProviderProps) {
-  const socketRef = useRef<Socket>();
+  const [socket, setSocket] = useState<Socket>();
   const authContext = useAuthContext();
 
   useEffect(() => {
     const auth = authContext.auth;
-    const socket = socketRef.current;
 
     if (auth != null && socket == null) {
       const newSocket = io(VITE_MESSAGE_SOCKET_URL, {
@@ -29,10 +28,10 @@ export default function SocketContextProvider({
           Authorization: auth.token,
         },
       });
-      socketRef.current = newSocket;
+      setSocket(newSocket);
 
       newSocket.on("connect", () => {
-        console.log(newSocket.id);
+        console.info("Socket connected", newSocket.id);
       });
       newSocket.on("error", (err) => console.log(err));
     }
@@ -42,12 +41,12 @@ export default function SocketContextProvider({
         socket.close();
       }
     };
-  }, [authContext.auth]);
+  }, [authContext.auth, setSocket, socket]);
 
   return (
     <SocketContext.Provider
       value={{
-        socket: socketRef.current,
+        socket: socket,
       }}
     >
       {children}

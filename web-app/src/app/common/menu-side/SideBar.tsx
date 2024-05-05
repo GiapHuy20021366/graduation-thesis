@@ -23,6 +23,7 @@ import {
   SettingsOutlined,
   People,
   LunchDiningOutlined,
+  StorefrontOutlined,
 } from "@mui/icons-material";
 import SideBarOpener from "./SideBarOpener";
 import StyledLink from "../navigate/StyledLink";
@@ -46,7 +47,7 @@ export default function SideBar() {
       onClose={() => appContentContext.setMenuSideActive(false)}
       variant="temporary"
     >
-      <Stack sx={{ overflow: "hidden" }}>
+      <Stack sx={{ overflow: "hidden", width: ["35vw", "25vw", "auto"] }}>
         <Stack direction="row" gap={1} p={1} alignItems={"center"}>
           <SquareContainer size={"4em"}>
             <Avatar
@@ -57,7 +58,7 @@ export default function SideBar() {
             </Avatar>
           </SquareContainer>
           <Typography>{exposedName}</Typography>
-          <SideBarOpener />
+          <SideBarOpener sx={{ marginLeft: "auto" }} />
         </Stack>
         <Divider sx={{ backgroundColor: "inherit" }} />
         <MenuList
@@ -66,7 +67,7 @@ export default function SideBar() {
         >
           {/* Home */}
           <StyledLink to={applicationPages.HOME}>
-            <MenuItem selected={page.is(applicationPages.HOME)}>
+            <MenuItem selected={page.is(applicationPages.HOME)} sx={{ gap: 2 }}>
               <ListItemIcon>
                 <HomeOutlined fontSize="medium" />
               </ListItemIcon>
@@ -76,7 +77,7 @@ export default function SideBar() {
 
           {/* User */}
           <StyledLink to={applicationPages.USER}>
-            <MenuItem selected={page.is(applicationPages.USER)}>
+            <MenuItem selected={page.is(applicationPages.USER)} sx={{ gap: 2 }}>
               <ListItemIcon>
                 <SentimentSatisfiedAltOutlined fontSize="medium" />
               </ListItemIcon>
@@ -86,9 +87,12 @@ export default function SideBar() {
 
           {/* User */}
           <StyledLink to={applicationPages.PLACE}>
-            <MenuItem selected={page.is(applicationPages.PLACE)}>
+            <MenuItem
+              selected={page.is(applicationPages.PLACE)}
+              sx={{ gap: 2 }}
+            >
               <ListItemIcon>
-                <SentimentSatisfiedAltOutlined fontSize="medium" />
+                <StorefrontOutlined fontSize="medium" />
               </ListItemIcon>
               <ListItemText>{lang("place")}</ListItemText>
             </MenuItem>
@@ -96,7 +100,10 @@ export default function SideBar() {
 
           {/* Location */}
           <StyledLink to={applicationPages.SET_LOCATION}>
-            <MenuItem selected={page.is(applicationPages.SET_LOCATION)}>
+            <MenuItem
+              selected={page.is(applicationPages.SET_LOCATION)}
+              sx={{ gap: 2 }}
+            >
               <ListItemIcon>
                 <RoomOutlined fontSize="medium" />
               </ListItemIcon>
@@ -105,8 +112,11 @@ export default function SideBar() {
           </StyledLink>
 
           {/* User Around */}
-          <StyledLink to={"/user/around"}>
-            <MenuItem selected={page.is(applicationPages.USER_AROUND)}>
+          <StyledLink to={applicationPages.USER_AROUND}>
+            <MenuItem
+              selected={page.is(applicationPages.USER_AROUND)}
+              sx={{ gap: 2 }}
+            >
               <ListItemIcon>
                 <People fontSize="medium" />
               </ListItemIcon>
@@ -115,8 +125,11 @@ export default function SideBar() {
           </StyledLink>
 
           {/* Food Around */}
-          <StyledLink to={"/food/around"}>
-            <MenuItem selected={page.is(applicationPages.FOOD_AROUND)}>
+          <StyledLink to={applicationPages.FOOD_AROUND}>
+            <MenuItem
+              selected={page.is(applicationPages.FOOD_AROUND)}
+              sx={{ gap: 2 }}
+            >
               <ListItemIcon>
                 <LunchDiningOutlined fontSize="medium" />
               </ListItemIcon>
@@ -127,8 +140,11 @@ export default function SideBar() {
           <Divider sx={{ backgroundColor: "inherit", my: 1 }} />
 
           {/* Setting */}
-          <StyledLink to={"/setting"}>
-            <MenuItem selected={page.is(applicationPages.SETTING)}>
+          <StyledLink to={applicationPages.SETTING}>
+            <MenuItem
+              selected={page.is(applicationPages.SETTING)}
+              sx={{ gap: 2 }}
+            >
               <ListItemIcon>
                 <SettingsOutlined fontSize="medium" />
               </ListItemIcon>

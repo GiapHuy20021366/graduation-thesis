@@ -309,6 +309,7 @@ export const notifyLikedFood = async (userId: string, foodId: string) => {
     {
       userId: userId,
       foodId: foodId,
+      authorId: foodId,
     }
   );
 };
