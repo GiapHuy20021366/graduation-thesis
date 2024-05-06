@@ -8,32 +8,46 @@ import {
   CardHeader,
   CardProps,
   IconButton,
+  Skeleton,
   Stack,
   Tooltip,
   Typography,
 } from "@mui/material";
 import { IFoodPostTagged } from "./HomeViewerContext";
-import { Favorite, LocationOn, Send, Share, Star } from "@mui/icons-material";
+import { Favorite, LocationOn, Send, Star } from "@mui/icons-material";
 import TimeExposed from "../common/custom/TimeExposed";
-import Carousel from "react-material-ui-carousel";
+// import Carousel from "react-material-ui-carousel";
 import { toDistance } from "../../data";
-import { useAppContentContext, useFoodPostViewerContext } from "../../hooks";
+import {
+  useAppContentContext,
+  useComponentLanguage,
+  useFoodPostViewerContext,
+} from "../../hooks";
 import CountDown from "../common/util/CountDown";
 import FoodAvatars from "../common/viewer/data/FoodAvatars";
 import FoodPostButtonWithMenu from "../food/post/FoodPostButtonWithMenu";
+import ButtonShareAction from "../common/util/ButtonShareAction";
 
 type HomeFoodItemDataProps = CardProps & {
   onExpandFood?: () => void;
   onExpandAuthor?: () => void;
   onExpandPlace?: () => void;
   item: IFoodPostTagged;
+  isLoading: boolean;
 };
 
 const HomeFoodItemData = React.forwardRef<
   HTMLDivElement,
   HomeFoodItemDataProps
 >((props, ref) => {
-  const { onExpandFood, onExpandAuthor, onExpandPlace, item, ...rest } = props;
+  const {
+    onExpandFood,
+    onExpandAuthor,
+    onExpandPlace,
+    item,
+    isLoading,
+    ...rest
+  } = props;
   const appContentContext = useAppContentContext();
 
   useEffect(() => {
@@ -47,6 +61,7 @@ const HomeFoodItemData = React.forwardRef<
 
   const context = useFoodPostViewerContext();
   const { food, likeFood } = context;
+  const lang = useComponentLanguage();
 
   return (
     <Card
@@ -59,15 +74,19 @@ const HomeFoodItemData = React.forwardRef<
     >
       <CardHeader
         avatar={
-          <FoodAvatars
-            food={food}
-            onClick={() => onExpandAuthor && onExpandAuthor()}
-            SecondaryAvatarProps={{
-              onClick: () => {
-                onExpandPlace && onExpandPlace();
-              },
-            }}
-          />
+          isLoading ? (
+            <Skeleton variant="circular" width={40} height={40} />
+          ) : (
+            <FoodAvatars
+              food={food}
+              onClick={() => onExpandAuthor && onExpandAuthor()}
+              SecondaryAvatarProps={{
+                onClick: () => {
+                  onExpandPlace && onExpandPlace();
+                },
+              }}
+            />
+          )
         }
         action={<FoodPostButtonWithMenu />}
         title={item.title}
@@ -75,12 +94,7 @@ const HomeFoodItemData = React.forwardRef<
           <Stack>
             <TimeExposed time={item.createdAt} />
             <Stack direction={"row"} gap={1}>
-              {/* <TimelapseOutlined color="info" /> */}
-              <CountDown
-                time={item.duration}
-                enable={false}
-                second={false}
-              />{" "}
+              <CountDown time={item.duration} enable={false} second={false} />{" "}
             </Stack>
           </Stack>
         }
@@ -92,12 +106,9 @@ const HomeFoodItemData = React.forwardRef<
           onExpandFood && onExpandFood();
         }}
       >
-        <Carousel
-          indicators
-          swipe
-          autoPlay
-          animation="slide"
+        {/* <Carousel
           cycleNavigation
+          autoPlay={false}
           fullHeightHover
           sx={{
             backgroundColor: "background.default",
@@ -118,7 +129,21 @@ const HomeFoodItemData = React.forwardRef<
               </Box>
             );
           })}
-        </Carousel>
+        </Carousel> */}
+        <Box
+          sx={{
+            width: "100%",
+            height: "200px",
+          }}
+          key={item.images[0]}
+        >
+          <img
+            src={item.images[0]}
+            loading="lazy"
+            width={"100%"}
+            height={"100%"}
+          />
+        </Box>
       </CardContent>
       <CardActions disableSpacing>
         <Stack direction={"row"}>
@@ -126,11 +151,8 @@ const HomeFoodItemData = React.forwardRef<
             arrow
             title={
               <Stack>
-                <Typography>Địa điểm: {" " + item.location.name}</Typography>
-                <Typography>
-                  Khoảng cách:
-                  {" " + distance}Km
-                </Typography>
+                <Typography>{lang("place-x", item.location.name)}</Typography>
+                <Typography>{lang("distance-x", distance, "Km")}</Typography>
               </Stack>
             }
           >
@@ -140,7 +162,7 @@ const HomeFoodItemData = React.forwardRef<
               </Badge>
             </IconButton>
           </Tooltip>
-          <Tooltip arrow title={`Chất lượng: ${item.quantity} sao`}>
+          <Tooltip arrow title={lang("quantity-x", item.quantity)}>
             <IconButton color="info">
               <Badge badgeContent={item.quantity + "*"}>
                 <Star />
@@ -149,7 +171,7 @@ const HomeFoodItemData = React.forwardRef<
           </Tooltip>
         </Stack>
         <Stack direction={"row"} ml={"auto"}>
-          <Tooltip arrow title="Yêu thích">
+          <Tooltip arrow title={lang("love")}>
             <IconButton
               color={food.liked ? "error" : "default"}
               onClick={likeFood}
@@ -159,14 +181,13 @@ const HomeFoodItemData = React.forwardRef<
               </Badge>
             </IconButton>
           </Tooltip>
-          <IconButton>
-            <Tooltip arrow title="Chia sẻ">
-              <IconButton color="info">
-                <Share />
-              </IconButton>
-            </Tooltip>
-          </IconButton>
-          <Tooltip arrow title="Gửi tin nhắn">
+          <Tooltip arrow title={lang("share")}>
+            <ButtonShareAction
+              color="info"
+              link={new URL(`/food/${item._id}`, window.location.href).href}
+            />
+          </Tooltip>
+          <Tooltip arrow title={lang("send-message")}>
             <IconButton color="secondary">
               <Send sx={{ rotate: "-45deg" }} />
             </IconButton>

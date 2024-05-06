@@ -17,6 +17,7 @@ import SubcribeChipAction from "./SubcribeChipAction";
 import PlaceViewerRating from "./PlaceViewerRating";
 import PlaceViewerExposedType from "./PlaceViewerExposedType";
 import { useComponentLanguage } from "../../../hooks";
+import ButtonShareAction from "../../common/util/ButtonShareAction";
 
 type PlaceViewerHeaderProps = BoxProps & {
   place: IPlaceExposedWithRatingAndFollow;
@@ -88,7 +89,15 @@ const PlaceViewerHeader = React.forwardRef<
             {exposedName}
           </Typography>
 
-          <PlaceViewerExposedType placeType={place.type} />
+          <Stack direction={"row"} gap={1}>
+            <PlaceViewerExposedType placeType={place.type} />
+            <Tooltip title={lang("share-label")}>
+              <ButtonShareAction
+                color="info"
+                link={new URL(`/place/${place._id}`, window.location.href).href}
+              />
+            </Tooltip>
+          </Stack>
 
           <Stack direction={"row"} sx={{ alignItems: "center" }} ml={-1}>
             <IconButton color="success">

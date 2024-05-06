@@ -14,7 +14,6 @@ import {
   EditOutlined,
   MapsUgcOutlined,
   NotificationsActiveOutlined,
-  Share,
 } from "@mui/icons-material";
 import UserSubcribeChipAction from "./SubcribedChipAction";
 import UserContextMenu from "./UserButtonContextMenu";
@@ -26,6 +25,7 @@ import {
 } from "../../../hooks";
 import UserViewerAvatarEditor from "./UserViewerAvatarEditor";
 import UserViewerNameEditor from "./UserViewerNameEditor";
+import ButtonShareAction from "../../common/util/ButtonShareAction";
 
 type UserViewerHeaderProps = BoxProps;
 
@@ -144,9 +144,12 @@ const UserViewerHeader = React.forwardRef<
               {lang("join-at")}
               <TimeExposed time={createdAt} hour={false} />
             </Typography>
-            <IconButton color="info" sx={{ ml: "auto" }}>
-              <Share />
-            </IconButton>
+            <Tooltip title={lang("share-label")}>
+              <ButtonShareAction
+                color="info"
+                link={new URL(`/user/${_id}`, window.location.href).href}
+              />
+            </Tooltip>
             <IconButton
               color="success"
               onClick={() => {

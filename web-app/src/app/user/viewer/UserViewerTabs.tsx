@@ -4,6 +4,7 @@ import { useI18nContext, useTabNavigate } from "../../../hooks";
 import {
   LunchDiningOutlined,
   NotificationsActiveOutlined,
+  StorefrontOutlined,
   TipsAndUpdatesOutlined,
 } from "@mui/icons-material";
 import { UserViewerTab, userViewerTabs } from "./user-viewer-tab";
@@ -65,7 +66,7 @@ const UserViewerTabs = React.forwardRef<HTMLDivElement, UserViewerTabsProps>(
           />
           <Tab
             label={lang("place")}
-            icon={<LunchDiningOutlined />}
+            icon={<StorefrontOutlined />}
             iconPosition="start"
           />
           <Tab

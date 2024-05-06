@@ -3,7 +3,6 @@ import { CardProps } from "@mui/material";
 import { IFoodPostTagged } from "./HomeViewerContext";
 import HomeFoodItemData from "./HomeFoodItemData";
 import { useFoodPostViewerIdHigherContext } from "../../hooks";
-import FoodPostViewerHolder from "../food/post/FoodPostViewerHolder";
 import FoodPostViewerContextProvider from "../food/post/FoodPostViewerContext";
 import NoAccess from "../common/NoAccess";
 import PageNotFound from "../common/PageNotFound";
@@ -18,6 +17,7 @@ type IHomeFoodItemProps = CardProps & {
 
 interface IHomeFoodItemDataProvider extends IHomeFoodItemProps {
   ref: React.ForwardedRef<HTMLDivElement>;
+  item: IFoodPostTagged;
 }
 
 function HomeFoodItemDataProvider(props: IHomeFoodItemDataProvider) {
@@ -26,10 +26,11 @@ function HomeFoodItemDataProvider(props: IHomeFoodItemDataProvider) {
 
   return (
     <>
-      {isLoading && <FoodPostViewerHolder />}
-      {data && accessable && (
-        <FoodPostViewerContextProvider foodPost={data}>
-          <HomeFoodItemData {...props} />
+      {accessable && (
+        <FoodPostViewerContextProvider
+          foodPost={found && data != null ? data : props.item}
+        >
+          <HomeFoodItemData {...props} isLoading={isLoading} />
         </FoodPostViewerContextProvider>
       )}
       {data && !accessable && <NoAccess />}

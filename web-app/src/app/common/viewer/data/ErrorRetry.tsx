@@ -18,7 +18,6 @@ const ErrorRetry = React.forwardRef<HTMLDivElement, ErrorRetryProps>(
         boxSizing={"border-box"}
         gap={2}
         p={1}
-        minHeight={"90vh"}
         alignContent={"center"}
         alignItems={"center"}
         justifyContent={"center"}

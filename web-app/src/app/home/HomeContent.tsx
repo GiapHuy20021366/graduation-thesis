@@ -8,6 +8,9 @@ import FoodViewerDialog from "../common/viewer/dialog/FoodViewerDialog";
 import PlaceViewerDialog from "../common/viewer/dialog/PlaceViewerDialog";
 import UserViewerDialog from "../common/viewer/dialog/UserViewerDialog";
 import EmptyList from "../common/viewer/data/EmptyList";
+import { homeTabs } from "./home-tabs";
+import ErrorRetry from "../common/viewer/data/ErrorRetry";
+import FoodPostViewerHolder from "../food/post/FoodPostViewerHolder";
 
 type HomeContentProps = StackProps;
 
@@ -19,7 +22,38 @@ const HomeContent = React.forwardRef<HTMLDivElement, HomeContentProps>(
 
     const device = useQueryDevice();
     const homeContext = useHomeViewerContext();
-    const { displayedFoods, load } = homeContext;
+    const {
+      displayedFoods,
+      load,
+      aroundLoader,
+      registeredLoader,
+      favoriteLoader,
+      tab,
+    } = homeContext;
+
+    const isLoad =
+      aroundLoader.isFetching ||
+      registeredLoader.isFetching ||
+      favoriteLoader.isFetching;
+
+    const isError = () => {
+      switch (tab) {
+        case homeTabs.ALL:
+          return (
+            aroundLoader.isError ||
+            registeredLoader.isError ||
+            favoriteLoader.isError
+          );
+        case homeTabs.AROUND:
+          return aroundLoader.isError;
+        case homeTabs.REGISTED:
+          return registeredLoader.isError;
+        case homeTabs.SUGGESTED:
+          return favoriteLoader.isError;
+      }
+    };
+
+    const error = isError();
 
     return (
       <Stack
@@ -88,14 +122,17 @@ const HomeContent = React.forwardRef<HTMLDivElement, HomeContentProps>(
         )}
 
         <ListEnd
-          active={displayedFoods.length !== 0}
+          active={displayedFoods.length !== 0 && !isLoad && !error}
           onRetry={() => load()}
           mt={3}
         />
         <EmptyList
-          active={displayedFoods.length === 0}
+          active={displayedFoods.length === 0 && !isLoad && !error}
           onRetry={() => load()}
         />
+
+        <ErrorRetry active={!isLoad && error} onRetry={() => load()} />
+        {isLoad && <FoodPostViewerHolder />}
       </Stack>
     );
   }

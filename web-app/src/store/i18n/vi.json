@@ -297,7 +297,7 @@
         "close-title": "Đóng menu"
     },
     "ViewerData": {
-        "error-occured": "Đã có lỗi xả ra",
+        "error-occured": "Đã có lỗi xảy ra",
         "retry": "Thử lại",
         "end": "Đã hết",
         "you-found-all": "Bạn đã tìm kiếm hết",
@@ -370,7 +370,15 @@
         "l-locate-me": "Vị trí của tôi",
         "l-load-this-area": "Tìm kiếm khu vực này",
         "every-one": "mọi người",
-        "near": "Gần"
+        "near": "Gần",
+        "copy": "Sao chép",
+        "copied": "Đã sao chép",
+        "place-x": "Địa điểm: {0}",
+        "distance-x": "Khoảng cách: {0} {1}",
+        "quantity-x": "Chất lượng {0} sao",
+        "love": "Yêu thích",
+        "share": "Chia sẻ",
+        "send-message": "Gửi tin nhắn"
     },
     "Toasts": {
         "can-not-sharing-now": "Không thể chia sẻ thực phẩm vào lúc này",

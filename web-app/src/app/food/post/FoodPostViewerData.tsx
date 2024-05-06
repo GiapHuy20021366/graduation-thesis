@@ -28,7 +28,6 @@ import {
   MapsUgcOutlined,
   ProductionQuantityLimitsOutlined,
   SentimentVerySatisfiedOutlined,
-  Share,
   SocialDistanceOutlined,
   TimelapseOutlined,
   VisibilityOffOutlined,
@@ -40,6 +39,7 @@ import { RichTextReadOnly } from "mui-tiptap";
 import StarterKit from "@tiptap/starter-kit";
 import FoodAvatars from "../../common/viewer/data/FoodAvatars";
 import TimeExposed from "../../common/custom/TimeExposed";
+import ButtonShareAction from "../../common/util/ButtonShareAction";
 
 const toUserId = (post: IFoodPostExposedWithLike): string => {
   const user = post.user;
@@ -186,11 +186,12 @@ export default function FoodPostViewerData() {
                 </Tooltip>
               </Badge>
             </IconButton>
-            <IconButton color="info">
-              <Tooltip title={lang("share-label")}>
-                <Share />
-              </Tooltip>
-            </IconButton>
+            <Tooltip title={lang("share-label")}>
+              <ButtonShareAction
+                color="info"
+                link={new URL(`/food/${data._id}`, window.location.href).href}
+              />
+            </Tooltip>
             <IconButton
               color="success"
               onClick={() => {
