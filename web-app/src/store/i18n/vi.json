@@ -237,7 +237,8 @@
         "people-title": "Mọi người",
         "people-label": "Mọi người",
         "place-title": "Địa điểm",
-        "place-label": "Địa điểm"
+        "place-label": "Địa điểm",
+        "food-title": "Thực phẩm"
     },
     "AvatarButtonAction": {
         "logout": "Đăng xuất",
@@ -378,7 +379,29 @@
         "quantity-x": "Chất lượng {0} sao",
         "love": "Yêu thích",
         "share": "Chia sẻ",
-        "send-message": "Gửi tin nhắn"
+        "send-message": "Gửi tin nhắn",
+        "go-to-view-this-user": "Xem người dùng này",
+        "go-to-view-this-place": "Xem địa điểm này",
+        "showing-this-area": "Hiển thị trong khu vực này",
+        "max-distance": "Khoảng cách tối đa",
+        "people": "Mọi người",
+        "restaurants": "Nhà hàng",
+        "eateries": "Quán ăn",
+        "groceries": "Tạp hóa",
+        "markets": "Nhà hàng",
+        "volunteers": "Tình nguyện",
+        "hide": "Ẩn",
+        "resolve": "Đánh dấu đã hết",
+        "every-one-tooltip": "Hiển thị với mọi người",
+        "only-you": "chỉ mình bạn",
+        "only-you-tooltip": "Hiển thị với mình bạn",
+        "resolved-tooltip": "Được đánh dấu là đã hết",
+        "unhide": "Hiện",
+        "unresolve": "Đánh dấu chưa hết",
+        "confirm-resolve-title": "Đánh dấu thực phẩm chưa hết",
+        "confirm-resolve-content": "Đánh dấu thực phẩm chưa hết giúp mọi người biết thực phẩm này hiện chưa được chia sẻ đến bất kì ai và hiện đang vẫn còn.",
+        "confirm-hide-title": "Xác nhận ẩn thực phẩm",
+        "confirm-hide-content": "Ẩn thực phẩm này đồng nghĩa chỉ có bạn mới có thể xem thực phẩm này. Nó cũng ẩn thực phẩm khỏi công cụ tìm kiếm."
     },
     "Toasts": {
         "can-not-sharing-now": "Không thể chia sẻ thực phẩm vào lúc này",

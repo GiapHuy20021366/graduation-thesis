@@ -87,7 +87,6 @@ export default function UsersAroundPage() {
   const [volunteers, setVolunteers] = useState<IPlaceExposed[]>([]);
 
   const [distance, setDistance] = useState<number>(2);
-  const [infoOpen, setInfoOpen] = useState<boolean>(false);
   const mapRef = useRef<google.maps.Map>();
   const authContext = useAuthContext();
   const { auth, account } = authContext;
@@ -148,11 +147,7 @@ export default function UsersAroundPage() {
 
   const handleLocateMe = () => {
     setCenter({ ...center });
-    setInfoOpen(true);
-  };
-
-  const handleOpenInfo = () => {
-    setInfoOpen(!infoOpen);
+    setSelectedMarker(0);
   };
 
   const doLoadUsers = useCallback(
@@ -429,32 +424,32 @@ export default function UsersAroundPage() {
           }}
         >
           <TogglePurpleChip
-            label={lang("People")}
+            label={lang("people")}
             value={PlaceType.PERSONAL}
             icon={<Person color="inherit" />}
           />
           <TogglePurpleChip
-            label={lang("Restaurants")}
+            label={lang("restaurants")}
             value={PlaceType.RESTAURANT}
             icon={<Restaurant color="inherit" />}
           />
           <TogglePurpleChip
-            label={lang("Eateries")}
+            label={lang("eateries")}
             value={PlaceType.EATERY}
             icon={<Storefront color="inherit" />}
           />
           <TogglePurpleChip
-            label={lang("Grocery")}
+            label={lang("groceries")}
             value={PlaceType.GROCERY}
             icon={<LocalConvenienceStore color="inherit" />}
           />
           <TogglePurpleChip
-            label={lang("Markets")}
+            label={lang("markets")}
             value={PlaceType.SUPERMARKET}
             icon={<LocalGroceryStore color="inherit" />}
           />
           <TogglePurpleChip
-            label={lang("Volunteers")}
+            label={lang("volunteers")}
             value={PlaceType.VOLUNTEER}
             icon={<VolunteerActivism color="inherit" />}
           />
@@ -479,10 +474,13 @@ export default function UsersAroundPage() {
                 scaledSize: new google.maps.Size(40, 40),
               }}
               position={center}
-              onClick={handleOpenInfo}
+              onClick={() => toggleMarker(0)}
             >
-              {infoOpen && (
-                <InfoWindowF position={center} onCloseClick={handleOpenInfo}>
+              {selectedMarker === 0 && (
+                <InfoWindowF
+                  position={center}
+                  onCloseClick={() => toggleMarker(0)}
+                >
                   <Box color={"black"}>
                     <span>{lang("your-current-location")}</span>
                   </Box>
@@ -677,12 +675,18 @@ export default function UsersAroundPage() {
                   scaledSize: new google.maps.Size(40, 40),
                 }}
                 position={home.coordinates}
+                onClick={() => toggleMarker(1)}
               >
-                <InfoWindowF position={home.coordinates}>
-                  <Box sx={{ width: 200 }} color={"black"}>
-                    <span>{lang("your-home")}</span>
-                  </Box>
-                </InfoWindowF>
+                {selectedMarker === 1 && (
+                  <InfoWindowF
+                    position={home.coordinates}
+                    onCloseClick={() => toggleMarker(1)}
+                  >
+                    <Box sx={{ width: 200 }} color={"black"}>
+                      <span>{lang("your-home")}</span>
+                    </Box>
+                  </InfoWindowF>
+                )}
               </MarkerF>
             )}
           </GoogleMap>
@@ -776,11 +780,11 @@ export default function UsersAroundPage() {
           <AccordionDetails>
             <Stack width={"100%"} gap={1}>
               <Box sx={{ textAlign: "center" }}>
-                {lang("Showing in this area")}
+                {lang("showing-this-area")}
               </Box>
               <Box>
-                <Typography sx={{ fontWeight: 600 }}>
-                  {lang("Max distance")}:
+                <Typography sx={{ fontWeight: 600, mb: 1 }}>
+                  {lang("max-distance")}:
                 </Typography>
                 <ToggleChipGroup
                   value={distance}

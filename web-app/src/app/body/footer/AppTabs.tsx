@@ -82,7 +82,7 @@ const AppTabs = React.forwardRef<HTMLDivElement, AppTabsProps>((props, ref) => {
           onClick={() => tabNavigate.setTab(AppTab.HOME)}
         />
       </Tooltip>
-      <Tooltip title={lang("food-around-title")} arrow>
+      <Tooltip title={lang("food-title")} arrow>
         <Tab
           icon={<FoodBankOutlined sx={{ width: "1.5em", height: "1.5em" }} />}
           // label={lang("food-around-label")}
