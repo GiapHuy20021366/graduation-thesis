@@ -1,6 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Stack, StackProps } from "@mui/material";
-import { useHomeViewerContext, useQueryDevice } from "../../hooks";
+import {
+  useAppContentContext,
+  useHomeViewerContext,
+  useQueryDevice,
+} from "../../hooks";
 import ListEnd from "../common/viewer/data/ListEnd";
 import HomeFoodItem from "./HomeFoodItem";
 import LazyLoad from "react-lazy-load";
@@ -22,6 +26,7 @@ const HomeContent = React.forwardRef<HTMLDivElement, HomeContentProps>(
 
     const device = useQueryDevice();
     const homeContext = useHomeViewerContext();
+    const appContentContext = useAppContentContext();
     const {
       displayedFoods,
       load,
@@ -54,6 +59,29 @@ const HomeContent = React.forwardRef<HTMLDivElement, HomeContentProps>(
     };
 
     const error = isError();
+
+    useEffect(() => {
+      const main = appContentContext.mainRef?.current;
+      let listener: any;
+
+      if (main != null) {
+        listener = (event: Event) => {
+          const element = event.target as HTMLDivElement;
+          const isAtBottom =
+            element.scrollHeight * 0.95 <=
+            element.scrollTop + element.clientHeight;
+          if (isAtBottom && !error && !isLoad) {
+            load();
+          }
+        };
+        main.addEventListener("scroll", listener);
+      }
+      return () => {
+        if (main != null && listener != null) {
+          main.removeEventListener("scroll", listener);
+        }
+      };
+    }, [appContentContext.mainRef, error, isLoad, load]);
 
     return (
       <Stack
