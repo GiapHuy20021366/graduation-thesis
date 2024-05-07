@@ -160,7 +160,7 @@ export default function PlaceList() {
           children={
             <SpeedDial
               icon={<AddOutlined />}
-              sx={{ position: "absolute", bottom: 136, right: 26 }}
+              sx={{ position: "fixed", bottom: 136, right: 26 }}
               ariaLabel={lang("add-place-label")}
             />
           }
@@ -176,7 +176,7 @@ export default function PlaceList() {
             <SpeedDial
               icon={<SearchOutlined />}
               ariaLabel={"search"}
-              sx={{ position: "absolute", bottom: 76, right: 26 }}
+              sx={{ position: "fixed", bottom: 76, right: 26 }}
             />
           }
           title={lang("place-search-label")}

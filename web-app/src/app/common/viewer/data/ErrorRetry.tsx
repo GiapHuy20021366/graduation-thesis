@@ -26,7 +26,9 @@ const ErrorRetry = React.forwardRef<HTMLDivElement, ErrorRetryProps>(
         display={active ? "flex" : "none"}
       >
         <Typography>{lang("error-occured")}</Typography>
-        <Button onClick={() => onRetry && onRetry()}>{lang("retry")}</Button>
+        <Button onClick={() => onRetry && onRetry()} fullWidth>
+          {lang("retry")}
+        </Button>
       </Stack>
     );
   }

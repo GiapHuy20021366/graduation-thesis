@@ -9,10 +9,11 @@ import UserViewerSubcribed from "./UserViewerSubcribed";
 import UserViewerPlace from "./UserViewerPlace";
 import { Add } from "@mui/icons-material";
 import StyledLink from "../../common/navigate/StyledLink";
-import { applicationPages } from "../../../hooks";
+import { applicationPages, useComponentLanguage } from "../../../hooks";
 
 export default function UserViewerData() {
   const [tab, setTab] = useState<UserViewerTab>(0);
+  const lang = useComponentLanguage();
   return (
     <Stack width={"100%"} boxSizing={"border-box"} boxShadow={1} gap={2} px={1}>
       <UserViewerHeader />
@@ -22,6 +23,7 @@ export default function UserViewerData() {
           position: "sticky",
           top: 1,
           zIndex: 1000,
+          backgroundColor: "background.default",
         }}
       />
       {/* Tabs display */}
@@ -34,10 +36,10 @@ export default function UserViewerData() {
 
         <UserViewerSubcribed active={tab === UserViewerTab.SUBCRIBED} />
       </>
-      <Tooltip arrow title="Thêm thực phẩm" placement="left">
+      <Tooltip arrow title={lang("add-food")} placement="left">
         <StyledLink
           to={applicationPages.FOOD_SHARING}
-          style={{ position: "absolute", bottom: 76, right: 26 }}
+          style={{ position: "fixed", bottom: 76, right: 26 }}
         >
           <SpeedDial icon={<Add />} ariaLabel={"Add food"} />
         </StyledLink>

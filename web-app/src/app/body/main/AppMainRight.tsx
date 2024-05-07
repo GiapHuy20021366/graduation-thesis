@@ -7,7 +7,7 @@ export default function AppMainRight() {
       tablet
       laptop
       desktop
-      display={["none", "block"]}
+      display={["none", "none", "block"]}
       sx={{ height: "100%" }}
       boxSizing={"border-box"}
     ></Grid2>

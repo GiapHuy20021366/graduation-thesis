@@ -401,7 +401,8 @@
         "confirm-resolve-title": "Đánh dấu thực phẩm chưa hết",
         "confirm-resolve-content": "Đánh dấu thực phẩm chưa hết giúp mọi người biết thực phẩm này hiện chưa được chia sẻ đến bất kì ai và hiện đang vẫn còn.",
         "confirm-hide-title": "Xác nhận ẩn thực phẩm",
-        "confirm-hide-content": "Ẩn thực phẩm này đồng nghĩa chỉ có bạn mới có thể xem thực phẩm này. Nó cũng ẩn thực phẩm khỏi công cụ tìm kiếm."
+        "confirm-hide-content": "Ẩn thực phẩm này đồng nghĩa chỉ có bạn mới có thể xem thực phẩm này. Nó cũng ẩn thực phẩm khỏi công cụ tìm kiếm.",
+        "add-food": "Thêm thực phẩm"
     },
     "Toasts": {
         "can-not-sharing-now": "Không thể chia sẻ thực phẩm vào lúc này",

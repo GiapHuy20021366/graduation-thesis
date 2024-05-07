@@ -55,10 +55,14 @@ const ButtonShareAction = React.forwardRef<
         }}
       >
         <DialogTitle>{lang("share")}</DialogTitle>
-        <DialogContent sx={{ minWidth: "300px" }}>
+        <DialogContent>
           <Stack
             direction="row"
-            sx={{ backgroundColor: "background.paper" }}
+            sx={{
+              backgroundColor: "background.paper",
+              overflowX: "hidden",
+              width: "100%",
+            }}
             onClick={() => {
               navigator.clipboard.writeText(link);
               setCopied(true);
@@ -68,6 +72,7 @@ const ButtonShareAction = React.forwardRef<
               sx={{
                 p: 1,
                 cursor: "pointer",
+                width: "calc(100% - 60px)",
               }}
             >
               {link}

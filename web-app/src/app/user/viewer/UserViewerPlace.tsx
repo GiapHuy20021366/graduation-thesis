@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { SpeedDial, Stack, StackProps } from "@mui/material";
-import { AddOutlined } from "@mui/icons-material";
-import { useNavigate } from "react-router";
+import { Stack, StackProps } from "@mui/material";
 import {
   useAppContentContext,
   useAuthContext,
@@ -36,7 +34,6 @@ type UserViewerPlaceProps = StackProps & {
 
 const UserViewerPlace = React.forwardRef<HTMLDivElement, UserViewerPlaceProps>(
   (props, ref) => {
-    const navigate = useNavigate();
     const { active, ...rest } = props;
     const viewerContext = useUserViewerContext();
     const { _id } = viewerContext;
@@ -204,12 +201,12 @@ const UserViewerPlace = React.forwardRef<HTMLDivElement, UserViewerPlaceProps>(
             />
           );
         })}
-        <SpeedDial
+        {/* <SpeedDial
           icon={<AddOutlined />}
-          sx={{ position: "absolute", bottom: 136, right: 26 }}
+          sx={{ position: "fixed", bottom: 136, right: 26 }}
           ariaLabel={"Create"}
           onClick={() => navigate("/place/update")}
-        />
+        /> */}
 
         {loader.isFetching && <PlaceSearchItemHolder />}
 

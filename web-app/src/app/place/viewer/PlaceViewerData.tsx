@@ -70,7 +70,7 @@ export default function PlaceViewerData({ data }: PlaceViewerDataProps) {
             <SpeedDial
               icon={<Add />}
               ariaLabel={lang("place-add-food-label")}
-              sx={{ position: "absolute", bottom: 76, right: 26 }}
+              sx={{ position: "fixed", bottom: 76, right: 26 }}
             />
           }
           title={lang("place-add-food-label")}

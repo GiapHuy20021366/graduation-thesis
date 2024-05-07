@@ -6,63 +6,31 @@ import {
   PeopleAltOutlined,
   PlaceOutlined,
 } from "@mui/icons-material";
-import { Location } from "react-router";
 import {
-  ITabOption,
+  ApplicationPage,
+  applicationPages,
   useComponentLanguage,
-  useTabNavigate,
+  usePageResolver,
 } from "../../../hooks";
-
-const AppTab = {
-  HOME: 0,
-  FOOD: 1,
-  PEOPLE_AROUND: 2,
-  PLACE: 3,
-} as const;
-
-type AppTab = (typeof AppTab)[keyof typeof AppTab];
+import StyledLink from "../../common/navigate/StyledLink";
 
 type AppTabsProps = TabsProps;
 
-const appTabs: ITabOption[] = [
-  {
-    value: AppTab.HOME,
-    url: "/home",
-  },
-  {
-    url: "/food",
-    value: AppTab.FOOD,
-  },
-  {
-    url: "/user/around",
-    value: AppTab.PEOPLE_AROUND,
-  },
-  {
-    url: "/place",
-    value: AppTab.PLACE,
-  },
-];
-
-const appTabResolver = (location: Location<any>): number => {
-  const pathname = location.pathname;
-  if (pathname.includes("/user/around")) return AppTab.PEOPLE_AROUND;
-  if (pathname.includes("/food")) return AppTab.FOOD;
-  if (pathname.includes("/place")) return AppTab.PLACE;
-  return AppTab.HOME;
-};
+const tabs: ApplicationPage[] = [
+  applicationPages.HOME,
+  applicationPages.FOOD,
+  applicationPages.USER_AROUND,
+  applicationPages.PLACE,
+] as const;
 
 const AppTabs = React.forwardRef<HTMLDivElement, AppTabsProps>((props, ref) => {
-  const tabNavigate = useTabNavigate({
-    tabOptions: appTabs,
-    resolver: appTabResolver,
-  });
-
   const lang = useComponentLanguage("AppTabs");
+  const page = usePageResolver();
 
   return (
     <Tabs
       ref={ref}
-      value={tabNavigate.tab}
+      value={tabs.indexOf(page.page)}
       variant="scrollable"
       scrollButtons
       allowScrollButtonsMobile
@@ -76,32 +44,34 @@ const AppTabs = React.forwardRef<HTMLDivElement, AppTabsProps>((props, ref) => {
       {...props}
     >
       <Tooltip title={lang("home-title")} arrow>
-        <Tab
-          icon={<HomeOutlined sx={{ width: "1.5em", height: "1.5em" }} />}
-          // label={lang("home-label")}
-          onClick={() => tabNavigate.setTab(AppTab.HOME)}
-        />
+        <StyledLink to={applicationPages.HOME}>
+          <Tab
+            icon={<HomeOutlined sx={{ width: "1.8em", height: "1.8em" }} />}
+          />
+        </StyledLink>
       </Tooltip>
       <Tooltip title={lang("food-title")} arrow>
-        <Tab
-          icon={<FoodBankOutlined sx={{ width: "1.5em", height: "1.5em" }} />}
-          // label={lang("food-around-label")}
-          onClick={() => tabNavigate.setTab(AppTab.FOOD)}
-        />
+        <StyledLink to={applicationPages.FOOD}>
+          <Tab
+            icon={<FoodBankOutlined sx={{ width: "1.8em", height: "1.8em" }} />}
+          />
+        </StyledLink>
       </Tooltip>
       <Tooltip title={lang("people-title")} arrow>
-        <Tab
-          icon={<PeopleAltOutlined sx={{ width: "1.5em", height: "1.5em" }} />}
-          // label={lang("people-label")}
-          onClick={() => tabNavigate.setTab(AppTab.PEOPLE_AROUND)}
-        />
+        <StyledLink to={applicationPages.USER_AROUND}>
+          <Tab
+            icon={
+              <PeopleAltOutlined sx={{ width: "1.8em", height: "1.8em" }} />
+            }
+          />
+        </StyledLink>
       </Tooltip>
       <Tooltip title={lang("place-title")} arrow>
-        <Tab
-          icon={<PlaceOutlined sx={{ width: "1.5em", height: "1.5em" }} />}
-          // label={lang("place-label")}
-          onClick={() => tabNavigate.setTab(AppTab.PLACE)}
-        />
+        <StyledLink to={applicationPages.PLACE}>
+          <Tab
+            icon={<PlaceOutlined sx={{ width: "1.8em", height: "1.8em" }} />}
+          />
+        </StyledLink>
       </Tooltip>
     </Tabs>
   );

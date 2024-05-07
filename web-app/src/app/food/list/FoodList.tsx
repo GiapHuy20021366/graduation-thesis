@@ -134,7 +134,7 @@ export default function FoodList() {
             <SpeedDial
               icon={<AddOutlined />}
               ariaLabel={"search"}
-              sx={{ position: "absolute", bottom: 196, right: 26 }}
+              sx={{ position: "fixed", bottom: 196, right: 26 }}
             />
           }
           title={lang("sharing-label")}
@@ -147,7 +147,7 @@ export default function FoodList() {
           children={
             <SpeedDial
               icon={<PlaceOutlined />}
-              sx={{ position: "absolute", bottom: 136, right: 26 }}
+              sx={{ position: "fixed", bottom: 136, right: 26 }}
               ariaLabel={lang("around-label")}
             />
           }
@@ -162,7 +162,7 @@ export default function FoodList() {
             <SpeedDial
               icon={<SearchOutlined />}
               ariaLabel={lang("search-label")}
-              sx={{ position: "absolute", bottom: 76, right: 26 }}
+              sx={{ position: "fixed", bottom: 76, right: 26 }}
             />
           }
           title={lang("search-label")}

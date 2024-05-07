@@ -47,8 +47,8 @@ export default function SideBar() {
       onClose={() => appContentContext.setMenuSideActive(false)}
       variant="temporary"
     >
-      <Stack sx={{ overflow: "hidden", width: ["35vw", "25vw", "auto"] }}>
-        <Stack direction="row" gap={1} p={1} alignItems={"center"}>
+      <Stack sx={{ overflow: "hidden", width: ["280px"] }}>
+        <Stack direction="row" gap={1} py={3} px={1} alignItems={"center"}>
           <SquareContainer size={"4em"}>
             <Avatar
               src={account?.avatar}
@@ -58,18 +58,34 @@ export default function SideBar() {
             </Avatar>
           </SquareContainer>
           <Typography>{exposedName}</Typography>
-          <SideBarOpener sx={{ marginLeft: "auto" }} />
+          <SideBarOpener
+            sx={{ marginLeft: "auto" }}
+            size="large"
+            IconPropsSx={{
+              fontSize: "35px",
+            }}
+          />
         </Stack>
         <Divider sx={{ backgroundColor: "inherit" }} />
         <MenuList
-          sx={{ gap: 2, overflowY: "auto" }}
+          sx={{
+            overflowY: "auto",
+            ".MuiListItemText-root": {
+              ".MuiTypography-root": {
+                fontWeight: 550,
+                fontSize: "1rem",
+                pl: 1,
+              },
+            },
+            py: 3,
+          }}
           onClick={() => appContentContext.setMenuSideActive(false)}
         >
           {/* Home */}
           <StyledLink to={applicationPages.HOME}>
             <MenuItem selected={page.is(applicationPages.HOME)} sx={{ gap: 2 }}>
               <ListItemIcon>
-                <HomeOutlined fontSize="medium" />
+                <HomeOutlined fontSize="large" />
               </ListItemIcon>
               <ListItemText>{lang("home")}</ListItemText>
             </MenuItem>
@@ -79,7 +95,7 @@ export default function SideBar() {
           <StyledLink to={applicationPages.USER}>
             <MenuItem selected={page.is(applicationPages.USER)} sx={{ gap: 2 }}>
               <ListItemIcon>
-                <SentimentSatisfiedAltOutlined fontSize="medium" />
+                <SentimentSatisfiedAltOutlined fontSize="large" />
               </ListItemIcon>
               <ListItemText>{lang("user")}</ListItemText>
             </MenuItem>
@@ -92,7 +108,7 @@ export default function SideBar() {
               sx={{ gap: 2 }}
             >
               <ListItemIcon>
-                <StorefrontOutlined fontSize="medium" />
+                <StorefrontOutlined fontSize="large" />
               </ListItemIcon>
               <ListItemText>{lang("place")}</ListItemText>
             </MenuItem>
@@ -105,7 +121,7 @@ export default function SideBar() {
               sx={{ gap: 2 }}
             >
               <ListItemIcon>
-                <RoomOutlined fontSize="medium" />
+                <RoomOutlined fontSize="large" />
               </ListItemIcon>
               <ListItemText>{lang("location")}</ListItemText>
             </MenuItem>
@@ -118,7 +134,7 @@ export default function SideBar() {
               sx={{ gap: 2 }}
             >
               <ListItemIcon>
-                <People fontSize="medium" />
+                <People fontSize="large" />
               </ListItemIcon>
               <ListItemText>{lang("users-around-me")}</ListItemText>
             </MenuItem>
@@ -131,13 +147,13 @@ export default function SideBar() {
               sx={{ gap: 2 }}
             >
               <ListItemIcon>
-                <LunchDiningOutlined fontSize="medium" />
+                <LunchDiningOutlined fontSize="large" />
               </ListItemIcon>
               <ListItemText>{lang("foods-around-me")}</ListItemText>
             </MenuItem>
           </StyledLink>
 
-          <Divider sx={{ backgroundColor: "inherit", my: 1 }} />
+          <Divider sx={{ backgroundColor: "inherit", my: 2 }} />
 
           {/* Setting */}
           <StyledLink to={applicationPages.SETTING}>
@@ -146,7 +162,7 @@ export default function SideBar() {
               sx={{ gap: 2 }}
             >
               <ListItemIcon>
-                <SettingsOutlined fontSize="medium" />
+                <SettingsOutlined fontSize="large" />
               </ListItemIcon>
               <ListItemText>{lang("setting")}</ListItemText>
             </MenuItem>
