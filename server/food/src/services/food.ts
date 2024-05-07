@@ -7,6 +7,7 @@ import {
   IFoodPostExposedWithLike,
   IFoodPostLocation,
   IFoodSearchParams,
+  IFoodSearchPopulate,
   IFoodUserLikeExposed,
   IPagination,
   IPostFoodData,
@@ -335,16 +336,24 @@ export const searchFood = async (
     toFoodPostExposed(post)
   );
 
-  // Populate result
-  const populate = params.populate;
-  const requireUser = populate?.user !== false;
-  const requirePlace = populate?.place !== false;
+  return populateFoodUsersAndPlaces(
+    result,
+    params.populate
+  ) as unknown as IFoodPostExposed[];
+};
+
+export const populateFoodUsersAndPlaces = async (
+  data: IFoodPostExposed[],
+  options?: IFoodSearchPopulate
+): Promise<unknown[]> => {
+  const requireUser = options?.user !== false;
+  const requirePlace = options?.place !== false;
 
   const users: string[] = [];
   const places: string[] = [];
-  posts.forEach((post) => {
-    const user = post.user;
-    const place = post.place?._id;
+  data.forEach((post) => {
+    const user = post.user as string;
+    const place = post.place as string | undefined;
     requireUser && !users.includes(user) && users.push(user);
     requirePlace && place && !places.includes(place) && places.push(place);
   });
@@ -361,7 +370,7 @@ export const searchFood = async (
   ]);
 
   if (requireUser || requirePlace) {
-    result.forEach((post) => {
+    data.forEach((post) => {
       if (userDict != null) {
         const user = userDict[post.user as string];
         if (user) {
@@ -376,8 +385,7 @@ export const searchFood = async (
       }
     });
   }
-
-  return result;
+  return data;
 };
 
 export const userLikeOrUnlikeFoodPost = async (
@@ -459,7 +467,7 @@ export const getLikedFoods = async (
     throw new InternalError();
   }
 
-  return likes
+  const result = likes
     .filter((like) => like.foodPost != null)
     .map((like): IFoodPostExposedWithLike => {
       const post = like.foodPost;
@@ -474,6 +482,10 @@ export const getLikedFoods = async (
         },
       };
     });
+
+  return populateFoodUsersAndPlaces(
+    result
+  ) as unknown as IFoodPostExposedWithLike[];
 };
 
 export const resolveFood = async (
