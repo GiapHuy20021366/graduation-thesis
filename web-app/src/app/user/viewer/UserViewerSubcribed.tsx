@@ -110,9 +110,9 @@ const UserViewerSubcribed = React.forwardRef<
       listener = (event: Event) => {
         const element = event.target as HTMLDivElement;
         const isAtBottom =
-          element.scrollTop + element.clientHeight === element.scrollHeight;
-
-        if (isAtBottom && !loader.isEnd && !loader.isError) {
+          element.scrollHeight * 0.95 <=
+          element.scrollTop + element.clientHeight;
+        if (isAtBottom && !loader.isEnd && !loader.isFetching) {
           doSearch();
         }
       };
@@ -123,7 +123,12 @@ const UserViewerSubcribed = React.forwardRef<
         main.removeEventListener("scroll", listener);
       }
     };
-  }, [appContentContext.mainRef, doSearch, loader.isEnd, loader.isError]);
+  }, [
+    appContentContext.mainRef,
+    doSearch,
+    loader.isEnd,
+    loader.isFetching,
+  ]);
 
   // Recover result
   useEffect(() => {

@@ -132,9 +132,9 @@ const MyPlace = React.forwardRef<HTMLDivElement, MyPlaceProps>((props, ref) => {
       listener = (event: Event) => {
         const element = event.target as HTMLDivElement;
         const isAtBottom =
-          element.scrollTop + element.clientHeight === element.scrollHeight;
-
-        if (isAtBottom && !isEnd) {
+          element.scrollHeight * 0.95 <=
+          element.scrollTop + element.clientHeight;
+        if (isAtBottom && !isEnd && !isFetching) {
           doSearch();
         }
       };
@@ -145,7 +145,7 @@ const MyPlace = React.forwardRef<HTMLDivElement, MyPlaceProps>((props, ref) => {
         main.removeEventListener("scroll", listener);
       }
     };
-  }, [appContentContext.mainRef, doSearch, isEnd]);
+  }, [appContentContext.mainRef, doSearch, isEnd, isFetching]);
 
   // Recover result
   useEffect(() => {

@@ -129,9 +129,9 @@ const NearFood = React.forwardRef<HTMLDivElement, NearFoodProps>(
         listener = (event: Event) => {
           const element = event.target as HTMLDivElement;
           const isAtBottom =
-            element.scrollTop + element.clientHeight === element.scrollHeight;
-
-          if (isAtBottom && !loader.isEnd) {
+            element.scrollHeight * 0.95 <=
+            element.scrollTop + element.clientHeight;
+          if (isAtBottom && !loader.isEnd && !loader.isFetching) {
             doSearch();
           }
         };
@@ -142,7 +142,7 @@ const NearFood = React.forwardRef<HTMLDivElement, NearFoodProps>(
           main.removeEventListener("scroll", listener);
         }
       };
-    }, [appContentContext.mainRef, doSearch, loader.isEnd]);
+    }, [appContentContext.mainRef, doSearch, loader.isEnd, loader.isFetching]);
 
     // Recover result
     useEffect(() => {

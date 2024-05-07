@@ -421,9 +421,9 @@ export default function PlaceSearchContextProvider({
       listener = (event: Event) => {
         const element = event.target as HTMLDivElement;
         const isAtBottom =
-          element.scrollTop + element.clientHeight === element.scrollHeight;
-
-        if (isAtBottom && !loader.isEnd) {
+          element.scrollHeight * 0.95 <=
+          element.scrollTop + element.clientHeight;
+        if (isAtBottom && !loader.isEnd && !loader.isFetching) {
           doSearchMore();
         }
       };
@@ -434,7 +434,12 @@ export default function PlaceSearchContextProvider({
         main.removeEventListener("scroll", listener);
       }
     };
-  }, [appContentContext.mainRef, doSearchMore, loader.isEnd]);
+  }, [
+    appContentContext.mainRef,
+    doSearchMore,
+    loader.isEnd,
+    loader.isFetching,
+  ]);
 
   // Recover result
   useEffect(() => {

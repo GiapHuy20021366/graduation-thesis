@@ -445,10 +445,10 @@ export default function FoodSearchBody() {
       listener = (event: Event) => {
         const element = event.target as HTMLDivElement;
         const isAtBottom =
-          element.scrollTop + element.clientHeight === element.scrollHeight;
-
-        if (isAtBottom && !loader.isEnd) {
-          doSearchMore();
+          element.scrollHeight * 0.95 <=
+          element.scrollTop + element.clientHeight;
+        if (isAtBottom && !loader.isEnd && !loader.isFetching) {
+          doSearch();
         }
       };
       mainRef.addEventListener("scroll", listener);
@@ -456,7 +456,13 @@ export default function FoodSearchBody() {
     return () => {
       mainRef && mainRef.removeEventListener("scroll", listener!);
     };
-  }, [appContentContext.mainRef, doSearchMore, loader.isEnd]);
+  }, [
+    appContentContext.mainRef,
+    doSearch,
+    doSearchMore,
+    loader.isEnd,
+    loader.isFetching,
+  ]);
 
   useEffect(() => {
     if (dirtyRef.current) {

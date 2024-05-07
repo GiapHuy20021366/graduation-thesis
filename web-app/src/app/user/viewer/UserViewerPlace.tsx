@@ -136,9 +136,9 @@ const UserViewerPlace = React.forwardRef<HTMLDivElement, UserViewerPlaceProps>(
         listener = (event: Event) => {
           const element = event.target as HTMLDivElement;
           const isAtBottom =
-            element.scrollTop + element.clientHeight === element.scrollHeight;
-
-          if (isAtBottom && !loader.isEnd) {
+            element.scrollHeight * 0.95 <=
+            element.scrollTop + element.clientHeight;
+          if (isAtBottom && !loader.isEnd && !loader.isFetching) {
             doSearch();
           }
         };
@@ -149,7 +149,7 @@ const UserViewerPlace = React.forwardRef<HTMLDivElement, UserViewerPlaceProps>(
           main.removeEventListener("scroll", listener);
         }
       };
-    }, [appContentContext.mainRef, doSearch, loader.isEnd]);
+    }, [appContentContext.mainRef, doSearch, loader.isEnd, loader.isFetching]);
 
     // Recover result
     useEffect(() => {

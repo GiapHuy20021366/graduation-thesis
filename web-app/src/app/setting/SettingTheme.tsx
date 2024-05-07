@@ -1,7 +1,7 @@
 import React from "react";
 import {
-  Box,
-  BoxProps,
+  FormControl,
+  FormControlProps,
   InputLabel,
   MenuItem,
   PaletteMode,
@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { useI18nContext, useThemeContext } from "../../hooks";
 
-type SettingThemeProps = BoxProps;
+type SettingThemeProps = FormControlProps;
 
 const SettingTheme = React.forwardRef<HTMLDivElement, SettingThemeProps>(
   (props, ref) => {
@@ -23,7 +23,7 @@ const SettingTheme = React.forwardRef<HTMLDivElement, SettingThemeProps>(
     };
 
     return (
-      <Box
+      <FormControl
         ref={ref}
         {...props}
         sx={{
@@ -43,7 +43,7 @@ const SettingTheme = React.forwardRef<HTMLDivElement, SettingThemeProps>(
           <MenuItem value="dark">{lang("dark")}</MenuItem>
           <MenuItem value="light">{lang("light")}</MenuItem>
         </Select>
-      </Box>
+      </FormControl>
     );
   }
 );
