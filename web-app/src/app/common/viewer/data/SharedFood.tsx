@@ -1,9 +1,8 @@
 import React from "react";
 import { Avatar, Box, Stack, StackProps, Typography } from "@mui/material";
-import { Person } from "@mui/icons-material";
+import { AccessTimeOutlined, Person } from "@mui/icons-material";
 import { IFoodPostExposed, SystemSide } from "../../../../data";
 import TimeExposed from "../../custom/TimeExposed";
-import { useComponentLanguage } from "../../../../hooks";
 import StyledLink from "../../navigate/StyledLink";
 
 type SharedFoodProps = StackProps & {
@@ -64,16 +63,13 @@ const toNavigate = (data: IFoodPostExposed, source?: SystemSide) => {
 const SharedFood = React.forwardRef<HTMLDivElement, SharedFoodProps>(
   (props, ref) => {
     const { data, source, onBeforeNavigate, ...rest } = props;
-    const lang = useComponentLanguage("ViewerData");
-
-    const isExpired = Date.now() - new Date(data.duration).getTime() < 0;
     const navigateAction = toNavigate(data, source);
 
     return (
       <Stack
         ref={ref}
         direction={"row"}
-        gap={1}
+        gap={3}
         {...rest}
         sx={{
           width: "100%",
@@ -96,7 +92,9 @@ const SharedFood = React.forwardRef<HTMLDivElement, SharedFoodProps>(
             to={`/food/${data._id}`}
             onBeforeNavigate={onBeforeNavigate}
           >
-            <Typography sx={{ fontWeight: 450 }}>{data.title}</Typography>
+            <Typography sx={{ fontWeight: 400, fontSize: "1.1rem" }}>
+              {data.title}
+            </Typography>
           </StyledLink>
 
           <StyledLink
@@ -108,15 +106,13 @@ const SharedFood = React.forwardRef<HTMLDivElement, SharedFoodProps>(
               <Typography>{navigateAction.name}</Typography>
             </Stack>
           </StyledLink>
-
-          <Typography>
-            {lang("added-at")}{" "}
-            <TimeExposed time={data.createdAt} milisecond={false} />
-          </Typography>
-          <Typography>
-            {isExpired ? lang("will-expired-at") : lang("expired-at")}{" "}
-            <TimeExposed time={data.duration} milisecond={false} />
-          </Typography>
+          <Stack direction={"row"} gap={1}>
+            <AccessTimeOutlined />
+            <Typography>
+              <TimeExposed time={data.createdAt} milisecond={false} /> -{" "}
+              <TimeExposed time={data.duration} milisecond={false} />
+            </Typography>
+          </Stack>
         </Stack>
       </Stack>
     );

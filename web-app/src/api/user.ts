@@ -156,11 +156,6 @@ export interface UserFetcher {
     params: IUserSearchParams,
     auth: IAuthInfo
   ): Promise<UserResponse<IUserExposedSimple[]>>;
-  getUserFollowers(
-    user: string,
-    params: IFollowerSearchParams,
-    auth: IAuthInfo
-  ): Promise<UserResponse<IUserFollowerExposed[]>>;
   followUser(
     userId: string,
     auth: IAuthInfo

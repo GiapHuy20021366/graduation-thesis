@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { IUserExposedWithFollower } from "../../../data";
 import {
   useAuthContext,
@@ -22,6 +22,7 @@ export default function UserViewerId({ id }: IUserViewerIdProps) {
   const authContext = useAuthContext();
   const auth = authContext.auth;
   const loader = useLoader();
+  const fetchedId = useRef<string>();
 
   const progressContext = usePageProgessContext();
 
@@ -63,10 +64,11 @@ export default function UserViewerId({ id }: IUserViewerIdProps) {
   }, [auth, id, isNotFound, loader, progressContext]);
 
   useEffect(() => {
-    if (data == null && !loader.isError) {
+    if ((data == null && !loader.isError) || fetchedId.current !== id) {
       doLoadUser();
+      fetchedId.current = id;
     }
-  }, [data, doLoadUser, loader.isError]);
+  }, [data, doLoadUser, id, loader.isError]);
 
   if (typeof id !== "string" || isNotFound) {
     return <PageNotFound />;

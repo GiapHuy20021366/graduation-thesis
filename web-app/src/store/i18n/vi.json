@@ -403,7 +403,8 @@
         "confirm-hide-title": "Xác nhận ẩn thực phẩm",
         "confirm-hide-content": "Ẩn thực phẩm này đồng nghĩa chỉ có bạn mới có thể xem thực phẩm này. Nó cũng ẩn thực phẩm khỏi công cụ tìm kiếm.",
         "add-food": "Thêm thực phẩm",
-        "l-place": "Địa điểm"
+        "l-place": "Địa điểm",
+        "open-filter": "Tìm kiếm nâng cao"
     },
     "Toasts": {
         "can-not-sharing-now": "Không thể chia sẻ thực phẩm vào lúc này",

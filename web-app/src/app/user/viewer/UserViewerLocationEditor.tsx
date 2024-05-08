@@ -12,9 +12,9 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { userFetcher } from "../../../api";
 import {
+  useAppContentContext,
   useAuthContext,
   useComponentLanguage,
-  useDistanceCalculation,
   useFetchLocation,
   useLoader,
   useToastContext,
@@ -50,7 +50,8 @@ const UserViewerLocationEditor = React.forwardRef<
     setLocation: setViewerLocation,
   } = viewerContext;
   const toast = useToastContext();
-  const distances = useDistanceCalculation();
+  const appContentContext = useAppContentContext();
+  const { currentLocation } = appContentContext;
   const fetchLocation = useFetchLocation({});
   const [selected, setSelected] = useState<ICoordinates | undefined>(
     viewerLocation?.coordinates
@@ -80,7 +81,7 @@ const UserViewerLocationEditor = React.forwardRef<
           setTimeout(() => {
             setCenter(
               viewerLocation?.coordinates ??
-                distances.currentLocation?.coordinates ?? {
+                currentLocation ?? {
                   lat: 21.02,
                   lng: 105.83,
                 }
@@ -92,7 +93,7 @@ const UserViewerLocationEditor = React.forwardRef<
     } else {
       dirtyRef.current = false;
     }
-  }, [distances.currentLocation, fetchLocation, props.open, viewerLocation]);
+  }, [currentLocation, fetchLocation, props.open, viewerLocation]);
 
   const handleOnClickOk = () => {
     const location = fetchLocation.location;
@@ -153,7 +154,7 @@ const UserViewerLocationEditor = React.forwardRef<
   };
 
   const handleLocateMe = () => {
-    const current = distances.currentLocation?.coordinates;
+    const current = currentLocation;
     if (current == null) return;
 
     fetchLocation.fetch(current, {

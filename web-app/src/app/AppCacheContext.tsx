@@ -7,7 +7,7 @@ interface IAppCacheContextProviderProps {
 interface IAppCacheContext {
   get: <T>(key: string) => T | undefined;
   getOrCreate: <T>(key: string, initer: T) => T;
-  save: (key: string, data: any) => void;
+  save: (key: string, data: any, target?: "SESSION" | "LOCAL" | "HEAP") => void;
   remove: (key: string) => void;
   removeIf: (fn: (key: string, data: unknown) => boolean) => void;
   querySelector: <T>(

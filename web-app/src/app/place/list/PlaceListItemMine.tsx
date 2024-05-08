@@ -62,7 +62,7 @@ const PlaceListItemMine = React.forwardRef<
             onBeforeNavigate && onBeforeNavigate(data._id)
           }
         >
-          <Typography sx={{ fontWeight: 500, fontSize: "1.3rem", mt: 2 }}>
+          <Typography sx={{ fontWeight: 400, fontSize: "1.1rem", mt: 2 }}>
             {data.exposedName}
           </Typography>
         </StyledLink>
@@ -71,7 +71,7 @@ const PlaceListItemMine = React.forwardRef<
         <Stack gap={1} direction={"row"}>
           <AccessTimeOutlined color="success" />
           <Typography>
-            {lang("created-at")} <TimeExposed time={data.updatedAt} />
+            <TimeExposed time={data.updatedAt} />
           </Typography>
         </Stack>
         <Stack direction="row" gap={1}>

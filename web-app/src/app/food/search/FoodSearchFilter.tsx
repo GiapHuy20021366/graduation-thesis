@@ -78,7 +78,11 @@ export default function FoodSearchFilter({
     searchContext.maxDuration
   );
   const [priceOption, setPriceOption] = useState<string | undefined>(
-    searchContext.price ? PriceOptions.CUSTOM : PriceOptions.ALL
+    searchContext.price == null
+      ? PriceOptions.ALL
+      : searchContext.price?.min && searchContext.price?.min
+      ? PriceOptions.CUSTOM
+      : PriceOptions.FREE
   );
   const [priceRange, setPriceRange] = useState<IFoodSearchPrice | undefined>({
     min: searchContext?.price?.min,
@@ -106,10 +110,13 @@ export default function FoodSearchFilter({
   };
 
   const handleApply = () => {
-    const price: IFoodSearchPrice = {
-      min: priceOption === PriceOptions.FREE ? 0 : priceRange?.min,
-      max: priceOption === PriceOptions.FREE ? 0 : priceRange?.max,
-    };
+    const price: IFoodSearchPrice | undefined =
+      priceOption !== PriceOptions.ALL
+        ? {
+            min: priceOption === PriceOptions.FREE ? 0 : priceRange?.min,
+            max: priceOption === PriceOptions.FREE ? 0 : priceRange?.max,
+          }
+        : undefined;
     const params: IFilterParams = {
       addedBy: toPlaceTypes(addedBy),
       available: available,

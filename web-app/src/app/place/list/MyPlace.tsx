@@ -1,16 +1,16 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Stack, StackProps } from "@mui/material";
 import {
   useAppContentContext,
   useAuthContext,
-  useDistanceCalculation,
+  useDirty,
+  useDynamicStorage,
+  useLoader,
   usePageProgessContext,
 } from "../../../hooks";
 import {
   IPagination,
   IPlaceExposedCooked,
-  loadFromSessionStorage,
-  saveToSessionStorage,
   toPlaceExposedCooked,
 } from "../../../data";
 import PlaceListItemMine from "./PlaceListItemMine";
@@ -33,32 +33,28 @@ type MyPlaceProps = StackProps & {
 const MyPlace = React.forwardRef<HTMLDivElement, MyPlaceProps>((props, ref) => {
   const { active, ...rest } = props;
 
-  const [data, setData] = useState<IPlaceExposedCooked[]>([]);
+  const storage = useDynamicStorage<IMyPlaceSnapshotData>(MY_PLACE_STORAGE_KEY);
+  const stored = storage.get();
+
+  const [data, setData] = useState<IPlaceExposedCooked[]>(stored?.data ?? []);
 
   const appContentContext = useAppContentContext();
+  const { currentLocation } = appContentContext;
   const authContext = useAuthContext();
   const progessContext = usePageProgessContext();
-  const distances = useDistanceCalculation();
 
   const { auth, account } = authContext;
 
-  const [isFetching, setIsFetching] = useState<boolean>(false);
-  const [isEnd, setIsEnd] = useState<boolean>(false);
-  const [isError, setIsError] = useState<boolean>(false);
+  const loader = useLoader();
 
-  // Recover at begining or fetch at begining
-  const dirtyRef = useRef<boolean>(false);
-
-  const doSaveStorage = () => {
+  const doSaveStorage = useCallback(() => {
     const snapshot: IMyPlaceSnapshotData = {
       data: data,
       scrollTop: appContentContext.mainRef?.current?.scrollTop,
     };
-    saveToSessionStorage(snapshot, {
-      key: MY_PLACE_STORAGE_KEY,
-      account: authContext.account?._id,
-    });
-  };
+    storage.update(() => snapshot);
+    storage.save();
+  }, [appContentContext.mainRef, data, storage]);
 
   const handleBeforeNavigate = () => {
     doSaveStorage();
@@ -66,16 +62,16 @@ const MyPlace = React.forwardRef<HTMLDivElement, MyPlaceProps>((props, ref) => {
 
   const doSearch = useCallback(() => {
     if (auth == null) return;
-    if (isFetching || !active) return;
+    if (loader.isFetching || !active) return;
     const pagination: IPagination = {
       skip: data.length,
       limit: 24,
     };
 
     progessContext.start();
-    setIsFetching(true);
-    setIsError(false);
-    setIsEnd(false);
+    loader.setIsFetching(true);
+    loader.setIsError(false);
+    loader.setIsEnd(false);
 
     userFetcher
       .searchPlace(
@@ -91,14 +87,14 @@ const MyPlace = React.forwardRef<HTMLDivElement, MyPlaceProps>((props, ref) => {
         const places = res.data;
         if (places != null) {
           if (places.length < pagination.limit) {
-            setIsEnd(true);
+            loader.setIsEnd(true);
           }
 
           const _newData = data.slice();
           places.forEach((place) => {
             _newData.push(
               toPlaceExposedCooked(place, {
-                currentCoordinates: distances.currentLocation?.coordinates,
+                currentCoordinates: currentLocation,
                 homeCoordinates: account?.location?.coordinates,
               })
             );
@@ -108,21 +104,13 @@ const MyPlace = React.forwardRef<HTMLDivElement, MyPlaceProps>((props, ref) => {
         }
       })
       .catch(() => {
-        setIsError(true);
+        loader.setIsError(true);
       })
       .finally(() => {
-        setIsFetching(false);
+        loader.setIsFetching(false);
         progessContext.end();
       });
-  }, [
-    auth,
-    isFetching,
-    active,
-    data,
-    progessContext,
-    account,
-    distances.currentLocation,
-  ]);
+  }, [auth, loader, active, data, progessContext, account, currentLocation]);
 
   useEffect(() => {
     const main = appContentContext.mainRef?.current;
@@ -134,7 +122,7 @@ const MyPlace = React.forwardRef<HTMLDivElement, MyPlaceProps>((props, ref) => {
         const isAtBottom =
           element.scrollHeight * 0.95 <=
           element.scrollTop + element.clientHeight;
-        if (isAtBottom && !isEnd && !isFetching) {
+        if (isAtBottom && !loader.isEnd && !loader.isFetching) {
           doSearch();
         }
       };
@@ -145,37 +133,35 @@ const MyPlace = React.forwardRef<HTMLDivElement, MyPlaceProps>((props, ref) => {
         main.removeEventListener("scroll", listener);
       }
     };
-  }, [appContentContext.mainRef, doSearch, isEnd, isFetching]);
+  }, [appContentContext.mainRef, doSearch, loader.isEnd, loader.isFetching]);
 
-  // Recover result
+  const dirty = useDirty();
   useEffect(() => {
     if (account == null) return;
     if (!active) return;
-    if (!dirtyRef.current) {
-      dirtyRef.current = true;
-      // At begining
-      const snapshot = loadFromSessionStorage<IMyPlaceSnapshotData>({
-        key: MY_PLACE_STORAGE_KEY,
-        maxDuration: 1 * 24 * 60 * 60 * 1000,
-        account: account._id,
-      });
-      if (snapshot) {
-        const snapshotData = snapshot.data;
-        setData(snapshotData);
-        if (snapshotData.length < 24) {
-          setIsEnd(true);
-        }
-        const mainRef = appContentContext.mainRef?.current;
-        if (mainRef) {
-          setTimeout(() => {
-            mainRef.scrollTop = snapshot.scrollTop ?? 0;
-          }, 300);
-        }
-      } else {
+    dirty.perform(() => {
+      if (storage.isNew) {
         doSearch();
+      } else {
+        if (stored && stored?.data.length < 24) loader.setIsEnd(true);
+        const mainRef = appContentContext.mainRef?.current;
+        if (mainRef != null) {
+          setTimeout(() => {
+            mainRef.scrollTop = stored?.scrollTop ?? 0;
+          }, 0);
+        }
       }
-    }
-  }, [account, active, appContentContext.mainRef, doSearch]);
+    });
+  }, [
+    account,
+    active,
+    appContentContext.mainRef,
+    dirty,
+    doSearch,
+    loader,
+    storage.isNew,
+    stored,
+  ]);
 
   return (
     <Stack
@@ -198,9 +184,9 @@ const MyPlace = React.forwardRef<HTMLDivElement, MyPlaceProps>((props, ref) => {
         );
       })}
 
-      {isFetching && <PlaceSearchItemHolder />}
-      <ListEnd active={isEnd && !isError} onRetry={doSearch} />
-      <ErrorRetry active={isError} onRetry={doSearch} />
+      {loader.isFetching && <PlaceSearchItemHolder />}
+      <ListEnd active={loader.isEnd && !loader.isError} onRetry={doSearch} />
+      <ErrorRetry active={loader.isError} onRetry={doSearch} />
     </Stack>
   );
 });

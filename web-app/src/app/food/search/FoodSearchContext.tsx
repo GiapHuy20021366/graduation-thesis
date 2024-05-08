@@ -2,6 +2,7 @@ import React, {
   Dispatch,
   SetStateAction,
   createContext,
+  useEffect,
   useState,
 } from "react";
 import {
@@ -11,7 +12,7 @@ import {
   OrderState,
   PlaceType,
 } from "../../../data";
-import { useAppCacheContext } from "../../../hooks";
+import { useDynamicStorage } from "../../../hooks";
 
 interface IFoodSearchContextProviderProps {
   children?: React.ReactNode;
@@ -53,8 +54,6 @@ export interface IFoodSearchContext {
     quantity: OrderState;
   };
 
-  doSaveStorage: () => void;
-
   setMaxDistance: Dispatch<SetStateAction<number | undefined>>;
   setQuery: Dispatch<SetStateAction<string>>;
   setCategories: Dispatch<SetStateAction<FoodCategory[] | undefined>>;
@@ -82,8 +81,6 @@ export const FoodSearchContext = createContext<IFoodSearchContext>({
     quantity: OrderState.NONE,
   },
 
-  doSaveStorage: () => {},
-
   setMaxDistance: () => {},
   setCategories: () => {},
   setMaxDuration: () => {},
@@ -104,47 +101,47 @@ export default function FoodSearchContextProvider({
   children,
   categories: targetCategories,
 }: IFoodSearchContextProviderProps) {
-  const cacher = useAppCacheContext();
-  const cached = cacher.get<IFoodSearchContextSnapshotData>(
+  const storage = useDynamicStorage<IFoodSearchContextSnapshotData>(
     FOOD_SEARCH_CONTEXT_STORAGE_KEY
   );
+  const stored = storage.get();
 
   const [maxDistance, setMaxDistance] = useState<number | undefined>(
-    cached?.maxDistance
+    stored?.maxDistance
   );
   const [categories, setCategories] = useState<FoodCategory[] | undefined>(
-    targetCategories ?? cached?.categories
+    targetCategories ?? stored?.categories
   );
   const [maxDuration, setMaxDuration] = useState<number | undefined>(
-    cached?.maxDuration
+    stored?.maxDuration
   );
-  const [query, setQuery] = useState<string>(cached?.query ?? "");
+  const [query, setQuery] = useState<string>(stored?.query ?? "");
   const [minQuantity, setMinQuantity] = useState<number | undefined>(
-    cached?.minQuantity ?? 4
+    stored?.minQuantity ?? 4
   );
   const [price, setPrice] = useState<IFoodSearchPrice | undefined>(
-    cached?.price
+    stored?.price
   );
   const [orderDistance, setOrderDistance] = useState<OrderState>(
-    cached?.order.distance ?? OrderState.NONE
+    stored?.order.distance ?? OrderState.NONE
   );
   const [orderNew, setOrderNew] = useState<OrderState>(
-    cached?.order.time ?? OrderState.NONE
+    stored?.order.time ?? OrderState.NONE
   );
   const [orderPrice, setOrderPrice] = useState<OrderState>(
-    cached?.order.price ?? OrderState.NONE
+    stored?.order.price ?? OrderState.NONE
   );
   const [orderQuantity, setOrderQuantity] = useState<OrderState>(
-    cached?.order.quantity ?? OrderState.NONE
+    stored?.order.quantity ?? OrderState.NONE
   );
   const [addedBy, setAddedBy] = useState<PlaceType[] | undefined>(
-    cached?.addedBy
+    stored?.addedBy
   );
   const [available, setAvailable] = useState<ItemAvailable>(
-    cached?.available ?? "AVAILABLE_ONLY"
+    stored?.available ?? "AVAILABLE_ONLY"
   );
 
-  const doSaveStorage = () => {
+  useEffect(() => {
     const snapshot: IFoodSearchContextSnapshotData = {
       available,
       order: {
@@ -161,8 +158,23 @@ export default function FoodSearchContextProvider({
       minQuantity,
       price,
     };
-    cacher.save(FOOD_SEARCH_CONTEXT_STORAGE_KEY, snapshot);
-  };
+    storage.update(() => snapshot);
+    storage.save();
+  }, [
+    addedBy,
+    available,
+    categories,
+    maxDistance,
+    maxDuration,
+    minQuantity,
+    orderDistance,
+    orderNew,
+    orderPrice,
+    orderQuantity,
+    price,
+    query,
+    storage,
+  ]);
 
   return (
     <FoodSearchContext.Provider
@@ -193,7 +205,6 @@ export default function FoodSearchContextProvider({
         setOrderQuantity,
         setAddedBy,
         setAvailable,
-        doSaveStorage,
       }}
     >
       {children}

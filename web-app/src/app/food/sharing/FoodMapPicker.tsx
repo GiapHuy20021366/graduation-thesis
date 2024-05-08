@@ -23,9 +23,9 @@ import {
   KeyboardArrowRight,
 } from "@mui/icons-material";
 import {
+  useAppContentContext,
   useAuthContext,
   useComponentLanguage,
-  useDistanceCalculation,
   useFetchLocation,
   useFoodSharingFormContext,
 } from "../../../hooks";
@@ -47,6 +47,8 @@ const FoodMapPicker = memo(() => {
 
   const authContext = useAuthContext();
   const { auth, account } = authContext;
+  const appContentContext = useAppContentContext();
+  const { currentLocation } = appContentContext;
 
   const sharingContext = useFoodSharingFormContext();
   const { location, setLocation, isEditable } = sharingContext;
@@ -70,8 +72,6 @@ const FoodMapPicker = memo(() => {
 
   const [infoOpen, setInfoOpen] = useState<number | undefined>(0);
 
-  const distances = useDistanceCalculation();
-
   const fetchAddress = useCallback(
     (pos: ICoordinates) => {
       const fetcheds = fetchLocation.fetcheds;
@@ -92,16 +92,16 @@ const FoodMapPicker = memo(() => {
   );
 
   const setCurrentLocation = useCallback(() => {
-    const current = distances.currentLocation;
+    const current = currentLocation;
     if (current) {
-      setCenter(current.coordinates);
+      setCenter(current);
       setInfoOpen(1);
-      fetchAddress(current.coordinates);
+      fetchAddress(current);
     }
-  }, [distances.currentLocation, fetchAddress]);
+  }, [currentLocation, fetchAddress]);
 
   const handleLocateMe = () => {
-    const current = distances.currentLocation?.coordinates;
+    const current = currentLocation;
     if (current != null) {
       if (!isDiffLocation(current, account?.location?.coordinates)) {
         setInfoOpen(0);
@@ -183,7 +183,7 @@ const FoodMapPicker = memo(() => {
     if (isEditable) {
       map.setCenter(location.coordinates);
     } else {
-      const current = distances.currentLocation?.coordinates;
+      const current = currentLocation;
       if (current) {
         map.setCenter(current);
         fetchLocation.fetch(current, {

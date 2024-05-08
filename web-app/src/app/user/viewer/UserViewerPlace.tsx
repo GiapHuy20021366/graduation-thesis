@@ -1,9 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Stack, StackProps } from "@mui/material";
 import {
   useAppContentContext,
   useAuthContext,
-  useDistanceCalculation,
+  useDirty,
+  useDynamicStorage,
   useLoader,
   usePageProgessContext,
   useUserViewerContext,
@@ -11,8 +12,6 @@ import {
 import {
   IPagination,
   IPlaceExposedCooked,
-  loadFromSessionStorage,
-  saveToSessionStorage,
   toPlaceExposedCooked,
 } from "../../../data";
 import { userFetcher } from "../../../api";
@@ -38,30 +37,30 @@ const UserViewerPlace = React.forwardRef<HTMLDivElement, UserViewerPlaceProps>(
     const viewerContext = useUserViewerContext();
     const { _id } = viewerContext;
 
-    const [data, setData] = useState<IPlaceExposedCooked[]>([]);
+    const storage = useDynamicStorage<IUserViewerPlaceSnapshotData>(
+      USER_VIEWER_PLACE(_id)
+    );
+    const stored = storage.get();
+
+    const [data, setData] = useState<IPlaceExposedCooked[]>(stored?.data ?? []);
 
     const appContentContext = useAppContentContext();
+    const { currentLocation } = appContentContext;
     const authContext = useAuthContext();
-    const progessContext = usePageProgessContext();
-    const distances = useDistanceCalculation();
-
     const { auth, account } = authContext;
+
+    const progessContext = usePageProgessContext();
 
     const loader = useLoader();
 
-    // Recover at begining or fetch at begining
-    const dirtyRef = useRef<boolean>(false);
-
-    const doSaveStorage = () => {
+    const doSaveStorage = useCallback(() => {
       const snapshot: IUserViewerPlaceSnapshotData = {
         data: data,
         scrollTop: appContentContext.mainRef?.current?.scrollTop,
       };
-      saveToSessionStorage(snapshot, {
-        key: USER_VIEWER_PLACE(_id),
-        account: authContext.account?._id,
-      });
-    };
+      storage.update(() => snapshot);
+      storage.save();
+    }, [appContentContext.mainRef, data, storage]);
 
     const handleBeforeNavigate = () => {
       doSaveStorage();
@@ -101,7 +100,7 @@ const UserViewerPlace = React.forwardRef<HTMLDivElement, UserViewerPlaceProps>(
             places.forEach((place) => {
               _newData.push(
                 toPlaceExposedCooked(place, {
-                  currentCoordinates: distances.currentLocation?.coordinates,
+                  currentCoordinates: currentLocation,
                   homeCoordinates: account?.location?.coordinates,
                 })
               );
@@ -124,8 +123,8 @@ const UserViewerPlace = React.forwardRef<HTMLDivElement, UserViewerPlaceProps>(
       data,
       progessContext,
       _id,
-      distances.currentLocation,
-      account?.location,
+      currentLocation,
+      account?.location?.coordinates,
     ]);
 
     useEffect(() => {
@@ -151,35 +150,33 @@ const UserViewerPlace = React.forwardRef<HTMLDivElement, UserViewerPlaceProps>(
       };
     }, [appContentContext.mainRef, doSearch, loader.isEnd, loader.isFetching]);
 
-    // Recover result
+    const dirty = useDirty();
     useEffect(() => {
       if (account == null) return;
       if (!active) return;
-      if (!dirtyRef.current) {
-        dirtyRef.current = true;
-        // At begining
-        const snapshot = loadFromSessionStorage<IUserViewerPlaceSnapshotData>({
-          key: USER_VIEWER_PLACE(_id),
-          maxDuration: 1 * 24 * 60 * 60 * 1000,
-          account: account._id,
-        });
-        if (snapshot) {
-          const snapshotData = snapshot.data;
-          setData(snapshotData);
-          if (snapshotData.length < 24) {
-            loader.setIsEnd(true);
-          }
-          const mainRef = appContentContext.mainRef?.current;
-          if (mainRef) {
-            setTimeout(() => {
-              mainRef.scrollTop = snapshot.scrollTop ?? 0;
-            }, 300);
-          }
-        } else {
+      dirty.perform(() => {
+        if (storage.isNew) {
           doSearch();
+        } else {
+          if (stored && stored?.data.length < 24) loader.setIsEnd(true);
+          const mainRef = appContentContext.mainRef?.current;
+          if (mainRef != null) {
+            setTimeout(() => {
+              mainRef.scrollTop = stored?.scrollTop ?? 0;
+            }, 0);
+          }
         }
-      }
-    }, [account, active, appContentContext.mainRef, doSearch, loader, _id]);
+      });
+    }, [
+      account,
+      active,
+      appContentContext.mainRef,
+      dirty,
+      doSearch,
+      loader,
+      storage.isNew,
+      stored,
+    ]);
 
     return (
       <Stack

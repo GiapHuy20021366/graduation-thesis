@@ -365,8 +365,8 @@ export const getPlaceFollowers = async (
   res: Response,
   next: NextFunction
 ) => {
-  const targetUser = req.params.id;
-  if (!isObjectId(targetUser)) {
+  const targetPlace = req.params.id;
+  if (!isObjectId(targetPlace)) {
     return next(new InvalidDataError());
   }
   const params = req.body;
@@ -374,7 +374,7 @@ export const getPlaceFollowers = async (
     ...toFollowerSearchParams(params),
     role: [FollowRole.PLACE],
     place: {
-      include: targetUser,
+      include: targetPlace,
     },
   };
   getFollowers(searchParams)

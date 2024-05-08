@@ -29,9 +29,9 @@ import {
 } from "@mui/icons-material";
 import { userFetcher } from "../../api";
 import {
+  useAppContentContext,
   useAuthContext,
   useComponentLanguage,
-  useDistanceCalculation,
   useFetchLocation,
   useToastContext,
 } from "../../hooks";
@@ -44,6 +44,8 @@ export default function LocationPage() {
 
   const authContext = useAuthContext();
   const { auth, account } = authContext;
+  const appContentContext = useAppContentContext();
+  const { currentLocation } = appContentContext;
 
   const [center, setCenter] = useState<ICoordinates>(
     account?.location?.coordinates ?? {
@@ -61,8 +63,6 @@ export default function LocationPage() {
   const lang = useComponentLanguage();
 
   const [infoOpen, setInfoOpen] = useState<number | undefined>(0);
-
-  const distances = useDistanceCalculation();
 
   const fetchAddress = useCallback(
     (pos: ICoordinates) => {
@@ -84,11 +84,11 @@ export default function LocationPage() {
   );
 
   const setCurrentLocation = () => {
-    const current = distances.currentLocation;
+    const current = currentLocation;
     if (current) {
-      setCenter(current.coordinates);
+      setCenter(current);
       setInfoOpen(1);
-      fetchAddress(current.coordinates);
+      fetchAddress(current);
     }
   };
 
@@ -98,7 +98,7 @@ export default function LocationPage() {
   }, []);
 
   const handleLocateMe = () => {
-    const current = distances.currentLocation?.coordinates;
+    const current = currentLocation;
     if (current != null) {
       if (!isDiffLocation(current, account?.location?.coordinates)) {
         setInfoOpen(0);

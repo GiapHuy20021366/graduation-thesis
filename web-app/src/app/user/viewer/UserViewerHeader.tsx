@@ -70,7 +70,7 @@ const UserViewerHeader = React.forwardRef<
         ...(props.sx ?? {}),
       }}
     >
-      <Stack direction={"row"} gap={1}>
+      <Stack direction={["column", "row"]} gap={1}>
         <Avatar
           sx={{
             width: [90, 100, 110, 120],

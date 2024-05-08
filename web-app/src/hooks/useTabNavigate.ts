@@ -7,9 +7,11 @@ export interface ITabOption {
   url?: string;
 }
 
+type TabResolver = (location: Location) => number | string;
+
 export interface ITabNavigateOptions {
   tabOptions?: ITabOption[];
-  resolver?: (location: Location) => number | string;
+  resolver?: TabResolver;
 }
 
 export const defaultResolver = (
@@ -50,28 +52,42 @@ export const toParams = (search: string): { [key: string]: string } => {
   return result;
 };
 
+export const toTabValue = (
+  location: Location<any>,
+  tabOptions?: ITabOption[],
+  resolver?: TabResolver
+): number => {
+  tabOptions ??= [];
+  resolver ??= defaultResolver;
+
+  const resolveValue = resolver(location);
+  if (typeof resolveValue === "string") {
+    const tabIndex = tabOptions.findIndex(
+      (option) => option.query === resolveValue
+    );
+    if (tabIndex !== -1) {
+      const tabValue = tabOptions[tabIndex].value;
+      return tabValue;
+    }
+  } else {
+    return resolveValue;
+  }
+  return 0;
+};
+
 export function useTabNavigate(
   options?: ITabNavigateOptions
 ): ITabNavigateStates {
   const navigate = useNavigate();
   const location = useLocation();
-  const [tabValue, setTabValue] = useState<number>(0);
+  const [tabValue, setTabValue] = useState<number>(
+    toTabValue(location, options?.tabOptions, options?.resolver)
+  );
 
   useEffect(() => {
-    const tabOptions = options?.tabOptions ?? [];
-    const resolver = options?.resolver ?? defaultResolver;
-
-    const resolveValue = resolver(location);
-    if (typeof resolveValue === "string") {
-      const tabIndex = tabOptions.findIndex(
-        (option) => option.query === resolveValue
-      );
-      if (tabIndex !== -1) {
-        const tabValue = tabOptions[tabIndex].value;
-        setTabValue(tabValue);
-      }
-    } else {
-      setTabValue(resolveValue);
+    const tab = toTabValue(location, options?.tabOptions, options?.resolver);
+    if (tab !== tabValue) {
+      setTabValue(tab);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);

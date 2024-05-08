@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Divider, Stack, StackProps } from "@mui/material";
 import {
   IFoodPostExposed,
@@ -6,12 +6,12 @@ import {
   IPagination,
   OrderState,
   SystemSide,
-  loadFromSessionStorage,
-  saveToSessionStorage,
 } from "../../../data";
 import {
   useAppContentContext,
   useAuthContext,
+  useDirty,
+  useDynamicStorage,
   useLoader,
   usePageProgessContext,
   useUserViewerContext,
@@ -40,15 +40,18 @@ const UserViewerShared = React.forwardRef<
   const { active, ...rest } = props;
   const viewerContext = useUserViewerContext();
   const { _id } = viewerContext;
+  const storage = useDynamicStorage<IUserViewerSharedSnapshotData>(
+    USER_VIEWER_SHARED(_id)
+  );
+  const stored = storage.get();
 
-  const [foods, setFoods] = useState<IFoodPostExposed[]>([]);
+  const [foods, setFoods] = useState<IFoodPostExposed[]>(stored?.data ?? []);
 
   const progessContext = usePageProgessContext();
   const authContext = useAuthContext();
   const { auth, account } = authContext;
   const appContentContext = useAppContentContext();
   const loader = useLoader();
-  const dirtyRef = useRef<boolean>(true);
 
   const doSearch = useCallback(() => {
     if (auth == null) return;
@@ -119,50 +122,46 @@ const UserViewerShared = React.forwardRef<
     };
   }, [appContentContext.mainRef, doSearch, loader.isEnd, loader.isFetching]);
 
-  const doSaveStorage = () => {
+  const doSaveStorage = useCallback(() => {
     const snapshot: IUserViewerSharedSnapshotData = {
       data: foods,
       scrollTop: appContentContext.mainRef?.current?.scrollTop,
     };
-    saveToSessionStorage(snapshot, {
-      key: USER_VIEWER_SHARED(_id),
-      account: authContext.account?._id,
-    });
-  };
+    storage.update(() => snapshot);
+    storage.save();
+  }, [appContentContext.mainRef, foods, storage]);
 
   const handleBeforeNavigate = () => {
     doSaveStorage();
   };
 
-  // Recover result
+  const dirty = useDirty();
   useEffect(() => {
     if (account == null) return;
     if (!active) return;
-    if (dirtyRef.current) {
-      dirtyRef.current = false;
-      // At begining
-      const snapshot = loadFromSessionStorage<IUserViewerSharedSnapshotData>({
-        key: USER_VIEWER_SHARED(_id),
-        maxDuration: 1 * 24 * 60 * 60 * 1000,
-        account: account._id,
-      });
-      if (snapshot) {
-        const snapshotData = snapshot.data;
-        setFoods(snapshotData);
-        if (snapshotData.length < 24) {
-          loader.setIsEnd(true);
-        }
-        const mainRef = appContentContext.mainRef?.current;
-        if (mainRef) {
-          setTimeout(() => {
-            mainRef.scrollTop = snapshot.scrollTop ?? 0;
-          }, 300);
-        }
-      } else {
+    dirty.perform(() => {
+      if (storage.isNew) {
         doSearch();
+      } else {
+        if (stored && stored?.data.length < 24) loader.setIsEnd(true);
+        const mainRef = appContentContext.mainRef?.current;
+        if (mainRef != null) {
+          setTimeout(() => {
+            mainRef.scrollTop = stored?.scrollTop ?? 0;
+          }, 0);
+        }
       }
-    }
-  }, [account, active, appContentContext.mainRef, doSearch, loader, _id]);
+    });
+  }, [
+    account,
+    active,
+    appContentContext.mainRef,
+    dirty,
+    doSearch,
+    loader,
+    storage.isNew,
+    stored,
+  ]);
 
   return (
     <Stack

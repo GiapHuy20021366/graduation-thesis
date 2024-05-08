@@ -16,14 +16,14 @@ import {
 import { Box, Chip, IconButton, Stack, Tooltip } from "@mui/material";
 import {
   CenterFocusStrongOutlined,
-  SettingsSuggestOutlined,
+  FilterAltOutlined,
 } from "@mui/icons-material";
 import {
-  useAppCacheContext,
   useAppContentContext,
   useAuthContext,
   useComponentLanguage,
-  useDistanceCalculation,
+  useDirty,
+  useDynamicStorage,
   useFoodSearchContext,
   useLoading,
   useQueryDevice,
@@ -72,13 +72,17 @@ export default function FoodAroundBody() {
     id: "google-map-script",
     googleMapsApiKey: GOOGLE_MAP_API_KEY,
   });
-  const cacher = useAppCacheContext();
-  const cached = cacher.get<IFoodAroundBodySnapshotData>(
+
+  const storage = useDynamicStorage<IFoodAroundBodySnapshotData>(
     FOOD_AROUND_BODY_STORAGE_KEY
   );
+  const stored = storage.get();
+
   const appContentContext = useAppContentContext();
+  const { currentLocation } = appContentContext;
+  const mapRef = useRef<google.maps.Map>();
   const [center, setCenter] = useState<ICoordinates>(
-    cached?.center ??
+    stored?.center ??
       appContentContext.currentLocation ?? {
         lat: 21.02,
         lng: 105.83,
@@ -88,27 +92,23 @@ export default function FoodAroundBody() {
   const lang = useComponentLanguage();
 
   const [groups, setGroups] = useState<IGroupFoodPostExposed[]>(
-    cached?.groups ?? []
+    stored?.groups ?? []
   );
-
   const [infoOpen, setInfoOpen] = useState<string | number | undefined>(
-    cached?.infoOpen
+    stored?.infoOpen
   );
   const fetching = useLoading();
-  const mapRef = useRef<google.maps.Map>();
   const [loadActive, setLoadActive] = useState<boolean>(false);
   const authContext = useAuthContext();
   const { auth, account } = authContext;
 
   const [filterOpen, setFilterOpen] = useState<boolean>(false);
   const searchContext = useFoodSearchContext();
-  const distances = useDistanceCalculation();
-  const dirtyRef = useRef<boolean>(true);
 
   const [openFood, setOpenFood] = useState<string | undefined>();
   const device = useQueryDevice();
 
-  const doSaveStorage = useCallback(() => {
+  useEffect(() => {
     const map = mapRef.current;
     if (map == null) return;
     const center = map.getCenter();
@@ -124,17 +124,19 @@ export default function FoodAroundBody() {
       groups: groups,
       infoOpen: infoOpen,
     };
-    cacher.save(FOOD_AROUND_BODY_STORAGE_KEY, snapshot);
-  }, [cacher, groups, infoOpen]);
+
+    storage.update(() => snapshot);
+    storage.save();
+  }, [groups, infoOpen, storage]);
 
   const setCurrentLocation = useCallback(() => {
     () => {
-      const current = distances.currentLocation;
+      const current = currentLocation;
       if (current != null) {
-        setCenter(current.coordinates);
+        setCenter(current);
       }
     };
-  }, [distances.currentLocation]);
+  }, [currentLocation]);
 
   const searchFood = useCallback(
     (params: IFoodSearchParams) => {
@@ -148,9 +150,6 @@ export default function FoodAroundBody() {
           const datas = data.data;
           if (datas != null && datas.length > 0) {
             setGroups(toGroups(datas));
-            setTimeout(() => {
-              doSaveStorage();
-            }, 0);
           }
           fetching.deactive();
           setLoadActive(false);
@@ -159,7 +158,7 @@ export default function FoodAroundBody() {
           fetching.deactive();
         });
     },
-    [auth, doSaveStorage, fetching]
+    [auth, fetching]
   );
 
   const doSearch = useCallback(() => {
@@ -198,22 +197,20 @@ export default function FoodAroundBody() {
       },
     };
     searchFood(params);
-    searchContext.doSaveStorage();
     setOpenFood(undefined);
     setInfoOpen(undefined);
   }, [searchContext, searchFood]);
 
+  const dirty = useDirty();
   useEffect(() => {
     const map = mapRef.current;
-    if (map == null) return;
-    if (dirtyRef.current) {
-      dirtyRef.current = false;
-      if (cached == null) {
+    if (map != null && storage.isNew) {
+      dirty.perform(() => {
         setCurrentLocation();
         doSearch();
-      }
+      });
     }
-  }, [cached, doSearch, setCurrentLocation]);
+  }, [dirty, doSearch, setCurrentLocation, storage.isNew]);
 
   const handleLocateMe = () => {
     setCenter({ ...center });
@@ -290,7 +287,6 @@ export default function FoodAroundBody() {
     searchContext.setCategories(params.categories);
     searchContext.setMinQuantity(params.minQuantity);
     searchContext.setPrice(params.price);
-    searchContext.doSaveStorage();
   };
 
   const onMapClick = () => {
@@ -331,11 +327,15 @@ export default function FoodAroundBody() {
         <Tooltip
           arrow
           children={
-            <IconButton color="info" onClick={() => setFilterOpen(true)}>
-              <SettingsSuggestOutlined />
+            <IconButton
+              color="success"
+              onClick={() => setFilterOpen(true)}
+              size="medium"
+            >
+              <FilterAltOutlined />
             </IconButton>
           }
-          title={"Open filter"}
+          title={lang("open-filter")}
         />
       </Box>
       <Box sx={{ width: "100%", flex: 1 }}>

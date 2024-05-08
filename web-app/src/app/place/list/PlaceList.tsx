@@ -143,12 +143,7 @@ export default function PlaceList() {
       </Stack>
 
       {/* Tab contents */}
-      <MyPlace
-        active={tab === PlacePageTab.MY_PLACE}
-        sx={{
-          minHeight: "100%",
-        }}
-      />
+      <MyPlace active={tab === PlacePageTab.MY_PLACE} />
       <NearPlace active={tab === PlacePageTab.NEAR_HERE} />
       <FavoritePlace active={tab === PlacePageTab.FAVORITE} />
       <SubcribedPlace active={tab === PlacePageTab.SUBCRIBED} />

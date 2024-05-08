@@ -1,16 +1,16 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Stack, StackProps } from "@mui/material";
 import {
   useAppContentContext,
   useAuthContext,
-  useDistanceCalculation,
+  useDirty,
+  useDynamicStorage,
+  useLoader,
   usePageProgessContext,
 } from "../../../hooks";
 import {
   IPagination,
   IPlaceExposedCooked,
-  loadFromSessionStorage,
-  saveToSessionStorage,
   toPlaceExposedCooked,
 } from "../../../data";
 import PlaceSearchItemHolder from "../search/PlaceSearchItemHolder";
@@ -34,32 +34,30 @@ const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
   (props, ref) => {
     const { active, ...rest } = props;
 
-    const [data, setData] = useState<IPlaceExposedCooked[]>([]);
+    const storage = useDynamicStorage<IFavoritePlaceSnapshotData>(
+      FAVORITE_PLACE_STORAGE_KEY
+    );
+    const stored = storage.get();
+
+    const [data, setData] = useState<IPlaceExposedCooked[]>(stored?.data ?? []);
 
     const appContentContext = useAppContentContext();
+    const { currentLocation } = appContentContext;
     const authContext = useAuthContext();
     const progessContext = usePageProgessContext();
-    const distances = useDistanceCalculation();
 
     const { auth, account } = authContext;
 
-    const [isFetching, setIsFetching] = useState<boolean>(false);
-    const [isEnd, setIsEnd] = useState<boolean>(false);
-    const [isError, setIsError] = useState<boolean>(false);
+    const loader = useLoader();
 
-    // Recover at begining or fetch at begining
-    const dirtyRef = useRef<boolean>(false);
-
-    const doSaveStorage = () => {
+    const doSaveStorage = useCallback(() => {
       const snapshot: IFavoritePlaceSnapshotData = {
         data: data,
         scrollTop: appContentContext.mainRef?.current?.scrollTop,
       };
-      saveToSessionStorage(snapshot, {
-        key: FAVORITE_PLACE_STORAGE_KEY,
-        account: authContext.account?._id,
-      });
-    };
+      storage.update(() => snapshot);
+      storage.save();
+    }, [appContentContext.mainRef, data, storage]);
 
     const handleBeforeNavigate = () => {
       doSaveStorage();
@@ -67,16 +65,16 @@ const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
 
     const doSearch = useCallback(() => {
       if (auth == null) return;
-      if (isFetching || !active) return;
+      if (loader.isFetching || !active) return;
       const pagination: IPagination = {
         skip: data.length,
         limit: 24,
       };
 
       progessContext.start();
-      setIsFetching(true);
-      setIsError(false);
-      setIsEnd(false);
+      loader.setIsFetching(true);
+      loader.setIsError(false);
+      loader.setIsEnd(false);
 
       userFetcher
         .getRankPlaceByFavorite(pagination, auth)
@@ -84,13 +82,13 @@ const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
           const places = res.data;
           if (places != null) {
             if (places.length < pagination.limit) {
-              setIsEnd(true);
+              loader.setIsEnd(true);
             }
             const _newPlaces = data.slice();
             places.forEach((place) => {
               _newPlaces.push(
                 toPlaceExposedCooked(place, {
-                  currentCoordinates: distances.currentLocation?.coordinates,
+                  currentCoordinates: currentLocation,
                   homeCoordinates: account?.location?.coordinates,
                 })
               );
@@ -99,20 +97,20 @@ const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
           }
         })
         .catch(() => {
-          setIsError(true);
+          loader.setIsError(true);
         })
         .finally(() => {
           progessContext.end();
-          setIsFetching(false);
+          loader.setIsFetching(false);
         });
     }, [
       auth,
-      isFetching,
+      loader,
       active,
       data,
       progessContext,
-      distances.currentLocation,
-      account?.location,
+      currentLocation,
+      account?.location?.coordinates,
     ]);
 
     useEffect(() => {
@@ -125,7 +123,7 @@ const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
           const isAtBottom =
             element.scrollHeight * 0.95 <=
             element.scrollTop + element.clientHeight;
-          if (isAtBottom && !isEnd && !isFetching) {
+          if (isAtBottom && !loader.isEnd && !loader.isFetching) {
             doSearch();
           }
         };
@@ -136,37 +134,35 @@ const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
           main.removeEventListener("scroll", listener);
         }
       };
-    }, [appContentContext.mainRef, doSearch, isEnd, isFetching]);
+    }, [appContentContext.mainRef, doSearch, loader.isEnd, loader.isFetching]);
 
-    // Recover result
+    const dirty = useDirty();
     useEffect(() => {
       if (account == null) return;
       if (!active) return;
-      if (!dirtyRef.current) {
-        // At begining
-        const snapshot = loadFromSessionStorage<IFavoritePlaceSnapshotData>({
-          key: FAVORITE_PLACE_STORAGE_KEY,
-          maxDuration: 1 * 24 * 60 * 60 * 1000,
-          account: account._id,
-        });
-        if (snapshot) {
-          const snapshotData = snapshot.data;
-          if (snapshotData.length < 24) {
-            setIsEnd(true);
-          }
-          setData(snapshotData);
-          const mainRef = appContentContext.mainRef?.current;
-          if (mainRef) {
-            setTimeout(() => {
-              mainRef.scrollTop = snapshot.scrollTop ?? 0;
-            }, 300);
-          }
-        } else {
+      dirty.perform(() => {
+        if (storage.isNew) {
           doSearch();
+        } else {
+          if (stored && stored?.data.length < 24) loader.setIsEnd(true);
+          const mainRef = appContentContext.mainRef?.current;
+          if (mainRef != null) {
+            setTimeout(() => {
+              mainRef.scrollTop = stored?.scrollTop ?? 0;
+            }, 0);
+          }
         }
-        dirtyRef.current = true;
-      }
-    }, [account, active, appContentContext.mainRef, doSearch]);
+      });
+    }, [
+      account,
+      active,
+      appContentContext.mainRef,
+      dirty,
+      doSearch,
+      loader,
+      storage.isNew,
+      stored,
+    ]);
 
     return (
       <Stack
@@ -189,9 +185,9 @@ const FavoritePlace = React.forwardRef<HTMLDivElement, FavoritePlaceProps>(
           );
         })}
 
-        {isFetching && <PlaceSearchItemHolder />}
-        <ListEnd active={isEnd && !isError} onRetry={doSearch} />
-        <ErrorRetry active={isError} onRetry={doSearch} />
+        {loader.isFetching && <PlaceSearchItemHolder />}
+        <ListEnd active={loader.isEnd && !loader.isError} onRetry={doSearch} />
+        <ErrorRetry active={loader.isError} onRetry={doSearch} />
       </Stack>
     );
   }

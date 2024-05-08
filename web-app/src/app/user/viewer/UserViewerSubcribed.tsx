@@ -1,14 +1,11 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Divider, Stack, StackProps } from "@mui/material";
-import {
-  IPagination,
-  IUserFollowerExposed,
-  loadFromSessionStorage,
-  saveToSessionStorage,
-} from "../../../data";
+import { IPagination, IUserFollowerExposed } from "../../../data";
 import {
   useAppContentContext,
   useAuthContext,
+  useDirty,
+  useDynamicStorage,
   useLoader,
   usePageProgessContext,
   useUserViewerContext,
@@ -39,7 +36,14 @@ const UserViewerSubcribed = React.forwardRef<
   const viewerContext = useUserViewerContext();
   const { _id } = viewerContext;
 
-  const [followers, setFollowers] = useState<IUserFollowerExposed[]>([]);
+  const storage = useDynamicStorage<IUserViewerSubcribedSnapshotData>(
+    USER_VIEWER_SUBCRIBED(_id)
+  );
+  const stored = storage.get();
+
+  const [followers, setFollowers] = useState<IUserFollowerExposed[]>(
+    stored?.data ?? []
+  );
 
   const progessContext = usePageProgessContext();
   const authContext = useAuthContext();
@@ -48,19 +52,14 @@ const UserViewerSubcribed = React.forwardRef<
 
   const loader = useLoader();
 
-  // Recover at begining or fetch at begining
-  const dirtyRef = useRef<boolean>(true);
-
-  const doSaveStorage = () => {
+  const doSaveStorage = useCallback(() => {
     const snapshot: IUserViewerSubcribedSnapshotData = {
       data: followers,
       scrollTop: appContentContext.mainRef?.current?.scrollTop,
     };
-    saveToSessionStorage(snapshot, {
-      key: USER_VIEWER_SUBCRIBED(_id),
-      account: authContext.account?._id,
-    });
-  };
+    storage.update(() => snapshot);
+    storage.save();
+  }, [appContentContext.mainRef, followers, storage]);
 
   const handleBeforeNavigate = () => {
     doSaveStorage();
@@ -81,7 +80,11 @@ const UserViewerSubcribed = React.forwardRef<
     loader.setIsEnd(false);
 
     userFetcher
-      .getUserFollowers(_id, { pagination: pagination }, auth)
+      .getUserFollowers(
+        _id,
+        { pagination: pagination, populate: { subcriber: true } },
+        auth
+      )
       .then((res) => {
         const data = res.data;
         if (data != null) {
@@ -123,44 +126,35 @@ const UserViewerSubcribed = React.forwardRef<
         main.removeEventListener("scroll", listener);
       }
     };
-  }, [
-    appContentContext.mainRef,
-    doSearch,
-    loader.isEnd,
-    loader.isFetching,
-  ]);
+  }, [appContentContext.mainRef, doSearch, loader.isEnd, loader.isFetching]);
 
-  // Recover result
+  const dirty = useDirty();
   useEffect(() => {
     if (account == null) return;
     if (!active) return;
-    if (dirtyRef.current) {
-      dirtyRef.current = false;
-      // At begining
-      const snapshot = loadFromSessionStorage<IUserViewerSubcribedSnapshotData>(
-        {
-          key: USER_VIEWER_SUBCRIBED(_id),
-          maxDuration: 1 * 24 * 60 * 60 * 1000,
-          account: account._id,
-        }
-      );
-      if (snapshot) {
-        const snapshotData = snapshot.data;
-        setFollowers(snapshotData);
-        if (snapshotData.length < 24) {
-          loader.setIsEnd(true);
-        }
-        const mainRef = appContentContext.mainRef?.current;
-        if (mainRef) {
-          setTimeout(() => {
-            mainRef.scrollTop = snapshot.scrollTop ?? 0;
-          }, 300);
-        }
-      } else {
+    dirty.perform(() => {
+      if (storage.isNew) {
         doSearch();
+      } else {
+        if (stored && stored?.data.length < 24) loader.setIsEnd(true);
+        const mainRef = appContentContext.mainRef?.current;
+        if (mainRef != null) {
+          setTimeout(() => {
+            mainRef.scrollTop = stored?.scrollTop ?? 0;
+          }, 0);
+        }
       }
-    }
-  }, [account, active, appContentContext.mainRef, doSearch, loader, _id]);
+    });
+  }, [
+    account,
+    active,
+    appContentContext.mainRef,
+    dirty,
+    doSearch,
+    loader,
+    storage.isNew,
+    stored,
+  ]);
 
   return (
     <Stack

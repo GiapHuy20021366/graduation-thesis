@@ -21,7 +21,7 @@ export default function UserViewerData() {
         onTabSet={(tab) => setTab(tab)}
         sx={{
           position: "sticky",
-          top: 1,
+          top: 0,
           zIndex: 1000,
           backgroundColor: "background.default",
         }}
@@ -36,14 +36,14 @@ export default function UserViewerData() {
 
         <UserViewerSubcribed active={tab === UserViewerTab.SUBCRIBED} />
       </>
-      <Tooltip arrow title={lang("add-food")} placement="left">
-        <StyledLink
-          to={applicationPages.FOOD_SHARING}
-          style={{ position: "fixed", bottom: 76, right: 26 }}
-        >
+      <StyledLink
+        to={applicationPages.FOOD_SHARING}
+        style={{ position: "fixed", bottom: 76, right: 26 }}
+      >
+        <Tooltip arrow title={lang("add-food")} placement="left">
           <SpeedDial icon={<Add />} ariaLabel={"Add food"} />
-        </StyledLink>
-      </Tooltip>
+        </Tooltip>
+      </StyledLink>
     </Stack>
   );
 }
