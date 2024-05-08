@@ -38,6 +38,7 @@ export interface IPlaceSearchParams extends Paginationed, Queried {
   order?: IPlaceSearchOrder;
   types?: PlaceType[];
   rating?: IPlaceSearchRating;
+  active?: boolean;
 }
 
 export const toPlaceSearchDistance = (
@@ -91,7 +92,7 @@ export const toPlaceSearchParams = (value: any): IPlaceSearchParams => {
   const result: IPlaceSearchParams = {};
   result.author = toIncludeAndExclude(value.author);
 
-  const { query, distance, order, pagination, types, rating } = value;
+  const { query, distance, order, pagination, types, rating, active } = value;
   if (isNotEmptyString(query)) {
     result.query = query;
   }
@@ -105,5 +106,10 @@ export const toPlaceSearchParams = (value: any): IPlaceSearchParams => {
     result.types = types;
   }
   result.rating = toPlaceSearchRating(rating);
+
+  if (typeof active === "boolean") {
+    result.active = active;
+  }
+
   return result;
 };

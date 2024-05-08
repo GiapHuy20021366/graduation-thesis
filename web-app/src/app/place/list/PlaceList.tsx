@@ -85,7 +85,7 @@ export default function PlaceList() {
   };
 
   return (
-    <Stack width={"100%"} boxSizing={"border-box"} height={"100%"}>
+    <Stack width={"100%"} boxSizing={"border-box"}>
       <Stack
         width="100%"
         direction={"row"}

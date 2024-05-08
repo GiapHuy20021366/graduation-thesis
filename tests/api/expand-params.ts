@@ -1,4 +1,4 @@
-interface IIFoodSearchParams {
+interface IFoodSearchParams {
   user?: {
     include?: string[];
     exclude?: string[];
@@ -21,7 +21,7 @@ interface IIFoodSearchParams {
     max?: number;
   };
   minQuantity?: number;
-  addedBy?: (0 | 1 | 2 | 3 | 4 | 5)[];
+  addedBy?: (0 | 1 | 2 | 4 | 8 | 16)[];
   available?: "ALL" | "AVAIABLE_ONLY" | "JUST_GONE";
   order?: {
     distance?: -1 | 1 | 0;
@@ -43,5 +43,35 @@ interface IIFoodSearchParams {
     limit: number;
   };
   query?: string;
+  active?: boolean;
+}
+
+interface IPlaceSearchParams {
+  pagination?: {
+    skip: number;
+    limit: number;
+  };
+  query?: string;
+  author?: {
+    include?: string[];
+    exclude?: string[];
+  };
+  distance?: {
+    max: number;
+    current: {
+      lat: number;
+      lng: number;
+    };
+  };
+  order?: {
+    distance?: -1 | 1 | 0;
+    rating?: -1 | 1 | 0;
+    time?: -1 | 1 | 0;
+  };
+  types?: (0 | 1 | 2 | 4 | 8 | 16)[];
+  rating?: {
+    min?: number;
+    max?: number;
+  };
   active?: boolean;
 }
