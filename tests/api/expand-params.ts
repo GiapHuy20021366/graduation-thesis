@@ -75,3 +75,22 @@ interface IPlaceSearchParams {
   };
   active?: boolean;
 }
+
+interface IFoodPostUploadData {
+  place?: string;
+  user: string;
+  images: string[];
+  title: string;
+  location: {
+    name: string;
+    coordinates: {
+      lat: number;
+      lng: number;
+    };
+  };
+  categories: string[];
+  decription: string;
+  quantity: number;
+  duration: number;
+  price: number;
+}

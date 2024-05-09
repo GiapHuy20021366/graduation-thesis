@@ -1,1 +1,137 @@
-[]
+[
+    {},
+    {
+        "pagination": {
+            "skip": 0,
+            "limit": 10
+        }
+    },
+    {
+        "author": {
+            "include": [
+                "66252db3dce942e19b422a8e"
+            ],
+            "excude": [
+                "66252db3dce942e19b422a8f"
+            ]
+        }
+    },
+    {
+        "author": {
+            "include": [
+                "66252db3dce942e19b422a8e"
+            ]
+        }
+    },
+    {
+        "author": {
+            "excude": [
+                "66252db3dce942e19b422a8f"
+            ]
+        }
+    },
+    {
+        "distance": {
+            "max": 10,
+            "current": {
+                "lat": 21.040621,
+                "lng": 105.777413
+            }
+        }
+    },
+    {
+        "distance": {
+            "max": 10
+        }
+    },
+    {
+        "distance": {
+            "current": {
+                "lat": 21.040621,
+                "lng": 105.777413
+            }
+        }
+    },
+    {
+        "order": {
+            "distance": 1
+        }
+    },
+    {
+        "order": {
+            "distance": -1
+        }
+    },
+    {
+        "order": {
+            "rating": 1
+        }
+    },
+    {
+        "order": {
+            "rating": -1
+        }
+    },
+    {
+        "order": {
+            "time": 1
+        }
+    },
+    {
+        "order": {
+            "time": -1
+        }
+    },
+    {
+        "type": [
+            0
+        ]
+    },
+    {
+        "type": [
+            1
+        ]
+    },
+    {
+        "type": [
+            2
+        ]
+    },
+    {
+        "type": [
+            4
+        ]
+    },
+    {
+        "type": [
+            8
+        ]
+    },
+    {
+        "type": [
+            16
+        ]
+    },
+    {
+        "active": true
+    },
+    {
+        "active": false
+    },
+    {
+        "rating": {
+            "min": 0
+        }
+    },
+    {
+        "rating": {
+            "max": 4
+        }
+    },
+    {
+        "rating": {
+            "min": 0,
+            "max": 4
+        }
+    }
+]
