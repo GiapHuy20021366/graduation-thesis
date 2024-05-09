@@ -44,6 +44,7 @@ export {
   isPagination,
   isPlaceType,
   isOrderState,
+  isNotEmptyArray,
   num,
 } from "./data-validate";
 export {

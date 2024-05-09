@@ -8,6 +8,7 @@ import {
   InvalidDataError,
   isAllNotEmptyString,
   isLocation,
+  isNotEmptyArray,
   isNotEmptyString,
   isNumber,
   isObjectId,
@@ -57,11 +58,15 @@ const validatePostFoodBody = (data: IPostFoodExtend): data is IPostFoodData => {
     throwErrorIfInvalidFormat("place", place, [isObjectId]);
   }
   throwErrorIfInvalidFormat("title", title, [isNotEmptyString]);
-  throwErrorIfInvalidFormat("images", images, [isAllNotEmptyString]);
+  throwErrorIfInvalidFormat("images", images, [
+    isNotEmptyArray,
+    isAllNotEmptyString,
+  ]);
   throwErrorIfInvalidFormat("categories", categories, [isAllNotEmptyString]);
   throwErrorIfInvalidFormat("duration", duration, [isNumber]);
   throwErrorIfInvalidFormat("location", location, [isLocation]);
   throwErrorIfInvalidFormat("quantity", quantity, [isNumber]);
+  throwErrorIfInvalidFormat("price", price, [isNumber]);
 
   return true;
 };

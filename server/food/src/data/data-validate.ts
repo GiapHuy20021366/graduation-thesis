@@ -31,6 +31,11 @@ export const isAllNotEmptyString = (value: any): value is string[] => {
   return value.every((v) => isNotEmptyString(v));
 };
 
+export const isNotEmptyArray = (value: any): value is unknown[] => {
+  if (!Array.isArray(value)) return false;
+  return value.length > 0;
+};
+
 export const isNumber = (value: any): value is number => {
   return typeof value === "number" && !isNaN(value);
 };
