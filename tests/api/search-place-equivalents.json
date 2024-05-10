@@ -1,137 +1,254 @@
 [
-    {},
     {
-        "pagination": {
-            "skip": 0,
-            "limit": 10
+        "test": {},
+        "input": {
+            "body": {}
         }
     },
     {
-        "author": {
-            "include": [
-                "66252db3dce942e19b422a8e"
-            ],
-            "excude": [
-                "66252db3dce942e19b422a8f"
-            ]
-        }
-    },
-    {
-        "author": {
-            "include": [
-                "66252db3dce942e19b422a8e"
-            ]
-        }
-    },
-    {
-        "author": {
-            "excude": [
-                "66252db3dce942e19b422a8f"
-            ]
-        }
-    },
-    {
-        "distance": {
-            "max": 10,
-            "current": {
-                "lat": 21.040621,
-                "lng": 105.777413
+        "test": {},
+        "input": {
+            "body": {
+                "pagination": {
+                    "skip": 0,
+                    "limit": 10
+                }
             }
         }
     },
     {
-        "distance": {
-            "max": 10
-        }
-    },
-    {
-        "distance": {
-            "current": {
-                "lat": 21.040621,
-                "lng": 105.777413
+        "test": {},
+        "input": {
+            "body": {
+                "author": {
+                    "include": [
+                        "66252db3dce942e19b422a8e"
+                    ],
+                    "exclude": [
+                        "66252db3dce942e19b422a8f"
+                    ]
+                }
             }
         }
     },
     {
-        "order": {
-            "distance": 1
+        "test": {},
+        "input": {
+            "body": {
+                "author": {
+                    "include": [
+                        "66252db3dce942e19b422a8e"
+                    ]
+                }
+            }
         }
     },
     {
-        "order": {
-            "distance": -1
+        "test": {},
+        "body": {
+            "author": {
+                "exclude": [
+                    "66252db3dce942e19b422a8f"
+                ]
+            }
         }
     },
     {
-        "order": {
-            "rating": 1
+        "test": {},
+        "input": {
+            "distance": {
+                "max": 10,
+                "current": {
+                    "lat": 21.040621,
+                    "lng": 105.777413
+                }
+            }
         }
     },
     {
-        "order": {
-            "rating": -1
+        "test": {},
+        "input": {
+            "body": {
+                "distance": {
+                    "max": 10
+                }
+            }
         }
     },
     {
-        "order": {
-            "time": 1
+        "test": {},
+        "input": {
+            "distance": {
+                "current": {
+                    "lat": 21.040621,
+                    "lng": 105.777413
+                }
+            }
         }
     },
     {
-        "order": {
-            "time": -1
+        "test": {},
+        "input": {
+            "order": {
+                "distance": 1
+            }
         }
     },
     {
-        "type": [
-            0
-        ]
-    },
-    {
-        "type": [
-            1
-        ]
-    },
-    {
-        "type": [
-            2
-        ]
-    },
-    {
-        "type": [
-            4
-        ]
-    },
-    {
-        "type": [
-            8
-        ]
-    },
-    {
-        "type": [
-            16
-        ]
-    },
-    {
-        "active": true
-    },
-    {
-        "active": false
-    },
-    {
-        "rating": {
-            "min": 0
+        "test": {},
+        "input": {
+            "body": {
+                "order": {
+                    "distance": -1
+                }
+            }
         }
     },
     {
-        "rating": {
-            "max": 4
+        "test": {},
+        "input": {
+            "body": {
+                "order": {
+                    "rating": 1
+                }
+            }
         }
     },
     {
-        "rating": {
-            "min": 0,
-            "max": 4
+        "test": {},
+        "input": {
+            "body": {
+                "order": {
+                    "rating": -1
+                }
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "order": {
+                    "time": 1
+                }
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "order": {
+                    "time": -1
+                }
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "type": [
+                    0
+                ]
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "type": [
+                    1
+                ]
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "type": [
+                    2
+                ]
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "type": [
+                    4
+                ]
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "type": [
+                    8
+                ]
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "type": [
+                    16
+                ]
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "active": true
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "active": false
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "rating": {
+                    "min": 0
+                }
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "rating": {
+                    "max": 4
+                }
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "rating": {
+                    "min": 0,
+                    "max": 4
+                }
+            }
         }
     }
 ]

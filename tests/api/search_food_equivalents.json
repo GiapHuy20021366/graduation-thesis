@@ -1,228 +1,443 @@
 [
     {
-        "user": {
-            "include": [
-                "66252db3dce942e19b422a8e"
-            ],
-            "excude": [
-                "66252db3dce942e19b422a8f"
-            ]
-        }
-    },
-    {
-        "user": {
-            "include": [
-                "66252db3dce942e19b422a8e"
-            ]
-        }
-    },
-    {
-        "user": {
-            "excude": [
-                "66252db3dce942e19b422a8f"
-            ]
-        }
-    },
-    {
-        "place": {
-            "include": [
-                "66252e1e6e79b2222b6c72af"
-            ],
-            "excude": [
-                "66252e1e6e79b2222b6c72b0"
-            ]
-        }
-    },
-    {
-        "place": {
-            "include": [
-                "66252e1e6e79b2222b6c72af"
-            ]
-        }
-    },
-    {
-        "place": {
-            "excude": [
-                "66252e1e6e79b2222b6c72b0"
-            ]
-        }
-    },
-    {
-        "distance": {
-            "max": 10,
-            "current": {
-                "lat": 21.040621,
-                "lng": 105.777413
+        "test": {},
+        "input": {
+            "body": {
+                "user": {
+                    "include": [
+                        "66252db3dce942e19b422a8e"
+                    ],
+                    "exclude": [
+                        "66252db3dce942e19b422a8f"
+                    ]
+                }
             }
         }
     },
     {
-        "distance": {
-            "max": 10
-        }
-    },
-    {
-        "distance": {
-            "current": {
-                "lat": 21.040621,
-                "lng": 105.777413
+        "test": {},
+        "input": {
+            "body": {
+                "user": {
+                    "include": [
+                        "66252db3dce942e19b422a8e"
+                    ]
+                }
             }
         }
     },
     {
-        "category": [
-            "ANIMAL_PRODUCT",
-            "SALADS"
-        ]
-    },
-    {
-        "category": []
-    },
-    {
-        "maxDuration": 3
-    },
-    {
-        "price": {
-            "min": 10000,
-            "max": 50000
+        "test": {},
+        "input": {
+            "body": {
+                "user": {
+                    "exclude": [
+                        "66252db3dce942e19b422a8f"
+                    ]
+                }
+            }
         }
     },
     {
-        "price": {
-            "min": 10000
+        "test": {},
+        "input": {
+            "body": {
+                "place": {
+                    "include": [
+                        "66252e1e6e79b2222b6c72af"
+                    ],
+                    "exclude": [
+                        "66252e1e6e79b2222b6c72b0"
+                    ]
+                }
+            }
         }
     },
     {
-        "price": {
-            "max": 50000
+        "test": {},
+        "input": {
+            "body": {
+                "place": {
+                    "include": [
+                        "66252e1e6e79b2222b6c72af"
+                    ]
+                }
+            }
         }
     },
     {
-        "minQuantity": 4
-    },
-    {
-        "addedBy": [
-            0
-        ]
-    },
-    {
-        "addedBy": [
-            1
-        ]
-    },
-    {
-        "addedBy": [
-            2
-        ]
-    },
-    {
-        "addedBy": [
-            3
-        ]
-    },
-    {
-        "addedBy": [
-            4
-        ]
-    },
-    {
-        "addedBy": [
-            5
-        ]
-    },
-    {
-        "available": "ALL"
-    },
-    {
-        "available": "AVAILABLE_ONLY"
-    },
-    {
-        "available": "JUST_GONE"
-    },
-    {
-        "resolved": true
-    },
-    {
-        "resolved": false
-    },
-    {
-        "query": "Tôm"
-    },
-    {
-        "active": true
-    },
-    {
-        "active": false
-    },
-    {
-        "pagination": {
-            "skip": 0,
-            "limit": 10
+        "test": {},
+        "input": {
+            "body": {
+                "place": {
+                    "exclude": [
+                        "66252e1e6e79b2222b6c72b0"
+                    ]
+                }
+            }
         }
     },
     {
-        "resolveBy": {
-            "include": [
-                "66252db3dce942e19b422a8e"
-            ],
-            "excude": [
-                "66252db3dce942e19b422a8f"
-            ]
+        "test": {},
+        "input": {
+            "body": {
+                "distance": {
+                    "max": 10,
+                    "current": {
+                        "lat": 21.040621,
+                        "lng": 105.777413
+                    }
+                }
+            }
         }
     },
     {
-        "resolveBy": {
-            "include": [
-                "66252db3dce942e19b422a8e"
-            ]
+        "test": {},
+        "input": {
+            "body": {
+                "distance": {
+                    "max": 10
+                }
+            }
         }
     },
     {
-        "resolveBy": {
-            "excude": [
-                "66252db3dce942e19b422a8f"
-            ]
+        "test": {},
+        "input": {
+            "body": {
+                "distance": {
+                    "current": {
+                        "lat": 21.040621,
+                        "lng": 105.777413
+                    }
+                }
+            }
         }
     },
     {
-        "order": {
-            "time": -1
+        "test": {},
+        "input": {
+            "body": {
+                "category": [
+                    "ANIMAL_PRODUCT",
+                    "SALADS"
+                ]
+            }
         }
     },
     {
-        "order": {
-            "time": 1
+        "test": {},
+        "input": {
+            "body": {
+                "category": []
+            }
         }
     },
     {
-        "order": {
-            "distance": -1
+        "test": {},
+        "input": {
+            "body": {
+                "maxDuration": 3
+            }
         }
     },
     {
-        "order": {
-            "distance": 1
+        "test": {},
+        "input": {
+            "body": {
+                "price": {
+                    "min": 10000,
+                    "max": 50000
+                }
+            }
         }
     },
     {
-        "order": {
-            "price": -1
+        "test": {},
+        "input": {
+            "body": {
+                "price": {
+                    "min": 10000
+                }
+            }
         }
     },
     {
-        "order": {
-            "price": 1
+        "test": {},
+        "input": {
+            "body": {
+                "price": {
+                    "max": 50000
+                }
+            }
         }
     },
     {
-        "order": {
-            "quantity": -1
+        "test": {},
+        "input": {
+            "body": {
+                "minQuantity": 4
+            }
         }
     },
     {
-        "order": {
-            "quantity": 1
+        "test": {},
+        "input": {
+            "body": {
+                "addedBy": [
+                    0
+                ]
+            }
         }
     },
-    {}
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "addedBy": [
+                    1
+                ]
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "addedBy": [
+                    2
+                ]
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "addedBy": [
+                    3
+                ]
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "addedBy": [
+                    4
+                ]
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "addedBy": [
+                    5
+                ]
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "available": "ALL"
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "available": "AVAILABLE_ONLY"
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "available": "JUST_GONE"
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "resolved": true
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "resolved": false
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "query": "Tôm"
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "active": true
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "active": false
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "pagination": {
+                    "skip": 0,
+                    "limit": 10
+                }
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "resolveBy": {
+                    "include": [
+                        "66252db3dce942e19b422a8e"
+                    ],
+                    "exclude": [
+                        "66252db3dce942e19b422a8f"
+                    ]
+                }
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "resolveBy": {
+                    "include": [
+                        "66252db3dce942e19b422a8e"
+                    ]
+                }
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "resolveBy": {
+                    "exclude": [
+                        "66252db3dce942e19b422a8f"
+                    ]
+                }
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "order": {
+                    "time": -1
+                }
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "order": {
+                    "time": 1
+                }
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "order": {
+                    "distance": -1
+                }
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "order": {
+                    "distance": 1
+                }
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "order": {
+                    "price": -1
+                }
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "order": {
+                    "price": 1
+                }
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "order": {
+                    "quantity": -1
+                }
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {
+                "order": {
+                    "quantity": 1
+                }
+            }
+        }
+    },
+    {
+        "test": {},
+        "input": {
+            "body": {}
+        }
+    }
 ]

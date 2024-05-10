@@ -5,7 +5,11 @@
             "result": false,
             "code": 400
         },
-        "user": null
+        "input": {
+            "body": {
+                "user": null
+            }
+        }
     },
     {
         "test": {
@@ -13,8 +17,12 @@
             "result": false,
             "code": 400
         },
-        "user": "66252db3dce942e19b422a8e",
-        "images": null
+        "input": {
+            "body": {
+                "user": "66252db3dce942e19b422a8e",
+                "images": null
+            }
+        }
     },
     {
         "test": {
@@ -22,9 +30,13 @@
             "result": false,
             "code": 400
         },
-        "user": "66252db3dce942e19b422a8e",
-        "images": [],
-        "title": null
+        "input": {
+            "body": {
+                "user": "66252db3dce942e19b422a8e",
+                "images": [],
+                "title": null
+            }
+        }
     },
     {
         "test": {
@@ -32,10 +44,14 @@
             "result": false,
             "code": 400
         },
-        "user": "66252db3dce942e19b422a8e",
-        "images": [],
-        "title": "Test title",
-        "location": null
+        "input": {
+            "body": {
+                "user": "66252db3dce942e19b422a8e",
+                "images": [],
+                "title": "Test title",
+                "location": null
+            }
+        }
     },
     {
         "test": {
@@ -43,17 +59,21 @@
             "result": false,
             "code": 400
         },
-        "user": "66252db3dce942e19b422a8e",
-        "images": [],
-        "title": "Test title",
-        "location": {
-            "name": "Test location",
-            "coordinates": {
-                "lat": 21.040621,
-                "lng": 105.777413
+        "input": {
+            "body": {
+                "user": "66252db3dce942e19b422a8e",
+                "images": [],
+                "title": "Test title",
+                "location": {
+                    "name": "Test location",
+                    "coordinates": {
+                        "lat": 21.040621,
+                        "lng": 105.777413
+                    }
+                },
+                "categories": null
             }
-        },
-        "categories": null
+        }
     },
     {
         "test": {
@@ -61,20 +81,24 @@
             "result": false,
             "code": 400
         },
-        "user": "66252db3dce942e19b422a8e",
-        "images": [],
-        "title": "Test title",
-        "location": {
-            "name": "Test location",
-            "coordinates": {
-                "lat": 21.040621,
-                "lng": 105.777413
+        "input": {
+            "body": {
+                "user": "66252db3dce942e19b422a8e",
+                "images": [],
+                "title": "Test title",
+                "location": {
+                    "name": "Test location",
+                    "coordinates": {
+                        "lat": 21.040621,
+                        "lng": 105.777413
+                    }
+                },
+                "categories": [
+                    "ANIMAL_PRODUCT"
+                ],
+                "description": null
             }
-        },
-        "categories": [
-            "ANIMAL_PRODUCT"
-        ],
-        "description": null
+        }
     },
     {
         "test": {
@@ -82,20 +106,24 @@
             "result": false,
             "code": 400
         },
-        "user": "66252db3dce942e19b422a8e",
-        "images": [],
-        "title": "Test title",
-        "location": {
-            "name": "Test location",
-            "coordinates": {
-                "lat": 21.040621,
-                "lng": 105.777413
+        "input": {
+            "body": {
+                "user": "66252db3dce942e19b422a8e",
+                "images": [],
+                "title": "Test title",
+                "location": {
+                    "name": "Test location",
+                    "coordinates": {
+                        "lat": 21.040621,
+                        "lng": 105.777413
+                    }
+                },
+                "categories": [
+                    "ANIMAL_PRODUCT"
+                ],
+                "duration": null
             }
-        },
-        "categories": [
-            "ANIMAL_PRODUCT"
-        ],
-        "duration": null
+        }
     },
     {
         "test": {
@@ -103,21 +131,25 @@
             "result": false,
             "code": 400
         },
-        "user": "66252db3dce942e19b422a8e",
-        "images": [],
-        "title": "Test title",
-        "location": {
-            "name": "Test location",
-            "coordinates": {
-                "lat": 21.040621,
-                "lng": 105.777413
+        "input": {
+            "body": {
+                "user": "66252db3dce942e19b422a8e",
+                "images": [],
+                "title": "Test title",
+                "location": {
+                    "name": "Test location",
+                    "coordinates": {
+                        "lat": 21.040621,
+                        "lng": 105.777413
+                    }
+                },
+                "categories": [
+                    "ANIMAL_PRODUCT"
+                ],
+                "duration": 1.7158754e+12,
+                "quantity": null
             }
-        },
-        "categories": [
-            "ANIMAL_PRODUCT"
-        ],
-        "duration": 1.7158754e+12,
-        "quantity": null
+        }
     },
     {
         "test": {
@@ -125,22 +157,26 @@
             "result": false,
             "code": 400
         },
-        "user": "66252db3dce942e19b422a8e",
-        "images": [],
-        "title": "Test title",
-        "location": {
-            "name": "Test location",
-            "coordinates": {
-                "lat": 21.040621,
-                "lng": 105.777413
+        "input": {
+            "body": {
+                "user": "66252db3dce942e19b422a8e",
+                "images": [],
+                "title": "Test title",
+                "location": {
+                    "name": "Test location",
+                    "coordinates": {
+                        "lat": 21.040621,
+                        "lng": 105.777413
+                    }
+                },
+                "categories": [
+                    "ANIMAL_PRODUCT"
+                ],
+                "duration": 1.7158754e+12,
+                "quantity": 4,
+                "price": null
             }
-        },
-        "categories": [
-            "ANIMAL_PRODUCT"
-        ],
-        "duration": 1.7158754e+12,
-        "quantity": 4,
-        "price": null
+        }
     },
     {
         "test": {
@@ -148,22 +184,26 @@
             "result": false,
             "code": 400
         },
-        "user": "66252db3dce942e19b422a",
-        "images": [],
-        "title": "Test title",
-        "location": {
-            "name": "Test location",
-            "coordinates": {
-                "lat": 21.040621,
-                "lng": 105.777413
+        "input": {
+            "body": {
+                "user": "66252db3dce942e19b422a",
+                "images": [],
+                "title": "Test title",
+                "location": {
+                    "name": "Test location",
+                    "coordinates": {
+                        "lat": 21.040621,
+                        "lng": 105.777413
+                    }
+                },
+                "categories": [
+                    "ANIMAL_PRODUCT"
+                ],
+                "duration": 1.7158754e+12,
+                "quantity": 4,
+                "price": 45000
             }
-        },
-        "categories": [
-            "ANIMAL_PRODUCT"
-        ],
-        "duration": 1.7158754e+12,
-        "quantity": 4,
-        "price": 45000
+        }
     },
     {
         "test": {
@@ -171,23 +211,27 @@
             "result": false,
             "code": 400
         },
-        "user": "66252db3dce942e19b422a8e",
-        "place": "66252e1e6e79b2222b6c7f",
-        "images": [],
-        "title": "Test title",
-        "location": {
-            "name": "Test location",
-            "coordinates": {
-                "lat": 21.040621,
-                "lng": 105.777413
+        "input": {
+            "body": {
+                "user": "66252db3dce942e19b422a8e",
+                "place": "66252e1e6e79b2222b6c7f",
+                "images": [],
+                "title": "Test title",
+                "location": {
+                    "name": "Test location",
+                    "coordinates": {
+                        "lat": 21.040621,
+                        "lng": 105.777413
+                    }
+                },
+                "categories": [
+                    "ANIMAL_PRODUCT"
+                ],
+                "duration": 1.7158754e+12,
+                "quantity": 4,
+                "price": 45000
             }
-        },
-        "categories": [
-            "ANIMAL_PRODUCT"
-        ],
-        "duration": 1.7158754e+12,
-        "quantity": 4,
-        "price": 45000
+        }
     },
     {
         "test": {
@@ -195,23 +239,27 @@
             "result": false,
             "code": 400
         },
-        "user": "66252db3dce942e19b422a8e",
-        "place": "66252e1e6e79b2222b6c72af",
-        "title": "",
-        "images": [],
-        "location": {
-            "name": "Test location",
-            "coordinates": {
-                "lat": 21.040621,
-                "lng": 105.777413
+        "input": {
+            "body": {
+                "user": "66252db3dce942e19b422a8e",
+                "place": "66252e1e6e79b2222b6c72af",
+                "title": "",
+                "images": [],
+                "location": {
+                    "name": "Test location",
+                    "coordinates": {
+                        "lat": 21.040621,
+                        "lng": 105.777413
+                    }
+                },
+                "categories": [
+                    "ANIMAL_PRODUCT"
+                ],
+                "duration": 1.7158754e+12,
+                "quantity": 4,
+                "price": 45000
             }
-        },
-        "categories": [
-            "ANIMAL_PRODUCT"
-        ],
-        "duration": 1.7158754e+12,
-        "quantity": 4,
-        "price": 45000
+        }
     },
     {
         "test": {
@@ -219,25 +267,29 @@
             "result": false,
             "code": 400
         },
-        "user": "66252db3dce942e19b422a8e",
-        "place": "66252e1e6e79b2222b6c72af",
-        "title": "Test title",
-        "images": [
-            ""
-        ],
-        "location": {
-            "name": "Test location",
-            "coordinates": {
-                "lat": 21.040621,
-                "lng": 105.777413
+        "input": {
+            "body": {
+                "user": "66252db3dce942e19b422a8e",
+                "place": "66252e1e6e79b2222b6c72af",
+                "title": "Test title",
+                "images": [
+                    ""
+                ],
+                "location": {
+                    "name": "Test location",
+                    "coordinates": {
+                        "lat": 21.040621,
+                        "lng": 105.777413
+                    }
+                },
+                "categories": [
+                    "ANIMAL_PRODUCT"
+                ],
+                "duration": 1.7158754e+12,
+                "quantity": 4,
+                "price": 45000
             }
-        },
-        "categories": [
-            "ANIMAL_PRODUCT"
-        ],
-        "duration": 1.7158754e+12,
-        "quantity": 4,
-        "price": 45000
+        }
     },
     {
         "test": {
@@ -245,25 +297,29 @@
             "result": false,
             "code": 400
         },
-        "user": "66252db3dce942e19b422a8e",
-        "place": "66252e1e6e79b2222b6c72af",
-        "title": "Test title",
-        "images": [
-            "http://res.cloudinary.com/dalvsnhwg/image/upload/v1702100786/mujq6q5cz"
-        ],
-        "categories": [
-            ""
-        ],
-        "location": {
-            "name": "Test location",
-            "coordinates": {
-                "lat": 21.040621,
-                "lng": 105.777413
+        "input": {
+            "body": {
+                "user": "66252db3dce942e19b422a8e",
+                "place": "66252e1e6e79b2222b6c72af",
+                "title": "Test title",
+                "images": [
+                    "http://res.cloudinary.com/dalvsnhwg/image/upload/v1702100786/mujq6q5cz"
+                ],
+                "categories": [
+                    ""
+                ],
+                "location": {
+                    "name": "Test location",
+                    "coordinates": {
+                        "lat": 21.040621,
+                        "lng": 105.777413
+                    }
+                },
+                "duration": 1.7158754e+12,
+                "quantity": 4,
+                "price": 45000
             }
-        },
-        "duration": 1.7158754e+12,
-        "quantity": 4,
-        "price": 45000
+        }
     },
     {
         "test": {
@@ -271,25 +327,29 @@
             "result": false,
             "code": 400
         },
-        "user": "66252db3dce942e19b422a8e",
-        "place": "66252e1e6e79b2222b6c72af",
-        "title": "Test title",
-        "images": [
-            "http://res.cloudinary.com/dalvsnhwg/image/upload/v1702100786/mujq6q5cz"
-        ],
-        "categories": [
-            "ANIMAL_PRODUCT"
-        ],
-        "duration": "1.7158754e+12",
-        "location": {
-            "name": "Test location",
-            "coordinates": {
-                "lat": 21.040621,
-                "lng": 105.777413
+        "input": {
+            "body": {
+                "user": "66252db3dce942e19b422a8e",
+                "place": "66252e1e6e79b2222b6c72af",
+                "title": "Test title",
+                "images": [
+                    "http://res.cloudinary.com/dalvsnhwg/image/upload/v1702100786/mujq6q5cz"
+                ],
+                "categories": [
+                    "ANIMAL_PRODUCT"
+                ],
+                "duration": "1.7158754e+12",
+                "location": {
+                    "name": "Test location",
+                    "coordinates": {
+                        "lat": 21.040621,
+                        "lng": 105.777413
+                    }
+                },
+                "quantity": 4,
+                "price": 45000
             }
-        },
-        "quantity": 4,
-        "price": 45000
+        }
     },
     {
         "test": {
@@ -297,21 +357,25 @@
             "result": false,
             "code": 400
         },
-        "user": "66252db3dce942e19b422a8e",
-        "place": "66252e1e6e79b2222b6c72af",
-        "title": "Test title",
-        "images": [
-            "http://res.cloudinary.com/dalvsnhwg/image/upload/v1702100786/mujq6q5cz"
-        ],
-        "categories": [
-            "ANIMAL_PRODUCT"
-        ],
-        "duration": 1.7158754e+12,
-        "location": {
-            "name": ""
-        },
-        "quantity": 4,
-        "price": 45000
+        "input": {
+            "body": {
+                "user": "66252db3dce942e19b422a8e",
+                "place": "66252e1e6e79b2222b6c72af",
+                "title": "Test title",
+                "images": [
+                    "http://res.cloudinary.com/dalvsnhwg/image/upload/v1702100786/mujq6q5cz"
+                ],
+                "categories": [
+                    "ANIMAL_PRODUCT"
+                ],
+                "duration": 1.7158754e+12,
+                "location": {
+                    "name": ""
+                },
+                "quantity": 4,
+                "price": 45000
+            }
+        }
     },
     {
         "test": {
@@ -319,21 +383,25 @@
             "result": false,
             "code": 400
         },
-        "user": "66252db3dce942e19b422a8e",
-        "place": "66252e1e6e79b2222b6c72af",
-        "title": "Test title",
-        "images": [
-            "http://res.cloudinary.com/dalvsnhwg/image/upload/v1702100786/mujq6q5cz"
-        ],
-        "categories": [
-            "ANIMAL_PRODUCT"
-        ],
-        "duration": 1.7158754e+12,
-        "location": {
-            "name": "Test location"
-        },
-        "quantity": 4,
-        "price": 45000
+        "input": {
+            "body": {
+                "user": "66252db3dce942e19b422a8e",
+                "place": "66252e1e6e79b2222b6c72af",
+                "title": "Test title",
+                "images": [
+                    "http://res.cloudinary.com/dalvsnhwg/image/upload/v1702100786/mujq6q5cz"
+                ],
+                "categories": [
+                    "ANIMAL_PRODUCT"
+                ],
+                "duration": 1.7158754e+12,
+                "location": {
+                    "name": "Test location"
+                },
+                "quantity": 4,
+                "price": 45000
+            }
+        }
     },
     {
         "test": {
@@ -341,25 +409,29 @@
             "result": false,
             "code": 400
         },
-        "user": "66252db3dce942e19b422a8e",
-        "place": "66252e1e6e79b2222b6c72af",
-        "title": "Test title",
-        "images": [
-            "http://res.cloudinary.com/dalvsnhwg/image/upload/v1702100786/mujq6q5cz"
-        ],
-        "categories": [
-            "ANIMAL_PRODUCT"
-        ],
-        "duration": 1.7158754e+12,
-        "location": {
-            "name": "Test location",
-            "coordinates": {
-                "lat": 21.040621,
-                "lng": 105.777413
+        "input": {
+            "body": {
+                "user": "66252db3dce942e19b422a8e",
+                "place": "66252e1e6e79b2222b6c72af",
+                "title": "Test title",
+                "images": [
+                    "http://res.cloudinary.com/dalvsnhwg/image/upload/v1702100786/mujq6q5cz"
+                ],
+                "categories": [
+                    "ANIMAL_PRODUCT"
+                ],
+                "duration": 1.7158754e+12,
+                "location": {
+                    "name": "Test location",
+                    "coordinates": {
+                        "lat": 21.040621,
+                        "lng": 105.777413
+                    }
+                },
+                "quantity": "4",
+                "price": 45000
             }
-        },
-        "quantity": "4",
-        "price": 45000
+        }
     },
     {
         "test": {
@@ -367,25 +439,29 @@
             "result": false,
             "code": 400
         },
-        "user": "66252db3dce942e19b422a8e",
-        "place": "66252e1e6e79b2222b6c72af",
-        "title": "Test title",
-        "images": [
-            "http://res.cloudinary.com/dalvsnhwg/image/upload/v1702100786/mujq6q5cz"
-        ],
-        "categories": [
-            "ANIMAL_PRODUCT"
-        ],
-        "duration": 1.7158754e+12,
-        "location": {
-            "name": "Test location",
-            "coordinates": {
-                "lat": 21.040621,
-                "lng": 105.777413
+        "input": {
+            "body": {
+                "user": "66252db3dce942e19b422a8e",
+                "place": "66252e1e6e79b2222b6c72af",
+                "title": "Test title",
+                "images": [
+                    "http://res.cloudinary.com/dalvsnhwg/image/upload/v1702100786/mujq6q5cz"
+                ],
+                "categories": [
+                    "ANIMAL_PRODUCT"
+                ],
+                "duration": 1.7158754e+12,
+                "location": {
+                    "name": "Test location",
+                    "coordinates": {
+                        "lat": 21.040621,
+                        "lng": 105.777413
+                    }
+                },
+                "quantity": 4,
+                "price": "45000"
             }
-        },
-        "quantity": 4,
-        "price": "45000"
+        }
     },
     {
         "test": {
@@ -393,25 +469,29 @@
             "result": false,
             "code": 404
         },
-        "user": "66252db3dce942e19b422b8e",
-        "place": "66252e1e6e79b2222b6c72af",
-        "title": "Test title",
-        "images": [
-            "http://res.cloudinary.com/dalvsnhwg/image/upload/v1702100786/mujq6q5cz"
-        ],
-        "categories": [
-            "ANIMAL_PRODUCT"
-        ],
-        "duration": 1.7158754e+12,
-        "location": {
-            "name": "Test location",
-            "coordinates": {
-                "lat": 21.040621,
-                "lng": 105.777413
+        "input": {
+            "body": {
+                "user": "66252db3dce942e19b422b8e",
+                "place": "66252e1e6e79b2222b6c72af",
+                "title": "Test title",
+                "images": [
+                    "http://res.cloudinary.com/dalvsnhwg/image/upload/v1702100786/mujq6q5cz"
+                ],
+                "categories": [
+                    "ANIMAL_PRODUCT"
+                ],
+                "duration": 1.7158754e+12,
+                "location": {
+                    "name": "Test location",
+                    "coordinates": {
+                        "lat": 21.040621,
+                        "lng": 105.777413
+                    }
+                },
+                "quantity": 4,
+                "price": 45000
             }
-        },
-        "quantity": 4,
-        "price": 45000
+        }
     },
     {
         "test": {
@@ -419,25 +499,29 @@
             "result": false,
             "code": 404
         },
-        "user": "66252db3dce942e19b422a8e",
-        "place": "66252e1e6e79b2222c6c72af",
-        "title": "Test title",
-        "images": [
-            "http://res.cloudinary.com/dalvsnhwg/image/upload/v1702100786/mujq6q5cz"
-        ],
-        "categories": [
-            "ANIMAL_PRODUCT"
-        ],
-        "duration": 1.7158754e+12,
-        "location": {
-            "name": "Test location",
-            "coordinates": {
-                "lat": 21.040621,
-                "lng": 105.777413
+        "input": {
+            "body": {
+                "user": "66252db3dce942e19b422a8e",
+                "place": "66252e1e6e79b2222c6c72af",
+                "title": "Test title",
+                "images": [
+                    "http://res.cloudinary.com/dalvsnhwg/image/upload/v1702100786/mujq6q5cz"
+                ],
+                "categories": [
+                    "ANIMAL_PRODUCT"
+                ],
+                "duration": 1.7158754e+12,
+                "location": {
+                    "name": "Test location",
+                    "coordinates": {
+                        "lat": 21.040621,
+                        "lng": 105.777413
+                    }
+                },
+                "quantity": 4,
+                "price": 45000
             }
-        },
-        "quantity": 4,
-        "price": 45000
+        }
     },
     {
         "test": {
@@ -445,24 +529,28 @@
             "result": true,
             "code": 200
         },
-        "user": "66252db3dce942e19b422a8e",
-        "place": "66252e1e6e79b2222b6c72af",
-        "title": "Test title",
-        "images": [
-            "http://res.cloudinary.com/dalvsnhwg/image/upload/v1702100786/mujq6q5cz"
-        ],
-        "categories": [
-            "ANIMAL_PRODUCT"
-        ],
-        "duration": 1.7158754e+12,
-        "location": {
-            "name": "Test location",
-            "coordinates": {
-                "lat": 21.040621,
-                "lng": 105.777413
+        "input": {
+            "body": {
+                "user": "66252db3dce942e19b422a8e",
+                "place": "66252e1e6e79b2222b6c72af",
+                "title": "Test title",
+                "images": [
+                    "http://res.cloudinary.com/dalvsnhwg/image/upload/v1702100786/mujq6q5cz"
+                ],
+                "categories": [
+                    "ANIMAL_PRODUCT"
+                ],
+                "duration": 1.7158754e+12,
+                "location": {
+                    "name": "Test location",
+                    "coordinates": {
+                        "lat": 21.040621,
+                        "lng": 105.777413
+                    }
+                },
+                "quantity": 4,
+                "price": 45000
             }
-        },
-        "quantity": 4,
-        "price": 45000
+        }
     }
 ]
