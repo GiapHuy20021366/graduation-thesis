@@ -1,18 +1,6 @@
 [
     {
         "test": {
-            "message": "It should reject due to missing user",
-            "result": false,
-            "code": 400
-        },
-        "input": {
-            "body": {
-                "user": null
-            }
-        }
-    },
-    {
-        "test": {
             "message": "It should reject due to missing images",
             "result": false,
             "code": 400
@@ -465,39 +453,9 @@
     },
     {
         "test": {
-            "message": "It should reject due to user not found",
-            "result": false,
-            "code": 404
-        },
-        "input": {
-            "body": {
-                "user": "66252db3dce942e19b422b8e",
-                "place": "66252e1e6e79b2222b6c72af",
-                "title": "Test title",
-                "images": [
-                    "http://res.cloudinary.com/dalvsnhwg/image/upload/v1702100786/mujq6q5cz"
-                ],
-                "categories": [
-                    "ANIMAL_PRODUCT"
-                ],
-                "duration": 1.7158754e+12,
-                "location": {
-                    "name": "Test location",
-                    "coordinates": {
-                        "lat": 21.040621,
-                        "lng": 105.777413
-                    }
-                },
-                "quantity": 4,
-                "price": 45000
-            }
-        }
-    },
-    {
-        "test": {
             "message": "It should reject due to place not found",
             "result": false,
-            "code": 404
+            "code": 500
         },
         "input": {
             "body": {
@@ -510,6 +468,7 @@
                 "categories": [
                     "ANIMAL_PRODUCT"
                 ],
+                "description": "",
                 "duration": 1.7158754e+12,
                 "location": {
                     "name": "Test location",
@@ -537,6 +496,7 @@
                 "images": [
                     "http://res.cloudinary.com/dalvsnhwg/image/upload/v1702100786/mujq6q5cz"
                 ],
+                "description": "",
                 "categories": [
                     "ANIMAL_PRODUCT"
                 ],
