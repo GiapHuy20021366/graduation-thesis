@@ -62,7 +62,7 @@ export default function AuthContextProvider({
     local?.account
   );
   const [auth, setAuth] = useState<IAuthInfo | undefined>(local?.auth);
-  const timeOutRef = useRef<number | undefined>();
+  const timeOutRef = useRef<NodeJS.Timeout | undefined>();
 
   const logout = () => {
     localStorage.removeItem("auth");

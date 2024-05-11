@@ -39,7 +39,7 @@ import {
   IFoodSearchHistoryParams,
   IFoodSearchHistoryExposed,
   foodFetcher,
-} from "../../../api/food";
+} from "../../../api";
 import OrderIcon from "../../common/custom/OrderIcon";
 import ListEnd from "../../common/viewer/data/ListEnd";
 import ErrorRetry from "../../common/viewer/data/ErrorRetry";
@@ -532,6 +532,7 @@ export default function FoodSearchBody() {
                 placeholder={lang("search-placeholder")}
                 InputProps={{
                   ...params.InputProps,
+                  id: "f-s-b-input-search",
                   style: {
                     borderRadius: 40,
                     paddingLeft: "1em",
@@ -547,7 +548,11 @@ export default function FoodSearchBody() {
                       {params.InputProps.endAdornment}
                       <InputAdornment position="end">
                         <Tooltip arrow title={lang("l-search")}>
-                          <IconButton color="info" onClick={() => doSearch()}>
+                          <IconButton
+                            color="info"
+                            onClick={() => doSearch()}
+                            id="f-s-b-btn-search"
+                          >
                             <SearchOutlined />
                           </IconButton>
                         </Tooltip>
@@ -556,7 +561,7 @@ export default function FoodSearchBody() {
                           title={lang("l-advance-search")}
                           onClick={() => setOpenFilter(true)}
                         >
-                          <IconButton color="info">
+                          <IconButton color="info" id="f-s-b-btn-filter">
                             <TuneOutlined />
                           </IconButton>
                         </Tooltip>
@@ -623,12 +628,13 @@ export default function FoodSearchBody() {
             width: "100%",
             boxSizing: "border-box",
           }}
+          id="f-s-b-food-container"
         >
-          {foods.map((food, index) => {
+          {foods.map((food) => {
             return (
               <FoodSearchItem
                 item={food}
-                key={index}
+                key={food._id}
                 onBeforeNavigate={() => doSaveStorage()}
               />
             );
@@ -637,14 +643,17 @@ export default function FoodSearchBody() {
           <ListEnd
             active={loader.isEnd && !loader.isError && foods.length > 0}
             onRetry={doSearchMore}
+            id="f-s-b-list-end"
           />
           <ErrorRetry
             active={!loader.isFetching && loader.isError}
             onRetry={doSearchMore}
+            id="f-s-b-error-retry"
           />
           <EmptyList
             active={!loader.isFetching && !loader.isError && foods.length === 0}
             onRetry={doSearchMore}
+            id="f-s-b-empty-list"
           />
         </Stack>
       </Stack>

@@ -42,6 +42,7 @@ export default function FoodSearchItem({
         margin: "0.5rem 0",
       }}
       gap={1}
+      id={item._id}
     >
       <Stack direction="row" gap={[1, 2]}>
         <Box width={"30%"}>

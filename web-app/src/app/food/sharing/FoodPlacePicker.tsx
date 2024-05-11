@@ -18,6 +18,7 @@ import {
 } from "../../../data";
 import {
   useAuthContext,
+  useComponentLanguage,
   useFoodSharingFormContext,
   useLoader,
 } from "../../../hooks";
@@ -40,6 +41,7 @@ const FoodPlacePicker = React.forwardRef<HTMLDivElement, FoodPlacePickerProps>(
     const { auth, account } = authContext;
     const loader = useLoader();
     const dirtyRef = useRef<boolean>(true);
+    const lang = useComponentLanguage();
 
     const onPlaceChanged = (event: SelectChangeEvent<string>) => {
       const value = event.target.value;
@@ -101,11 +103,11 @@ const FoodPlacePicker = React.forwardRef<HTMLDivElement, FoodPlacePickerProps>(
           ...(props.sx ?? {}),
         }}
       >
-        <Box component="h4">Đăng trên</Box>
-        <Typography>Bạn muốn chia sẻ thực phẩm này trên</Typography>
+        <Box component="h4">{lang("post-on")}</Box>
+        <Typography>{lang("want-share-on")}</Typography>
         <Divider />
         <Select
-          label={"Địa điểm"}
+          label={lang("l-place")}
           variant="standard"
           disableUnderline={true}
           displayEmpty={true}
@@ -117,7 +119,9 @@ const FoodPlacePicker = React.forwardRef<HTMLDivElement, FoodPlacePickerProps>(
           }}
           disabled={disabled}
         >
-          <MenuItem value={PERSONAL_PAGE}>Trang cá nhân của bạn</MenuItem>
+          <MenuItem value={PERSONAL_PAGE}>
+            {lang("your-personal-page")}
+          </MenuItem>
           {places.map((place) => {
             return (
               <MenuItem value={place._id} key={place._id}>

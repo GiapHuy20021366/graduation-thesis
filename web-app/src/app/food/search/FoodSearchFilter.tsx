@@ -241,6 +241,7 @@ export default function FoodSearchFilter({
                   variant="outlined"
                   label={lang("l-all")}
                   value={ItemAddedBy.ALL}
+                  id="f-s-f-item-added-by-all"
                 />
                 <ToggleChip
                   variant="outlined"
@@ -278,6 +279,7 @@ export default function FoodSearchFilter({
                   variant="outlined"
                   label={lang("l-all")}
                   value={ItemAvailable.ALL}
+                  id="f-s-f-item-available-all"
                 />
                 <ToggleChip
                   variant="outlined"
@@ -316,6 +318,7 @@ export default function FoodSearchFilter({
                   variant="outlined"
                   label={lang("l-all")}
                   value={-1}
+                  id="f-s-f-max-distance-all"
                 />
                 <ToggleChip variant="outlined" label={"0.5 km"} value={0.5} />
                 <ToggleChip variant="outlined" label={"1 km"} value={1} />
@@ -351,6 +354,7 @@ export default function FoodSearchFilter({
                   variant="outlined"
                   label={lang("l-all")}
                   value={-1}
+                  id="f-s-f-max-duration-all"
                 />
                 <ToggleChip
                   variant="outlined"
@@ -385,7 +389,7 @@ export default function FoodSearchFilter({
                   onChange={(_event, checked) => setCategoryActive(checked)}
                   checked={categoryActive}
                 />
-                <Typography>
+                <Typography id="f-s-f-category-typography">
                   {categoryActive ? lang("l-custom") : lang("l-all")}
                 </Typography>
               </Stack>
@@ -479,6 +483,7 @@ export default function FoodSearchFilter({
                   variant="outlined"
                   label={lang("l-all")}
                   value={PriceOptions.ALL}
+                  id="f-s-f-price-range-all"
                 />
                 <ToggleChip
                   variant="outlined"

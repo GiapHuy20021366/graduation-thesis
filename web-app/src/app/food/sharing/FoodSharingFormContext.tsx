@@ -18,7 +18,7 @@ import {
   IFoodPostExposedWithLike,
 } from "../../../data";
 
-interface IFoodSharingFormContext {
+export interface IFoodSharingFormContext {
   images: (IImageExposed | null)[];
   categories: FoodCategory[];
   location: IFoodUpLoadLocation;

@@ -14,11 +14,7 @@ import {
 } from "@mui/material";
 import FoodImagesContainer from "./FoodImagesContainer";
 import { useState } from "react";
-import {
-  foodFetcher,
-  FoodResponse,
-  IFoodUploadResponseData,
-} from "../../../api";
+import { foodFetcher, FoodResponse, IPostFoodResponse } from "../../../api";
 import {
   useAuthContext,
   useFoodSharingFormContext,
@@ -136,7 +132,7 @@ export default function FoodSharingForm() {
       progess.start();
 
       const editData = editDataRef?.current;
-      const promise: Promise<FoodResponse<IFoodUploadResponseData>> =
+      const promise: Promise<FoodResponse<IPostFoodResponse>> =
         editData == null
           ? foodFetcher.uploadFood(foodUploadData, auth)
           : foodFetcher.updateFood(editData._id, foodUploadData, auth);
@@ -344,7 +340,6 @@ export default function FoodSharingForm() {
           </Stack>
         </Stack>
       )}
-
       {activeStep === FormPage.PAGE_SECOND && (
         <Stack spacing={2}>
           <FoodPlacePicker disabled={isEditable} />
