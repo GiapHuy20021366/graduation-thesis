@@ -243,4 +243,289 @@ describe("FoodSharingForm Test", () => {
     expect(result.queryByText("reset")).toBeInTheDocument();
     expect(result.queryByText("apply")).toBeInTheDocument();
   });
+
+  it("Check filter apply correct", async () => {
+    const searchData = genData();
+    mocks.searchFood.mockResolvedValue({ data: searchData });
+    const data: IFoodSearchContextData = {
+      available: "ALL",
+      order: {
+        distance: 0,
+        price: 0,
+        quantity: 0,
+        time: 0,
+      },
+      query: "--Query",
+      addedBy: [0],
+      categories: [FoodCategory.BEVERAGES, FoodCategory.ANIMAL_PRODUCT],
+      maxDistance: 2,
+      maxDuration: 2,
+      minQuantity: 3,
+      price: {
+        max: undefined,
+        min: undefined,
+      },
+    };
+
+    const result = render(
+      <FakeNeccesaryContexts>
+        <FakeFoodSearchContext data={data}>
+          <FoodSearchBody />
+        </FakeFoodSearchContext>
+      </FakeNeccesaryContexts>
+    );
+
+    const buttonFilter = result.container.querySelector("#f-s-b-btn-filter");
+    act(() => {
+      fireEvent.click(buttonFilter!);
+    });
+
+    // mocks.searchFood.mockClear();
+    // mocks.searchFood.mockResolvedValue({ data: searchData });
+    const applyButton = result.getByText("apply");
+    act(() => {
+      fireEvent.click(applyButton);
+    });
+
+    await waitFor(
+      () => {
+        expect(applyButton).not.toBeInTheDocument();
+        expect(mocks.searchFood).toBeCalledTimes(1);
+        searchData.forEach((d) => {
+          expect(
+            result.container.querySelector(`#${d._id}`)
+          ).toBeInTheDocument();
+        });
+      },
+      { timeout: 1000 }
+    );
+  });
+
+  it("Check tab time click correct", async () => {
+    const searchData = genData();
+    mocks.searchFood.mockResolvedValue({ data: searchData });
+    const data: IFoodSearchContextData = {
+      available: "ALL",
+      order: {
+        distance: 0,
+        price: 0,
+        quantity: 0,
+        time: 0,
+      },
+      query: "--Query",
+      addedBy: [0],
+      categories: [FoodCategory.BEVERAGES, FoodCategory.ANIMAL_PRODUCT],
+      maxDistance: 2,
+      maxDuration: 2,
+      minQuantity: 3,
+      price: {
+        max: undefined,
+        min: undefined,
+      },
+    };
+
+    const result = render(
+      <FakeNeccesaryContexts>
+        <FakeFoodSearchContext data={data}>
+          <FoodSearchBody />
+        </FakeFoodSearchContext>
+      </FakeNeccesaryContexts>
+    );
+
+    const buttonFilter = result.container.querySelector("#f-s-b-btn-filter");
+    act(() => {
+      fireEvent.click(buttonFilter!);
+    });
+
+    // mocks.searchFood.mockClear();
+    // mocks.searchFood.mockResolvedValue({ data: searchData });
+    const tabTime = result.getByText("l-time");
+    act(() => {
+      fireEvent.click(tabTime);
+    });
+
+    await waitFor(
+      () => {
+        expect(mocks.searchFood).toBeCalledTimes(1);
+        expect(result.queryByText("Loading")).not.toBeInTheDocument();
+        searchData.forEach((d) => {
+          expect(
+            result.container.querySelector(`#${d._id}`)
+          ).toBeInTheDocument();
+        });
+      },
+      { timeout: 1000 }
+    );
+  });
+
+  it("Check tab distance click correct", async () => {
+    const searchData = genData();
+    mocks.searchFood.mockResolvedValue({ data: searchData });
+    const data: IFoodSearchContextData = {
+      available: "ALL",
+      order: {
+        distance: 0,
+        price: 0,
+        quantity: 0,
+        time: 0,
+      },
+      query: "--Query",
+      addedBy: [0],
+      categories: [FoodCategory.BEVERAGES, FoodCategory.ANIMAL_PRODUCT],
+      maxDistance: 2,
+      maxDuration: 2,
+      minQuantity: 3,
+      price: {
+        max: undefined,
+        min: undefined,
+      },
+    };
+
+    const result = render(
+      <FakeNeccesaryContexts>
+        <FakeFoodSearchContext data={data}>
+          <FoodSearchBody />
+        </FakeFoodSearchContext>
+      </FakeNeccesaryContexts>
+    );
+
+    const buttonFilter = result.container.querySelector("#f-s-b-btn-filter");
+    act(() => {
+      fireEvent.click(buttonFilter!);
+    });
+
+    // mocks.searchFood.mockClear();
+    // mocks.searchFood.mockResolvedValue({ data: searchData });
+    const tabTime = result.getByText("l-distance");
+    act(() => {
+      fireEvent.click(tabTime);
+    });
+
+    await waitFor(
+      () => {
+        expect(mocks.searchFood).toBeCalledTimes(1);
+        expect(result.queryByText("Loading")).not.toBeInTheDocument();
+        searchData.forEach((d) => {
+          expect(
+            result.container.querySelector(`#${d._id}`)
+          ).toBeInTheDocument();
+        });
+      },
+      { timeout: 1000 }
+    );
+  });
+
+  it("Check tab price click correct", async () => {
+    const searchData = genData();
+    mocks.searchFood.mockResolvedValue({ data: searchData });
+    const data: IFoodSearchContextData = {
+      available: "ALL",
+      order: {
+        distance: 0,
+        price: 0,
+        quantity: 0,
+        time: 0,
+      },
+      query: "--Query",
+      addedBy: [0],
+      categories: [FoodCategory.BEVERAGES, FoodCategory.ANIMAL_PRODUCT],
+      maxDistance: 2,
+      maxDuration: 2,
+      minQuantity: 3,
+      price: {
+        max: undefined,
+        min: undefined,
+      },
+    };
+
+    const result = render(
+      <FakeNeccesaryContexts>
+        <FakeFoodSearchContext data={data}>
+          <FoodSearchBody />
+        </FakeFoodSearchContext>
+      </FakeNeccesaryContexts>
+    );
+
+    const buttonFilter = result.container.querySelector("#f-s-b-btn-filter");
+    act(() => {
+      fireEvent.click(buttonFilter!);
+    });
+
+    // mocks.searchFood.mockClear();
+    // mocks.searchFood.mockResolvedValue({ data: searchData });
+    const tabTime = result.getByText("l-price");
+    act(() => {
+      fireEvent.click(tabTime);
+    });
+
+    await waitFor(
+      () => {
+        expect(mocks.searchFood).toBeCalledTimes(1);
+        expect(result.queryByText("Loading")).not.toBeInTheDocument();
+        searchData.forEach((d) => {
+          expect(
+            result.container.querySelector(`#${d._id}`)
+          ).toBeInTheDocument();
+        });
+      },
+      { timeout: 1000 }
+    );
+  });
+
+  it("Check tab quantity click correct", async () => {
+    const searchData = genData();
+    mocks.searchFood.mockResolvedValue({ data: searchData });
+    const data: IFoodSearchContextData = {
+      available: "ALL",
+      order: {
+        distance: 0,
+        price: 0,
+        quantity: 0,
+        time: 0,
+      },
+      query: "--Query",
+      addedBy: [0],
+      categories: [FoodCategory.BEVERAGES, FoodCategory.ANIMAL_PRODUCT],
+      maxDistance: 2,
+      maxDuration: 2,
+      minQuantity: 3,
+      price: {
+        max: undefined,
+        min: undefined,
+      },
+    };
+
+    const result = render(
+      <FakeNeccesaryContexts>
+        <FakeFoodSearchContext data={data}>
+          <FoodSearchBody />
+        </FakeFoodSearchContext>
+      </FakeNeccesaryContexts>
+    );
+
+    const buttonFilter = result.container.querySelector("#f-s-b-btn-filter");
+    act(() => {
+      fireEvent.click(buttonFilter!);
+    });
+
+    // mocks.searchFood.mockClear();
+    // mocks.searchFood.mockResolvedValue({ data: searchData });
+    const tabTime = result.getByText("l-quantity");
+    act(() => {
+      fireEvent.click(tabTime);
+    });
+
+    await waitFor(
+      () => {
+        expect(mocks.searchFood).toBeCalledTimes(1);
+        expect(result.queryByText("Loading")).not.toBeInTheDocument();
+        searchData.forEach((d) => {
+          expect(
+            result.container.querySelector(`#${d._id}`)
+          ).toBeInTheDocument();
+        });
+      },
+      { timeout: 1000 }
+    );
+  });
 });

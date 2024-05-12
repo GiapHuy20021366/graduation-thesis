@@ -5,6 +5,7 @@ import FakeRoutes from "./FakeRoutes";
 import { BrowserRouter } from "react-router-dom";
 import ToastContextProvider from "../../src/app/ToastContext";
 import FakeAppCacheContext from "./FakeAppCacheContext";
+import FakeAppContentContext from "./FakeAppContentContext";
 
 export default function FakeNeccesaryContexts({
   children,
@@ -16,9 +17,11 @@ export default function FakeNeccesaryContexts({
       <ToastContextProvider>
         <FakeAuthContext>
           <FakeAppCacheContext>
-            <BrowserRouter>
-              <FakeRoutes>{children}</FakeRoutes>{" "}
-            </BrowserRouter>
+            <FakeAppContentContext>
+              <BrowserRouter>
+                <FakeRoutes>{children}</FakeRoutes>{" "}
+              </BrowserRouter>
+            </FakeAppContentContext>
           </FakeAppCacheContext>
         </FakeAuthContext>
       </ToastContextProvider>
