@@ -175,10 +175,8 @@ export default function FoodAroundBody() {
     const params: IFoodSearchParams = {
       category: searchContext.categories,
       active: true,
+      resolved: false,
       addedBy: searchContext.addedBy,
-      available: searchContext.available,
-      maxDuration: searchContext.maxDuration,
-      minQuantity: searchContext.minQuantity,
       price: searchContext.price,
       populate: {
         user: false,
@@ -196,6 +194,25 @@ export default function FoodAroundBody() {
         distance: OrderState.INCREASE,
       },
     };
+    params.time = {};
+    if (searchContext.maxDuration != null) {
+      params.time.to =
+        Date.now() + searchContext.maxDuration * 24 * 60 * 60 * 1000;
+    }
+    switch (searchContext.available) {
+      case "ALL":
+        break;
+      case "AVAILABLE_ONLY":
+        params.time.from = Date.now();
+        break;
+      case "JUST_GONE":
+        params.time.to = Date.now() - 1;
+    }
+    if (searchContext.minQuantity != null) {
+      params.quantity = {
+        min: searchContext.minQuantity,
+      };
+    }
     searchFood(params);
     setOpenFood(undefined);
     setInfoOpen(undefined);
@@ -251,10 +268,8 @@ export default function FoodAroundBody() {
     const paramsToSearch: IFoodSearchParams = {
       category: params.categories,
       active: true,
+      resolved: false,
       addedBy: params.addedBy,
-      available: params.available,
-      maxDuration: params.maxDuration,
-      minQuantity: params.minQuantity,
       price: params.price,
       user: {
         exclude: accountId ? [accountId] : undefined,
@@ -275,6 +290,26 @@ export default function FoodAroundBody() {
         distance: OrderState.INCREASE,
       },
     };
+    paramsToSearch.time = {};
+    if (params.maxDuration != null) {
+      paramsToSearch.time.to =
+        Date.now() + params.maxDuration * 24 * 60 * 60 * 1000;
+    }
+    switch (params.available) {
+      case "ALL":
+        break;
+      case "AVAILABLE_ONLY":
+        paramsToSearch.time.from = Date.now();
+        break;
+      case "JUST_GONE":
+        paramsToSearch.time.to = Date.now() - 1;
+    }
+    if (params.minQuantity != null) {
+      paramsToSearch.quantity = {
+        min: params.minQuantity,
+      };
+    }
+
     searchFood(paramsToSearch);
     setOpenFood(undefined);
     setInfoOpen(undefined);

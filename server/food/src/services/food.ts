@@ -203,15 +203,8 @@ export const findFoodPostById = async (
 };
 
 const toFoodSearchBuilder = (params: IFoodSearchParams): QueryBuilder => {
-  const {
-    query,
-    addedBy,
-    available,
-    maxDuration,
-    pagination,
-    distance,
-    order,
-  } = params;
+  const { query, addedBy, duration, time, pagination, distance, order } =
+    params;
 
   const builder = new QueryBuilder();
 
@@ -221,8 +214,10 @@ const toFoodSearchBuilder = (params: IFoodSearchParams): QueryBuilder => {
     .value("active", params.active)
     .value("resolved", params.resolved)
     .array("categories", params.category)
-    .min("quantity", params.minQuantity)
+    .minMax("quantity", params.quantity)
     .minMax("price", params.price)
+    .minMax("createdAt", { min: time?.from, max: time?.to })
+    .minMax("duration", { min: duration?.from, max: duration?.to })
     .incAndExc("resolveBy", params.resolveBy)
     .incAndExc("user", params.user)
     .incAndExc("place._id", params.place);
@@ -251,23 +246,6 @@ const toFoodSearchBuilder = (params: IFoodSearchParams): QueryBuilder => {
         });
       }
     }
-  }
-
-  if (available != null) {
-    switch (available) {
-      case "ALL":
-        break;
-      case "AVAILABLE_ONLY":
-        builder.min("duration", Date.now());
-        break;
-      case "JUST_GONE":
-        builder.max("duration", Date.now());
-        break;
-    }
-  }
-
-  if (maxDuration != null && available !== "JUST_GONE") {
-    builder.min("duration", Date.now() + maxDuration * 24 * 60 * 60 * 1000);
   }
 
   if (query) {

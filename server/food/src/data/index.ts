@@ -65,6 +65,10 @@ export {
   IIncludeAndExclude,
   toFoodSearchParams,
   toIncludeAndExclude,
+  IFoodPostResolveBy,
+  IFoodSearchDuration,
+  IFoodSearchTime,
+  IFoodSearchQuantity,
 } from "./food-search-params";
 export { ItemAddedBy } from "./item-added-by";
 export { ItemAvailable } from "./item-available";

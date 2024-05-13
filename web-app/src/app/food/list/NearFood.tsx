@@ -85,6 +85,7 @@ const NearFood = React.forwardRef<HTMLDivElement, NearFoodProps>(
         },
         pagination: pagination,
         active: true,
+        resolved: false,
       };
 
       progessContext.start();

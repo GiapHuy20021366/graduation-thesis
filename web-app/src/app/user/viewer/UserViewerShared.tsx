@@ -75,6 +75,7 @@ const UserViewerShared = React.forwardRef<
       user: {
         include: [_id],
       },
+      active: true,
     };
 
     foodFetcher

@@ -89,6 +89,7 @@ const PlaceViewerShared = React.forwardRef<
       place: {
         include: [place._id],
       },
+      active: true,
     };
 
     foodFetcher

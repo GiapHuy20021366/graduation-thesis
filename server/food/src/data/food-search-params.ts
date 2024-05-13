@@ -12,12 +12,10 @@ import {
 import { ICoordinates } from "./coordinates";
 import {
   isArrayPlaceTypes,
-  isItemAvailable,
   isOrderState,
   isPagination,
   isPlaceType,
 } from "./data-validate";
-import { ItemAvailable } from "./item-available";
 import { OrderState } from "./order-state";
 import { Queried } from "./schemad";
 
@@ -55,6 +53,21 @@ export interface IFoodSearchPopulate {
   place?: boolean;
 }
 
+export interface IFoodSearchDuration {
+  from?: number;
+  to?: number;
+}
+
+export interface IFoodSearchTime {
+  from?: number;
+  to?: number;
+}
+
+export interface IFoodSearchQuantity {
+  min?: number;
+  max?: number;
+}
+
 export interface IFoodSearchParams
   extends Paginationed,
     Queried,
@@ -63,15 +76,15 @@ export interface IFoodSearchParams
   place?: IFoodSearchPlace;
   distance?: IFoodSearchDistance;
   category?: string | string[];
-  maxDuration?: number; // time left
   price?: IFoodSearchPrice;
-  minQuantity?: number;
   addedBy?: PlaceType | PlaceType[];
-  available?: ItemAvailable;
   order?: IFoodSeachOrder;
   populate?: IFoodSearchPopulate;
   resolved?: boolean;
   resolveBy?: IFoodPostResolveBy;
+  time?: IFoodSearchTime;
+  duration?: IFoodSearchDuration;
+  quantity?: IFoodSearchQuantity;
 }
 
 export const toFoodSearchParams = (value: any): IFoodSearchParams => {
@@ -110,9 +123,28 @@ export const toFoodSearchParams = (value: any): IFoodSearchParams => {
     }
   }
 
-  const maxDuration = value.maxDuration;
-  if (isNumber(maxDuration)) {
-    result.maxDuration = maxDuration;
+  const time = value.time;
+  if (time != null && typeof time === "object") {
+    result.time = {};
+    const { from, to } = time;
+    if (isNumber(from)) {
+      result.time.from = from;
+    }
+    if (isNumber(to)) {
+      result.time.to = to;
+    }
+  }
+
+  const duration = value.duration;
+  if (duration != null && typeof duration === "object") {
+    result.duration = {};
+    const { from, to } = duration;
+    if (isNumber(from)) {
+      result.duration.from = from;
+    }
+    if (isNumber(to)) {
+      result.duration.to = to;
+    }
   }
 
   const price = value.price;
@@ -128,9 +160,14 @@ export const toFoodSearchParams = (value: any): IFoodSearchParams => {
     }
   }
 
-  const minQuantity = value.minQuantity;
-  if (isNumber(minQuantity)) {
-    result.minQuantity = minQuantity;
+  const quantity = value.quantity;
+  if (quantity != null && typeof quantity === "object") {
+    result.quantity = {};
+    const { min, max } = quantity;
+    if (isNumber(min)) {
+      result.quantity.min = min;
+      result.quantity.max = max;
+    }
   }
 
   const addedBy = value.addedBy;
@@ -142,11 +179,6 @@ export const toFoodSearchParams = (value: any): IFoodSearchParams => {
     } else if (addedBy.length > 1) {
       result.addedBy = addedBy;
     }
-  }
-
-  const available = value.available;
-  if (isItemAvailable(available)) {
-    result.available = available;
   }
 
   const active = value.active;

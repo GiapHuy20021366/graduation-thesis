@@ -42,19 +42,28 @@ const foodSeachHistorySchema = new Schema<
       },
     },
     category: Schema.Types.Mixed,
-    maxDuration: Number,
     price: {
       min: Number,
       max: Number,
     },
-    minQuantity: Number,
     addedBy: Schema.Types.Mixed,
-    available: String,
     order: {
       distance: Number,
       time: Number,
       price: Number,
       quantity: Number,
+    },
+    time: {
+      from: Number,
+      to: Number,
+    },
+    duration: {
+      from: Number,
+      to: Number,
+    },
+    quantity: {
+      min: Number,
+      max: Number,
     },
   },
   createdAt: {

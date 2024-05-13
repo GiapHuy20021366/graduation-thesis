@@ -87,10 +87,25 @@ const toSearchParams = (
   const result: IFoodSearchParams = {};
 
   result.category = context.categories;
-  result.maxDuration = context.maxDuration;
-  result.minQuantity = context.minQuantity;
+  result.time = {};
+  if (context.maxDuration != null) {
+    result.time.to = Date.now() + context.maxDuration * 24 * 60 * 60 * 1000;
+  }
+  switch (context.available) {
+    case "ALL":
+      break;
+    case "AVAILABLE_ONLY":
+      result.time.from = Date.now();
+      break;
+    case "JUST_GONE":
+      result.time.to = Date.now() - 1;
+  }
+  if (context.minQuantity != null) {
+    result.quantity = {
+      min: context.minQuantity,
+    };
+  }
   result.addedBy = context.addedBy;
-  result.available = context.available;
 
   if (context.query && context.query.trim().length > 0) {
     result.query = context.query;
@@ -104,6 +119,8 @@ const toSearchParams = (
   }
 
   result.order = order;
+  result.active = true;
+  result.resolved = false;
 
   if (context.price != null) {
     result.price = {
