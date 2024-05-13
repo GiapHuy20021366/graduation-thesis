@@ -198,7 +198,7 @@ export interface UserFetcher {
     placeId: string,
     active: boolean,
     auth: IAuthInfo
-  ): Promise<UserResponse<boolean>>;
+  ): Promise<UserResponse<{ active: boolean }>>;
   followPlace(
     placeId: string,
     followType: FollowType,
@@ -495,7 +495,7 @@ export const userFetcher: UserFetcher = {
     placeId: string,
     active: boolean,
     auth: IAuthInfo
-  ): Promise<UserResponse<boolean>> => {
+  ): Promise<UserResponse<{ active: boolean }>> => {
     return userInstance.get(
       userEndpoints.activePlace.replace(":id", placeId) +
         `?active=${active ? "true" : "false"}`,

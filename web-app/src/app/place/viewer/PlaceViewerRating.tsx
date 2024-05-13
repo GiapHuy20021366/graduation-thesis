@@ -148,7 +148,9 @@ const PlaceViewerRating = React.forwardRef<
             value={rating}
             getLabelText={getLabelText}
             onChange={(_event, newValue) => {
-              ratingPlace(newValue);
+              if (newValue != null) {
+                ratingPlace(newValue);
+              }
             }}
             onChangeActive={(_event, newHover) => {
               setHover(newHover);

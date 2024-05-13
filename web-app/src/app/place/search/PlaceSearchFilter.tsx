@@ -53,7 +53,10 @@ const PlaceSearchFilter = React.forwardRef<
     onApply && onApply(filterParams);
     onCloseFilter();
   };
-  const handleReset = () => {};
+  const handleReset = () => {
+    setMaxDistance(-1);
+    setTypes([1, 2, 4, 8, 16]);
+  };
 
   useEffect(() => {
     setMaxDistance(searchContext.maxDistance ?? -1);
@@ -105,16 +108,11 @@ const PlaceSearchFilter = React.forwardRef<
                   },
                 }}
               >
-                <ToggleChip
+                {/* <ToggleChip
                   variant="outlined"
                   label={lang("l-personal")}
                   value={PlaceType.PERSONAL}
-                />
-                <ToggleChip
-                  variant="outlined"
-                  label={lang("l-volunteer")}
-                  value={PlaceType.VOLUNTEER}
-                />
+                /> */}
                 <ToggleChip
                   variant="outlined"
                   label={lang("l-eatery")}
@@ -134,6 +132,11 @@ const PlaceSearchFilter = React.forwardRef<
                   variant="outlined"
                   label={lang("l-supermarket")}
                   value={PlaceType.SUPERMARKET}
+                />
+                <ToggleChip
+                  variant="outlined"
+                  label={lang("l-volunteer")}
+                  value={PlaceType.VOLUNTEER}
                 />
               </ToggleChipGroup>
             </Box>

@@ -1,5 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   IconButton,
   IconButtonProps,
   ListItemIcon,
@@ -11,13 +17,21 @@ import {
   IAccountExposed,
   IPlaceExposedWithRatingAndFollow,
 } from "../../../data";
-import { Edit, MoreVert, ReportGmailerrorred } from "@mui/icons-material";
+import {
+  Edit,
+  MoreVert,
+  ReportGmailerrorred,
+  VisibilityOffOutlined,
+  VisibilityOutlined,
+} from "@mui/icons-material";
 import {
   applicationPages,
   useAuthContext,
   useComponentLanguage,
+  useToastContext,
 } from "../../../hooks";
 import StyledLink from "../../common/navigate/StyledLink";
+import { userFetcher } from "../../../api";
 
 type PlaceButtonContextMenuProps = IconButtonProps & {
   data: IPlaceExposedWithRatingAndFollow;
@@ -46,10 +60,33 @@ const PlaceContextMenu = React.forwardRef<
   const lang = useComponentLanguage();
 
   const authContext = useAuthContext();
-  const account = authContext.account;
+  const { account, auth } = authContext;
   const canEdit = isPermitEdit(data, account);
+  const toast = useToastContext();
 
   const open = Boolean(anchorEl);
+
+  const [openConfirmHide, setOpenConfirmHide] = useState<boolean>(false);
+  const [active, setActive] = useState<boolean>(data.active);
+
+  const activePlace = () => {
+    if (auth == null) return;
+    userFetcher
+      .activePlace(data._id, !active, auth)
+      .then((res) => {
+        const datas = res.data;
+        if (datas) {
+          setActive(datas.active);
+        }
+      })
+      .catch(() => {
+        toast.error(
+          lang(
+            active ? "can-not-inactive-place-now" : "can-not-active-place-now"
+          )
+        );
+      });
+  };
 
   const handleClick = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -61,6 +98,7 @@ const PlaceContextMenu = React.forwardRef<
   const handleClose = () => {
     setAnchorEl(null);
   };
+
   return (
     <>
       <IconButton
@@ -115,14 +153,31 @@ const PlaceContextMenu = React.forwardRef<
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
         {canEdit && (
-          <StyledLink to={applicationPages.PLACE_UPDATE} state={data}>
-            <MenuItem>
+          <>
+            <StyledLink to={applicationPages.PLACE_UPDATE} state={data}>
+              <MenuItem>
+                <ListItemIcon>
+                  <Edit fontSize="small" />
+                </ListItemIcon>
+                {lang("edit")}
+              </MenuItem>
+            </StyledLink>
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                if (active) {
+                  setOpenConfirmHide(true);
+                } else {
+                  activePlace();
+                }
+              }}
+            >
               <ListItemIcon>
-                <Edit fontSize="small" />
+                {active ? <VisibilityOffOutlined /> : <VisibilityOutlined />}
               </ListItemIcon>
-              {lang("edit")}
+              {lang(active ? "hide" : "unhide")}
             </MenuItem>
-          </StyledLink>
+          </>
         )}
         <MenuItem onClick={handleClose}>
           <ListItemIcon>
@@ -131,6 +186,34 @@ const PlaceContextMenu = React.forwardRef<
           {lang("report")}
         </MenuItem>
       </Menu>
+
+      {/* Dialog confirm hide/unhide */}
+      <Dialog
+        open={openConfirmHide}
+        keepMounted
+        onClose={() => setOpenConfirmHide(false)}
+        aria-describedby="dialog-confirm-hide-place"
+      >
+        <DialogTitle>{lang("confirm-hide-place-title")}</DialogTitle>
+        <DialogContent sx={{ minWidth: "300px" }}>
+          <DialogContentText id="dialog-confirm-hide-place">
+            {lang("confirm-hide-place-content")}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenConfirmHide(false)}>
+            {lang("cancel")}
+          </Button>
+          <Button
+            onClick={() => {
+              setOpenConfirmHide(false);
+              activePlace();
+            }}
+          >
+            {lang("agree")}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 });

@@ -25,6 +25,7 @@ const isAccessable = (
   account?: IAccountExposed
 ) => {
   if (account == null || data == null) return false;
+  if (data.active) return true;
   const follow = data.userFollow;
   if (follow == null) return false;
   return follow.role === FollowRole.PLACE && follow.subcriber === account._id;

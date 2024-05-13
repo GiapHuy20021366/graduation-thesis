@@ -248,13 +248,10 @@ const toFoodSearchBuilder = (params: IFoodSearchParams): QueryBuilder => {
     }
   }
 
-  if (query) {
-    // Query
+  if (query != null && query.length > 0) {
     builder.value("$text", {
       $search: query,
     });
-
-    // max distance on location
     if (distance != null) {
       const { max, current } = distance;
       builder.value("location.two_array", {

@@ -184,9 +184,7 @@ export default function PlaceSearchContextProvider({
         limit: 24,
       };
 
-      if (!options?.update) {
-        setData([]);
-      } else {
+      if (options?.update) {
         pagination.skip = data.length;
       }
 
@@ -194,26 +192,29 @@ export default function PlaceSearchContextProvider({
 
       loader.setIsFetching(true);
       loader.setIsError(false);
+      loader.setIsEnd(false);
 
       // progessContext.start();
       userFetcher
         .searchPlace(params, auth)
         .then((res) => {
-          const data = res.data;
-          if (data) {
-            setTimeout(() => {
-              const cookedData = data.map((d) =>
-                toPlaceExposedCooked(d, {
-                  currentCoordinates: distances.currentLocation?.coordinates,
-                  homeCoordinates: account?.location?.coordinates,
-                })
-              );
+          const datas = res.data;
+          if (datas) {
+            const cookedData = datas.map((d) =>
+              toPlaceExposedCooked(d, {
+                currentCoordinates: distances.currentLocation?.coordinates,
+                homeCoordinates: account?.location?.coordinates,
+              })
+            );
+            if (options?.update) {
+              setData([...data, ...cookedData]);
+            } else {
               setData(cookedData);
-              if (data.length < pagination.limit) {
-                loader.setIsEnd(true);
-              }
-              loader.setIsFetching(false);
-            }, 500);
+            }
+            if (datas.length < pagination.limit) {
+              loader.setIsEnd(true);
+            }
+            loader.setIsFetching(false);
           }
         })
         .catch(() => {
@@ -224,7 +225,13 @@ export default function PlaceSearchContextProvider({
           // progessContext.end();
         });
     },
-    [account?.location, auth, data.length, distances.currentLocation, loader]
+    [
+      account?.location?.coordinates,
+      auth,
+      data,
+      distances.currentLocation?.coordinates,
+      loader,
+    ]
   );
 
   const doSearchRelative = useCallback(
