@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-import { IPlaceExposedWithRatingAndFollow } from "../../../data";
+import {
+  FollowRole,
+  IAccountExposed,
+  IPlaceExposedWithRatingAndFollow,
+} from "../../../data";
 import PlaceViewerHolder from "./PlaceViewerHolder";
 import PlaceViewerRetry from "./PlaceViewerRetry";
 import {
@@ -10,16 +14,27 @@ import {
 import PageNotFound from "../../common/PageNotFound";
 import { userFetcher } from "../../../api";
 import PlaceViewerData from "./PlaceViewerData";
+import NoAccess from "../../common/NoAccess";
 
 interface PlaceViewerProps {
   id?: string;
 }
 
+const isAccessable = (
+  data?: IPlaceExposedWithRatingAndFollow,
+  account?: IAccountExposed
+) => {
+  if (account == null || data == null) return false;
+  const follow = data.userFollow;
+  if (follow == null) return false;
+  return follow.role === FollowRole.PLACE && follow.subcriber === account._id;
+};
+
 export default function PlaceViewerId({ id }: PlaceViewerProps) {
   const [data, setData] = useState<IPlaceExposedWithRatingAndFollow>();
   const [isNotFound, setIsNotFound] = useState<boolean>(false);
   const authContext = useAuthContext();
-  const auth = authContext.auth;
+  const { auth, account } = authContext;
 
   const progressContext = usePageProgessContext();
   const loader = useLoader();
@@ -71,9 +86,15 @@ export default function PlaceViewerId({ id }: PlaceViewerProps) {
     return <PageNotFound />;
   }
 
+  const accessable = isAccessable(data, account);
+
+  if (data && !accessable) {
+    return <NoAccess />;
+  }
+
   return (
     <>
-      {data && <PlaceViewerData data={data} />}
+      {data && accessable && <PlaceViewerData data={data} />}
       {loader.isFetching && <PlaceViewerHolder />}
       {loader.isError && <PlaceViewerRetry onRetry={doLoadPlace} />}
     </>

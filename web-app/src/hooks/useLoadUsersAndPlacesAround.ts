@@ -185,6 +185,7 @@ export const useLoadUsersAndPlacesAround = (
         limit: limit,
       },
       types: [type],
+      active: true,
     };
 
     return userFetcher.searchPlace(params, auth).then((res) => {

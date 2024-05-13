@@ -231,7 +231,8 @@ export const unfollowPlace = async (
 };
 
 const toPlaceSearchBuilder = (params: IPlaceSearchParams): QueryBuilder => {
-  const { author, distance, order, pagination, query, rating, types } = params;
+  const { author, distance, order, pagination, query, rating, types, active } =
+    params;
 
   const builder = new QueryBuilder();
 
@@ -240,7 +241,8 @@ const toPlaceSearchBuilder = (params: IPlaceSearchParams): QueryBuilder => {
     .pagination(pagination)
     .minMax("rating.mean", rating)
     .incAndExc("author", author)
-    .array("type", types);
+    .array("type", types)
+    .value("active", active);
 
   if (query != null && query.length > 0) {
     builder.value("$text", {

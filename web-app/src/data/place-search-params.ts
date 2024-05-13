@@ -30,4 +30,5 @@ export interface IPlaceSearchParams extends Paginationed, Queried {
   order?: IPlaceSearchOrder;
   types?: PlaceType[];
   rating?: IPlaceSearchRating;
+  active?: boolean;
 }

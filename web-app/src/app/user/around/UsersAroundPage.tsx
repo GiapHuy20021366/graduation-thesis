@@ -262,6 +262,7 @@ export default function UsersAroundPage() {
           limit: 50,
         },
         types: [type],
+        active: true,
       };
 
       return userFetcher.searchPlace(params, auth).then((res) => {

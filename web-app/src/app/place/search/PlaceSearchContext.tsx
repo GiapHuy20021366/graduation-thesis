@@ -239,6 +239,7 @@ export default function PlaceSearchContextProvider({
             max: maxDistance,
           },
           types: types,
+          active: true,
         },
         options
       );
@@ -267,6 +268,7 @@ export default function PlaceSearchContextProvider({
           order: {
             distance: order,
           },
+          active: true,
         },
         options
       );
@@ -289,6 +291,7 @@ export default function PlaceSearchContextProvider({
           order: {
             distance: order,
           },
+          active: true,
         },
         options
       );
@@ -341,6 +344,7 @@ export default function PlaceSearchContextProvider({
           },
           types: types,
           order: _order,
+          active: true,
         },
         options
       );
@@ -379,6 +383,7 @@ export default function PlaceSearchContextProvider({
           },
           types: types,
           order: _order,
+          active: true,
           ...filter,
         },
         options
