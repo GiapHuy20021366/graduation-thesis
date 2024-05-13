@@ -5,7 +5,7 @@ import BeforeJoin from "./BeforeJoin";
 import { useI18nContext } from "../../hooks";
 
 export default function SignUpPage() {
-  const [accepted, setAccepted] = useState<boolean>(false);
+  const [accepted, setAccepted] = useState<boolean>(true);
   const languageContext = useI18nContext();
   const lang = languageContext.of(SignUpPage);
 
@@ -18,7 +18,7 @@ export default function SignUpPage() {
           textAlign: "center"
         }}>
           <Stack>
-            <h1>{lang("join", "F4U")}</h1>
+            <h1>{lang("join", "CommuniFood")}</h1>
           </Stack>
           <SignUpForm />
         </Stack>

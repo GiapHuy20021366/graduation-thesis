@@ -75,7 +75,7 @@ userInstance.interceptors.response.use(
         unknown,
         ResponseErrorLike<unknown, unknown>
       >;
-      return Promise.reject(data);
+      return Promise.reject(data.error);
     }
     const _error: ResponseErrorLike<unknown, unknown> = {
       code: response?.status ?? 500,
@@ -296,15 +296,11 @@ export const userFetcher: UserFetcher = {
   activeMannualAccount: async (
     token: string
   ): Promise<UserResponse<AccountInfo>> => {
-    return userInstance.post(
-      userEndpoints.activeManual,
-      {},
-      {
-        params: {
-          token,
-        },
-      }
-    );
+    return userInstance.get(userEndpoints.activeManual, {
+      params: {
+        token,
+      },
+    });
   },
   getUsersNear: async (
     params: IGetUserNearParams,

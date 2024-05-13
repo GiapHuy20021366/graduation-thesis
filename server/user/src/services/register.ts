@@ -80,7 +80,7 @@ export const createManualAccountFromToken = async (
   const { email, firstName, lastName, password } = info.data;
 
   const account = await User.findOneByEmail(email);
-  if (account !== null) {
+  if (account != null) {
     throw new ResourceExistedError({
       message: "Email already existed",
       data: {

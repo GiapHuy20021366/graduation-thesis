@@ -87,7 +87,7 @@ export default function AppMainCenter() {
               <Setting />
             </Suspense>
           }
-        />
+        />        
         <Route path="/*" element={<PageNotFound />} />
       </Routes>
     </Grid2>

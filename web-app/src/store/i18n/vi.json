@@ -409,7 +409,12 @@
         "want-share-on": "Bạn muốn chia sẻ thực phẩm này trên",
         "your-personal-page": "Trang cá nhân của bạn",
         "confirm-hide-place-title": "Xác nhận ẩn địa điểm",
-        "confirm-hide-place-content": "Ẩn địa điểm này đồng nghĩa chỉ có bạn mới có thể xem địa điểm này. Nó cũng ẩn địa điểm khỏi công cụ tìm kiếm."
+        "confirm-hide-place-content": "Ẩn địa điểm này đồng nghĩa chỉ có bạn mới có thể xem địa điểm này. Nó cũng ẩn địa điểm khỏi công cụ tìm kiếm.",
+        "verify-your-account": "Xác thực tài khoản của bạn",
+        "all-done-sent-active": "Hoàn tất, chúng tôi đã gửi thông tin xác thực đến tài khoản email của bạn.",
+        "not-recieved-email": "Chưa nhận được email",
+        "try-again": "Thử lại",
+        "verifying": "Đang xác thực"
     },
     "Toasts": {
         "can-not-sharing-now": "Không thể chia sẻ thực phẩm vào lúc này",

@@ -57,7 +57,7 @@ foodInstance.interceptors.response.use(
         unknown,
         ResponseErrorLike<unknown, unknown>
       >;
-      return Promise.reject(data);
+      return Promise.reject(data.error);
     }
     const _error: ResponseErrorLike<unknown, unknown> = {
       code: response?.status ?? 500,

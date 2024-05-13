@@ -87,12 +87,12 @@ export default function SignUpForm() {
   const onSubmit = (data: FormValues) => {
     userFetcher
       .manualRegister(data)
-      .then(() => navigate("/signup/verify", { state: data }))
+      .then(() => navigate("/verify/signup", { state: data }))
       .catch((error) => {
         const target = error?.data?.target;
         const reason = error?.data?.reason;
         if (target === "email") {
-          if (reason === "EMAIL_EXISTED") {
+          if (reason === "email-existed") {
             setError("email", {
               message: lang("email-existed"),
             });
@@ -167,7 +167,7 @@ export default function SignUpForm() {
               <Checkbox
                 value="allowExtraEmails"
                 color="primary"
-                defaultChecked
+                checked={true}
               />
             }
             label={lang("l-allow-email")}

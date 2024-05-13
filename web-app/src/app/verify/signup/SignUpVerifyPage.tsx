@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { LoadingButton } from "@mui/lab";
 import { userFetcher } from "../../../api";
-import { useAuthContext } from "../../../hooks";
+import { useAuthContext, useComponentLanguage, useDirty } from "../../../hooks";
 
 interface IAccountInfo {
   email: string;
@@ -31,17 +31,34 @@ function WaitingEmailVerify({ account }: IWaitingEmailVerify) {
     }, 10000);
   };
 
+  const lang = useComponentLanguage();
+
   return (
     <Container>
       <Stack>
-        <h1>Verify your account</h1>
-        <p>All done, we sent active to your email</p>
-        <Link href={`https://${account.email}`}>{account.email}</Link>
+        <h1>{lang("verify-your-account")}</h1>
+        <p>{lang("all-done-sent-active")}</p>
+        <Link
+          href={`https://${account.email}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {account.email}
+        </Link>
       </Stack>
-      <Stack>
-        <p>Don't recieve email,</p>
-        <LoadingButton loading={loading} onClick={handleClick}>
-          Try again
+      <Stack
+        direction={"row"}
+        sx={{
+          alignContent: "center",
+        }}
+      >
+        <p>{lang("not-recieved-email")}?</p>
+        <LoadingButton
+          loading={loading}
+          onClick={handleClick}
+          sx={{ width: "fit-content", textTransform: "none" }}
+        >
+          {lang("try-again")}
         </LoadingButton>
       </Stack>
     </Container>
@@ -51,30 +68,35 @@ function WaitingEmailVerify({ account }: IWaitingEmailVerify) {
 function AccountTokenVerify() {
   const navigate = useNavigate();
   const auth = useAuthContext();
+  const lang = useComponentLanguage();
+  const location = window.location;
+  const token = new URLSearchParams(location.search).get("token") as
+    | string
+    | undefined;
 
+  const dirty = useDirty();
   useEffect(() => {
-    const location = window.location;
-    const token = new URLSearchParams(location.search).get("token") as
-      | string
-      | undefined;
-    if (token == null) {
-      navigate("/error/page-wrong", { replace: true });
-    } else {
-      userFetcher
-        .activeMannualAccount(token)
-        .then((response) => {
-          const account = response.data;
-          auth.setAccount(account);
-          auth.setToken(account?.token);
-        })
-        .catch((error) => {
-          console.error(error);
-          navigate("/error/page-wrong", { replace: true });
-        });
-    }
-  }, []);
+    dirty.perform(() => {
+      if (token == null) {
+        console.log("Token not found");
+        navigate("/error/page-wrong", { replace: true });
+      } else {
+        userFetcher
+          .activeMannualAccount(token)
+          .then((response) => {
+            const account = response.data;
+            auth.setAccount(account);
+            auth.setToken(account?.token);
+          })
+          .catch((error) => {
+            console.error(error);
+            navigate("/error/page-wrong", { replace: true });
+          });
+      }
+    });
+  }, [auth, dirty, navigate, token]);
 
-  return <div>Verifying...</div>;
+  return <div>{lang("verifying")}...</div>;
 }
 
 export default function SignUpVerifyPage() {
