@@ -125,6 +125,7 @@ export const sendMessageToConversation = (
   meta: ISocketServerMeta
 ) => {
   const conversationRoom = toConversationRoom(conversationId);
+  console.log(client.id, message.textContent);
   // Join this conversation first
   joinConversation(client, conversationId, meta).then(
     (conversationMeta): void => {
@@ -144,37 +145,39 @@ export const sendMessageToConversation = (
           });
 
           // Emit to participants that not in room but currently online
-          if (participants.length !== listenedUsers.length) {
-            participants.forEach((participant) => {
-              const sockets = meta.userIdToSockets[participant];
-              if (sockets == null) return;
+          participants.forEach((participant) => {
+            const sockets = meta.userIdToSockets[participant];
+            if (sockets == null) return;
 
-              if (!listenedUsers.includes(participant)) {
-                sockets.forEach((socket) => {
-                  socket.emit(
-                    socketConversationEmitKey.CONVERSATION_META,
-                    conversationMeta
-                  );
-                  socket.emit(
-                    socketConversationEmitKey.CONVERSATION_NEW_MESSAGE(),
-                    uuid,
-                    message
-                  );
-                });
-              }
-              sockets.forEach((socket) =>
+            if (!listenedUsers.includes(participant)) {
+              sockets.forEach((socket) => {
                 socket.emit(
-                  socketConversationEmitKey.CONVERSATION_NEW_MESSAGE(conversationId),
+                  socketConversationEmitKey.CONVERSATION_META,
+                  conversationMeta
+                );
+                socket.emit(
+                  socketConversationEmitKey.CONVERSATION_NEW_MESSAGE(),
                   uuid,
-                  messageExposed
-                )
-              );
-            });
-          }
+                  message
+                );
+              });
+            }
+            sockets.forEach((socket) =>
+              socket.emit(
+                socketConversationEmitKey.CONVERSATION_NEW_MESSAGE(
+                  conversationId
+                ),
+                uuid,
+                messageExposed
+              )
+            );
+          });
         })
         .catch((_error) => {
           client.emit(
-            socketConversationEmitKey.CONVERSATION_MESSAGE_ERROR(conversationId),
+            socketConversationEmitKey.CONVERSATION_MESSAGE_ERROR(
+              conversationId
+            ),
             uuid
           );
         });

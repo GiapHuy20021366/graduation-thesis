@@ -1,16 +1,15 @@
-import React from "react";
-import { Avatar, Stack, StackProps, Typography } from "@mui/material";
 import {
   IConversationCooked,
   IConversationMessageCooked,
   IConversationParticipant,
 } from "../../../data";
 import { useAuthContext } from "../../../hooks";
+import { Conversation, Avatar } from "@chatscope/chat-ui-kit-react";
 
-type ConversationListItemProps = StackProps & {
+interface IConversationListItemProps {
   active?: boolean;
   conversation: IConversationCooked;
-};
+}
 
 const toOpposite = (
   participants: IConversationParticipant[],
@@ -31,58 +30,26 @@ const toLastestMessage = (
   return messages[messages.length - 1];
 };
 
-const ConversationListItem = React.forwardRef<
-  HTMLDivElement,
-  ConversationListItemProps
->((props, ref) => {
-  const { active, conversation, ...rest } = props;
+export default function ConversationListItem({
+  conversation,
+  active,
+}: IConversationListItemProps) {
   const authContext = useAuthContext();
   const op = toOpposite(conversation.participants, authContext.account?._id);
 
   const latestMessage = toLastestMessage(conversation.messages);
 
   return (
-    <Stack
-      ref={ref}
-      direction={"row"}
-      gap={2}
-      py={1}
-      px={1}
-      boxShadow={1}
-      {...rest}
-      sx={{
-        width: "100%",
-        cursor: "pointer",
-        boxSizing: "border-box",
-        ...(props.sx ?? {}),
+    <Conversation
+      info={latestMessage?.textContent}
+      lastSenderName={latestMessage?.sender?.firstName}
+      name={op?.firstName}
+      active={active}
+      style={{
+        borderRadius: "5px",
       }}
     >
-      <Avatar
-        sx={{
-          width: [45, 60, 75, 90],
-          height: [45, 60, 75, 90],
-          cursor: "pointer",
-          boxShadow: 5,
-        }}
-        src={op?.avatar}
-      >
-        {op?.firstName[0] ?? "H"}
-      </Avatar>
-      <Stack flex={1}>
-        <Typography sx={{ fontWeight: 500 }}>
-          {op?.firstName} {op?.lastName}
-        </Typography>
-        <Typography>
-          {latestMessage && (
-            <>
-              {latestMessage.sender?.firstName} {latestMessage.sender?.lastName}
-              : {latestMessage.textContent}
-            </>
-          )}
-        </Typography>
-      </Stack>
-    </Stack>
+      <Avatar name={op?.firstName} src={op?.avatar} size="xs" />
+    </Conversation>
   );
-});
-
-export default ConversationListItem;
+}

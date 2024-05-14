@@ -70,6 +70,17 @@ export default function ConversationViewerContextProvider({
   const authContext = useAuthContext();
   const { account } = authContext;
 
+  const loadMessages = (from: number, to: number) => {
+    console.log(from, to);
+  };
+
+  useEffect(() => {
+    setMessages(conversation.messages ?? []);
+    setSendings([]);
+    setErrors([]);
+    loadMessages(Date.now() - 24 * 60 * 60 * 1000, Date.now());
+  }, [conversation]);
+
   useEffect(() => {
     const socket = socketContext.socket;
     if (socket == null) return;
@@ -103,7 +114,7 @@ export default function ConversationViewerContextProvider({
             avatar: senderInfo.avatar,
           },
         });
-        console.log("New messages", _messages);
+        // console.log("New messages", _messages);
         setMessages(_messages);
       }
     };
@@ -152,10 +163,6 @@ export default function ConversationViewerContextProvider({
     userResolver,
   ]);
 
-  const loadMessages = (from: number, to: number) => {
-    console.log(from, to);
-  };
-
   const sendMessage = (message: IConversationMessage) => {
     const socket = socketContext.socket;
     if (socket && account) {
@@ -166,7 +173,7 @@ export default function ConversationViewerContextProvider({
           ...message,
           _id: uuid,
           createdAt: new Date(),
-          udpatedAt: new Date(),
+          updatedAt: new Date(),
           sender: account._id,
         },
       ]);

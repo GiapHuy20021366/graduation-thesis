@@ -3,5 +3,5 @@ import { IConversationMessage } from "./conversation-message";
 export interface IConversationMessageExposed extends IConversationMessage {
   _id: string;
   createdAt: string | Date; // time
-  udpatedAt: string | Date;
+  updatedAt: string | Date;
 }

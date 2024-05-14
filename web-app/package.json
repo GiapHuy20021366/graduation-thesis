@@ -11,6 +11,7 @@
     "test": "vitest FoodSearchBody"
   },
   "dependencies": {
+    "@chatscope/chat-ui-kit-react": "^2.0.3",
     "@hookform/resolvers": "^3.3.2",
     "@mui/lab": "^5.0.0-alpha.153",
     "@react-google-maps/api": "^2.19.2",
