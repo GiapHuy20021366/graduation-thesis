@@ -123,10 +123,10 @@ export default function LocationPage() {
         setHome(newLocation);
         setInfoOpen(0);
         authContext.updateLocation(newLocation);
-        toastContext.success("Set location successful");
+        toastContext.success(lang("set-location-successful"));
       })
       .catch(() => {
-        toastContext.error("Can not set location now");
+        toastContext.error("cannot-set-location-now");
       });
   };
 

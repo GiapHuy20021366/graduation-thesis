@@ -416,7 +416,8 @@
         "try-again": "Thử lại",
         "verifying": "Đang xác thực",
         "SYSTEM_USER": "Người dùng hệ thống",
-        "conversation-title": "Nhắn tin"
+        "conversation-title": "Nhắn tin",
+        "set-my-location": "Đặt vị trí của tôi"
     },
     "Toasts": {
         "can-not-sharing-now": "Không thể chia sẻ thực phẩm vào lúc này",
@@ -439,7 +440,9 @@
         "user-no-description": "Người dùng không mô tả",
         "can-not-inactive-place-now": "Không thể ẩn địa điểm vào lúc này",
         "can-not-active-place-now": "Không thể hiện địa điểm vào lúc này",
-        "can-not-message-now": "Không thể nhắn tin vào lúc này"
+        "can-not-message-now": "Không thể nhắn tin vào lúc này",
+        "set-location-successful": "Cập nhật vị trí thành công",
+        "cannot-set-location-now": "Không thể cập nhật vị trí vào thời điểm hiện tại"
     },
     "PlaceList": {
         "my-label": "Của tôi",
