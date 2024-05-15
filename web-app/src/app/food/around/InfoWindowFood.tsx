@@ -34,6 +34,7 @@ function InfoWindowFoodData({ item, onOpen }: IInfoWindowFoodDataProps) {
         color: "black",
       }}
       gap={1}
+      id={item._id}
     >
       <Stack direction="row" gap={[1, 2]}>
         <Box width={"30%"}>

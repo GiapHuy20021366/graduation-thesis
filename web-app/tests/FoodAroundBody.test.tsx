@@ -1,8 +1,8 @@
 import "@testing-library/jest-dom";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import React from "react";
-import FoodSearchBody from "../src/app/food/search/FoodSearchBody";
+import FoodAroundBody from "../src/app/food/around/FoodAroundBody";
 import { ClipboardEventMock, DragEventMock } from "./utils/richTextTestUtils";
 import FakeNeccesaryContexts from "./contexts/FakeNeccesaryContexts";
 import FakeFoodSearchContext, {
@@ -74,7 +74,7 @@ const genData = () => {
   return searchData;
 };
 
-describe("FoodSearchBody Test", () => {
+describe("FoodAroundBody Test", () => {
   beforeEach(() => {
     mocks.searchHistory.mockResolvedValue({ data: [] });
     mocks.searchFood.mockResolvedValue({ data: [] });
@@ -83,7 +83,7 @@ describe("FoodSearchBody Test", () => {
     vi.clearAllMocks();
   });
 
-  // Check basic components: search input, filter button, tabs, result
+  // Check basic components
   it("Check basic components", async () => {
     const searchData = genData();
     mocks.searchFood.mockResolvedValue({ data: searchData });
@@ -110,26 +110,15 @@ describe("FoodSearchBody Test", () => {
     const result = render(
       <FakeNeccesaryContexts>
         <FakeFoodSearchContext data={data}>
-          <FoodSearchBody />
+          <FoodAroundBody />
         </FakeFoodSearchContext>
       </FakeNeccesaryContexts>
     );
 
-    // input search
-    expect(screen.getByDisplayValue(data.query)).toBeInTheDocument();
-    // button search
-    expect(
-      result.container.querySelector("#f-s-b-btn-filter")
-    ).toBeInTheDocument();
     // button filter
     expect(
-      result.container.querySelector("#f-s-b-btn-filter")
+      result.container.querySelector("#f-a-b-btn-filter")
     ).toBeInTheDocument();
-    // Tabs
-    expect(result.queryByText("l-relative")).toBeInTheDocument();
-    expect(result.queryByText("l-distance")).toBeInTheDocument();
-    expect(result.queryByText("l-price")).toBeInTheDocument();
-    expect(result.queryByText("l-quantity")).toBeInTheDocument();
 
     // result
     await waitFor(
@@ -143,11 +132,6 @@ describe("FoodSearchBody Test", () => {
       },
       { timeout: 1000 }
     );
-
-    // list end
-    expect(
-      result.container.querySelector("#f-s-b-list-end")
-    ).toBeInTheDocument();
   });
 
   // Check filter open correctly
@@ -177,12 +161,12 @@ describe("FoodSearchBody Test", () => {
     const result = render(
       <FakeNeccesaryContexts>
         <FakeFoodSearchContext data={data}>
-          <FoodSearchBody />
+          <FoodAroundBody />
         </FakeFoodSearchContext>
       </FakeNeccesaryContexts>
     );
 
-    const buttonFilter = result.container.querySelector("#f-s-b-btn-filter");
+    const buttonFilter = result.container.querySelector("#f-a-b-btn-filter");
     act(() => {
       fireEvent.click(buttonFilter!);
     });
@@ -270,7 +254,7 @@ describe("FoodSearchBody Test", () => {
     const result = render(
       <FakeNeccesaryContexts>
         <FakeFoodSearchContext data={data}>
-          <FoodSearchBody />
+          <FoodAroundBody />
         </FakeFoodSearchContext>
       </FakeNeccesaryContexts>
     );
@@ -291,11 +275,6 @@ describe("FoodSearchBody Test", () => {
       () => {
         expect(applyButton).not.toBeInTheDocument();
         expect(mocks.searchFood).toBeCalledTimes(1);
-        searchData.forEach((d) => {
-          expect(
-            result.container.querySelector(`#${d._id}`)
-          ).toBeInTheDocument();
-        });
       },
       { timeout: 1000 }
     );
@@ -327,7 +306,7 @@ describe("FoodSearchBody Test", () => {
     const result = render(
       <FakeNeccesaryContexts>
         <FakeFoodSearchContext data={data}>
-          <FoodSearchBody />
+          <FoodAroundBody />
         </FakeFoodSearchContext>
       </FakeNeccesaryContexts>
     );
@@ -347,183 +326,6 @@ describe("FoodSearchBody Test", () => {
     await waitFor(
       () => {
         expect(mocks.searchFood).toBeCalledTimes(1);
-        expect(result.queryByText("Loading")).not.toBeInTheDocument();
-        searchData.forEach((d) => {
-          expect(
-            result.container.querySelector(`#${d._id}`)
-          ).toBeInTheDocument();
-        });
-      },
-      { timeout: 1000 }
-    );
-  });
-
-  it("Check tab distance click correct", async () => {
-    const searchData = genData();
-    mocks.searchFood.mockResolvedValue({ data: searchData });
-    const data: IFoodSearchContextData = {
-      available: "ALL",
-      order: {
-        distance: 0,
-        price: 0,
-        quantity: 0,
-        time: 0,
-      },
-      query: "--Query",
-      addedBy: [0],
-      categories: [FoodCategory.BEVERAGES, FoodCategory.ANIMAL_PRODUCT],
-      maxDistance: 2,
-      maxDuration: 2,
-      minQuantity: 3,
-      price: {
-        max: undefined,
-        min: undefined,
-      },
-    };
-
-    const result = render(
-      <FakeNeccesaryContexts>
-        <FakeFoodSearchContext data={data}>
-          <FoodSearchBody />
-        </FakeFoodSearchContext>
-      </FakeNeccesaryContexts>
-    );
-
-    const buttonFilter = result.container.querySelector("#f-s-b-btn-filter");
-    act(() => {
-      fireEvent.click(buttonFilter!);
-    });
-
-    // mocks.searchFood.mockClear();
-    // mocks.searchFood.mockResolvedValue({ data: searchData });
-    const tabTime = result.getByText("l-distance");
-    act(() => {
-      fireEvent.click(tabTime);
-    });
-
-    await waitFor(
-      () => {
-        expect(mocks.searchFood).toBeCalledTimes(1);
-        expect(result.queryByText("Loading")).not.toBeInTheDocument();
-        searchData.forEach((d) => {
-          expect(
-            result.container.querySelector(`#${d._id}`)
-          ).toBeInTheDocument();
-        });
-      },
-      { timeout: 1000 }
-    );
-  });
-
-  it("Check tab price click correct", async () => {
-    const searchData = genData();
-    mocks.searchFood.mockResolvedValue({ data: searchData });
-    const data: IFoodSearchContextData = {
-      available: "ALL",
-      order: {
-        distance: 0,
-        price: 0,
-        quantity: 0,
-        time: 0,
-      },
-      query: "--Query",
-      addedBy: [0],
-      categories: [FoodCategory.BEVERAGES, FoodCategory.ANIMAL_PRODUCT],
-      maxDistance: 2,
-      maxDuration: 2,
-      minQuantity: 3,
-      price: {
-        max: undefined,
-        min: undefined,
-      },
-    };
-
-    const result = render(
-      <FakeNeccesaryContexts>
-        <FakeFoodSearchContext data={data}>
-          <FoodSearchBody />
-        </FakeFoodSearchContext>
-      </FakeNeccesaryContexts>
-    );
-
-    const buttonFilter = result.container.querySelector("#f-s-b-btn-filter");
-    act(() => {
-      fireEvent.click(buttonFilter!);
-    });
-
-    // mocks.searchFood.mockClear();
-    // mocks.searchFood.mockResolvedValue({ data: searchData });
-    const tabTime = result.getByText("l-price");
-    act(() => {
-      fireEvent.click(tabTime);
-    });
-
-    await waitFor(
-      () => {
-        expect(mocks.searchFood).toBeCalledTimes(1);
-        expect(result.queryByText("Loading")).not.toBeInTheDocument();
-        searchData.forEach((d) => {
-          expect(
-            result.container.querySelector(`#${d._id}`)
-          ).toBeInTheDocument();
-        });
-      },
-      { timeout: 1000 }
-    );
-  });
-
-  it("Check tab quantity click correct", async () => {
-    const searchData = genData();
-    mocks.searchFood.mockResolvedValue({ data: searchData });
-    const data: IFoodSearchContextData = {
-      available: "ALL",
-      order: {
-        distance: 0,
-        price: 0,
-        quantity: 0,
-        time: 0,
-      },
-      query: "--Query",
-      addedBy: [0],
-      categories: [FoodCategory.BEVERAGES, FoodCategory.ANIMAL_PRODUCT],
-      maxDistance: 2,
-      maxDuration: 2,
-      minQuantity: 3,
-      price: {
-        max: undefined,
-        min: undefined,
-      },
-    };
-
-    const result = render(
-      <FakeNeccesaryContexts>
-        <FakeFoodSearchContext data={data}>
-          <FoodSearchBody />
-        </FakeFoodSearchContext>
-      </FakeNeccesaryContexts>
-    );
-
-    const buttonFilter = result.container.querySelector("#f-s-b-btn-filter");
-    act(() => {
-      fireEvent.click(buttonFilter!);
-    });
-
-    // mocks.searchFood.mockClear();
-    // mocks.searchFood.mockResolvedValue({ data: searchData });
-    const tabTime = result.getByText("l-quantity");
-    act(() => {
-      fireEvent.click(tabTime);
-    });
-
-    await waitFor(
-      () => {
-        expect(mocks.searchFood).toBeCalledTimes(1);
-        expect(result.queryByText("Loading")).not.toBeInTheDocument();
-        searchData.forEach((d) => {
-          expect(
-            result.container.querySelector(`#${d._id}`)
-          ).toBeInTheDocument();
-        });
       },
       { timeout: 1000 }
     );

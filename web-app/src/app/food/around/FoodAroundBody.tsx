@@ -366,6 +366,7 @@ export default function FoodAroundBody() {
               color="success"
               onClick={() => setFilterOpen(true)}
               size="medium"
+              id="f-a-b-btn-filter"
             >
               <FilterAltOutlined />
             </IconButton>
