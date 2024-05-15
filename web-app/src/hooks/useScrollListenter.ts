@@ -22,7 +22,7 @@ export const useScrollListener = (
 
   useEffect(() => {
     const current = container?.current;
-    let listener = null;
+    let listener: ((e: Event) => void) | null = null;
     if (current) {
       listener = (event: Event) => {
         const element = event.target as HTMLDivElement;

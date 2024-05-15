@@ -21,7 +21,7 @@ export default function PageProgessContextProvider({
   children,
 }: IToastContextProviderProps) {
   const [loading, setLoading] = useState<boolean>(false);
-  const timeOut = useRef<number | null>(null);
+  const timeOut = useRef<NodeJS.Timeout | null>(null);
 
   const start = useCallback(() => {
     if (timeOut.current != null) {

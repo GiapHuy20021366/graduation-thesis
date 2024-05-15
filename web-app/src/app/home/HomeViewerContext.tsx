@@ -151,7 +151,6 @@ export default function HomeViewerContextProvider({
                   },
                   // active: true,
                   pagination: pagination,
-                  available: "ALL",
                   populate: {
                     place: false,
                     user: false,

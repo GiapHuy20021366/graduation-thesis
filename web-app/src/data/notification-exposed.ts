@@ -47,22 +47,24 @@ export const groupNotificationsByDuration = (
   duration: number
 ): INotificationExposed[][] => {
   const result: INotificationExposed[][] = [];
-  const dataWithDate = datas.map((d) => ({
-    ...d,
-    createdAt: new Date(d.createdAt),
-    updatedAt: new Date(d.updatedAt),
-  }));
-  dataWithDate.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  // const sorted = datas.map((d) => ({
+  //   ...d,
+  //   createdAt: new Date(d.createdAt),
+  //   updatedAt: new Date(d.updatedAt),
+  // }));
+  const sorted = datas.sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 
   let group: INotificationExposed[] | null = null;
   let index = 0;
-  while (index < dataWithDate.length) {
-    const notification = dataWithDate[index];
+  while (index < sorted.length) {
+    const notification = sorted[index];
     if (group == null) {
       group = [notification];
     } else {
-      const latestTime = group[0].createdAt.getTime();
-      const currentTime = notification.createdAt.getTime();
+      const latestTime = new Date(group[0].createdAt).getTime();
+      const currentTime = new Date(notification.createdAt).getTime();
       if (latestTime - currentTime > duration) {
         result.push(group);
         group = [notification];
@@ -89,8 +91,8 @@ export const toNotificationAnyGroups = (
       _id: group[0]._id,
       count: group.length,
       datas: group,
-      maxTime: group[0].createdAt,
-      minTime: group[group.length - 1].createdAt,
+      maxTime: new Date(group[0].createdAt),
+      minTime: new Date(group[group.length - 1].createdAt),
       read: group.every((n) => n.read),
       type: group[0].type,
     })

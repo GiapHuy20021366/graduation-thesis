@@ -21,7 +21,7 @@ const tabs: ApplicationPage[] = [
   applicationPages.FOOD,
   applicationPages.USER_AROUND,
   applicationPages.PLACE,
-] as const;
+];
 
 const AppTabs = React.forwardRef<HTMLDivElement, AppTabsProps>((props, ref) => {
   const lang = useComponentLanguage("AppTabs");
