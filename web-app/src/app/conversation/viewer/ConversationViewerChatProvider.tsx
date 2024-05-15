@@ -1,4 +1,8 @@
-import { useAuthContext, useConversationViewerContext } from "../../../hooks";
+import {
+  useAuthContext,
+  useComponentLanguage,
+  useConversationViewerContext,
+} from "../../../hooks";
 import { useEffect, useState } from "react";
 import {
   ConversationMessageType,
@@ -15,6 +19,7 @@ import {
   MessageInput,
   MessageList,
 } from "@chatscope/chat-ui-kit-react";
+import { useNavigate } from "react-router";
 
 interface IConversationMessageGroupMessage {
   sendTime: string;
@@ -31,6 +36,25 @@ interface IConversationMessageGroup {
 
 type DateCooked = Omit<IConversationMessageCooked, "updatedAt"> & {
   updatedAt: Date;
+};
+
+const toTimeAgo = (messageTime: number) => {
+  const currentTime = new Date().getTime();
+  const diffTime = currentTime - messageTime;
+  const diffSeconds = Math.floor(diffTime / 1000);
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffSeconds < 60) {
+    return "just now";
+  } else if (diffMinutes < 60) {
+    return `${diffMinutes} minutes ago`;
+  } else if (diffHours < 24) {
+    return `${diffHours} hours ago`;
+  } else {
+    return `${diffDays} days ago`;
+  }
 };
 
 const toConversationMessageGroups = (
@@ -82,7 +106,7 @@ const toConversationMessageGroups = (
         _id: i._id,
       })),
       sender: g[0].sender!,
-      sendTime: new Date(g[0].updatedAt).toISOString(),
+      sendTime: toTimeAgo(new Date(g[0].updatedAt).getTime()),
     })
   );
 };
@@ -100,9 +124,11 @@ const toOpposite = (
 
 export default function ConversationViewerData() {
   const viewerContext = useConversationViewerContext();
-  const { messages, sendMessage, conversation } = viewerContext;
+  const { messages, sendMessage, conversation, loadMessages } = viewerContext;
   const authContext = useAuthContext();
   const { account } = authContext;
+  const navigate = useNavigate();
+  const lang = useComponentLanguage();
 
   const [cookeds, setCookeds] = useState<IConversationMessageGroup[]>([]);
   useEffect(() => {
@@ -124,21 +150,38 @@ export default function ConversationViewerData() {
 
   const op = toOpposite(conversation.participants, authContext.account?._id);
 
+  const onMessageListScroll = (
+    event: React.UIEvent<HTMLDivElement, UIEvent>
+  ) => {
+    const element = event.target as HTMLDivElement;
+    const isAtBottom =
+      element.scrollHeight * 0.95 <= element.scrollTop + element.clientHeight;
+    console.log("Load message");
+    if (isAtBottom) {
+      loadMessages();
+    }
+  };
+
   return (
     <ChatContainer
       style={{ height: "100̀̀̀%", width: "100%", boxSizing: "border-box" }}
     >
       <ConversationHeader>
-        <Avatar name={op?.firstName} src={op?.avatar} />
+        <Avatar
+          name={op?.firstName}
+          src={op?.avatar}
+          style={{ cursor: "pointer" }}
+          onClick={() => navigate(`/user/${op?._id}`)}
+        />
         <ConversationHeader.Content
-          info="Người dùng hệ thống"
+          info={lang("SYSTEM_USER")}
           userName={op?.firstName}
         />
         <ConversationHeader.Actions>
           <InfoButton />
         </ConversationHeader.Actions>
       </ConversationHeader>
-      <MessageList>
+      <MessageList onScroll={onMessageListScroll}>
         {cookeds.map((group) => {
           const direction =
             group.sender._id === account?._id ? "outgoing" : "incoming";
@@ -152,7 +195,12 @@ export default function ConversationViewerData() {
                 marginTop: "30px",
               }}
             >
-              <Avatar src={group.sender.avatar} name={group.sender.firstName} />
+              <Avatar
+                src={group.sender.avatar}
+                name={group.sender.firstName}
+                style={{ cursor: "pointer" }}
+                onClick={() => navigate(`/user/${group.sender._id}`)}
+              />
               <MessageGroup.Messages>
                 <Message.Header sentTime={group.sendTime} />
                 {group.messages.map((msg) => {

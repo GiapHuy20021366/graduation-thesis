@@ -57,7 +57,9 @@ export default function ConversationViewerId({
         gap={1}
       >
         {(!isMobile || conversationId == null) && (
-          <MyConversationList sx={{ flex: 4, gap: 1 }} />
+          <MyConversationList
+            sx={{ flex: 4, gap: 1, overflowY: "auto", maxWidth: "33.33%" }}
+          />
         )}
         <Divider orientation="vertical" sx={{ backgroundColor: "inherit" }} />
         <Box sx={{ flex: 8 }} height={"100%"}>

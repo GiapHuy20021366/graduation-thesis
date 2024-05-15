@@ -17,6 +17,7 @@ export const applicationPages = {
   SET_LOCATION: "/location",
   SETTING: "/setting",
   UNKNOWN: "/unknown",
+  CONVERSATION: "/conversation",
 } as const;
 
 export type ApplicationPage =

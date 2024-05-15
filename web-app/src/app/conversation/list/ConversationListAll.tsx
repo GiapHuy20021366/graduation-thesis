@@ -2,7 +2,6 @@ import { Stack, StackProps } from "@mui/material";
 import { useConversationContext } from "../../../hooks";
 import ConversationListItem from "./ConversationListItem";
 import { useParams } from "react-router-dom";
-import { useEffect } from "react";
 import StyledLink from "../../common/navigate/StyledLink";
 import React from "react";
 import { ConversationList } from "@chatscope/chat-ui-kit-react";
@@ -17,10 +16,6 @@ const ConversationListAll = React.forwardRef<
   const params = useParams();
 
   const activeId = params.id;
-
-  useEffect(() => {
-    console.log(conversationContext.conversations);
-  }, [conversationContext.conversations]);
 
   return (
     <Stack
@@ -44,6 +39,12 @@ const ConversationListAll = React.forwardRef<
         ".cs-conversation__info-content": {
           color: "text.primary",
         },
+        ".cs-conversation__info": {
+          color: "text.primary",
+        },
+        ".cs-avatar.cs-avatar--xs": {
+          minWidth: "42.1px",
+        },
         ...props.sx,
       }}
     >
@@ -53,21 +54,21 @@ const ConversationListAll = React.forwardRef<
           width: "100%",
         }}
       >
-        {Object.entries(conversationContext.conversations).map(
-          ([conversationId, conversation]) => {
-            return (
-              <StyledLink
-                to={`/conversation/${conversationId}`}
-                key={conversationId}
-              >
-                <ConversationListItem
-                  active={activeId === conversationId}
-                  conversation={conversation}
-                />
-              </StyledLink>
-            );
-          }
-        )}
+        {conversationContext.snaps.map(({ meta, message }) => {
+          const conversationId = meta._id;
+          return (
+            <StyledLink
+              to={`/conversation/${conversationId}/view`}
+              key={conversationId}
+            >
+              <ConversationListItem
+                active={activeId === conversationId}
+                conversation={meta}
+                lstMessage={message}
+              />
+            </StyledLink>
+          );
+        })}
       </ConversationList>
     </Stack>
   );

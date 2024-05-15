@@ -4,6 +4,8 @@ import {
   IConversationMessageExposed,
   IPagination,
   InternalError,
+  OrderState,
+  QueryBuilder,
   ResourceNotExistedError,
   UnauthorizationError,
 } from "../data";
@@ -151,16 +153,21 @@ export const newConversationMessage = async (
 
 export const getMessages = async (
   conversationId: string,
-  from: number,
-  to: Number
+  from: number | null,
+  to: number | null,
+  limit: number | null
 ): Promise<IConversationMessageExposed[]> => {
-  const messages = await ConversationMessage.find({
-    conversation: conversationId,
-    createdAt: {
-      $gte: from,
-      $lte: to,
-    },
-  }).exec();
+  const builder = new QueryBuilder()
+    .minMax("createdAt", { min: from, max: to })
+    .pagination({ limit: limit ?? 50, skip: 0 })
+    .value("conversation", conversationId)
+    .order("createdAt", OrderState.DECREASE);
+
+  const messages = await ConversationMessage.find(builder.options)
+    .skip(builder.skip)
+    .limit(builder.limit)
+    .sort(builder.sort)
+    .exec();
 
   return messages.map((message) => ({
     _id: message._id.toString(),

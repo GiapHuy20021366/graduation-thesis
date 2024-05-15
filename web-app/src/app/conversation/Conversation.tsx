@@ -6,7 +6,7 @@ export default function Conversation() {
   return (
     <Routes>
       <Route path="/" element={<ConversationViewerId />} />
-      <Route path="/:id" element={<ConversationViewerId />} />
+      <Route path="/:id/view" element={<ConversationViewerId />} />
     </Routes>
   );
 }

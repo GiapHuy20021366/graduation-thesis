@@ -1,6 +1,10 @@
 import { IconButton, Stack, StackProps, Tooltip } from "@mui/material";
 import SideBarOpener from "../../common/menu-side/SideBarOpener";
-import { BookmarkAddOutlined, SearchOutlined } from "@mui/icons-material";
+import {
+  BookmarkAddOutlined,
+  MarkChatUnreadOutlined,
+  SearchOutlined,
+} from "@mui/icons-material";
 import StyledLink from "../../common/navigate/StyledLink";
 import NotificationButtonAction from "./utils/notification/NotificationButtonAction";
 import { applicationPages, useComponentLanguage } from "../../../hooks";
@@ -25,26 +29,35 @@ const AppHeaderUtil = React.forwardRef<HTMLDivElement, AppHeaderUtilProps>(
           color="inherit"
           IconPropsSx={{ width: "1.3em", height: "1.3em" }}
         />
-        <Tooltip arrow title={lang("add-food-title")}>
-          <StyledLink to={applicationPages.FOOD_SHARING}>
+        <StyledLink to={applicationPages.FOOD_SHARING}>
+          <Tooltip arrow title={lang("add-food-title")}>
             <IconButton color="inherit">
               <BookmarkAddOutlined sx={{ width: "1.3em", height: "1.3em" }} />
             </IconButton>
-          </StyledLink>
-        </Tooltip>
+          </Tooltip>
+        </StyledLink>
         <Tooltip arrow title={lang("notification-title")}>
           <NotificationButtonAction
             color="inherit"
             IconPropsSx={{ width: "1.3em", height: "1.3em" }}
           />
         </Tooltip>
-        <Tooltip arrow title={lang("search-food-title")}>
-          <StyledLink to={applicationPages.FOOD_SEARCH}>
+        <StyledLink to={applicationPages.FOOD_SEARCH}>
+          <Tooltip arrow title={lang("search-food-title")}>
             <IconButton color="inherit">
               <SearchOutlined sx={{ width: "1.3em", height: "1.3em" }} />
             </IconButton>
-          </StyledLink>
-        </Tooltip>
+          </Tooltip>
+        </StyledLink>
+        <StyledLink to={applicationPages.CONVERSATION}>
+          <Tooltip arrow title={lang("conversation-title")}>
+            <IconButton color="inherit">
+              <MarkChatUnreadOutlined
+                sx={{ width: "1.1em", height: "1.1em" }}
+              />
+            </IconButton>
+          </Tooltip>
+        </StyledLink>
       </Stack>
     );
   }

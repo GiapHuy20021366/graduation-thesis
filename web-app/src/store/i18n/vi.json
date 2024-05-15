@@ -414,7 +414,9 @@
         "all-done-sent-active": "Hoàn tất, chúng tôi đã gửi thông tin xác thực đến tài khoản email của bạn.",
         "not-recieved-email": "Chưa nhận được email",
         "try-again": "Thử lại",
-        "verifying": "Đang xác thực"
+        "verifying": "Đang xác thực",
+        "SYSTEM_USER": "Người dùng hệ thống",
+        "conversation-title": "Nhắn tin"
     },
     "Toasts": {
         "can-not-sharing-now": "Không thể chia sẻ thực phẩm vào lúc này",
@@ -436,7 +438,8 @@
         "cannot-action-now": "Không thể thực hiện hành động này bây giờ",
         "user-no-description": "Người dùng không mô tả",
         "can-not-inactive-place-now": "Không thể ẩn địa điểm vào lúc này",
-        "can-not-active-place-now": "Không thể hiện địa điểm vào lúc này"
+        "can-not-active-place-now": "Không thể hiện địa điểm vào lúc này",
+        "can-not-message-now": "Không thể nhắn tin vào lúc này"
     },
     "PlaceList": {
         "my-label": "Của tôi",

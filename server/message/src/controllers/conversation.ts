@@ -73,11 +73,15 @@ export const createConversation = async (
 };
 
 export const getConversationMessages = async (
-  req: Request<{ id: string }, {}, {}, { from: string; to: string }>,
+  req: Request<
+    { id: string },
+    {},
+    {},
+    { from?: string; to?: string; limit?: string }
+  >,
   res: Response,
   next: NextFunction
 ) => {
-  const auth = req.authContext;
   const id = req.params.id;
   if (!isObjectId(id)) {
     return next(
@@ -90,16 +94,15 @@ export const getConversationMessages = async (
       })
     );
   }
-  const from = +req.query.from;
-  const to = +req.query.to;
-  if (isNaN(from) || isNaN(to)) {
-    return next(
-      new InvalidDataError({
-        message: `Invalid from ${req.query.from} and to ${req.query.to}`,
-      })
-    );
-  }
-  getConversationMessagesService(id, from, to)
+
+  const from = +(req.query.from ?? "");
+  const to = +(req.query.to ?? "");
+  const limit = +(req.query.limit ?? "");
+  const fromVal = !isNaN(from) ? from : null;
+  const toVal = !isNaN(to) ? to : null;
+  const limitVal = !isNaN(limit) ? limit : 50;
+
+  getConversationMessagesService(id, fromVal, toVal, limitVal)
     .then((data) => res.status(200).json(toResponseSuccessData(data)))
     .catch(next);
 };

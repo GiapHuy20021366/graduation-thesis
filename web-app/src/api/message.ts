@@ -67,8 +67,9 @@ export interface MessageFetcher {
 
   getConversationMessages: (
     id: string,
-    from: number,
-    to: number,
+    from: number | null,
+    to: number | null,
+    limit: number | null,
     auth: IAuthInfo
   ) => Promise<MessageResponse<IConversationMessageExposed[]>>;
 
@@ -132,13 +133,24 @@ export const messageFetcher: MessageFetcher = {
 
   getConversationMessages: (
     id: string,
-    from: number,
-    to: number,
+    from: number | null,
+    to: number | null,
+    limit: number | null,
     auth: IAuthInfo
   ): Promise<MessageResponse<IConversationMessageExposed[]>> => {
+    const buider = new URLSearchParams();
+    if (from != null) {
+      buider.set("from", String(from));
+    }
+    if (to != null) {
+      buider.set("to", String(to));
+    }
+    if (limit != null) {
+      buider.set("limit", String(limit));
+    }
     return messageInstance.get(
       messageEndpoints.getConversationMessages.replace(":id", id) +
-        `?from=${from}&to=${to}`,
+        `?${buider.toString()}`,
       {
         headers: {
           Authorization: auth.token,

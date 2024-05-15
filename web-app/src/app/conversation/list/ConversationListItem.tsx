@@ -9,6 +9,7 @@ import { Conversation, Avatar } from "@chatscope/chat-ui-kit-react";
 interface IConversationListItemProps {
   active?: boolean;
   conversation: IConversationCooked;
+  lstMessage?: IConversationMessageCooked;
 }
 
 const toOpposite = (
@@ -33,11 +34,12 @@ const toLastestMessage = (
 export default function ConversationListItem({
   conversation,
   active,
+  lstMessage,
 }: IConversationListItemProps) {
   const authContext = useAuthContext();
   const op = toOpposite(conversation.participants, authContext.account?._id);
 
-  const latestMessage = toLastestMessage(conversation.messages);
+  const latestMessage = lstMessage ?? toLastestMessage(conversation.messages);
 
   return (
     <Conversation

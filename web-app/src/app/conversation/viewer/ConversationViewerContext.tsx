@@ -1,16 +1,23 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   IConversationCooked,
-  IConversationExposed,
   IConversationMessage,
   IConversationMessageCooked,
   IConversationMessageExposed,
 } from "../../../data";
 import {
   useAuthContext,
+  useConversationContext,
   useSocketContext,
   useUserResolver,
 } from "../../../hooks";
+import { messageFetcher } from "../../../api";
 
 interface IConversationViewerContextProviderProps {
   children?: React.ReactNode;
@@ -19,7 +26,7 @@ interface IConversationViewerContextProviderProps {
 
 interface IConversationViewerContext {
   messages: IConversationMessageCooked[];
-  loadMessages: (from: number, to: number) => void;
+  loadMessages: (to?: number | null) => void;
   sendMessage: (message: IConversationMessage) => void;
   conversation: IConversationCooked;
 }
@@ -59,6 +66,8 @@ export default function ConversationViewerContextProvider({
   conversation,
 }: IConversationViewerContextProviderProps) {
   const socketContext = useSocketContext();
+  const chatGlobalContext = useConversationContext();
+  const { doPushMessage, updateSnaps } = chatGlobalContext;
   const conversationId = conversation._id;
   const [messages, setMessages] = useState<IConversationMessageCooked[]>(
     conversation.messages ?? []
@@ -68,26 +77,78 @@ export default function ConversationViewerContextProvider({
 
   const userResolver = useUserResolver();
   const authContext = useAuthContext();
-  const { account } = authContext;
+  const { account, auth } = authContext;
+  const currentConversationRef = useRef<string>();
 
-  const loadMessages = (from: number, to: number) => {
-    console.log(from, to);
-  };
+  const loadMessages = useCallback(
+    (to?: number | null, refresh?: boolean) => {
+      if (auth == null) {
+        return;
+      }
+      const first = messages[0];
+      to ??=
+        refresh || first == null
+          ? Date.now()
+          : new Date(first.createdAt).getTime();
+
+      const targets = refresh ? [] : messages.slice();
+
+      messageFetcher
+        .getConversationMessages(conversation._id, null, to, null, auth)
+        .then((res) => {
+          const datas = res.data;
+          if (datas != null) {
+            const participants = conversation.participants;
+            const cookeds: IConversationMessageCooked[] = datas.map((msg) => {
+              const sender = participants.find((p) => p._id === msg.sender);
+              return {
+                ...msg,
+                sender,
+              };
+            });
+            const all = targets.slice();
+            cookeds.forEach((cooked) => {
+              if (all.findIndex((a) => a._id === cooked._id) === -1) {
+                all.unshift(cooked);
+              }
+            });
+            setMessages(all);
+            if (all.length > 0) {
+              const lst = all[all.length - 1];
+              updateSnaps(lst);
+            }
+          }
+        });
+    },
+    [auth, conversation._id, conversation.participants, messages, updateSnaps]
+  );
 
   useEffect(() => {
-    setMessages(conversation.messages ?? []);
-    setSendings([]);
-    setErrors([]);
-    loadMessages(Date.now() - 24 * 60 * 60 * 1000, Date.now());
-  }, [conversation]);
+    const current = currentConversationRef.current;
+    if (current !== conversation._id) {
+      currentConversationRef.current = conversation._id;
+      // const messages = conversation.messages;
+      setMessages([]);
+      setSendings([]);
+      setErrors([]);
+      // let lstTime: number | null = null;
+      // if (messages != null) {
+      //   const first = messages[0];
+      //   if (first != null) {
+      //     lstTime = new Date(first.createdAt).getTime();
+      //   }
+      // }
+      loadMessages(null, true);
+    }
+  }, [conversation, loadMessages]);
 
   useEffect(() => {
     const socket = socketContext.socket;
     if (socket == null) return;
 
-    const onConversationMeta = (conversation: IConversationExposed) => {
-      console.log(conversation);
-    };
+    // const onConversationMeta = (conversation: IConversationExposed) => {
+    //   console.log(conversation);
+    // };
 
     const onConversationNewMessage = (
       uuid: string,
@@ -104,7 +165,7 @@ export default function ConversationViewerContextProvider({
       const _messages = messages.slice();
       const msgIndex = _messages.findIndex((msg) => msg._id === message._id);
       if (msgIndex === -1) {
-        console.log(uuid, message);
+        // console.log(uuid, message);
         _messages.push({
           ...message,
           sender: senderInfo && {
@@ -114,13 +175,14 @@ export default function ConversationViewerContextProvider({
             avatar: senderInfo.avatar,
           },
         });
-        // console.log("New messages", _messages);
         setMessages(_messages);
+        updateSnaps(_messages[_messages.length - 1]);
+        // doPushMessage(message);
       }
     };
 
     const onConversationMessageError = (uuid: string) => {
-      console.log(uuid);
+      // console.log(uuid);
       const _errors = errors.slice();
       _errors.push(uuid);
       setErrors(_errors);
@@ -131,7 +193,7 @@ export default function ConversationViewerContextProvider({
       onConversationNewMessage
     );
 
-    socket.on(ConversationViewerOnKey.CONVERSATION_META, onConversationMeta);
+    // socket.on(ConversationViewerOnKey.CONVERSATION_META, onConversationMeta);
 
     socket.on(
       ConversationViewerOnKey.CONVERSATION_MESSAGE_ERROR(conversationId),
@@ -144,10 +206,10 @@ export default function ConversationViewerContextProvider({
         onConversationNewMessage
       );
 
-      socket.removeListener(
-        ConversationViewerOnKey.CONVERSATION_META,
-        onConversationMeta
-      );
+      // socket.removeListener(
+      //   ConversationViewerOnKey.CONVERSATION_META,
+      //   onConversationMeta
+      // );
 
       socket.removeListener(
         ConversationViewerOnKey.CONVERSATION_MESSAGE_ERROR(conversationId),
@@ -156,10 +218,12 @@ export default function ConversationViewerContextProvider({
     };
   }, [
     conversationId,
+    doPushMessage,
     errors,
     messages,
     sendings,
     socketContext.socket,
+    updateSnaps,
     userResolver,
   ]);
 

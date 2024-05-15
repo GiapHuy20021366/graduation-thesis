@@ -27,10 +27,12 @@ const AppTabs = React.forwardRef<HTMLDivElement, AppTabsProps>((props, ref) => {
   const lang = useComponentLanguage("AppTabs");
   const page = usePageResolver();
 
+  const pageIndex = Math.max(0, tabs.indexOf(page.page));
+
   return (
     <Tabs
       ref={ref}
-      value={tabs.indexOf(page.page)}
+      value={pageIndex}
       variant="scrollable"
       scrollButtons
       allowScrollButtonsMobile
