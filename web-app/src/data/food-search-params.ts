@@ -65,11 +65,11 @@ export interface IFoodSearchParams extends Queried, Paginationed {
   price?: IFoodSearchPrice;
   addedBy?: PlaceType[];
   active?: boolean;
-  order?: IFoodSeachOrder;
-  populate?: IFoodSearchPopulate;
   resolved?: boolean;
   resolveBy?: IFoodPostResolveBy;
   time?: IFoodSearchTime;
   duration?: IFoodSearchDuration;
   quantity?: IFoodSearchQuantity;
+  populate?: IFoodSearchPopulate;
+  order?: IFoodSeachOrder;
 }
