@@ -1,23 +1,16 @@
 [
     {
-        "test": {},
+        "test": {
+            "message": "It does not depend on any params"
+        },
         "input": {
             "body": {}
         }
     },
     {
-        "test": {},
-        "input": {
-            "body": {
-                "pagination": {
-                    "skip": 0,
-                    "limit": 10
-                }
-            }
-        }
-    },
-    {
-        "test": {},
+        "test": {
+            "message": "It should return place that author include user(s) and exclude user(s)"
+        },
         "input": {
             "body": {
                 "author": {
@@ -32,7 +25,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return place that author include user(s)"
+        },
         "input": {
             "body": {
                 "author": {
@@ -44,7 +39,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return place that author exclude user(s)"
+        },
         "body": {
             "author": {
                 "exclude": [
@@ -54,7 +51,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return place that have distance from current maximun x (kms)"
+        },
         "input": {
             "distance": {
                 "max": 10,
@@ -66,86 +65,9 @@
         }
     },
     {
-        "test": {},
-        "input": {
-            "body": {
-                "distance": {
-                    "max": 10
-                }
-            }
-        }
-    },
-    {
-        "test": {},
-        "input": {
-            "distance": {
-                "current": {
-                    "lat": 21.040621,
-                    "lng": 105.777413
-                }
-            }
-        }
-    },
-    {
-        "test": {},
-        "input": {
-            "order": {
-                "distance": 1
-            }
-        }
-    },
-    {
-        "test": {},
-        "input": {
-            "body": {
-                "order": {
-                    "distance": -1
-                }
-            }
-        }
-    },
-    {
-        "test": {},
-        "input": {
-            "body": {
-                "order": {
-                    "rating": 1
-                }
-            }
-        }
-    },
-    {
-        "test": {},
-        "input": {
-            "body": {
-                "order": {
-                    "rating": -1
-                }
-            }
-        }
-    },
-    {
-        "test": {},
-        "input": {
-            "body": {
-                "order": {
-                    "time": 1
-                }
-            }
-        }
-    },
-    {
-        "test": {},
-        "input": {
-            "body": {
-                "order": {
-                    "time": -1
-                }
-            }
-        }
-    },
-    {
-        "test": {},
+        "test": {
+            "message": "It should return only personal place (type = 0)"
+        },
         "input": {
             "body": {
                 "type": [
@@ -155,7 +77,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return only volunteer place (type = 1)"
+        },
         "input": {
             "body": {
                 "type": [
@@ -165,7 +89,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return only eatery place (type = 2)"
+        },
         "input": {
             "body": {
                 "type": [
@@ -175,7 +101,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return only restaurant place (type = 4)"
+        },
         "input": {
             "body": {
                 "type": [
@@ -185,7 +113,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return only supermarket place (type = 8)"
+        },
         "input": {
             "body": {
                 "type": [
@@ -195,7 +125,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return only grocery place (type = 16)"
+        },
         "input": {
             "body": {
                 "type": [
@@ -205,7 +137,46 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return place that rating in range [min, max]"
+        },
+        "input": {
+            "body": {
+                "rating": {
+                    "min": 2,
+                    "max": 4
+                }
+            }
+        }
+    },
+    {
+        "test": {
+            "message": "It should return place that rating in range [min, +infinity]"
+        },
+        "input": {
+            "body": {
+                "rating": {
+                    "min": 2
+                }
+            }
+        }
+    },
+    {
+        "test": {
+            "message": "It should return place that rating in range [-infinity, max]"
+        },
+        "input": {
+            "body": {
+                "rating": {
+                    "max": 4
+                }
+            }
+        }
+    },
+    {
+        "test": {
+            "message": "It should return active place(s)"
+        },
         "input": {
             "body": {
                 "active": true
@@ -213,7 +184,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return inactive place(s)"
+        },
         "input": {
             "body": {
                 "active": false
@@ -221,32 +194,84 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return maximun limit place(s)"
+        },
         "input": {
             "body": {
-                "rating": {
-                    "min": 0
+                "pagination": {
+                    "skip": 0,
+                    "limit": 10
                 }
             }
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should place that distance order increase"
+        },
+        "input": {
+            "order": {
+                "distance": 1
+            }
+        }
+    },
+    {
+        "test": {
+            "message": "It should place that distance order decrease"
+        },
         "input": {
             "body": {
-                "rating": {
-                    "max": 4
+                "order": {
+                    "distance": -1
                 }
             }
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should place that rating order increase"
+        },
         "input": {
             "body": {
-                "rating": {
-                    "min": 0,
-                    "max": 4
+                "order": {
+                    "rating": 1
+                }
+            }
+        }
+    },
+    {
+        "test": {
+            "message": "It should place that rating order decrease"
+        },
+        "input": {
+            "body": {
+                "order": {
+                    "rating": -1
+                }
+            }
+        }
+    },
+    {
+        "test": {
+            "message": "It should place that time order increase"
+        },
+        "input": {
+            "body": {
+                "order": {
+                    "time": 1
+                }
+            }
+        }
+    },
+    {
+        "test": {
+            "message": "It should place that time order decrease"
+        },
+        "input": {
+            "body": {
+                "order": {
+                    "time": -1
                 }
             }
         }

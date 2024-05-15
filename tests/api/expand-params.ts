@@ -1,4 +1,5 @@
 interface IFoodSearchParams {
+  query?: string;
   user?: {
     include?: string[];
     exclude?: string[];
@@ -15,14 +16,33 @@ interface IFoodSearchParams {
     };
   };
   category?: string | string[];
-  maxDuration?: number;
   price?: {
     min?: number;
     max?: number;
   };
-  minQuantity?: number;
   addedBy?: (0 | 1 | 2 | 4 | 8 | 16)[];
-  available?: "ALL" | "AVAIABLE_ONLY" | "JUST_GONE";
+  resolved?: boolean;
+  resolveBy?: {
+    include?: string[];
+    exclude?: string[];
+  };
+  active?: boolean;
+  time?: {
+    from?: number;
+    to?: number;
+  };
+  duration?: {
+    from?: number;
+    to?: number;
+  };
+  quantity?: {
+    min?: number;
+    max?: number;
+  };
+  pagination?: {
+    skip: number;
+    limit: number;
+  };
   order?: {
     distance?: -1 | 1 | 0;
     time?: -1 | 1 | 0;
@@ -33,24 +53,9 @@ interface IFoodSearchParams {
     user?: boolean;
     place?: boolean;
   };
-  resolved?: boolean;
-  resolveBy?: {
-    include?: string[];
-    exclude?: string[];
-  };
-  pagination?: {
-    skip: number;
-    limit: number;
-  };
-  query?: string;
-  active?: boolean;
 }
 
 interface IPlaceSearchParams {
-  pagination?: {
-    skip: number;
-    limit: number;
-  };
   query?: string;
   author?: {
     include?: string[];
@@ -63,17 +68,21 @@ interface IPlaceSearchParams {
       lng: number;
     };
   };
-  order?: {
-    distance?: -1 | 1 | 0;
-    rating?: -1 | 1 | 0;
-    time?: -1 | 1 | 0;
-  };
   types?: (0 | 1 | 2 | 4 | 8 | 16)[];
   rating?: {
     min?: number;
     max?: number;
   };
   active?: boolean;
+  pagination?: {
+    skip: number;
+    limit: number;
+  };
+  order?: {
+    distance?: -1 | 1 | 0;
+    rating?: -1 | 1 | 0;
+    time?: -1 | 1 | 0;
+  };
 }
 
 interface IFoodPostUploadData {

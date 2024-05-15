@@ -1,6 +1,18 @@
 [
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that title include query"
+        },
+        "input": {
+            "body": {
+                "query": "Tôm"
+            }
+        }
+    },
+    {
+        "test": {
+            "message": "It should return foods that author include user(s) and exclude user(s)"
+        },
         "input": {
             "body": {
                 "user": {
@@ -15,7 +27,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that author include user(s)"
+        },
         "input": {
             "body": {
                 "user": {
@@ -27,7 +41,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that author exclude user(s)"
+        },
         "input": {
             "body": {
                 "user": {
@@ -39,7 +55,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that posted by a place, include place(s) and exclude place(s)"
+        },
         "input": {
             "body": {
                 "place": {
@@ -54,7 +72,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that posted by a place, ixclude place(s)"
+        },
         "input": {
             "body": {
                 "place": {
@@ -66,7 +86,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that posted by a place, exclude place(s)"
+        },
         "input": {
             "body": {
                 "place": {
@@ -78,7 +100,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that have distance from position maximumn x (kms)"
+        },
         "input": {
             "body": {
                 "distance": {
@@ -92,30 +116,9 @@
         }
     },
     {
-        "test": {},
-        "input": {
-            "body": {
-                "distance": {
-                    "max": 10
-                }
-            }
-        }
-    },
-    {
-        "test": {},
-        "input": {
-            "body": {
-                "distance": {
-                    "current": {
-                        "lat": 21.040621,
-                        "lng": 105.777413
-                    }
-                }
-            }
-        }
-    },
-    {
-        "test": {},
+        "test": {
+            "message": "It should return foods that have only category(s)"
+        },
         "input": {
             "body": {
                 "category": [
@@ -126,7 +129,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that not depend on category(s)"
+        },
         "input": {
             "body": {
                 "category": []
@@ -134,15 +139,9 @@
         }
     },
     {
-        "test": {},
-        "input": {
-            "body": {
-                "maxDuration": 3
-            }
-        }
-    },
-    {
-        "test": {},
+        "test": {
+            "message": "It should return foods that have price in range [min, max]"
+        },
         "input": {
             "body": {
                 "price": {
@@ -153,7 +152,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that have price in range [min, +infinity]"
+        },
         "input": {
             "body": {
                 "price": {
@@ -163,7 +164,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that have price in range [-infinity, max]"
+        },
         "input": {
             "body": {
                 "price": {
@@ -173,15 +176,9 @@
         }
     },
     {
-        "test": {},
-        "input": {
-            "body": {
-                "minQuantity": 4
-            }
-        }
-    },
-    {
-        "test": {},
+        "test": {
+            "message": "It should return foods that added by personal (not place)"
+        },
         "input": {
             "body": {
                 "addedBy": [
@@ -191,7 +188,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that added by volunteer place (type=1)"
+        },
         "input": {
             "body": {
                 "addedBy": [
@@ -201,7 +200,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that added by eatery place (type=2)"
+        },
         "input": {
             "body": {
                 "addedBy": [
@@ -211,17 +212,9 @@
         }
     },
     {
-        "test": {},
-        "input": {
-            "body": {
-                "addedBy": [
-                    3
-                ]
-            }
-        }
-    },
-    {
-        "test": {},
+        "test": {
+            "message": "It should return foods that added by restaurant place (type=4)"
+        },
         "input": {
             "body": {
                 "addedBy": [
@@ -231,41 +224,33 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that added by supermarket place (type=8)"
+        },
         "input": {
             "body": {
                 "addedBy": [
-                    5
+                    8
                 ]
             }
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that added by grocery place (type=16)"
+        },
         "input": {
             "body": {
-                "available": "ALL"
+                "addedBy": [
+                    16
+                ]
             }
         }
     },
     {
-        "test": {},
-        "input": {
-            "body": {
-                "available": "AVAILABLE_ONLY"
-            }
-        }
-    },
-    {
-        "test": {},
-        "input": {
-            "body": {
-                "available": "JUST_GONE"
-            }
-        }
-    },
-    {
-        "test": {},
+        "test": {
+            "message": "It should return foods that resolved"
+        },
         "input": {
             "body": {
                 "resolved": true
@@ -273,7 +258,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that not resolved"
+        },
         "input": {
             "body": {
                 "resolved": false
@@ -281,42 +268,9 @@
         }
     },
     {
-        "test": {},
-        "input": {
-            "body": {
-                "query": "Tôm"
-            }
-        }
-    },
-    {
-        "test": {},
-        "input": {
-            "body": {
-                "active": true
-            }
-        }
-    },
-    {
-        "test": {},
-        "input": {
-            "body": {
-                "active": false
-            }
-        }
-    },
-    {
-        "test": {},
-        "input": {
-            "body": {
-                "pagination": {
-                    "skip": 0,
-                    "limit": 10
-                }
-            }
-        }
-    },
-    {
-        "test": {},
+        "test": {
+            "message": "It should return foods that resolved by include user(s) and exclude user(s)"
+        },
         "input": {
             "body": {
                 "resolveBy": {
@@ -331,7 +285,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that resolved by include user(s)"
+        },
         "input": {
             "body": {
                 "resolveBy": {
@@ -343,7 +299,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that resolved by exclude user(s)"
+        },
         "input": {
             "body": {
                 "resolveBy": {
@@ -355,7 +313,153 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that currently active"
+        },
+        "input": {
+            "body": {
+                "active": true
+            }
+        }
+    },
+    {
+        "test": {
+            "message": "It should return foods that currently not active"
+        },
+        "input": {
+            "body": {
+                "active": false
+            }
+        }
+    },
+    {
+        "test": {
+            "message": "It should return foods that posted in time range [from, to]"
+        },
+        "input": {
+            "body": {
+                "time": {
+                    "from": 1715778597636,
+                    "to": 1.7163834e+12
+                }
+            }
+        }
+    },
+    {
+        "test": {
+            "message": "It should return foods that posted in time range [from, +infinity]"
+        },
+        "input": {
+            "body": {
+                "time": {
+                    "from": 1715778597636
+                }
+            }
+        }
+    },
+    {
+        "test": {
+            "message": "It should return foods that posted in time range [-infinity, to]"
+        },
+        "input": {
+            "body": {
+                "time": {
+                    "to": 1.7163834e+12
+                }
+            }
+        }
+    },
+    {
+        "test": {
+            "message": "It should return foods that duration in time range [from, to]"
+        },
+        "input": {
+            "body": {
+                "duration": {
+                    "from": 1715778597636,
+                    "to": 1.7163834e+12
+                }
+            }
+        }
+    },
+    {
+        "test": {
+            "message": "It should return foods that duration in duration range [from, +infinity]"
+        },
+        "input": {
+            "body": {
+                "duration": {
+                    "from": 1715778597636
+                }
+            }
+        }
+    },
+    {
+        "test": {
+            "message": "It should return foods that duration in duration range [-infinity, to]"
+        },
+        "input": {
+            "body": {
+                "duration": {
+                    "to": 1.7163834e+12
+                }
+            }
+        }
+    },
+    {
+        "test": {
+            "message": "It should return foods that quantity in range [min, max]"
+        },
+        "input": {
+            "body": {
+                "quantity": {
+                    "min": 2,
+                    "max": 4
+                }
+            }
+        }
+    },
+    {
+        "test": {
+            "message": "It should return foods that quantity in range [min, +infinity]"
+        },
+        "input": {
+            "body": {
+                "quantity": {
+                    "min": 2
+                }
+            }
+        }
+    },
+    {
+        "test": {
+            "message": "It should return foods that quantity in range [-infinity, max]"
+        },
+        "input": {
+            "body": {
+                "quantity": {
+                    "max": 2
+                }
+            }
+        }
+    },
+    {
+        "test": {
+            "message": "It should return maximumn limit food(s)"
+        },
+        "input": {
+            "body": {
+                "pagination": {
+                    "skip": 0,
+                    "limit": 10
+                }
+            }
+        }
+    },
+    {
+        "test": {
+            "message": "It should return foods that order by time descrease"
+        },
         "input": {
             "body": {
                 "order": {
@@ -365,7 +469,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that order by time increase"
+        },
         "input": {
             "body": {
                 "order": {
@@ -375,7 +481,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that order by distance decrease"
+        },
         "input": {
             "body": {
                 "order": {
@@ -385,7 +493,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that order by distance increase"
+        },
         "input": {
             "body": {
                 "order": {
@@ -395,7 +505,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that order by price decrease"
+        },
         "input": {
             "body": {
                 "order": {
@@ -405,7 +517,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that order by price increase"
+        },
         "input": {
             "body": {
                 "order": {
@@ -415,7 +529,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that order by quantity decrease"
+        },
         "input": {
             "body": {
                 "order": {
@@ -425,7 +541,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It should return foods that order by quantity increase"
+        },
         "input": {
             "body": {
                 "order": {
@@ -435,7 +553,9 @@
         }
     },
     {
-        "test": {},
+        "test": {
+            "message": "It does not depend on any filter options"
+        },
         "input": {
             "body": {}
         }
