@@ -3,6 +3,6 @@ export default {
     image: "images",
     foodPost: "food-posts",
     foodSearchHistory: "search-histories",
-    foodUserLike: "food-post-user-likes",
+    foodUserLike: "food-likes",
     userCached: "user-caches"
 }

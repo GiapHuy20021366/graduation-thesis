@@ -148,7 +148,7 @@ export default function FoodAroundBody() {
         .searchFood(params, auth)
         .then((data) => {
           const datas = data.data;
-          if (datas != null && datas.length > 0) {
+          if (datas != null) {
             setGroups(toGroups(datas));
           }
           fetching.deactive();
@@ -290,19 +290,19 @@ export default function FoodAroundBody() {
         distance: OrderState.INCREASE,
       },
     };
-    paramsToSearch.time = {};
+    paramsToSearch.duration = {};
     if (params.maxDuration != null) {
-      paramsToSearch.time.to =
+      paramsToSearch.duration.to =
         Date.now() + params.maxDuration * 24 * 60 * 60 * 1000;
     }
     switch (params.available) {
       case "ALL":
         break;
       case "AVAILABLE_ONLY":
-        paramsToSearch.time.from = Date.now();
+        paramsToSearch.duration.from = Date.now();
         break;
       case "JUST_GONE":
-        paramsToSearch.time.to = Date.now() - 1;
+        paramsToSearch.duration.to = Date.now() - 1;
     }
     if (params.minQuantity != null) {
       paramsToSearch.quantity = {

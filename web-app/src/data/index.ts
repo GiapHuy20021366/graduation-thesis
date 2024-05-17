@@ -191,3 +191,4 @@ export {
   parseError,
   utilRetry,
 } from "./hook-fetch-like";
+export { toFoods } from "./to-foods";

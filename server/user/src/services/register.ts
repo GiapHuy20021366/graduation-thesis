@@ -38,13 +38,10 @@ export const registAccountByManual = async (
     });
   }
 
-  const token = signToken(
-    {
-      ...info,
-      password: hashText(info.password),
-    },
-    "1h"
-  );
+  const token = signToken({
+    ...info,
+    password: hashText(info.password),
+  });
 
   // send email to user
   RabbitMQ.instance.publicMessage(

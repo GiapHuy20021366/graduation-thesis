@@ -1,8 +1,9 @@
 import React from "react";
 import { Avatar, Box, Stack, StackProps, Typography } from "@mui/material";
-import { INotificationGroup } from "../../../../../../data";
+import { INotificationGroup, toFoods } from "../../../../../../data";
 import SquareContainer from "../../../../../common/custom/SquareContainer";
-import { useComponentLanguage } from "../../../../../../hooks";
+import { applicationPages, useComponentLanguage } from "../../../../../../hooks";
+import StyledLink from "../../../../../common/navigate/StyledLink";
 
 type NotificationFoodSuggestedAroundProps = StackProps & {
   group: INotificationGroup;
@@ -36,26 +37,32 @@ const NotificationFoodSuggestedAround = React.forwardRef<
   const lang = useComponentLanguage("NotificationExposed");
   const data = toExposed(group);
   return (
-    <Stack
-      ref={ref}
-      {...props}
-      sx={{
-        width: "100%",
-        ...(rest.sx ?? {}),
-      }}
-      gap={3}
-      direction={"row"}
-      p={1}
+    <StyledLink
+      to={applicationPages.FOOD_VIEW}
+      key={group._id}
+      state={{ foodIds: toFoods(data) }}
     >
-      <Box width={"60px"}>
-        <SquareContainer size={"60px"}>
-          <Avatar sx={{ width: "100%", height: "100%" }} />
-        </SquareContainer>
-      </Box>
-      <Typography>
-        {lang("food-suggested-around", data.foods.length)}
-      </Typography>
-    </Stack>
+      <Stack
+        ref={ref}
+        {...props}
+        sx={{
+          width: "100%",
+          ...(rest.sx ?? {}),
+        }}
+        gap={3}
+        direction={"row"}
+        p={1}
+      >
+        <Box width={"60px"}>
+          <SquareContainer size={"60px"}>
+            <Avatar sx={{ width: "100%", height: "100%" }} />
+          </SquareContainer>
+        </Box>
+        <Typography>
+          {lang("food-suggested-around", data.foods.length)}
+        </Typography>
+      </Stack>
+    </StyledLink>
   );
 });
 

@@ -43,55 +43,26 @@ const NotificationItemExposed = React.forwardRef<
       }}
     >
       {type === NotificationType.FOOD_EXPIRED && (
-        <StyledLink to={applicationPages.FOOD} key={group._id}>
-          <NotificationFoodExpired group={group} key={group._id} />
-        </StyledLink>
+        <NotificationFoodExpired group={group} key={group._id} />
       )}
       {type === NotificationType.FOOD_LIKED && (
-        <StyledLink
-          to={applicationPages.FOOD_VIEWER.replace(
-            ":id",
-            group.datas[0].typedFoods![0]
-          )}
-          key={group._id}
-        >
-          <NotificationFoodLike group={group} key={group._id} />
-        </StyledLink>
+        <NotificationFoodLike group={group} key={group._id} />
       )}
       {type === NotificationType.FOOD_NEAR_EXPIRED && (
-        <StyledLink to={applicationPages.FOOD} key={group._id}>
-          <NotificationFoodNearExpired group={group} key={group._id} />
-        </StyledLink>
+        <NotificationFoodNearExpired group={group} key={group._id} />
       )}
 
       {type === NotificationType.FOOD_SUBCRIBED_PLACE && (
-        <StyledLink
-          to={applicationPages.HOME + "?tab=registed"}
-          key={group._id}
-        >
-          <NotificationFoodSubcribedPlace group={group} key={group._id} />
-        </StyledLink>
+        <NotificationFoodSubcribedPlace group={group} key={group._id} />
       )}
       {type === NotificationType.FOOD_SUBCRIBED_USER && (
-        <StyledLink
-          to={applicationPages.HOME + "?tab=registed"}
-          key={group._id}
-        >
-          <NotificationFoodSubcribedUser group={group} key={group._id} />
-        </StyledLink>
+        <NotificationFoodSubcribedUser group={group} key={group._id} />
       )}
       {type === NotificationType.FOOD_SUGGESTED_AROUND && (
-        <StyledLink to={applicationPages.HOME + "?tab=around"} key={group._id}>
-          <NotificationFoodSuggestedAround group={group} key={group._id} />
-        </StyledLink>
+        <NotificationFoodSuggestedAround group={group} key={group._id} />
       )}
       {type === NotificationType.FOOD_SUGGESTED_CATEGORY && (
-        <StyledLink
-          to={applicationPages.HOME + "?tab=suggested"}
-          key={group._id}
-        >
-          <NotificationFoodSuggestedCategory group={group} key={group._id} />
-        </StyledLink>
+        <NotificationFoodSuggestedCategory group={group} key={group._id} />
       )}
       {type === NotificationType.PLACE_INACTIVE && (
         <StyledLink

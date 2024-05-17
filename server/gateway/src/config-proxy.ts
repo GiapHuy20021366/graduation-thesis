@@ -37,6 +37,9 @@ export const withProxy = (app: Express): void => {
   const excludeList = toExcludeList(endpoints);
   app.use((req: Request, res: Response, next: NextFunction) => {
     const pathName = req.path;
+    if (!pathName.startsWith("/api")) {
+      return next();
+    }
     if (!excludeList.has(pathName)) {
       const verified = verifyToken(req.headers.authorization);
       if (verified == null || typeof verified === "string") {

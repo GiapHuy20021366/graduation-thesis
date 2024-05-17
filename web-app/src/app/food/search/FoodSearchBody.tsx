@@ -87,18 +87,18 @@ const toSearchParams = (
   const result: IFoodSearchParams = {};
 
   result.category = context.categories;
-  result.time = {};
+  result.duration = {};
   if (context.maxDuration != null) {
-    result.time.to = Date.now() + context.maxDuration * 24 * 60 * 60 * 1000;
+    result.duration.to = Date.now() + context.maxDuration * 24 * 60 * 60 * 1000;
   }
   switch (context.available) {
     case "ALL":
       break;
     case "AVAILABLE_ONLY":
-      result.time.from = Date.now();
+      result.duration.from = Date.now();
       break;
     case "JUST_GONE":
-      result.time.to = Date.now() - 1;
+      result.duration.to = Date.now() - 1;
   }
   if (context.minQuantity != null) {
     result.quantity = {
@@ -464,7 +464,7 @@ export default function FoodSearchBody() {
           element.scrollHeight * 0.95 <=
           element.scrollTop + element.clientHeight;
         if (isAtBottom && !loader.isEnd && !loader.isFetching) {
-          doSearch();
+          doSearchMore();
         }
       };
       mainRef.addEventListener("scroll", listener);
@@ -474,7 +474,6 @@ export default function FoodSearchBody() {
     };
   }, [
     appContentContext.mainRef,
-    doSearch,
     doSearchMore,
     loader.isEnd,
     loader.isFetching,

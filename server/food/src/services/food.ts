@@ -400,7 +400,7 @@ export const userLikeOrUnlikeFoodPost = async (
     foodPost.likeCount = newLikeCount;
     await foodPost.save();
     // Notify
-    notifyLikedFood(userId, foodPostId);
+    notifyLikedFood(foodPost.user, foodPostId);
     return toFoodUserLikeExposed(newLike);
   }
 

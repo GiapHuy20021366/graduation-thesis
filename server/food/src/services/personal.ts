@@ -42,7 +42,8 @@ export const getFavoriteFoods = async (
   pagination?: IPagination
 ): Promise<IFoodPostExposed[]> => {
   const cached = await getUserCached(userId);
-  if (cached == null) return [];
+  const location = cached?.location?.coordinates;
+  if (cached == null || location == null) return [];
 
   const { categories, favorite } = cached;
   const { loveds, rateds } = favorite;
@@ -54,6 +55,14 @@ export const getFavoriteFoods = async (
 
   const foods = await FoodPost.aggregate<HydratedDocument<IFoodPostSchema>>([
     {
+      $geoNear: {
+        near: { type: "Point", coordinates: [location.lng, location.lat] },
+        distanceField: "distance",
+        maxDistance: 15000,
+        spherical: true,
+      },
+    },
+    {
       $match: {
         active: true,
         resolved: false,
@@ -61,27 +70,31 @@ export const getFavoriteFoods = async (
           $ne: userId,
         },
         duration: {
-          $gt: Date.now(),
+          $gt: new Date(),
         },
-      },
-    },
-    { $unwind: "$categories" },
-    {
-      $project: {
-        _id: 1,
-        category: "$categories",
-        point: {
-          $arrayElemAt: [{ $objectToArray: categoryToScrore }, "$categories"],
-        },
+        // "location.two_array": {
+        //   $geoWithin: {
+        //     $centerSphere: [[location.lng, location.lat], 15000 / 6378100],
+        //   },
+        // },
       },
     },
     {
-      $group: {
-        _id: "$_id",
-        total_points: { $sum: "$point" },
+      $addFields: {
+        totalScore: {
+          $reduce: {
+            input: "$categories",
+            initialValue: 0,
+            in: {
+              $add: ["$$value", { $ifNull: [categoryToScrore["$$this"], 0] }],
+            },
+          },
+        },
       },
     },
-    { $sort: { total_points: -1 } },
+    {
+      $sort: { totalScore: -1 },
+    },
     { $skip: pagination?.skip ?? 0 },
     { $limit: pagination?.limit ?? 24 },
   ]).exec();

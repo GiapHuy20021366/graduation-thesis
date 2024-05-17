@@ -29,9 +29,9 @@ import FoodPostButtonWithMenu from "../food/post/FoodPostButtonWithMenu";
 import ButtonShareAction from "../common/util/ButtonShareAction";
 
 type HomeFoodItemDataProps = CardProps & {
-  onExpandFood?: () => void;
-  onExpandAuthor?: () => void;
-  onExpandPlace?: () => void;
+  onExpandFood?: (id: string) => void;
+  onExpandAuthor?: (id: string) => void;
+  onExpandPlace?: (id: string) => void;
   item: IFoodPostTagged;
   isLoading: boolean;
 };
@@ -63,6 +63,9 @@ const HomeFoodItemData = React.forwardRef<
   const { food, likeFood } = context;
   const lang = useComponentLanguage();
 
+  const authorId = typeof item.user === "string" ? item.user : item.user._id;
+  const placeId = typeof item.place === "string" ? item.place : item.place?._id;
+
   return (
     <Card
       ref={ref}
@@ -79,10 +82,10 @@ const HomeFoodItemData = React.forwardRef<
           ) : (
             <FoodAvatars
               food={food}
-              onClick={() => onExpandAuthor && onExpandAuthor()}
+              onClick={() => onExpandAuthor && onExpandAuthor(authorId)}
               SecondaryAvatarProps={{
                 onClick: () => {
-                  onExpandPlace && onExpandPlace();
+                  onExpandPlace && onExpandPlace(placeId!);
                 },
               }}
             />
@@ -103,7 +106,7 @@ const HomeFoodItemData = React.forwardRef<
       <CardContent
         sx={{ py: 0, cursor: "pointer" }}
         onClick={() => {
-          onExpandFood && onExpandFood();
+          onExpandFood && onExpandFood(item._id);
         }}
       >
         {/* <Carousel

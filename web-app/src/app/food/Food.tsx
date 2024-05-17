@@ -4,6 +4,7 @@ import FoodSearchPage from "./search/FoodSearchPage";
 import FoodPost from "./post/FoodPost";
 import FoodList from "./list/FoodList";
 import FoodAroundPage from "./around/FoodAroundPage";
+import View from "./view/View";
 
 export default function Food() {
   return (
@@ -12,6 +13,7 @@ export default function Food() {
       <Route path="/sharing" element={<FoodSharingPage />} />
       <Route path="/search" element={<FoodSearchPage />} />
       <Route path="/around" element={<FoodAroundPage />} />
+      <Route path="/view" element={<View />} />
       <Route path="/:id" element={<FoodPost />} />
     </Routes>
   );

@@ -14,6 +14,7 @@ export const applicationPages = {
   FOOD_VIEWER: "/food/:id",
   FOOD_SHARING: "/food/sharing",
   FOOD_AROUND: "/food/around",
+  FOOD_VIEW: "/food/view",
   SET_LOCATION: "/location",
   SETTING: "/setting",
   UNKNOWN: "/unknown",

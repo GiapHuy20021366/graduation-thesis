@@ -417,7 +417,8 @@
         "verifying": "Đang xác thực",
         "SYSTEM_USER": "Người dùng hệ thống",
         "conversation-title": "Nhắn tin",
-        "set-my-location": "Đặt vị trí của tôi"
+        "set-my-location": "Đặt vị trí của tôi",
+        "food-view": "Danh sách thực phẩm"
     },
     "Toasts": {
         "can-not-sharing-now": "Không thể chia sẻ thực phẩm vào lúc này",

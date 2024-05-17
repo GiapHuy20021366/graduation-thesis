@@ -99,7 +99,7 @@ export interface IGroupFoodAggregate {
 export const notifyAroundFoodToUsers = async () => {
   const square = 10; // km
   const divider = square / 111.111;
-  const limit = 5;
+  const limit = 24;
   let skip: number = 0;
   let total: number = 0;
   // Get near 24h found
@@ -111,10 +111,10 @@ export const notifyAroundFoodToUsers = async () => {
             active: true,
             resolved: false,
             duration: {
-              $gt: Date.now(),
+              $gt: new Date(),
             },
             createdAt: {
-              $gt: Date.now() - 24 * 60 * 60 * 1000,
+              $gt: new Date(Date.now() - 24 * 60 * 60 * 1000),
             },
           },
         },
@@ -171,6 +171,7 @@ export const notifyAroundFoodToUsers = async () => {
         })
           .select("_id")
           .then((data) => {
+            // consoleLogger.info("Users", data.length);
             const ids = data.map((d) => d.user);
             if (ids.length > 0) {
               RabbitMQ.instance.publicMessage(
