@@ -1,8 +1,9 @@
 import React from "react";
 import { Avatar, Box, Stack, StackProps, Typography } from "@mui/material";
-import { INotificationGroup } from "../../../../../../data";
+import { INotificationGroup, toFoods } from "../../../../../../data";
 import SquareContainer from "../../../../../common/custom/SquareContainer";
-import { useComponentLanguage } from "../../../../../../hooks";
+import { applicationPages, useComponentLanguage } from "../../../../../../hooks";
+import StyledLink from "../../../../../common/navigate/StyledLink";
 
 type NotificationFoodAroundProps = StackProps & {
   group: INotificationGroup;
