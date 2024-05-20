@@ -385,7 +385,7 @@ export default function FoodSearchBody() {
     searchContext.setAvailable(params.available);
     searchContext.setMaxDistance(params.maxDistance);
     searchContext.setMaxDuration(params.maxDuration);
-    searchContext.setCategories(params.categories);
+    searchContext.setCategories(params.category);
     searchContext.setMinQuantity(params.minQuantity);
     searchContext.setPrice(params.price);
     const order = toOrder(tab, {

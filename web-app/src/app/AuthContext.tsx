@@ -112,7 +112,7 @@ export default function AuthContextProvider({
         setAccount(account);
         setToken(account?.token);
         localStorage.setItem("account", JSON.stringify(account));
-        localStorage.setAuth("auth", JSON.stringify(auth));
+        localStorage.setItem("auth", JSON.stringify(auth));
       })
       .catch((error) => {
         console.error(error);

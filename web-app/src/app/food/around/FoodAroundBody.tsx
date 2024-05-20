@@ -280,7 +280,7 @@ export default function FoodAroundBody() {
     const accountId = authContext.account?._id;
 
     const paramsToSearch: IFoodSearchParams = {
-      category: params.categories,
+      category: params.category,
       active: true,
       resolved: false,
       addedBy: params.addedBy,
@@ -333,7 +333,7 @@ export default function FoodAroundBody() {
     searchContext.setAvailable(params.available);
     searchContext.setMaxDistance(params.maxDistance);
     searchContext.setMaxDuration(params.maxDuration);
-    searchContext.setCategories(params.categories);
+    searchContext.setCategories(params.category);
     searchContext.setMinQuantity(params.minQuantity);
     searchContext.setPrice(params.price);
   };

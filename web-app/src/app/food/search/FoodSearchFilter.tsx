@@ -44,7 +44,7 @@ export interface IFilterParams {
   available: ItemAvailable;
   maxDistance?: number;
   maxDuration?: number;
-  categories?: FoodCategory[];
+  category?: FoodCategory[];
   minQuantity?: number;
   price?: IFoodSearchPrice;
 }
@@ -122,7 +122,7 @@ export default function FoodSearchFilter({
       available: available,
       maxDistance: maxDistance,
       maxDuration: maxDuration,
-      categories: categoryActive ? categories : undefined,
+      category: categoryActive ? categories : undefined,
       minQuantity: minQuantity,
       price: price,
     };
