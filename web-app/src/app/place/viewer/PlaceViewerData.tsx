@@ -1,6 +1,10 @@
 import { SpeedDial, Stack, Tooltip } from "@mui/material";
 import PlaceViewerHeader from "./PlaceViewerHeader";
-import { IPlaceExposedWithRatingAndFollow } from "../../../data";
+import {
+  FollowType,
+  IAccountExposed,
+  IPlaceExposedWithRatingAndFollow,
+} from "../../../data";
 import PlaceViewerTabs from "./PlaceViewerTabs";
 import { useState } from "react";
 import { PlaceViewerTab } from "./place-viewer-tab";
@@ -9,15 +13,31 @@ import PlaceViewerSubcribed from "./PlaceViewerSubcribed";
 import PlaceViewerShared from "./PlaceViewerShared";
 import { Add } from "@mui/icons-material";
 import StyledLink from "../../common/navigate/StyledLink";
-import { useComponentLanguage } from "../../../hooks";
+import { useAuthContext, useComponentLanguage } from "../../../hooks";
 
 interface PlaceViewerDataProps {
   data: IPlaceExposedWithRatingAndFollow;
 }
+const isPermitEdit = (
+  place: IPlaceExposedWithRatingAndFollow,
+  account?: IAccountExposed
+): boolean => {
+  if (account == null) return false;
+  if (place.userFollow == null) return false;
+  if (
+    place.userFollow.type !== FollowType.ADMIN ||
+    place.userFollow.subcriber !== account._id
+  )
+    return false;
+  return true;
+};
 
 export default function PlaceViewerData({ data }: PlaceViewerDataProps) {
   const [tab, setTab] = useState<PlaceViewerTab>(0);
   const lang = useComponentLanguage();
+  const authContext = useAuthContext();
+  const isEditable = isPermitEdit(data, authContext.account);
+
   return (
     <Stack width={"100%"} boxSizing={"border-box"} boxShadow={1} gap={0} px={1}>
       <PlaceViewerHeader place={data} />
@@ -63,20 +83,22 @@ export default function PlaceViewerData({ data }: PlaceViewerDataProps) {
         />
       </>
 
-      <StyledLink to={`/food/sharing?place=${data._id}`}>
-        <Tooltip
-          arrow
-          children={
-            <SpeedDial
-              icon={<Add />}
-              ariaLabel={lang("place-add-food-label")}
-              sx={{ position: "fixed", bottom: 76, right: 26 }}
-            />
-          }
-          title={lang("place-add-food-label")}
-          placement="left"
-        />
-      </StyledLink>
+      {isEditable && (
+        <StyledLink to={`/food/sharing?place=${data._id}`}>
+          <Tooltip
+            arrow
+            children={
+              <SpeedDial
+                icon={<Add />}
+                ariaLabel={lang("place-add-food-label")}
+                sx={{ position: "fixed", bottom: 76, right: 26 }}
+              />
+            }
+            title={lang("place-add-food-label")}
+            placement="left"
+          />
+        </StyledLink>
+      )}
     </Stack>
   );
 }

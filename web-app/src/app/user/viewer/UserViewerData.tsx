@@ -9,11 +9,17 @@ import UserViewerSubcribed from "./UserViewerSubcribed";
 import UserViewerPlace from "./UserViewerPlace";
 import { Add } from "@mui/icons-material";
 import StyledLink from "../../common/navigate/StyledLink";
-import { applicationPages, useComponentLanguage } from "../../../hooks";
+import {
+  applicationPages,
+  useComponentLanguage,
+  useUserViewerContext,
+} from "../../../hooks";
 
 export default function UserViewerData() {
   const [tab, setTab] = useState<UserViewerTab>(0);
   const lang = useComponentLanguage();
+  const viewer = useUserViewerContext();
+  const { isEditable } = viewer;
   return (
     <Stack width={"100%"} boxSizing={"border-box"} boxShadow={1} gap={2} px={1}>
       <UserViewerHeader />
@@ -36,14 +42,16 @@ export default function UserViewerData() {
 
         <UserViewerSubcribed active={tab === UserViewerTab.SUBCRIBED} />
       </>
-      <StyledLink
-        to={applicationPages.FOOD_SHARING}
-        style={{ position: "fixed", bottom: 76, right: 26 }}
-      >
-        <Tooltip arrow title={lang("add-food")} placement="left">
-          <SpeedDial icon={<Add />} ariaLabel={"Add food"} />
-        </Tooltip>
-      </StyledLink>
+      {isEditable && (
+        <StyledLink
+          to={applicationPages.FOOD_SHARING}
+          style={{ position: "fixed", bottom: 76, right: 26 }}
+        >
+          <Tooltip arrow title={lang("add-food")} placement="left">
+            <SpeedDial icon={<Add />} ariaLabel={"Add food"} />
+          </Tooltip>
+        </StyledLink>
+      )}
     </Stack>
   );
 }

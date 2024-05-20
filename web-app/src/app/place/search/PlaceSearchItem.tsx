@@ -8,6 +8,7 @@ import {
   StarBorderOutlined,
 } from "@mui/icons-material";
 import StyledLink from "../../common/navigate/StyledLink";
+import { useComponentLanguage } from "../../../hooks";
 
 type PlaceSearchItemProps = StackProps & {
   data: IPlaceExposedCooked;
@@ -17,7 +18,7 @@ type PlaceSearchItemProps = StackProps & {
 const PlaceSearchItem = React.forwardRef<HTMLDivElement, PlaceSearchItemProps>(
   (props, ref) => {
     const { data, onBeforeNavigate, ...rest } = props;
-
+    const lang = useComponentLanguage();
     return (
       <Stack
         ref={ref}
@@ -25,7 +26,7 @@ const PlaceSearchItem = React.forwardRef<HTMLDivElement, PlaceSearchItemProps>(
         {...rest}
         sx={{
           width: "100%",
-          gap: 1,
+          gap: [1, 2, 3],
           py: 1,
           alignItems: "center",
           ...(props.sx ?? {}),
@@ -66,14 +67,24 @@ const PlaceSearchItem = React.forwardRef<HTMLDivElement, PlaceSearchItemProps>(
           <Stack direction="row" gap={1}>
             <StarBorderOutlined color="secondary" />
             <Typography>
-              {data.rating.count} lượt, đánh giá {data.rating.mean.toFixed(1)}
-              /5.0
+              {lang(
+                "rated-point",
+                data.rating.count,
+                data.rating.mean.toFixed(1),
+                "5.0"
+              )}
             </Typography>
           </Stack>
 
           <Stack gap={1} direction={"row"}>
             <SocialDistanceOutlined color="info" />
-            <Typography>{data.currentDistance ?? 0} Kms</Typography>
+            <Typography>
+              {lang(
+                "distance-x",
+                ((data.currentDistance ?? 0) * 1000).toFixed(0),
+                "m"
+              )}
+            </Typography>
           </Stack>
           <Stack gap={1} direction={"row"}>
             <LocationOnOutlined color="success" />

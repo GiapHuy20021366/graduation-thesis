@@ -418,7 +418,9 @@
         "SYSTEM_USER": "Người dùng hệ thống",
         "conversation-title": "Nhắn tin",
         "set-my-location": "Đặt vị trí của tôi",
-        "food-view": "Danh sách thực phẩm"
+        "food-view": "Danh sách thực phẩm",
+        "require-exposedName": "Tên hiển thị là bắt buộc",
+        "place-around-label": "Địa điểm xung quanh"
     },
     "Toasts": {
         "can-not-sharing-now": "Không thể chia sẻ thực phẩm vào lúc này",

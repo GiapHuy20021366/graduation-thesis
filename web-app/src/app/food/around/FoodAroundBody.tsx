@@ -171,8 +171,12 @@ export default function FoodAroundBody() {
       lat: center.lat(),
       lng: center.lng(),
     };
+    const accountId = authContext.account?._id;
 
     const params: IFoodSearchParams = {
+      user: {
+        exclude: accountId ? [accountId] : undefined,
+      },
       category: searchContext.categories,
       active: true,
       resolved: false,
@@ -188,25 +192,25 @@ export default function FoodAroundBody() {
       },
       pagination: {
         skip: 0,
-        limit: 5000,
+        limit: Number.MAX_SAFE_INTEGER,
       },
       order: {
         distance: OrderState.INCREASE,
       },
     };
-    params.time = {};
+    params.duration = {};
     if (searchContext.maxDuration != null) {
-      params.time.to =
+      params.duration.to =
         Date.now() + searchContext.maxDuration * 24 * 60 * 60 * 1000;
     }
     switch (searchContext.available) {
       case "ALL":
         break;
       case "AVAILABLE_ONLY":
-        params.time.from = Date.now();
+        params.duration.from = Date.now();
         break;
       case "JUST_GONE":
-        params.time.to = Date.now() - 1;
+        params.duration.to = Date.now() - 1;
     }
     if (searchContext.minQuantity != null) {
       params.quantity = {
@@ -216,7 +220,17 @@ export default function FoodAroundBody() {
     searchFood(params);
     setOpenFood(undefined);
     setInfoOpen(undefined);
-  }, [searchContext, searchFood]);
+  }, [
+    authContext.account?._id,
+    searchContext.addedBy,
+    searchContext.available,
+    searchContext.categories,
+    searchContext.maxDistance,
+    searchContext.maxDuration,
+    searchContext.minQuantity,
+    searchContext.price,
+    searchFood,
+  ]);
 
   const dirty = useDirty();
   useEffect(() => {

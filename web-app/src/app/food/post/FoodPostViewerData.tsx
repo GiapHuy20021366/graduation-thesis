@@ -76,6 +76,11 @@ export default function FoodPostViewerData() {
 
   const { active, resolved, resolveTime } = data;
 
+  const distance = toDistance(
+    data.location.coordinates,
+    appContentContext.currentLocation
+  );
+
   return (
     <Box width={"100%"}>
       <Carousel
@@ -164,11 +169,7 @@ export default function FoodPostViewerData() {
           <Stack direction={"row"} gap={1}>
             <SocialDistanceOutlined color="info" />
             <Typography>
-              {toDistance(
-                data.location.coordinates,
-                appContentContext.currentLocation
-              )}{" "}
-              kms
+              {lang("distance-x", (distance * 1000).toFixed(0), "m")}
             </Typography>
           </Stack>
           <Stack direction="row">
@@ -275,10 +276,16 @@ export default function FoodPostViewerData() {
                 <SocialDistanceOutlined color="info" />
                 <Typography>
                   {user.location?.name
-                    ? toDistance(
-                        user.location?.coordinates,
-                        appContentContext.currentLocation
-                      ) + "km"
+                    ? lang(
+                        "distance-x",
+                        (
+                          toDistance(
+                            user.location?.coordinates,
+                            appContentContext.currentLocation
+                          ) * 1000
+                        ).toFixed(0),
+                        "m"
+                      )
                     : lang("no-address")}
                 </Typography>
               </Stack>

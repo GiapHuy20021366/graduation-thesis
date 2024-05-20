@@ -61,7 +61,9 @@ export default function PlaceEditForm() {
       .then((datas) => {
         const place = datas.data;
         if (place != null) {
-          navigate(`/place/${place._id}`);
+          navigate(`/place/${place._id}`, {
+            replace: true,
+          });
         }
       })
       .catch(() => {

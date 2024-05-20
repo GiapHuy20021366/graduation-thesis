@@ -21,6 +21,7 @@ import { toDistance } from "../../data";
 import {
   useAppContentContext,
   useComponentLanguage,
+  useConversationContext,
   useFoodPostViewerContext,
 } from "../../hooks";
 import CountDown from "../common/util/CountDown";
@@ -62,6 +63,7 @@ const HomeFoodItemData = React.forwardRef<
   const context = useFoodPostViewerContext();
   const { food, likeFood } = context;
   const lang = useComponentLanguage();
+  const conversationContext = useConversationContext();
 
   const authorId = typeof item.user === "string" ? item.user : item.user._id;
   const placeId = typeof item.place === "string" ? item.place : item.place?._id;
@@ -190,7 +192,13 @@ const HomeFoodItemData = React.forwardRef<
               link={new URL(`/food/${item._id}`, window.location.href).href}
             />
           </Tooltip>
-          <Tooltip arrow title={lang("send-message")}>
+          <Tooltip
+            arrow
+            title={lang("send-message")}
+            onClick={() =>
+              conversationContext.doBeginConversationWith(authorId)
+            }
+          >
             <IconButton color="secondary">
               <Send sx={{ rotate: "-45deg" }} />
             </IconButton>

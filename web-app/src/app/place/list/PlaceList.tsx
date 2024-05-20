@@ -12,6 +12,7 @@ import {
   HomeOutlined,
   NotificationsActiveOutlined,
   PeopleAltOutlined,
+  PlaceOutlined,
   SearchOutlined,
 } from "@mui/icons-material";
 import MyPlace from "./MyPlace";
@@ -149,6 +150,20 @@ export default function PlaceList() {
       <SubcribedPlace active={tab === PlacePageTab.SUBCRIBED} />
       <RatingPlace active={tab === PlacePageTab.RATING} />
 
+      <StyledLink to={applicationPages.USER_AROUND}>
+        <Tooltip
+          arrow
+          children={
+            <SpeedDial
+              icon={<PlaceOutlined />}
+              sx={{ position: "fixed", bottom: 196, right: 26 }}
+              ariaLabel={lang("place-around-label")}
+            />
+          }
+          title={lang("around-label")}
+          placement="left"
+        />
+      </StyledLink>
       <StyledLink to={applicationPages.PLACE_UPDATE}>
         <Tooltip
           arrow

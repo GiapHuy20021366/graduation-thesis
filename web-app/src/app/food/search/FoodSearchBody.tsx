@@ -21,6 +21,7 @@ import {
   IFoodSeachOrder,
   IFoodSearchParams,
   toNextOrderState,
+  toOrderedFood,
 } from "../../../data";
 import FoodSearchItem from "./FoodSearchItem";
 import FoodSearchFilter, { IFilterParams } from "./FoodSearchFilter";
@@ -260,7 +261,11 @@ export default function FoodSearchBody() {
             if (datas.length < 24) {
               loader.setIsEnd(true);
             }
-            setFoods(datas);
+            const sorted = toOrderedFood(datas, {
+              order: params.order,
+              current: appContentContext.currentLocation,
+            });
+            setFoods(sorted);
           }
         })
         .catch(() => {
@@ -271,7 +276,7 @@ export default function FoodSearchBody() {
           doSaveStorage();
         });
     },
-    [auth, doSaveStorage, loader]
+    [appContentContext.currentLocation, auth, doSaveStorage, loader]
   );
 
   const doSearch = useCallback(() => {
@@ -399,6 +404,26 @@ export default function FoodSearchBody() {
             }
           : undefined,
     };
+    searchParams.duration = {};
+    if (params.maxDuration != null) {
+      searchParams.duration.to =
+        Date.now() + params.maxDuration * 24 * 60 * 60 * 1000;
+    }
+    switch (params.available) {
+      case "ALL":
+        break;
+      case "AVAILABLE_ONLY":
+        searchParams.duration.from = Date.now();
+        break;
+      case "JUST_GONE":
+        searchParams.duration.to = Date.now() - 1;
+    }
+    if (params.minQuantity != null) {
+      searchParams.quantity = {
+        min: params.minQuantity,
+      };
+    }
+
     searchFood(searchParams);
   };
 
@@ -434,7 +459,11 @@ export default function FoodSearchBody() {
           if (datas.length < 24) {
             loader.setIsEnd(true);
           }
-          const newData = [...foods, ...datas];
+          const sorted = toOrderedFood(datas, {
+            order: params.order,
+            current: params.distance?.current,
+          });
+          const newData = [...foods, ...sorted];
           setFoods(newData);
         }
       })

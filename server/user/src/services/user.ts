@@ -33,7 +33,6 @@ export const getUser = async (
 
   if (detail) {
     const numFollowers = await Follower.count({
-      type: FollowType.SUBCRIBER,
       role: FollowRole.USER,
       user: id,
     });

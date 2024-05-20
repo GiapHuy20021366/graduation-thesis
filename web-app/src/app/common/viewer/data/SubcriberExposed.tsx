@@ -1,6 +1,11 @@
 import React from "react";
 import { Avatar, Stack, StackProps, Typography } from "@mui/material";
-import { FollowType, IFollowerExposed, toTimeInfo } from "../../../../data";
+import {
+  FollowRole,
+  FollowType,
+  IFollowerExposed,
+  toTimeInfo,
+} from "../../../../data";
 import { useComponentLanguage } from "../../../../hooks";
 import StyledLink from "../../navigate/StyledLink";
 
@@ -69,6 +74,11 @@ const SubcriberExposed = React.forwardRef<HTMLDivElement, SubciberExposedProps>(
 
           <Typography>
             {[data.type].map((followType) => {
+              if (data.role === FollowRole.USER) {
+                return `${lang("subcriber-from")}  ${times.day}/${
+                  times.month
+                }/${times.year}`;
+              }
               switch (followType) {
                 case FollowType.ADMIN:
                   return `${lang("admin-create-from")}  ${times.day}/${

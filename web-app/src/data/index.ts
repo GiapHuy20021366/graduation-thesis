@@ -192,3 +192,4 @@ export {
   utilRetry,
 } from "./hook-fetch-like";
 export { toFoods } from "./to-foods";
+export { toOrderedDistance, toOrderedFood } from "./to-ordered-food";
