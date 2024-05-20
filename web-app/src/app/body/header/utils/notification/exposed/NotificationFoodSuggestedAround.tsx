@@ -2,7 +2,11 @@ import React from "react";
 import { Avatar, Box, Stack, StackProps, Typography } from "@mui/material";
 import { INotificationGroup, toFoods } from "../../../../../../data";
 import SquareContainer from "../../../../../common/custom/SquareContainer";
-import { applicationPages, useComponentLanguage } from "../../../../../../hooks";
+import {
+  applicationPages,
+  useAuthContext,
+  useComponentLanguage,
+} from "../../../../../../hooks";
 import StyledLink from "../../../../../common/navigate/StyledLink";
 
 type NotificationFoodSuggestedAroundProps = StackProps & {
@@ -36,6 +40,7 @@ const NotificationFoodSuggestedAround = React.forwardRef<
   const { group, ...rest } = props;
   const lang = useComponentLanguage("NotificationExposed");
   const data = toExposed(group);
+  const authContext = useAuthContext();
   return (
     <StyledLink
       to={applicationPages.FOOD_VIEW}
@@ -55,7 +60,10 @@ const NotificationFoodSuggestedAround = React.forwardRef<
       >
         <Box width={"60px"}>
           <SquareContainer size={"60px"}>
-            <Avatar sx={{ width: "100%", height: "100%" }} />
+            <Avatar
+              sx={{ width: "100%", height: "100%" }}
+              src={authContext.account?.avatar}
+            />
           </SquareContainer>
         </Box>
         <Typography>

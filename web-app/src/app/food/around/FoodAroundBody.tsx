@@ -294,7 +294,7 @@ export default function FoodAroundBody() {
       },
       distance: {
         current: current,
-        max: searchContext.maxDistance ?? 2,
+        max: params.maxDistance ?? 2,
       },
       pagination: {
         skip: 0,

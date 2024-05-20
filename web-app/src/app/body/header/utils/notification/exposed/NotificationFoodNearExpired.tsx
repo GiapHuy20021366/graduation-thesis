@@ -4,6 +4,7 @@ import { INotificationGroup, toFoods } from "../../../../../../data";
 import SquareContainer from "../../../../../common/custom/SquareContainer";
 import {
   applicationPages,
+  useAuthContext,
   useComponentLanguage,
 } from "../../../../../../hooks";
 import StyledLink from "../../../../../common/navigate/StyledLink";
@@ -39,6 +40,7 @@ const NotificationFoodNearExpired = React.forwardRef<
   const { group, ...rest } = props;
   const lang = useComponentLanguage("NotificationExposed");
   const data = toExposed(group);
+  const authContext = useAuthContext();
   return (
     <StyledLink
       to={applicationPages.FOOD_VIEW}
@@ -58,7 +60,10 @@ const NotificationFoodNearExpired = React.forwardRef<
       >
         <Box width={"60px"}>
           <SquareContainer size={"60px"}>
-            <Avatar sx={{ width: "100%", height: "100%" }} />
+            <Avatar
+              sx={{ width: "100%", height: "100%" }}
+              src={authContext.account?.avatar}
+            />
           </SquareContainer>
         </Box>
         <Typography>{lang("food-near-expired", data.foods.length)}</Typography>

@@ -331,8 +331,8 @@ export default function FoodAroundFilter({
             <ToggleChip variant="outlined" label={"2 km"} value={2} />
             <ToggleChip variant="outlined" label={"5 km"} value={5} />
             <ToggleChip variant="outlined" label={"10 km"} value={10} />
-            <ToggleChip variant="outlined" label={"25 km"} value={25} />
-            <ToggleChip variant="outlined" label={"50 km"} value={50} />
+            {/* <ToggleChip variant="outlined" label={"25 km"} value={25} />
+            <ToggleChip variant="outlined" label={"50 km"} value={50} /> */}
           </ToggleChipGroup>
         </Box>
         <Divider variant="inset" />

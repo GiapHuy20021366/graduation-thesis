@@ -143,17 +143,21 @@ export default function HomeViewerContextProvider({
               .searchFood(
                 {
                   user: {
-                    // exclude: [account._id],
+                    exclude: [account._id],
                   },
                   distance: {
                     current: currentLocation,
                     max: Number.MAX_SAFE_INTEGER,
                   },
-                  // active: true,
+                  active: true,
+                  resolved: false,
                   pagination: pagination,
                   populate: {
                     place: false,
                     user: false,
+                  },
+                  duration: {
+                    from: Date.now(),
                   },
                 },
                 auth

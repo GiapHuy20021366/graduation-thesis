@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Stack, StackProps } from "@mui/material";
 import {
   useAppContentContext,
@@ -58,7 +58,23 @@ const HomeContent = React.forwardRef<HTMLDivElement, HomeContentProps>(
       }
     };
 
+    const isEnd = useCallback(() => {
+      switch (tab) {
+        case homeTabs.ALL:
+          return (
+            aroundLoader.isEnd && registeredLoader.isEnd && favoriteLoader.isEnd
+          );
+        case homeTabs.AROUND:
+          return aroundLoader.isEnd;
+        case homeTabs.REGISTED:
+          return registeredLoader.isEnd;
+        case homeTabs.SUGGESTED:
+          return favoriteLoader.isEnd;
+      }
+    }, [aroundLoader.isEnd, favoriteLoader.isEnd, registeredLoader.isEnd, tab]);
+
     const error = isError();
+    const end = isEnd();
 
     useEffect(() => {
       const main = appContentContext.mainRef?.current;
@@ -70,7 +86,7 @@ const HomeContent = React.forwardRef<HTMLDivElement, HomeContentProps>(
           const isAtBottom =
             element.scrollHeight * 0.95 <=
             element.scrollTop + element.clientHeight;
-          if (isAtBottom && !error && !isLoad) {
+          if (isAtBottom && !error && !isLoad && !end) {
             load();
           }
         };
@@ -81,7 +97,7 @@ const HomeContent = React.forwardRef<HTMLDivElement, HomeContentProps>(
           main.removeEventListener("scroll", listener);
         }
       };
-    }, [appContentContext.mainRef, error, isLoad, load]);
+    }, [appContentContext.mainRef, end, error, isEnd, isLoad, load]);
 
     return (
       <Stack
