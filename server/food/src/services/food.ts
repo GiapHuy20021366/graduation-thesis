@@ -224,7 +224,7 @@ const toFoodSearchBuilder = (params: IFoodSearchParams): QueryBuilder => {
   if (addedBy != null) {
     if (typeof addedBy === "number") {
       if (addedBy === PlaceType.PERSONAL) {
-        builder.value("place.type", null);
+        builder.options["place.type"] = null;
       } else {
         builder.value("place.type", addedBy);
       }

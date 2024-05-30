@@ -33,8 +33,17 @@ app.use(
     origin: [PROXY_URL],
   })
 );
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(
+  bodyParser.json({
+    limit: "10000kb",
+  })
+);
+app.use(
+  bodyParser.urlencoded({
+    limit: "10000kb",
+    extended: true,
+  })
+);
 
 // init endpoints
 initRouter(app);
